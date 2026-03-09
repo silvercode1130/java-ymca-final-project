@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--	
+	마이바티스 참고 사이트
+	  - http://blog.mybatis.org/
+	  - http://www.mybatis.org/mybatis-3/ko/index.html
+	  
+	@Mapper 애노테이션이 적용된 인터페이스와 맵퍼 XML파일은
+	namespace 속성으로 연결되기 때문에 맵퍼 XML의 namespace를
+	지정할 때 @Mapper 애노테이션이 적용된 맵퍼 인터페이스의
+	완전한 클래스 이름(패키지를 포함한 이름)을 지정하면 된다.   
+-->
+<mapper namespace="com.springbootstudy.bbs.mapper.BoardMapper" >
+
+	<!--
+		한 페이지 출력할 게시글 리스트를 가져오는 맵핑 구문
+		
+		테이블의 컬럼명은 일반적으로 언더스코어 표기법("_")을 사용하는 경우가
+		많고 자바 클래스의 인스턴스 맴버는 카멜표기법을 사용한다.
+		application.properties 파일에 MyBatis 설정을 할 때 다음과 같이 설정 했기
+		때문에 별도 설정 없이 컬럼 데이터를 잘 읽어올 수 있다.
+		
+		mybatis.configuration.map-underscore-to-camel-case=true
+		
+		만약 위와 같이 설정할 수 없고 테이블의 컬럼명과 도메인 클래스의 프로퍼티
+		이름이 다른 경우 아래와 같이 SELECT 쿼리에 별칭을 사용해 도메인 클래스의
+		프로퍼티 이름과 동일하게 맞춰야 한다. 그렇지 않으면 오류는 발생하지 않지만
+		해당 컬럼의 데이터를 읽어 올 수 없다. 이외에 ResultMap을 사용해 컬럼명과
+		다른 이름을 가진 도메인 클래스의 프로퍼티를 연결할 수도 있다. 
+		
+		SELECT read_count AS readCount FROM springbbs
+		
+		resultType에 Board를 지정하고 BoardMapper 인터페이스에서 메서드를 정의할 때
+		반환 타입을 List<Board>로 지정하면 MyBatis가 쿼리를 실행한 결과 집합에서
+		한 행의 데이터를 Board 객체로 만들어 List에 담아서 반환되도록 처리해 준다.
+		
+		Oracle에서는 페이징 처리를 위해 의사컬럼인 ROWNUM을 사용했지만
+		MySQL은 검색된 데이터에서 특정 행 번호부터 지정한 개수만큼 행을 읽어오는
+		LIMIT 명령을 제공하고 있다. LIMIT의 첫 번째 매개변수에 가져올 데이터의
+		시작 행을 지정하고 두 번째 매개변수에 가져올 데이터의 개수를 지정하면 된다.
+		
+		BoardMapper 인터페이스에서 현재 페이지에 해당하는 게시글 리스트를 조회할
+		아래 맵핑 구문을 호출할 때 @Param("파라미터 이름") 애노테이션을 사용해
+		파라미터 이름을 "startRow"와 "num"으로 설정하여 맵핑 구문을 호출하면 Map
+		객체에 담겨서 이 맵핑 구문으로 전달된다. 그러므로 parameterType="map"으로
+		설정하고 SQL 쿼리에서 사용할 때는 아래 LIMIT 명령 다음에 파라미터를 지정한
+		것 처럼 Map의 키로 지정한 #{startRow}와 #{num}을 지정하면 된다.	
+	-->
+	<select id="boardList" parameterType="map" resultType="Board">	
+		SELECT 
+			no, 
+			title, 
+			writer, 
+			content, 
+			reg_date AS regDate,
+			read_count AS readCount,
+			pass,
+			file1 
+		FROM springbbs 
+		ORDER BY no DESC
+		LIMIT #{startRow}, #{num}
+	</select>
+
+	<!--
+		전체 게시글 수를 반환하는 맵핑 구문  
+
+		SQL 쿼리 결과가 int형이므로 resultType은 생략했다.
+	-->
+	<select id="getBoardCount">	
+		SELECT 
+			COUNT(no) 
+		FROM springbbs
+	</select>
+	
+	<!--
+		no에 해당하는 게시글 하나를 가져오는 맵핑 구문
+		
+		application.properties 파일에 MyBatis 설정을 할 때 다음과 같이 설정 했기	
+		때문에 resultType에 패키지를 제외하고 클래스 이름을 지정할 수 있다.
+		
+		
+		mybatis.type-aliases-package=com.springbootstudy.bbs.domain
+				
+		parameterType은 기본형(int)이므로 생략할 수 있으며 BoardMapper 인터페이스에서
+		전달된 파라미터는 #{} 로 감싸서 SQL 쿼리에서 사용할 수 있다. 이 맵핑 구문을
+		호출하는 getBoard(int no) 메서드의 파라미터 no를 맵핑 구문의 SQL 쿼리에서
+		사용하려면 다음과 같이 #{no}로 사용하면 된다.
+	-->
+	<select id="getBoard" resultType="Board">
+		SELECT 
+			* 
+		FROM springbbs 
+		WHERE no = #{no}
+	</select>
+	
+	<!-- 
+		게시글을 테이블에 추가하는 맵핑 구문
+			
+		아래는 BoardMapper 인터페이스의 insertBoard(Board board) 메서드에서
+		호출하는 맵핑 구문으로 parameterType을 Board 타입으로 지정하면 된다.
+		아래와 같이 parameterType에 도메인 클래스 타입을 지정하는 경우 VALUES()에 
+		지정하는 값은 getter 메서드를 지정하는 것이 아니라 클래스의 프로퍼티만
+		(인스턴스 변수)를 #{}로 감싸서 지정하면 MyBatis가 알아서 처리해 준다.
+		이 맵핑 구문이 실행되고 반환되는 값은 테이블에 추가된 행의 개수를 정수로
+		반환하는데 반환 값이 필요없다면 resultType은 생략할 수 있다.
+		
+		테이블에 하나의 레코드를 INSERT 할때 자동으로 증가되는 컬럼이나
+		Sequence를 사용하는 컬럼의 값을 읽어 와야 할 때도 있다.
+		보통 자동 증가되는 컬럼의 값은 데이터가 INSERT 된 후에 읽어오고
+		Sequence일 경우 INSERT 이전에 값을 읽어 와야 한다.
+		이렇게 INSERT 작업을 하면서 생성된 키의 값을 읽어 와야 할 경우
+		아래와 같이 useGeneratedKeys="true"를 지정하고 자동 생성된
+		키의 값을 설정할 자바 모델 객체의 프로퍼티 이름을 keyProperty에
+		지정하면 Board 객체의 no 프로퍼티에 값을 설정해 준다.	
+	-->
+	<insert id="insertBoard" parameterType="Board"
+		useGeneratedKeys="true" keyProperty="no">
+		INSERT INTO springbbs(title, writer, content, 
+				reg_date, read_count, pass, file1)
+				
+			VALUES(#{title}, #{writer}, #{content}, 
+				SYSDATE(), #{readCount}, #{pass}, #{file1})
+	</insert>
+	
+	<!--
+		게시판 테이블에서 no에 해당하는 게시글의 비밀번호를 가져오는 맵핑 구문
+	
+		아래는 BoardMapper 인터페이스의 isPassCheck(int no) 메서드에서
+		호출하는 맵핑 구문으로 파라미터 no는 기본형이므로 parameterType은 생략할 수
+		있으며 SQL 쿼리에서 이 파라미터를 사용하려면 #{no}와 같이 지정하면 된다.
+		 
+		반환 값이 자바 기본형 또는 String이면 resultType은 생략할 수 있다.
+	-->
+	<!-- <select id="isPassCheck" resultType="String"> -->
+	<select id="isPassCheck">
+		SELECT 
+			pass
+		FROM springbbs
+		WHERE no = #{no}
+	</select>
+	
+	<!--
+		게시판 테이블에서 no에 해당하는 게시글을 수정하는 맵핑 구문	
+		
+		아래는 DAO 클래스의 updateBoard(Board board) 메서드에서
+		사용하는 맵핑 구문으로 parameterType을 Board 타입으로 지정했다.
+		parameterType에 모델 클래스 타입을 지정하는 경우 VALUES()에 
+		지정하는 값은 getter 메서드를 지정하는 것이 아니라 클래스의 프로퍼티
+		(인스턴스 변수)를 #{}로 감싸서 지정하면 MyBatis가 알아서 처리해 준다.
+	-->
+	<update id="updateBoard" parameterType="Board">
+		UPDATE springbbs 
+			SET title = #{title}, content = #{content},
+				reg_date = SYSDATE()
+		WHERE no = #{no}
+	</update>
+	
+	<!--
+		게시판 테이블에서 no에 해당하는 게시글을 삭제하는 맵핑 구문	
+		
+		아래는 BoardMapper 인터페이스의 deleteBoard(int no) 메서드에서
+		사용하는 맵핑 구문으로 parameterType이 int 형이므로 생략했다.		
+	-->
+	<delete id="deleteBoard">
+		DELETE FROM springbbs
+		WHERE no = #{no}
+	</delete>
+
+	<!--
+		게시판 테이블에서 no에 해당하는 게시글 읽은 횟수를 증가시키는 맵핑 구문
+	-->
+	<update id="incrementReadCount">
+		UPDATE springbbs
+			SET read_count = read_count + 1
+		WHERE no = #{no}
+	</update>
+
+</mapper>	
+
+
+

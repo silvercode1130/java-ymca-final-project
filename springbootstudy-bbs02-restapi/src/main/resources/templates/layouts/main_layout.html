@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<!--/* Thymeleaf와 Thymeleaf Layout을 사용하기 위한 NameSpace 정의 */-->
+<html xmlns:th="http://www.thymeleaf.org"
+		xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>BoardService</title>      
+    <link th:href="@{bootstrap/bootstrap.min.css}" rel="stylesheet" >
+    <script th:src="@{js/jquery-3.7.1.min.js}"></script>
+    <script th:src="@{js/formcheck.js}"></script>
+  </head>
+  <body>
+  	<div class="container">
+ 		<!--/* header */--> 		
+		<!--/* 
+			~{} 표현식은 화면의 조각인 프래그먼트를 지정하는 표현식으로
+			th:replace 속성에 지정했기 때문에 div 요소의 내용을 대체한다.
+			프래그먼트는 ~{경로/파일명::프래그먼트 이름} 형식으로 지정한다.
+			경로는 templates 폴더를 기준으로 상대 경로 방식으로 지정하면 된다. 
+		*/--> 		
+		<div th:replace="~{fragments/header::header}"></div>
+  		<!--/* content : 요청 마다 변경되는 부분 */-->
+  		<div layout:fragment="content"></div>
+  		<!--/* footer */-->
+		<div th:replace="~{fragments/footer::footer}"></div> 
+	</div>	
+    <script th:src="@{bootstrap/bootstrap.bundle.min.js}"></script>    
+  </body>
+</html>
