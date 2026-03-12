@@ -1,0 +1,143 @@
+
+public class MemberVO {
+    private Long   memIdx;        // PK
+    private String memId;         // 로그인 ID
+    private String memPwd;        // 비밀번호 해시
+    private String memName;
+    private String memTel;
+    private String memEmail;
+    private String memIp;
+    private Integer memRoleIdx;   // FK → role.role_idx (권한 등급)
+    private Integer memGradeIdx;  // FK → grade.grade_idx (신용도 등급)
+    private Date   memBday;
+    private Date   memRegdate;
+    private String memIsDeleted;  // 'Y' / 'N'
+    private Date   memDeldate;
+}
+
+public class MemberProfileVO {
+    private Long   memIdx;       // PK & FK → member.mem_idx
+    private String memNickname;
+    private String memIntro;
+    private String memImg;
+}
+
+public class MemberAddrVO {
+    private Long   addrIdx;        // PK
+    private Long   memIdx;         // FK → member.mem_idx
+    private String memZipcode;
+    private String memAddr;
+    private String memAddrDetail;
+    private String isPrimary;      // 'Y' / 'N' 대표 주소 여부
+}
+
+public class RoldVO {
+	private Long roleIdx;	// PK
+	private String roleName;	// 권한등급
+}
+
+public class GradeVO {
+	private Integer gradeIdx;	// PK
+	private String gradeName;	// (basic / silver / gold / vip)
+	private Double gradeCredit;	// 신용도 기준
+}
+
+
+public class ItemVO {
+    private Long    itemIdx;           // PK
+    private String  itemName;
+    private Integer itemCategoryIdx;   // FK → item_category
+    private String  itemBrand;
+    private String  itemCondition;     // NEW / USED_A / USED_B 등
+    private String  itemThumbnailImg;
+    private String  itemDetailImg;
+    private Date    itemRegdate;
+    private String  itemIsDeleted;     // 'Y' / 'N'
+}
+
+public class ItemCategoryVO {
+    private Integer itemCategoryIdx;   // PK
+    private String  itemCategoryCode;  // 예: BALL, RACKET, HEALTH, OUTDOOR ...
+    private String  itemCategoryName;  // 예: 구기 종목, 라켓 스포츠 ...
+}
+
+
+public class AuctionVO {
+    private Long    auctionIdx;            // PK
+    private Long    buyerIdx;              // FK → member.mem_idx
+    private Integer itemCategoryIdx;       // FK → item_category (요청 카테고리)
+    private String  auctionTitle;
+    private String  auctionDesc;
+    private Long    auctionTargetPrice;    // 희망 최대가 (nullable)
+    private Date    auctionStartAt;
+    private Date    auctionEndAt;          // 입찰 마감
+    private Date    auctionDecisionDeadline;
+    private Long    auctionWinningBidIdx;  // FK → bid.bid_idx (nullable)
+    private Integer auctionStatusIdx;      // FK → auction_status
+    private Date    auctionRegdate;
+private Long auctionViewCount	// 조회수
+}
+
+public class AuctionStatusVO {
+	private Integer auctionStatusIdx;	// PK
+	private String auctionStatusCode;	// 경매 상태명 (open/closed/failed/canceled)
+	private String auctionStatusName;	// 한글 상태명 (진행중/마감/유찰/취소 등)
+}
+
+public class BidVO {
+    private Long    bidIdx;            // PK
+    private Long    auctionIdx;        // FK → auction
+    private Long    bidderIdx;         // FK → member
+    private Long    itemIdx;           // FK → item (실제 제안 상품)
+    private Integer itemCategoryIdx;   // FK → item_category (기본=auction과 동일)
+    private Long    bidPrice;          // 이 경매에서 제안한 가격 (핵심)
+    private Integer bidQuantity;       // 수량 (기본 1)
+    private String  bidMessage;        // 제안 조건/설명
+    private Integer bidStatusIdx;      // FK → bid_status (NORMAL/WON/LOST/CANCELED)
+    private Date    bidRegdate;
+}
+
+public class BidStatusVO {
+	private Integer bidStatusIdx;	//PK
+	private String bidStatusCode;	// 입찰 상태명 (normal/won/lost/canceled)
+	private String bidStatusName;	// 한글 상태명 (일반/낙찰/실패/취소)
+}
+
+
+public class BoardVO {
+    private Long   boardIdx;        // PK
+    private Long   memIdx;          // FK → member.mem_idx
+    private String boardTitle;
+    private String boardContent;
+    private String boardIp;
+    private String boardThumbnail;
+    private Long   boardViewCount;
+    private Integer boardTypeIdx;   // FK → board_type.board_type_idx
+    private Date   boardRegdate;
+    private Date   boardModdate;
+    private String boardIsDeleted;  // 'Y' / 'N'
+    private Date   boardDeldate;
+}
+
+public class BoardTypeVO {
+    private Integer boardTypeIdx;      // PK
+    private String  boardTypeCode;     // 예: "GOLF_BOARD", "SKI_BOARD"
+    private String  boardTypeName;     // 예: "골프 게시판"
+    private String  boardCanComment;   // 'Y' / 'N'
+    private Integer boardMinRole;      // 최소 권한 (role_idx)
+}
+
+public class ReplyVO {
+    private Long   replyIdx;        // PK
+    private Long   boardIdx;        // FK → board.board_idx
+    private Long   memIdx;          // FK → member.mem_idx
+    private String replyContent;
+    private String replyIp;
+    private Date   replyRegdate;
+    private Date   replyModdate;
+    private String replyIsDeleted;  // 'Y' / 'N'
+    private Date   replyDeldate;
+private Integer reply_ref;	// 원댓
+private Integer reply_step;	// 댓글 순서
+private Integer reply_depth;	// 댓글 깊이
+}
