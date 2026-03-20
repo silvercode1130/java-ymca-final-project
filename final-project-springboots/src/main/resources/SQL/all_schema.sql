@@ -1,6 +1,11 @@
 /* ==========================================
    RESET (DROP TABLES)
    ========================================== */
+DROP DATABASE IF EXISTS pq;
+
+CREATE DATABASE IF NOT EXISTS pq;
+
+USE pq;
 
 SET FOREIGN_KEY_CHECKS = 0;
 
