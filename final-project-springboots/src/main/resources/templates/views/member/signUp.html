@@ -29,7 +29,7 @@ function formatTel(input) {
 function idCheck() {
     let memId = document.querySelector("#memId").value.trim();
     let memIdMsg = document.querySelector("#memIdMsg");
-    let isIdDuplicate = true;   // 기본은 disabled
+    isIdDuplicate = false;   // 기본은 disabled
 
     // 형식 먼저 검사
     let idReg = /^[A-Za-z0-9]{5,}$/;

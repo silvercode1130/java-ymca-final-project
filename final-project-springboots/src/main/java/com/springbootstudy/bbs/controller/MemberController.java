@@ -38,7 +38,6 @@ public class MemberController {
 	
 	
 	// signUp.jsp - 회원가입 처리 기능
-	// signUp.jsp - 회원가입 처리 기능
 	@PostMapping("/views/member/signUp.do")
 	public String signUp(
 			@RequestParam("memId") String memId,
@@ -48,7 +47,7 @@ public class MemberController {
 	        @RequestParam("memEmail") String memEmail,
 	        HttpServletRequest request 
 	) { 
-	    // 1. DB에 넣기 전에 미리 필수 값들을 준비하자!
+	    // DB에 넣기 전에 미리 필수 값들을 준비하자!
 	    String memIp = request.getRemoteAddr();
 	    if (memIp.equalsIgnoreCase("0:0:0:0:0:0:0:1")) {	// memIp 자체를 못찾음
 	    	memIp = "127.0.0.1";	// memIp cannot be resolved to a variable
@@ -58,11 +57,8 @@ public class MemberController {
 	    long memRoleIdx = 1L;  // 기본 권한 1번
 	    int memGradeIdx = 1;   // 기본 등급 1번 
  
-	    // 2. 서비스로 보낼 때 이 값들을 다 같이 던져줘야 해! 
-	    // 65번 에러
+	    // 서비스로 보낼 때 이 값들을 다 같이 던져줘야 해! 
 	    int result = memberService.insertMember(memId, memPwd, memName, memTel, memEmail, memIp);
-	    // The method insertMember(String, String, String, String, String) in the type MemberService is not 
-	    //		applicable for the arguments (String, String, String, String, String, String, long, int)
 	    
 	    if (result > 0) {
 	        return "redirect:/views/member/login.do"; 
@@ -70,37 +66,7 @@ public class MemberController {
 	        return "redirect:/views/member/signUp.do";
 	    }
 	}
-//	@PostMapping("/views/member/signUp.do")
-//    public String signUp(
-//            @RequestParam("memId") String memId,
-//            @RequestParam("memPwd") String memPwd,
-//            @RequestParam("memName") String memName,
-//            @RequestParam("memTel") String memTel,
-//            @RequestParam("memEmail") String memEmail,
-//            Model model,
-//            HttpServletRequest request
-//    ) { 
-//        int result = memberService.insertMember(memId, memPwd, memName, memTel, memEmail);
-//        
-//        // 1. 사용자의 진짜 IP 주소 가져오기
-//        String userIp = request.getRemoteAddr();
-//        if (userIp.equalsIgnoreCase("0:0:0:0:0:0:0:1")) {
-//            userIp = "127.0.0.1"; // 로컬 테스트용 처리
-//        }
-//
-//        // 2. 모델에 값 담기 (이 이름으로 HTML에서 부를 거야!)
-//        model.addAttribute("memIp", userIp);
-//        model.addAttribute("memRoleIdx", 1);  // 기본 권한 1번
-//        model.addAttribute("memGradeIdx", 1); // 기본 등급 1번
-// 
-//        if (result > 0) {
-//            return "redirect:/views/member/login";
-//        } else {
-//            return "redirect:/views/member/signUp";
-//        }
-//    }
 
-	
 	
 	// signUp.jsp - 중복 아이디 검사
 	@ResponseBody
@@ -140,7 +106,7 @@ public class MemberController {
         // Cannot make a static reference to the non-static method loginMember(String, String) from the type MemberService
  
         if (result > 0) {
-            return "redirect:/views/member/signUp.do";
+            return "redirect:/views/member/signUp.do";	// ## 수정 - 메인 생기면 메인으로 변경
         } else {
             return "redirect:/views/member/login.do";
         }
