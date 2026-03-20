@@ -16,7 +16,7 @@ public class MemberVO {
  private String  memTel;        // 전화번호
  private String  memEmail;      // 이메일
  private String  memIp;         // IP 주소
- private Integer memRoleIdx;    // FK → role.role_idx (권한 등급)
+ private Integer memRoleIdx;    // FK → role.role_idx (권한 등급) 
  private Integer memGradeIdx;   // FK → grade.grade_idx (신용도 등급)
  private LocalDate     memBday;     // 생일
  private LocalDateTime memRegdate;  // 가입일
