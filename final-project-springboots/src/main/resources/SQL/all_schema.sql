@@ -303,13 +303,39 @@ CREATE TABLE reply (
 INSERT INTO role (role_idx, role_name) VALUES (1, 'USER');
 INSERT INTO role (role_idx, role_name) VALUES (2, 'ADMIN');
 
--- 5-2) GRADE 코드 예시
+-- 5-2) GRADE 코드
 INSERT INTO grade (grade_idx, grade_name, grade_credit) VALUES (1, 'basic',  0.00);
 INSERT INTO grade (grade_idx, grade_name, grade_credit) VALUES (2, 'silver', 3.50);
 INSERT INTO grade (grade_idx, grade_name, grade_credit) VALUES (3, 'gold',   4.00);
 INSERT INTO grade (grade_idx, grade_name, grade_credit) VALUES (4, 'vip',    4.50);
 
--- 5-3) AUCTION_STATUS 코드 예시
+-- 5-3) ITEM_CATEGORY 코드
+INSERT INTO item_category (item_category_idx, item_category_code, item_category_name)
+VALUES (1, 'ball',        '공/볼');
+
+INSERT INTO item_category (item_category_idx, item_category_code, item_category_name)
+VALUES (2, 'racket',      '라켓/배트/클럽');
+
+INSERT INTO item_category (item_category_idx, item_category_code, item_category_name)
+VALUES (3, 'protective',  '보호대/보호장비');
+
+INSERT INTO item_category (item_category_idx, item_category_code, item_category_name)
+VALUES (4, 'apparel',     '의류/신발');
+
+INSERT INTO item_category (item_category_idx, item_category_code, item_category_name)
+VALUES (5, 'fitness',     '헬스/홈트 용품');
+
+INSERT INTO item_category (item_category_idx, item_category_code, item_category_name)
+VALUES (6, 'outdoor',     '아웃도어/캠핑 스포츠');
+
+INSERT INTO item_category (item_category_idx, item_category_code, item_category_name)
+VALUES (7, 'swim',        '수영/수상 스포츠 용품');
+
+INSERT INTO item_category (item_category_idx, item_category_code, item_category_name)
+VALUES (8, 'accessory',   '액세서리/잡화');
+
+
+-- 5-4) AUCTION_STATUS 코드
 INSERT INTO auction_status (auction_status_idx, auction_status_code, auction_status_name)
 VALUES (1, 'open',    '진행중');
 INSERT INTO auction_status (auction_status_idx, auction_status_code, auction_status_name)
@@ -319,7 +345,7 @@ VALUES (3, 'failed',  '유찰');
 INSERT INTO auction_status (auction_status_idx, auction_status_code, auction_status_name)
 VALUES (4, 'canceled','취소');
 
--- 5-4) BID_STATUS 코드 예시
+-- 5-5) BID_STATUS 코드
 INSERT INTO bid_status (bid_status_idx, bid_status_code, bid_status_name)
 VALUES (1, 'normal',   '일반');
 INSERT INTO bid_status (bid_status_idx, bid_status_code, bid_status_name)
@@ -329,7 +355,7 @@ VALUES (3, 'lost',     '실패');
 INSERT INTO bid_status (bid_status_idx, bid_status_code, bid_status_name)
 VALUES (4, 'canceled', '취소');
 
--- 5-5) BOARD_TYPE 코드 예시
+-- 5-6) BOARD_TYPE 코드
 INSERT INTO board_type (board_type_idx, board_type_code, board_type_name, board_can_comment, board_min_role)
 VALUES (1,  'soccer',    '축구',     'Y', 1);
 
