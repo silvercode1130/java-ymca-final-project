@@ -98,7 +98,7 @@ CREATE TABLE board_type (
 
 -- 1-1) MEMBER (회원 기본 정보)
 CREATE TABLE member (
-    mem_idx        BIGINT        NOT NULL AUTO_INCREMENT COMMENT 'PK',
+    mem_idx		   BIGINT		 NOT NULL AUTO_INCREMENT COMMENT 'PK',
     mem_id         VARCHAR(50)   NOT NULL COMMENT '로그인 ID',
     mem_pwd        VARCHAR(255)  NOT NULL COMMENT '비밀번호 해시',
     mem_name       VARCHAR(50)   DEFAULT NULL COMMENT '성명',
@@ -336,6 +336,46 @@ VALUES (4, 'canceled', '취소');
 
 -- 5-5) BOARD_TYPE 코드 예시
 INSERT INTO board_type (board_type_idx, board_type_code, board_type_name, board_can_comment, board_min_role)
-VALUES (1, 'GOLF_BOARD', '골프 게시판', 'Y', 1);
+VALUES (1,  'soccer',    '축구',     'Y', 1);
+
 INSERT INTO board_type (board_type_idx, board_type_code, board_type_name, board_can_comment, board_min_role)
-VALUES (2, 'SKI_BOARD',  '스키 게시판',  'Y', 1);
+VALUES (2,  'baseball',  '야구',     'Y', 1);
+
+INSERT INTO board_type (board_type_idx, board_type_code, board_type_name, board_can_comment, board_min_role)
+VALUES (3,  'basketball','농구',     'Y', 1);
+
+INSERT INTO board_type (board_type_idx, board_type_code, board_type_name, board_can_comment, board_min_role)
+VALUES (4,  'golf',      '골프',     'Y', 1);
+
+INSERT INTO board_type (board_type_idx, board_type_code, board_type_name, board_can_comment, board_min_role)
+VALUES (5,  'ski',       '스키',     'Y', 1);
+
+INSERT INTO board_type (board_type_idx, board_type_code, board_type_name, board_can_comment, board_min_role)
+VALUES (6,  'tennis',    '테니스',   'Y', 1);
+
+INSERT INTO board_type (board_type_idx, board_type_code, board_type_name, board_can_comment, board_min_role)
+VALUES (7,  'badminton', '배드민턴', 'Y', 1);
+
+INSERT INTO board_type (board_type_idx, board_type_code, board_type_name, board_can_comment, board_min_role)
+VALUES (8,  'tabletennis','탁구',    'Y', 1);
+
+INSERT INTO board_type (board_type_idx, board_type_code, board_type_name, board_can_comment, board_min_role)
+VALUES (9,  'running',   '러닝',     'Y', 1);
+
+INSERT INTO board_type (board_type_idx, board_type_code, board_type_name, board_can_comment, board_min_role)
+VALUES (10, 'cycling',   '자전거',   'Y', 1);
+
+INSERT INTO board_type (board_type_idx, board_type_code, board_type_name, board_can_comment, board_min_role)
+VALUES (11, 'fitness',   '헬스',     'Y', 1);
+
+INSERT INTO board_type (board_type_idx, board_type_code, board_type_name, board_can_comment, board_min_role)
+VALUES (12, 'yoga',      '요가',     'Y', 1);
+
+INSERT INTO board_type (board_type_idx, board_type_code, board_type_name, board_can_comment, board_min_role)
+VALUES (13, 'pilates',   '필라테스', 'Y', 1);
+
+INSERT INTO board_type (board_type_idx, board_type_code, board_type_name, board_can_comment, board_min_role)
+VALUES (14, 'aerobics',  '에어로빅', 'Y', 1);
+
+INSERT INTO board_type (board_type_idx, board_type_code, board_type_name, board_can_comment, board_min_role)
+VALUES (15, 'swimming',  '수영',     'Y', 1);
