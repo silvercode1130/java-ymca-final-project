@@ -1,4 +1,15 @@
 /* ==========================================
+   DATABASE 생성 및 선택
+   ========================================== */
+
+DROP DATABASE IF EXISTS final;
+CREATE DATABASE IF NOT EXISTS final
+    CHARACTER SET utf8mb4
+    COLLATE utf8mb4_unicode_ci;
+
+USE final;
+
+/* ==========================================
    RESET (DROP TABLES)
    ========================================== */
 
