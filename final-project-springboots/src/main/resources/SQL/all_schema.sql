@@ -104,7 +104,7 @@ CREATE TABLE board_type (
 
 -- 1-1) MEMBER (회원 기본 정보)
 CREATE TABLE member (
-    mem_idx        BIGINT        NOT NULL AUTO_INCREMENT COMMENT 'PK',
+    mem_idx		   BIGINT		 NOT NULL AUTO_INCREMENT COMMENT 'PK',
     mem_id         VARCHAR(50)   NOT NULL COMMENT '로그인 ID',
     mem_pwd        VARCHAR(255)  NOT NULL COMMENT '비밀번호 해시',
     mem_name       VARCHAR(50)   DEFAULT NULL COMMENT '성명',
