@@ -22,34 +22,23 @@
 
 
 	<!-- 아이디 중복 체크 -->
-    <select id="countByMemId" resultType="int">
+    <select id="countByMemId" parameterType="string" resultType="int">
         SELECT COUNT(*)
         FROM member
-        WHERE mem_Id = #{memId}
+        WHERE mem_id = #{memId}
     </select>
 
     <!-- 회원가입 -->
     <insert id="insertMember">
-        INSERT INTO member (
-            mem_Id,
-            mem_Pwd,
-            mem_Name,
-            mem_Tel,
-            mem_Email,
-            mem_ip, 
-            mem_role_idx, 
-            mem_grade_idx
-        ) VALUES (
-            #{memId},
-            #{memPwd},
-            #{memName},
-            #{memTel},
-            #{memEmail},
-            #{memIp},
-            #{memRoleIdx},
-            #{memGradeIdx}
-        )
-    </insert>
+    INSERT INTO member (
+        mem_id, mem_pwd, mem_name, mem_tel, mem_email,
+        mem_ip, mem_role_idx, mem_grade_idx
+    )
+    VALUES (
+        #{memId}, #{memPwd}, #{memName}, #{memTel}, #{memEmail},
+        #{memIp}, #{memRoleIdx}, #{memGradeIdx}
+    )
+	</insert>
 
     <!-- 로그인 -->
     <select id="loginMember" resultType="int">
