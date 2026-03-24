@@ -18,12 +18,12 @@
       <a class="nav-link" href="/auctions">경매</a>
       <span th:if="${session.loginMember != null}">
         <a class="nav-link" href="/mypage/profile" th:text="${session.loginMember.memName}">내 정보</a>
-        <form action="/views/member/logout.do" method="post" style="display:inline">
+        <form action="/views/member/logout" method="post" style="display:inline">
           <button type="submit" class="btn btn-sm" style="color:#aaa; background:none; border:none;">로그아웃</button>
         </form>
       </span>
       <span th:if="${session.loginMember == null}">
-        <a class="nav-link" href="/views/member/login.do">로그인</a>
+        <a class="nav-link" href="/views/member/login">로그인</a>
       </span>
     </div>
   </div>
