@@ -2,11 +2,7 @@ package com.springbootstudy.bbs.domain;
 
 import java.time.LocalDateTime;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 //게시글
 @Data
@@ -25,6 +21,9 @@ public class BoardVO {
  private String  		boardIsDeleted;  // 'Y' / 'N'
  private LocalDateTime 	boardDeldate; 	 // 삭제일
 
+ // 조회용 추가 필드
+ private String         boardTypeName;   // 게시판 타입명 (JOIN)
+ private String         boardTypeCode;   // 게시판 타입 코드 (JOIN)
 }
 
 
