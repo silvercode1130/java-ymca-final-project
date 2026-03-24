@@ -2,7 +2,8 @@ package com.springbootstudy.bbs.mapper;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
-import org.springframework.web.bind.annotation.RequestParam;
+
+import com.springbootstudy.bbs.domain.MemberVO;
 
 @Mapper
 public interface MemberMapper {
@@ -19,18 +20,8 @@ public interface MemberMapper {
 	        @Param("memGradeIdx") int memGradeIdx
     );
 	
-	Long findDefaultRoleIdx();
-
-	//int insertMember(String memId, String memPwd, String memName, String memTel, String memEmail);
 	
-	// 회원가입 - 아이디 중복 확인용 
-	//int countByMemId(String memId);
-
-	// 회원가입 - 아이디 중복 확인용
-	static boolean isDuplicate(String emp_id) {
-		// TODO Auto-generated method stub
-		return false;
-	}
+	Long findDefaultRoleIdx(); 
 	
 	int countByMemId(@Param("memId") String memId);
 
@@ -40,7 +31,8 @@ public interface MemberMapper {
             @Param("memId") String memId,
             @Param("memPwd") String memPwd
     );
-	//int loginMember(String memId, String memPwd);
+
+	MemberVO getMember(String memId);
 
 
 

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title th:text="${board.boardTitle} + ' - PickQ'">게시글 상세</title>
+<link rel="stylesheet" th:href="@{/bootstrap/bootstrap.min.css}">
+<style>
+
+</style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg">
+  <div class="container">
+    <a class="navbar-brand" href="/">⚡ PickQ</a>
+    <div class="ms-auto d-flex gap-3 align-items-center">
+      <a class="nav-link" href="/boards">커뮤니티</a>
+      <a class="nav-link" href="/auctions">경매</a>
+      <span th:if="${session.loginMember != null}">
+        <a class="nav-link" href="/mypage/profile" th:text="${session.loginMember.memName}">내 정보</a>
+        <form action="/views/member/logout.do" method="post" style="display:inline">
+          <button type="submit" class="btn btn-sm" style="color:#aaa; background:none; border:none;">로그아웃</button>
+        </form>
+      </span>
+      <span th:if="${session.loginMember == null}">
+        <a class="nav-link" href="/views/member/login.do">로그인</a>
+      </span>
+    </div>
+  </div>
+</nav>
+
+<div class="container py-4" style="max-width: 860px;">
+
+  <!-- 게시글 본문 -->
+  <div class="board-card">
+    <div class="board-title" th:text="${board.boardTitle}"></div>
+    <div class="board-meta">
+      <span>📂 <a th:href="@{/boards/{tc}(tc=${board.boardTypeCode})}"
+                  th:text="${board.boardTypeName}"
+                  style="color:#c6f135; text-decoration:none;"></a></span>
+      <span>✍️ <span th:text="${board.memIdx}">작성자</span></span>
+      <span>👁 <span th:text="${board.boardViewCount}">0</span></span>
+      <span>🕐 <span th:text="${#temporals.format(board.boardRegdate, 'yyyy-MM-dd HH:mm')}"></span></span>
+    </div>
+    <hr class="divider">
+    <div class="board-content" th:text="${board.boardContent}"></div>
+  </div>
+
+  <!-- 수정/삭제 버튼 (작성자 본인만) -->
+  <div class="d-flex gap-2 mb-4"
+       th:if="${session.loginMember != null and session.loginMember.memIdx == board.memIdx}">
+    <a th:href="@{/boards/{tc}/{id}/edit(tc=${board.boardTypeCode}, id=${board.boardIdx})}"
+       class="btn btn-ghost btn-sm">✏️ 수정</a>
+    <form th:action="@{/boards/{tc}/{id}/delete(tc=${board.boardTypeCode}, id=${board.boardIdx})}"
+          method="post" style="display:inline">
+      <button type="submit" class="btn btn-danger-soft btn-sm"
+              onclick="return confirm('삭제하시겠습니까?')">🗑 삭제</button>
+    </form>
+  </div>
+
+  <!-- 댓글 섹션 -->
+  <div class="reply-section">
+    <h5>💬 댓글 <span th:text="${#lists.size(replies)}">0</span>개</h5>
+
+    <div th:each="r : ${replies}" class="reply-item">
+      <div class="d-flex align-items-start gap-2">
+        <span th:style="'margin-left:' + (${r.replyDepth} * 20) + 'px'">
+          <span th:if="${r.replyDepth > 0}" style="color:#c6f135; margin-right:4px">↳</span>
+        </span>
+        <div class="flex-grow-1">
+          <div class="reply-content" th:text="${r.replyContent}"></div>
+          <div class="reply-meta d-flex gap-3">
+            <span th:text="${r.memIdx}">작성자</span>
+            <span th:text="${#temporals.format(r.replyRegdate, 'MM-dd HH:mm')}"></span>
+            <span class="reply-toggle"
+                  th:onclick="'toggleReplyForm(' + ${r.replyIdx} + ')'">↩ 답글</span>
+          </div>
+          <div th:id="'replyForm-' + ${r.replyIdx}" style="display:none; margin-top:.5rem;">
+            <form th:action="@{/boards/{tc}/{id}/replies(tc=${typeCode}, id=${board.boardIdx})}"
+                  method="post" class="reply-form">
+              <input type="hidden" name="parentReplyIdx" th:value="${r.replyIdx}">
+              <textarea name="replyContent" rows="2" class="form-control form-control-sm mb-1"
+                        placeholder="답글을 입력하세요"></textarea>
+              <button type="submit" class="btn btn-lime btn-sm">등록</button>
+              <button type="button" class="btn btn-ghost btn-sm"
+                      th:onclick="'toggleReplyForm(' + ${r.replyIdx} + ')'">취소</button>
+            </form>
+          </div>
+        </div>
+        <form th:if="${session.loginMember != null and session.loginMember.memIdx == r.memIdx}"
+              th:action="@{/boards/{tc}/replies/{rid}/delete(tc=${typeCode}, rid=${r.replyIdx})}"
+              method="post">
+          <input type="hidden" name="boardIdx" th:value="${board.boardIdx}">
+          <button type="submit" class="btn btn-danger-soft btn-sm"
+                  onclick="return confirm('삭제하시겠습니까?')">✕</button>
+        </form>
+      </div>
+    </div>
+
+    <div th:if="${session.loginMember != null}" class="mt-3">
+      <form th:action="@{/boards/{tc}/{id}/replies(tc=${typeCode}, id=${board.boardIdx})}"
+            method="post" class="reply-form">
+        <textarea name="replyContent" rows="3" class="form-control mb-2"
+                  placeholder="댓글을 입력하세요"></textarea>
+        <button type="submit" class="btn btn-lime btn-sm">💬 댓글 등록</button>
+      </form>
+    </div>
+    <div th:if="${session.loginMember == null}" class="mt-3" style="color:#666; font-size:.9rem;">
+      댓글을 작성하려면 <a href="/views/member/login.do" style="color:#c6f135">로그인</a>이 필요합니다.
+    </div>
+  </div>
+
+  <div class="mt-3">
+    <a th:href="@{/boards/{tc}(tc=${typeCode})}" class="btn btn-ghost btn-sm">← 목록으로</a>
+  </div>
+
+</div>
+
+<script th:src="@{/js/jquery-3.7.1.min.js}"></script>
+<script th:src="@{/bootstrap/bootstrap.bundle.min.js}"></script>
+<script>
+function toggleReplyForm(replyIdx) {
+  const el = document.getElementById('replyForm-' + replyIdx);
+  el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
+</script>
+</body>
+</html>
