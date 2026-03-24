@@ -16,13 +16,13 @@
     <div class="ms-auto d-flex gap-3 align-items-center">
       <a class="nav-link active" href="/boards">커뮤니티</a>
       <a class="nav-link" href="/auctions">경매</a>
-      <span th:if="${session.loginMember != null}">
-        <a class="nav-link" href="/mypage/profile" th:text="${session.loginMember.memName}">내 정보</a>
-        <form action="/views/member/logout.do" method="post" style="display:inline">
+      <span th:if="${session.isLogin != null}">
+        <a class="nav-link" href="/mypage/profile" th:text="${session.isLogin.memName}">내 정보</a>
+        <form action="/views/member/logout" method="post" style="display:inline">
           <button type="submit" class="btn btn-sm" style="color:#aaa; background:none; border:none;">로그아웃</button>
         </form>
       </span>
-      <span th:if="${session.loginMember == null}">
+      <span th:if="${session.isLogin == null}">
         <a class="nav-link" href="/views/member/login">로그인</a>
       </span>
     </div>
@@ -35,7 +35,7 @@
     <div class="page-title">
       📋 <span th:text="${currentType != null} ? ${currentType.boardTypeName} : '커뮤니티'"></span>
     </div>
-    <a th:if="${session.loginMember != null and typeCode != null}"
+    <a th:if="${session.isLogin != null and typeCode != null}"
        th:href="@{/boards/{tc}/new(tc=${typeCode})}"
        class="btn btn-write">✏️ 글쓰기</a>
   </div>
