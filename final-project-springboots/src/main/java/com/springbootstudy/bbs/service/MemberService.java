@@ -46,5 +46,11 @@ public class MemberService {
         return memberMapper.loginMember(memId, memPwd);
     }
 
+    // 로그인
+	public MemberVO getMemberVO(String memId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 
 }

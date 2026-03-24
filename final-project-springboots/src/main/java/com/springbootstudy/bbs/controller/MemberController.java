@@ -1,5 +1,6 @@
 package com.springbootstudy.bbs.controller;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -14,10 +15,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.springbootstudy.bbs.domain.MemberVO;
 import com.springbootstudy.bbs.mapper.MemberMapper;
 import com.springbootstudy.bbs.service.MemberService;
 
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 @Controller
 public class MemberController {
@@ -27,6 +32,13 @@ public class MemberController {
 	
 	@Autowired
 	private MemberMapper memberMapper;
+	
+	@Autowired
+    HttpServletRequest request;
+    
+    @Autowired
+    //HttpSession session;
+
 
 	// 회원가입 -----------------------------------------------------------------
 	
@@ -96,23 +108,50 @@ public class MemberController {
 		
 		return "/views/member/login"; 
 	}
-	
+	// 세션, 서블릿 리퀘스트를 넣고 -> 서비스 들고 옴(model로)
 	
 	// login.jsp - 로그인 처리 기능
 	@PostMapping("/views/member/login")
-    public String login(
-            @RequestParam("memId") String memId,
-            @RequestParam("memPwd") String memPwd
-    ) {
-        int result = memberService.loginMember(memId, memPwd); 
-        // Cannot make a static reference to the non-static method loginMember(String, String) from the type MemberService
- 
-        if (result > 0) {
-            return "redirect:/boards";	// ## 수정 - 메인 생기면 메인으로 변경
-        } else {
-            return "redirect:/views/member/login";  
-        }
-    }
+	public String login(Model model, HttpSession session, 
+	                    @RequestParam("memId") String memId, 
+	                    @RequestParam("memPwd") String memPwd,
+	                    RedirectAttributes ra) { // 일회성 메세지 전달용(로그인 실패 시)
+
+	    // 1. 로그인 체크 - 성공 시 1 / 실패 시 0
+	    int result = memberService.loginMember(memId, memPwd);
+
+	    if (result > 0) {
+	    	// 로그인 성공 시
+	        MemberVO memberVO = memberService.getMemberVO(memId);
+	        
+	        // 모델이 아니라 '세션'에 유저 객체를 담아야 유지됨
+	        session.setAttribute("loginUser", memberVO);
+	        session.setAttribute("isLogin", true);
+	        
+	        return "redirect:/boards"; 
+	    } else {
+	        // 로그인 실패 시
+	        ra.addFlashAttribute("errorMsg", "아이디 혹은 비밀번호가 틀렸습니다");
+	        return "redirect:/views/member/login"; 
+	    }
+	}
+
+	// 지우지 말 것(에러나면 얘 써야 함!!!)
+//	@PostMapping("/views/member/login")
+//    public String login(Model model, HttpSession session, HttpServletResponse response,
+//    		@RequestParam("memId") String memId, @RequestParam("memPwd") String memPwd) {
+//		
+//		// 로그인 성공 여부 체크
+//		int result = memberService.loginMember(memId, memPwd);
+//		
+//		MemberVO memberVO = memberService.getMemberVO(memId);
+//	
+//		session.setAttribute("isLogin", true);
+//		
+//		model.addAttribute("memberVo", memberVO);
+//		
+//		return "redirect:/boards";
+//	}
 	
 	
 	// 비번찾기 -----------------------------------------------------------------

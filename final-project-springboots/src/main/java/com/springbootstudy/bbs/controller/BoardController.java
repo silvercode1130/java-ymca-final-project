@@ -122,7 +122,7 @@ public class BoardController {
             Model model, HttpSession session
     ) {
         MemberVO loginMember = (MemberVO) session.getAttribute("loginMember");
-        if (loginMember == null) return "redirect:/views/member/login.do";
+        if (loginMember == null) return "redirect:/views/member/login";
 
         BoardVO board = boardService.getBoardDetail(boardIdx);
         if (!board.getMemIdx().equals(loginMember.getMemIdx())) {
@@ -199,7 +199,7 @@ public class BoardController {
             HttpSession session
     ) {
         MemberVO loginMember = (MemberVO) session.getAttribute("loginMember");
-        if (loginMember == null) return "redirect:/views/member/login.do";
+        if (loginMember == null) return "redirect:/views/member/login";
 
         boardService.removeReply(replyIdx);
         return "redirect:/boards/" + typeCode + "/" + boardIdx;
