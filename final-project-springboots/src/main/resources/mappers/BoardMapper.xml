@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--	
+	마이바티스 참고 사이트
+	  - http://blog.mybatis.org/
+	  - http://www.mybatis.org/mybatis-3/ko/index.html
+	  
+	@Mapper 애노테이션이 적용된 인터페이스와 맵퍼 XML파일은
+	namespace 속성으로 연결되기 때문에 맵퍼 XML의 namespace를
+	지정할 때 @Mapper 애노테이션이 적용된 맵퍼 인터페이스의
+	완전한 클래스 이름(패키지를 포함한 이름)을 지정하면 된다.   
+-->
+<mapper namespace="com.springbootstudy.bbs.mapper.MemberMapper" >
+	<!-- role에 기본값 주기 -->
+	<select id="findDefaultRoleIdx" resultType="long">
+	    SELECT role_idx 
+	    FROM role 
+	    ORDER BY role_idx ASC 
+	    LIMIT 1
+	</select>
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.springbootstudy.bbs.mapper.BoardMapper">
+
+    <!-- ── 게시판 타입 ──────────────────────────────────────── -->
+    <select id="findAllBoardTypes" resultType="BoardTypeVO">
+        SELECT board_type_idx,
+               board_type_code,
+               board_type_name,
+               board_can_comment,
+               board_min_role
+        FROM board_type
+        ORDER BY board_type_idx
+    </select>
+
+    <!-- typeCode로 단건 조회 -->
+    <select id="findBoardTypeByCode" resultType="BoardTypeVO">
+        SELECT board_type_idx,
+               board_type_code,
+               board_type_name,
+               board_can_comment,
+               board_min_role
+        FROM board_type
+        WHERE board_type_code = #{typeCode}
+    </select>
+
+    <!-- ── 게시글 목록 ──────────────────────────────────────── -->
+    <select id="findBoards" resultType="BoardVO">
+        SELECT b.board_idx,
+               b.mem_idx,
+               b.board_title,
+               b.board_content,
+               b.board_ip,
+               b.board_thumbnail,
+               b.board_view_count,
+               b.board_type_idx,
+               b.board_regdate,
+               b.board_moddate,
+               b.board_is_deleted,
+               bt.board_type_name,
+               bt.board_type_code
+        FROM board b
+        LEFT JOIN board_type bt ON b.board_type_idx = bt.board_type_idx
+        WHERE b.board_is_deleted = 'N'
+        <if test="typeCode != null and typeCode != ''">
+            AND bt.board_type_code = #{typeCode}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            AND (b.board_title LIKE CONCAT('%', #{keyword}, '%')
+              OR b.board_content LIKE CONCAT('%', #{keyword}, '%'))
+        </if>
+        ORDER BY b.board_idx DESC
+    </select>
+
+    <!-- ── 게시글 상세 ──────────────────────────────────────── -->
+    <select id="findBoardById" resultType="BoardVO">
+        SELECT b.board_idx,
+               b.mem_idx,
+               b.board_title,
+               b.board_content,
+               b.board_ip,
+               b.board_thumbnail,
+               b.board_view_count,
+               b.board_type_idx,
+               b.board_regdate,
+               b.board_moddate,
+               b.board_is_deleted,
+               bt.board_type_code,
+               bt.board_type_name
+        FROM board b
+        LEFT JOIN board_type bt ON b.board_type_idx = bt.board_type_idx
+        WHERE b.board_idx = #{boardIdx}
+          AND b.board_is_deleted = 'N'
+    </select>
+
+    <!-- ── 조회수 +1 ─────────────────────────────────────────── -->
+    <update id="increaseViewCount">
+        UPDATE board
+        SET board_view_count = board_view_count + 1
+        WHERE board_idx = #{boardIdx}
+    </update>
+
+    <!-- ── 게시글 등록 ──────────────────────────────────────── -->
+    <insert id="insertBoard" useGeneratedKeys="true" keyProperty="boardIdx">
+        INSERT INTO board (
+            mem_idx,
+            board_title,
+            board_content,
+            board_ip,
+            board_thumbnail,
+            board_type_idx
+        ) VALUES (
+            #{memIdx},
+            #{boardTitle},
+            #{boardContent},
+            #{boardIp},
+            #{boardThumbnail},
+            #{boardTypeIdx}
+        )
+    </insert>
+
+    <!-- ── 게시글 수정 ──────────────────────────────────────── -->
+    <update id="updateBoard">
+        UPDATE board
+        SET board_title   = #{boardTitle},
+            board_content = #{boardContent},
+            board_moddate = NOW()
+        WHERE board_idx = #{boardIdx}
+    </update>
+
+    <!-- ── 게시글 삭제 (soft) ───────────────────────────────── -->
+    <update id="deleteBoard">
+        UPDATE board
+        SET board_is_deleted = 'Y',
+            board_deldate    = NOW()
+        WHERE board_idx = #{boardIdx}
+    </update>
+
+    <!-- ── 댓글 수 ──────────────────────────────────────────── -->
+    <select id="countRepliesByBoard" resultType="int">
+        SELECT COUNT(*)
+        FROM reply
+        WHERE board_idx = #{boardIdx}
+          AND reply_is_deleted = 'N'
+    </select>
+
+    <!-- ── 댓글 목록 ────────────────────────────────────────── -->
+    <select id="findRepliesByBoard" resultType="ReplyVO">
+        SELECT reply_idx,
+               board_idx,
+               mem_idx,
+               reply_content,
+               reply_ip,
+               reply_regdate,
+               reply_moddate,
+               reply_is_deleted,
+               reply_ref,
+               reply_step,
+               reply_depth
+        FROM reply
+        WHERE board_idx = #{boardIdx}
+          AND reply_is_deleted = 'N'
+        ORDER BY reply_ref ASC, reply_step ASC
+    </select>
+
+    <!-- ── 댓글 등록 ────────────────────────────────────────── -->
+    <insert id="insertReply" useGeneratedKeys="true" keyProperty="replyIdx">
+        INSERT INTO reply (
+            board_idx,
+            mem_idx,
+            reply_content,
+            reply_ip,
+            reply_ref,
+            reply_step,
+            reply_depth
+        ) VALUES (
+            #{boardIdx},
+            #{memIdx},
+            #{replyContent},
+            #{replyIp},
+            #{replyRef},
+            #{replyStep},
+            #{replyDepth}
+        )
+    </insert>
+
+    <!-- ── 대댓 등록 전 step 밀기 ───────────────────────────── -->
+    <update id="shiftReplyStep">
+        UPDATE reply
+        SET reply_step = reply_step + 1
+        WHERE board_idx = #{boardIdx}
+          AND reply_ref  = #{ref}
+          AND reply_step > #{step}
+    </update>
+
+    <!-- ── 댓글 단건 조회 ──────────────────────────────────────── -->
+    <select id="findReplyById" resultType="ReplyVO">
+        SELECT reply_idx,
+               board_idx,
+               mem_idx,
+               reply_content,
+               reply_ip,
+               reply_regdate,
+               reply_ref,
+               reply_step,
+               reply_depth
+        FROM reply
+        WHERE reply_idx = #{replyIdx}
+    </select>
+
+    <!-- ── 원댓 ref 업데이트 ────────────────────────────────── -->
+    <update id="updateReplyRef">
+        UPDATE reply
+        SET reply_ref = #{replyRef}
+        WHERE reply_idx = #{replyIdx}
+    </update>
+
+    <!-- ── 댓글 삭제 (soft) ─────────────────────────────────── -->
+    <update id="deleteReply">
+        UPDATE reply
+        SET reply_is_deleted = 'Y',
+            reply_deldate    = NOW()
+        WHERE reply_idx = #{replyIdx}
+    </update>
+
+</mapper>
+
+
+	<!-- 아이디 중복 체크 -->
+    <select id="countByMemId" resultType="int">
+        SELECT COUNT(*)
+        FROM member
+        WHERE mem_Id = #{memId}
+    </select>
+
+    <!-- 회원가입 -->
+    <insert id="insertMember">
+        INSERT INTO member (
+            mem_Id,
+            mem_Pwd,
+            mem_Name,
+            mem_Tel,
+            mem_Email,
+            mem_ip, 
+            mem_role_idx, 
+            mem_grade_idx
+        ) VALUES (
+            #{memId},
+            #{memPwd},
+            #{memName},
+            #{memTel},
+            #{memEmail},
+            #{memIp},
+            #{memRoleIdx},
+            #{memGradeIdx}
+        )
+    </insert>
+
+    <!-- 로그인 -->
+    <select id="loginMember" resultType="int">
+        SELECT COUNT(*)
+        FROM member
+        WHERE mem_Id = #{memId}
+          AND mem_Pwd = #{memPwd}
+    </select>
+
+</mapper>	
+
+
+
