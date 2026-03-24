@@ -9,8 +9,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.springbootstudy.bbs.mapper.MemberMapper;
 import com.springbootstudy.bbs.service.MemberService;
@@ -33,56 +35,56 @@ public class MemberController {
 	public String signUp() {
 		
 		
-		return "/views/member/signUp"; 
+		return "views/member/signUp"; 
 	}
 	
 	
 	// signUp.jsp - 회원가입 처리 기능
-	@PostMapping("/views/member/signUp.do")
-	public String signUp(
-			@RequestParam("memId") String memId,
-	        @RequestParam("memPwd") String memPwd,
-	        @RequestParam("memName") String memName,
-	        @RequestParam("memTel") String memTel,
-	        @RequestParam("memEmail") String memEmail,
-	        HttpServletRequest request 
-	) { 
-	    // DB에 넣기 전에 미리 필수 값들을 준비하자!
-	    String memIp = request.getRemoteAddr();
-	    if (memIp.equalsIgnoreCase("0:0:0:0:0:0:0:1")) {	// memIp 자체를 못찾음
-	    	memIp = "127.0.0.1";	// memIp cannot be resolved to a variable
-	    		 
-	    }
-	    
-	    long memRoleIdx = 1L;  // 기본 권한 1번
-	    int memGradeIdx = 1;   // 기본 등급 1번 
- 
-	    // 서비스로 보낼 때 이 값들을 다 같이 던져줘야 해! 
-	    int result = memberService.insertMember(memId, memPwd, memName, memTel, memEmail, memIp);
-	    
-	    if (result > 0) {
-	        return "redirect:/views/member/login.do"; 
-	    } else {
-	        return "redirect:/views/member/signUp.do";
-	    }
-	}
+	// 회원가입 처리
+    @PostMapping("/views/member/signUp.do")
+    public String signUp(
+    		@RequestParam("memId") String memId,
+            @RequestParam("memPwd") String memPwd,
+            @RequestParam("memName") String memName,
+            @RequestParam("memTel") String memTel,
+            @RequestParam("memEmail") String memEmail,
+            @RequestParam("memIp") String memIp,
+            @RequestParam("memRoleIdx") Long memRoleIdx,
+            @RequestParam("memGradeIdx") int memGradeIdx,
+            Model model
+    ) {
+
+        try {
+            memberService.insertMember(
+                    memId, memPwd, memName, memTel, memEmail,
+                    memIp, memRoleIdx, memGradeIdx
+            );
+
+            return "redirect:/views/member/login.do";
+
+        } catch (Exception e) {
+            e.printStackTrace();
+
+            model.addAttribute("errorMessage", "회원가입 실패");
+            return "views/member/signUp";
+        }
+    }
 
 	
 	// signUp.jsp - 중복 아이디 검사
 	@ResponseBody
 	@GetMapping("/views/member/check_id.do")
-	public Map<String, Boolean> check_id(@RequestParam("memId")String memId) {
+	public String check_id(@RequestParam("memId") String memId) {
 
-		int count = memberMapper.countByMemId(memId);	// Cannot make a static reference to the non-static method countByMemId(String) from the type MemberMapper
-		
-		boolean isDuplicate = count > 0;
+	    int count = memberMapper.countByMemId(memId);
+	    boolean isDuplicate = count > 0;
 
-		Map<String, Boolean> map = new HashMap<>();
-		map.put("result", isDuplicate); 
-	
-
-		return map;
-	} 
+	    if (isDuplicate) {
+	        return "duplicate";
+	    } else {
+	        return "ok";
+	    }
+	}
 	
 	
 	// 로그인 -----------------------------------------------------------------
@@ -108,7 +110,7 @@ public class MemberController {
         if (result > 0) {
             return "redirect:/views/member/signUp.do";	// ## 수정 - 메인 생기면 메인으로 변경
         } else {
-            return "redirect:/views/member/login.do";
+            return "redirect:/views/member/login.do"; 
         }
     }
 	

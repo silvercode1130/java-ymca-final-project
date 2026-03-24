@@ -1,4 +1,15 @@
 /* ==========================================
+   DATABASE 생성 및 선택
+   ========================================== */
+
+DROP DATABASE IF EXISTS final;
+CREATE DATABASE IF NOT EXISTS final
+    CHARACTER SET utf8mb4
+    COLLATE utf8mb4_unicode_ci;
+
+USE final;
+
+/* ==========================================
    RESET (DROP TABLES)
    ========================================== */
 
@@ -303,13 +314,39 @@ CREATE TABLE reply (
 INSERT INTO role (role_idx, role_name) VALUES (1, 'USER');
 INSERT INTO role (role_idx, role_name) VALUES (2, 'ADMIN');
 
--- 5-2) GRADE 코드 예시
+-- 5-2) GRADE 코드
 INSERT INTO grade (grade_idx, grade_name, grade_credit) VALUES (1, 'basic',  0.00);
 INSERT INTO grade (grade_idx, grade_name, grade_credit) VALUES (2, 'silver', 3.50);
 INSERT INTO grade (grade_idx, grade_name, grade_credit) VALUES (3, 'gold',   4.00);
 INSERT INTO grade (grade_idx, grade_name, grade_credit) VALUES (4, 'vip',    4.50);
 
--- 5-3) AUCTION_STATUS 코드 예시
+-- 5-3) ITEM_CATEGORY 코드
+INSERT INTO item_category (item_category_idx, item_category_code, item_category_name)
+VALUES (1, 'ball',        '공/볼');
+
+INSERT INTO item_category (item_category_idx, item_category_code, item_category_name)
+VALUES (2, 'racket',      '라켓/배트/클럽');
+
+INSERT INTO item_category (item_category_idx, item_category_code, item_category_name)
+VALUES (3, 'protective',  '보호대/보호장비');
+
+INSERT INTO item_category (item_category_idx, item_category_code, item_category_name)
+VALUES (4, 'apparel',     '의류/신발');
+
+INSERT INTO item_category (item_category_idx, item_category_code, item_category_name)
+VALUES (5, 'fitness',     '헬스/홈트 용품');
+
+INSERT INTO item_category (item_category_idx, item_category_code, item_category_name)
+VALUES (6, 'outdoor',     '아웃도어/캠핑 스포츠');
+
+INSERT INTO item_category (item_category_idx, item_category_code, item_category_name)
+VALUES (7, 'swim',        '수영/수상 스포츠 용품');
+
+INSERT INTO item_category (item_category_idx, item_category_code, item_category_name)
+VALUES (8, 'accessory',   '액세서리/잡화');
+
+
+-- 5-4) AUCTION_STATUS 코드
 INSERT INTO auction_status (auction_status_idx, auction_status_code, auction_status_name)
 VALUES (1, 'open',    '진행중');
 INSERT INTO auction_status (auction_status_idx, auction_status_code, auction_status_name)
@@ -319,7 +356,7 @@ VALUES (3, 'failed',  '유찰');
 INSERT INTO auction_status (auction_status_idx, auction_status_code, auction_status_name)
 VALUES (4, 'canceled','취소');
 
--- 5-4) BID_STATUS 코드 예시
+-- 5-5) BID_STATUS 코드
 INSERT INTO bid_status (bid_status_idx, bid_status_code, bid_status_name)
 VALUES (1, 'normal',   '일반');
 INSERT INTO bid_status (bid_status_idx, bid_status_code, bid_status_name)
@@ -329,8 +366,48 @@ VALUES (3, 'lost',     '실패');
 INSERT INTO bid_status (bid_status_idx, bid_status_code, bid_status_name)
 VALUES (4, 'canceled', '취소');
 
--- 5-5) BOARD_TYPE 코드 예시
+-- 5-6) BOARD_TYPE 코드
 INSERT INTO board_type (board_type_idx, board_type_code, board_type_name, board_can_comment, board_min_role)
-VALUES (1, 'GOLF_BOARD', '골프 게시판', 'Y', 1);
+VALUES (1,  'soccer',    '축구',     'Y', 1);
+
 INSERT INTO board_type (board_type_idx, board_type_code, board_type_name, board_can_comment, board_min_role)
-VALUES (2, 'SKI_BOARD',  '스키 게시판',  'Y', 1);
+VALUES (2,  'baseball',  '야구',     'Y', 1);
+
+INSERT INTO board_type (board_type_idx, board_type_code, board_type_name, board_can_comment, board_min_role)
+VALUES (3,  'basketball','농구',     'Y', 1);
+
+INSERT INTO board_type (board_type_idx, board_type_code, board_type_name, board_can_comment, board_min_role)
+VALUES (4,  'golf',      '골프',     'Y', 1);
+
+INSERT INTO board_type (board_type_idx, board_type_code, board_type_name, board_can_comment, board_min_role)
+VALUES (5,  'ski',       '스키',     'Y', 1);
+
+INSERT INTO board_type (board_type_idx, board_type_code, board_type_name, board_can_comment, board_min_role)
+VALUES (6,  'tennis',    '테니스',   'Y', 1);
+
+INSERT INTO board_type (board_type_idx, board_type_code, board_type_name, board_can_comment, board_min_role)
+VALUES (7,  'badminton', '배드민턴', 'Y', 1);
+
+INSERT INTO board_type (board_type_idx, board_type_code, board_type_name, board_can_comment, board_min_role)
+VALUES (8,  'tabletennis','탁구',    'Y', 1);
+
+INSERT INTO board_type (board_type_idx, board_type_code, board_type_name, board_can_comment, board_min_role)
+VALUES (9,  'running',   '러닝',     'Y', 1);
+
+INSERT INTO board_type (board_type_idx, board_type_code, board_type_name, board_can_comment, board_min_role)
+VALUES (10, 'cycling',   '자전거',   'Y', 1);
+
+INSERT INTO board_type (board_type_idx, board_type_code, board_type_name, board_can_comment, board_min_role)
+VALUES (11, 'fitness',   '헬스',     'Y', 1);
+
+INSERT INTO board_type (board_type_idx, board_type_code, board_type_name, board_can_comment, board_min_role)
+VALUES (12, 'yoga',      '요가',     'Y', 1);
+
+INSERT INTO board_type (board_type_idx, board_type_code, board_type_name, board_can_comment, board_min_role)
+VALUES (13, 'pilates',   '필라테스', 'Y', 1);
+
+INSERT INTO board_type (board_type_idx, board_type_code, board_type_name, board_can_comment, board_min_role)
+VALUES (14, 'aerobics',  '에어로빅', 'Y', 1);
+
+INSERT INTO board_type (board_type_idx, board_type_code, board_type_name, board_can_comment, board_min_role)
+VALUES (15, 'swimming',  '수영',     'Y', 1);
