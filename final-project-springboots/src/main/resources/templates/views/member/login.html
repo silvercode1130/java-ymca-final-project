@@ -5,7 +5,7 @@
 
 <th:block layout:fragment="content">
 
-<form th:action="@{/views/member/login.do}" method="post">
+<form th:action="@{/views/member/login}" method="post">
 
 	<script type="text/javascript">
 		//필수 항목 체크 안되면 못 넘어가게 하는 기능
@@ -54,7 +54,7 @@
             </div>
 
             <div class="text-center">
-                <a th:href="@{/views/member/signUp.do}">
+                <a th:href="@{/views/member/signUp}">
                     회원가입
                 </a>
             </div>

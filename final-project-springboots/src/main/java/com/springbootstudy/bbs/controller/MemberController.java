@@ -31,7 +31,7 @@ public class MemberController {
 	// 회원가입 -----------------------------------------------------------------
 	
 	// signUp.jsp - 창 띄우기
-	@GetMapping("/views/member/signUp.do")
+	@GetMapping("/views/member/signUp")
 	public String signUp() {
 		
 		
@@ -41,7 +41,7 @@ public class MemberController {
 	
 	// signUp.jsp - 회원가입 처리 기능
 	// 회원가입 처리
-    @PostMapping("/views/member/signUp.do")
+    @PostMapping("/views/member/signUp")
     public String signUp(
     		@RequestParam("memId") String memId,
             @RequestParam("memPwd") String memPwd,
@@ -60,7 +60,7 @@ public class MemberController {
                     memIp, memRoleIdx, memGradeIdx
             );
 
-            return "redirect:/views/member/login.do";
+            return "redirect:/views/member/login";
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -73,7 +73,7 @@ public class MemberController {
 	
 	// signUp.jsp - 중복 아이디 검사
 	@ResponseBody
-	@GetMapping("/views/member/check_id.do")
+	@GetMapping("/views/member/check_id")
 	public String check_id(@RequestParam("memId") String memId) {
 
 	    int count = memberMapper.countByMemId(memId);
@@ -90,7 +90,7 @@ public class MemberController {
 	// 로그인 -----------------------------------------------------------------
 	
 	// login.jsp - 창 띄우기
-	@GetMapping("/views/member/login.do")
+	@GetMapping("/views/member/login")
 	public String login() {
 		
 		
@@ -99,7 +99,7 @@ public class MemberController {
 	
 	
 	// login.jsp - 로그인 처리 기능
-	@PostMapping("/views/member/login.do")
+	@PostMapping("/views/member/login")
     public String login(
             @RequestParam("memId") String memId,
             @RequestParam("memPwd") String memPwd
@@ -108,9 +108,9 @@ public class MemberController {
         // Cannot make a static reference to the non-static method loginMember(String, String) from the type MemberService
  
         if (result > 0) {
-            return "redirect:/views/member/signUp.do";	// ## 수정 - 메인 생기면 메인으로 변경
+            return "redirect:/boards";	// ## 수정 - 메인 생기면 메인으로 변경
         } else {
-            return "redirect:/views/member/login.do"; 
+            return "redirect:/views/member/login";  
         }
     }
 	
@@ -118,7 +118,7 @@ public class MemberController {
 	// 비번찾기 -----------------------------------------------------------------
 	
 	// pwdFind.jsp - 창 띄우기
-	@GetMapping("/views/member/pwdFind.do")
+	@GetMapping("/views/member/pwdFind")
 	public String pwdFind() {
 		
 		
