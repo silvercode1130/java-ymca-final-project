@@ -17,9 +17,9 @@ public class ReplyVO {
  private LocalDateTime 	replyModdate;  	 // 수정일
  private String  		replyIsDeleted;  // 'Y' / 'N'
  private LocalDateTime 	replyDeldate;  	 // 삭제일
- private Integer 		reply_ref;       // 원댓
- private Integer 		reply_step;      // 댓글 순서
- private Integer 		reply_depth;     // 댓글 깊이
+ private Integer 		replyRef;        // 원댓
+ private Integer 		replyStep;       // 댓글 순서
+ private Integer 		replyDepth;      // 댓글 깊이
 
 }
 

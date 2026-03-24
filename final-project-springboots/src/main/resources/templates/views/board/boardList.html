@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title th:text="${currentType != null} ? ${currentType.boardTypeName} + ' - PickQ' : '커뮤니티 - PickQ'">커뮤니티 - PickQ</title>
+<link rel="stylesheet" th:href="@{/bootstrap/bootstrap.min.css}">
+<style>
+
+</style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg">
+  <div class="container">
+    <a class="navbar-brand" href="/">⚡ PickQ</a>
+    <div class="ms-auto d-flex gap-3 align-items-center">
+      <a class="nav-link active" href="/boards">커뮤니티</a>
+      <a class="nav-link" href="/auctions">경매</a>
+      <span th:if="${session.loginMember != null}">
+        <a class="nav-link" href="/mypage/profile" th:text="${session.loginMember.memName}">내 정보</a>
+        <form action="/views/member/logout.do" method="post" style="display:inline">
+          <button type="submit" class="btn btn-sm" style="color:#aaa; background:none; border:none;">로그아웃</button>
+        </form>
+      </span>
+      <span th:if="${session.loginMember == null}">
+        <a class="nav-link" href="/views/member/login.do">로그인</a>
+      </span>
+    </div>
+  </div>
+</nav>
+
+<div class="container py-4">
+
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div class="page-title">
+      📋 <span th:text="${currentType != null} ? ${currentType.boardTypeName} : '커뮤니티'"></span>
+    </div>
+    <a th:if="${session.loginMember != null and typeCode != null}"
+       th:href="@{/boards/{tc}/new(tc=${typeCode})}"
+       class="btn btn-write">✏️ 글쓰기</a>
+  </div>
+
+  <!-- 게시판 탭 -->
+  <div class="board-tabs">
+    <a href="/boards" class="board-tab" th:classappend="${typeCode == null} ? ' active' : ''">전체</a>
+    <a th:each="bt : ${boardTypes}"
+       th:href="@{/boards/{tc}(tc=${bt.boardTypeCode})}"
+       th:text="${bt.boardTypeName}"
+       class="board-tab"
+       th:classappend="${typeCode != null and typeCode == bt.boardTypeCode} ? ' active' : ''">
+    </a>
+  </div>
+
+  <!-- 검색 -->
+  <form th:action="${typeCode != null} ? '/boards/' + ${typeCode} : '/boards'" method="get" class="filter-bar">
+    <div class="row g-2 align-items-center">
+      <div class="col">
+        <input type="text" name="keyword" class="form-control form-control-sm"
+               placeholder="제목 또는 내용 검색" th:value="${keyword}">
+      </div>
+      <div class="col-auto">
+        <button type="submit" class="btn btn-search btn-sm">🔍 검색</button>
+      </div>
+    </div>
+  </form>
+
+  <!-- 게시글 테이블 -->
+  <table class="table board-table mb-0">
+    <thead>
+      <tr>
+        <th style="width:60px">번호</th>
+        <th th:if="${typeCode == null}" style="width:90px">카테고리</th>
+        <th>제목</th>
+        <th style="width:100px">작성자</th>
+        <th style="width:70px">조회</th>
+        <th style="width:110px">등록일</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr th:if="${#lists.isEmpty(boards)}">
+        <td th:colspan="${typeCode == null} ? 6 : 5" class="text-center py-4" style="color:#666">게시글이 없습니다.</td>
+      </tr>
+      <tr th:each="b : ${boards}">
+        <td th:text="${b.boardIdx}"></td>
+        <td th:if="${typeCode == null}">
+          <a th:href="@{/boards/{tc}(tc=${b.boardTypeCode})}"
+             class="badge-type" th:text="${b.boardTypeName}"></a>
+        </td>
+        <td>
+          <a th:href="@{/boards/{tc}/{id}(tc=${b.boardTypeCode}, id=${b.boardIdx})}"
+             th:text="${b.boardTitle}"></a>
+        </td>
+        <td th:text="${b.memIdx}"></td>
+        <td th:text="${b.boardViewCount}"></td>
+        <td th:text="${#temporals.format(b.boardRegdate, 'MM-dd HH:mm')}"></td>
+      </tr>
+    </tbody>
+  </table>
+
+</div>
+
+<script th:src="@{/js/jquery-3.7.1.min.js}"></script>
+<script th:src="@{/bootstrap/bootstrap.bundle.min.js}"></script>
+</body>
+</html>
