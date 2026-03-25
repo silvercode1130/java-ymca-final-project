@@ -1,5 +1,9 @@
 package com.springbootstudy.bbs.service;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +28,15 @@ public class MyPageService {
     return myPageMapper.getAuction(auctionIdx);
   }
 
+  public List<AuctionVO> getAuctionList(int memIdx) {
+    return myPageMapper.getAuctionListByMemIdx(memIdx);
+  }
+
   public BidVO getBid(int bidIdx) {
     return myPageMapper.getBid(bidIdx);
+  }
+
+  public List<BidVO> getBidList(int memIdx) {
+    return myPageMapper.getBidListByMemIdx(memIdx);
   }
 }

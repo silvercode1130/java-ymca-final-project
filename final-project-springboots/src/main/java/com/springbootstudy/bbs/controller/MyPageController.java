@@ -1,6 +1,9 @@
 package com.springbootstudy.bbs.controller;
 
+import java.util.List;
+
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,15 +20,23 @@ import lombok.RequiredArgsConstructor;
 public class MyPageController {
   private final MyPageService myPageService;
 
-  // 경매현황 조회
-  @GetMapping("/auction/{auctionIdx}")
-  public AuctionVO getAuction(@PathVariable int auctionIdx) {
-    return myPageService.getAuction(auctionIdx);
+  // 내 경매 목록
+  @GetMapping("auctions/{memIdx}")
+  public String getAuctionList(@PathVariable int memIdx, Model model) {
+    List<AuctionVO> auctionList = myPageService.getAuctionList(memIdx);
+
+    model.addAttribute("auctions", auctionList);
+
+    return "mystatus/acutionview";
   }
 
-  // 입찰 현황 조회
-  @GetMapping("/bid/{bidIdx}")
-  public BidVO getBid(@PathVariable int bidIdx) {
-    return myPageService.getBid(bidIdx);
+  // 내 입찰 내역
+  @GetMapping("bids/{memIdx}")
+  public String getBidList(@PathVariable int memIdx, Model model) {
+    List<BidVO> bidList = myPageService.getBidList(memIdx);
+
+    model.addAttribute("bids", bidList);
+
+    return "mystatus/bidview";
   }
 }

@@ -1,5 +1,7 @@
 package com.springbootstudy.bbs.mapper;
 
+import java.util.List;
+
 import org.apache.ibatis.annotations.Mapper;
 
 import com.springbootstudy.bbs.domain.AuctionVO;
@@ -13,4 +15,8 @@ public interface MyPageMapper {
   public AuctionVO getAuction(int auctionIdx);
 
   public BidVO getBid(int bidIdx);
+
+  public List<AuctionVO> getAuctionListByMemIdx(int memIdx);
+
+  public List<BidVO> getBidListByMemIdx(int memIdx);
 }
