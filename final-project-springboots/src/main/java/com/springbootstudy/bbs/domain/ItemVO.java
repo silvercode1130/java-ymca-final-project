@@ -1,7 +1,5 @@
 package com.springbootstudy.bbs.domain;
 
-import java.util.Date;
-
 import lombok.Data;
 
 //아이템(상품) 정보
