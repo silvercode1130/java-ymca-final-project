@@ -20,20 +20,26 @@ public interface MemberMapper {
 	        @Param("memGradeIdx") int memGradeIdx
     );
 	
-	
 	Long findDefaultRoleIdx(); 
 	
+	// 회원 조회 
 	int countByMemId(@Param("memId") String memId);
 
 	
-	// 로그인 - 로그인 처리용
-	int loginMember(
-            @Param("memId") String memId,
-            @Param("memPwd") String memPwd
-    );
+	
+	// 로그인 =============================================
+	
+    // 아이디 존재 여부 체크
+    int checkId(String memId);
 
-	MemberVO getMember(String memId);
+    // 비밀번호 조회
+    String getPassword(String memId);
 
+    // 회원 정보 조회
+    MemberVO getMemberVO(String memId);
+    
+    // 탈퇴
+    int deleteMember(String memId);
 
 
 }
