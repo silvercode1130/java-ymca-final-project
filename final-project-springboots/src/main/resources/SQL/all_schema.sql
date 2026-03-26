@@ -190,20 +190,22 @@ CREATE TABLE auction (
     auction_title             VARCHAR(200)  NOT NULL COMMENT '경매 제목',
     auction_desc              TEXT          NOT NULL COMMENT '경매 설명',
     auction_target_price      BIGINT        DEFAULT NULL COMMENT '희망 최대가 (nullable)',
+    auction_view_count        BIGINT        NOT NULL DEFAULT 0 COMMENT '조회수',
     auction_start_at          DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '경매 시작일시',
     auction_end_at            DATETIME      NOT NULL COMMENT '입찰 마감일시',
     auction_decision_deadline DATETIME      NOT NULL COMMENT '결정 마감일',
-    auction_winning_bid_idx   BIGINT        DEFAULT NULL COMMENT 'FK → bid.bid_idx (nullable)',
     auction_status_idx        INT           NOT NULL COMMENT 'FK → auction_status',
     auction_regdate           DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '등록일',
-    auction_view_count        BIGINT        NOT NULL DEFAULT 0 COMMENT '조회수',
+    auction_moddate           DATETIME      DEFAULT NULL COMMENT '수정일',
+    auction_is_deleted        CHAR(1)       NOT NULL DEFAULT 'N' COMMENT 'Y/N',
+    auction_deldate           DATETIME      DEFAULT NULL COMMENT '삭제일',
     PRIMARY KEY (auction_idx),
     KEY idx_auction_buyer (buyer_idx),
     KEY idx_auction_item_category (item_category_idx),
     KEY idx_auction_status (auction_status_idx),
+    CONSTRAINT ck_auction_is_deleted CHECK (auction_is_deleted IN ('Y','N')),
     CONSTRAINT fk_auction_buyer
-        FOREIGN KEY (buyer_idx)         REFERENCES member(mem_idx)
-        ON DELETE CASCADE,
+        FOREIGN KEY (buyer_idx) REFERENCES member(mem_idx) ON DELETE CASCADE,
     CONSTRAINT fk_auction_item_category
         FOREIGN KEY (item_category_idx) REFERENCES item_category(item_category_idx),
     CONSTRAINT fk_auction_status
@@ -216,37 +218,26 @@ CREATE TABLE bid (
     auction_idx       BIGINT        NOT NULL COMMENT 'FK → auction',
     bidder_idx        BIGINT        NOT NULL COMMENT 'FK → member (입찰자)',
     item_idx          BIGINT        NOT NULL COMMENT 'FK → item (실제 제안 상품)',
-    item_category_idx INT           NOT NULL COMMENT 'FK → item_category',
     bid_price         BIGINT        NOT NULL COMMENT '제안 가격',
     bid_quantity      INT           NOT NULL DEFAULT 1 COMMENT '수량',
     bid_message       VARCHAR(500)  DEFAULT NULL COMMENT '제안 조건/설명',
     bid_status_idx    INT           NOT NULL COMMENT 'FK → bid_status',
     bid_regdate       DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '등록일',
+    bid_moddate       DATETIME      DEFAULT NULL COMMENT '수정/취소일',
     PRIMARY KEY (bid_idx),
     KEY idx_bid_auction (auction_idx),
     KEY idx_bid_bidder (bidder_idx),
     KEY idx_bid_item (item_idx),
-    KEY idx_bid_item_category (item_category_idx),
     KEY idx_bid_status (bid_status_idx),
     CONSTRAINT fk_bid_auction
-        FOREIGN KEY (auction_idx)       REFERENCES auction(auction_idx)
-        ON DELETE CASCADE,
+        FOREIGN KEY (auction_idx) REFERENCES auction(auction_idx) ON DELETE CASCADE,
     CONSTRAINT fk_bid_bidder
-        FOREIGN KEY (bidder_idx)        REFERENCES member(mem_idx)
-        ON DELETE CASCADE,
+        FOREIGN KEY (bidder_idx) REFERENCES member(mem_idx) ON DELETE CASCADE,
     CONSTRAINT fk_bid_item
-        FOREIGN KEY (item_idx)          REFERENCES item(item_idx),
-    CONSTRAINT fk_bid_item_category
-        FOREIGN KEY (item_category_idx) REFERENCES item_category(item_category_idx),
+        FOREIGN KEY (item_idx) REFERENCES item(item_idx),
     CONSTRAINT fk_bid_status
-        FOREIGN KEY (bid_status_idx)    REFERENCES bid_status(bid_status_idx)
+        FOREIGN KEY (bid_status_idx) REFERENCES bid_status(bid_status_idx)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='입찰 테이블';
-
--- auction_winning_bid_idx FK (bid 생성 후)
-ALTER TABLE auction
-    ADD CONSTRAINT fk_auction_winning_bid
-        FOREIGN KEY (auction_winning_bid_idx) REFERENCES bid(bid_idx);
-
 
 
 /* ==========================================
