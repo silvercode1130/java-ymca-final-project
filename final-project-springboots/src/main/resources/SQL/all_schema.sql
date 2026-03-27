@@ -1,3 +1,19 @@
+-- 1. 'final'이라는 이름의 계정을 만들고 비밀번호 설정하기
+-- (localhost는 쩡이 컴퓨터에서만 접속 가능하다는 뜻)
+CREATE USER 'final'@'localhost' IDENTIFIED BY 'final';
+
+-- 2. 이 계정에게 모든 데이터베이스를 관리할 수 있는 '왕' 권한 주기
+GRANT ALL PRIVILEGES ON *.* TO 'final'@'localhost' WITH GRANT OPTION;
+
+-- 3. 설정한 권한을 지금 바로 적용하기 (새로고침 느낌)
+FLUSH PRIVILEGES;
+
+-- 4. 방 만들기 (이름은 마음대로! 보통 프로젝트명으로)
+CREATE DATABASE final_project; 
+
+-- 5. 방 안으로 들어가기 (이걸 해야 에러가 안 남)
+USE final_project;
+
 /* ==========================================
    DATABASE 생성 및 선택
    ========================================== */

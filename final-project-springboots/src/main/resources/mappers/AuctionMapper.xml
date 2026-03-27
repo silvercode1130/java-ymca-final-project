@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--	
+	마이바티스 참고 사이트
+	  - http://blog.mybatis.org/
+	  - http://www.mybatis.org/mybatis-3/ko/index.html
+	  
+	@Mapper 애노테이션이 적용된 인터페이스와 맵퍼 XML파일은
+	namespace 속성으로 연결되기 때문에 맵퍼 XML의 namespace를
+	지정할 때 @Mapper 애노테이션이 적용된 맵퍼 인터페이스의
+	완전한 클래스 이름(패키지를 포함한 이름)을 지정하면 된다.   
+-->
+<mapper namespace="com.springbootstudy.bbs.mapper.AuctionMapper">
+	
+	<resultMap id="AuctionListMap" type="com.springbootstudy.bbs.domain.AuctionListDTO">
+	    <id property="auctionIdx" column="auction_idx" />
+	    <result property="auctionTitle" column="auction_title" />
+	    <result property="auctionTargetPrice" column="auction_target_price" />
+	    <result property="auctionEndAt" column="auction_end_at" />
+	    
+	    <result property="itemCategoryName" column="item_category_name" />
+	    
+	    <result property="itemThumbnailImg" column="item_thumbnail_img" />
+	    
+	    <result property="minBidPrice" column="min_price" />
+	    <result property="bidCount" column="b_count" />
+	</resultMap>
+	
+	<select id="auctionList" resultMap="AuctionListMap">
+		SELECT 
+	        a.auction_idx, 
+	        a.auction_title, 
+	        a.auction_target_price, 
+	        a.auction_end_at,
+	        ic.item_category_name,
+	        i.item_thumbnail_img,
+	        <!-- 입찰 테이블에서 개수와 최저가 계산 -->
+	        COUNT(b.bid_idx) AS b_count,
+	        IFNULL(MIN(b.bid_price), 0) AS min_price
+	    FROM auction a
+	   	<!-- 카테고리 이름 가져오기 -->
+	    LEFT JOIN item_category ic ON a.item_category_idx = ic.item_category_idx
+	    <!-- 입찰 정보 가져오기 -->
+	    LEFT JOIN bid b ON a.auction_idx = b.auction_idx
+	    <!-- 실제 제안된 상품의 이미지 가져오기 -->
+	    LEFT JOIN item i ON b.item_idx = i.item_idx
+	    WHERE a.auction_status_idx = 1  <!-- 진행 중인 경매만 -->
+	    GROUP BY 			
+	        a.auction_idx, 
+	        a.auction_title, 
+	        a.auction_target_price, 
+	        a.auction_end_at, 
+	        ic.item_category_name, 
+	        i.item_thumbnail_img  ORDER BY a.auction_regdate DESC <!-- 최신순 정렬 -->
+	</select>
+	
+	
+	
+</mapper>	
+
+
+
