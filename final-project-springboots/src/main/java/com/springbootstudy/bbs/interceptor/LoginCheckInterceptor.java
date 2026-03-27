@@ -41,25 +41,48 @@ public class LoginCheckInterceptor implements HandlerInterceptor {
 	 * 또는 컨트롤러 자체를 실행하지 않게 할 수 있다.
 	 **/
 
-	// 로그인 실패 시 띄워주는 인터셉터
+	 // 로그인 실패 시 띄워주는 인터셉터
 	@Override
 	public boolean preHandle(HttpServletRequest request,
-			HttpServletResponse response, Object handler) throws Exception {
-		log.info("##########LoginCheckInterceptor - preHandle()##########");
-		// 현재 세션에 저장된 loginMsg 속성을 삭제
-		HttpSession session = request.getSession();
-		session.removeAttribute("loginMsg");
+	      HttpServletResponse response, Object handler) throws Exception {
 
-		// 세션에 isLogin란 이름의 속성이 없으면 로그인 상태가 아님
-		if (request.getSession().getAttribute("isLogin") == null) {
-			// 로그인 상태가 아니라면 로그인 폼으로 리다이렉트 시킨다.
-			response.sendRedirect("/views/member/login");
-			session.setAttribute("loginMsg", "로그인이 필요한 서비스");
-			return false;
-		}
-		return true;
+	   log.info("##########LoginCheckInterceptor - preHandle()##########");
+
+	   HttpSession session = request.getSession();
+	   String uri = request.getRequestURI();
+
+	   // 로그인 필요한 경로는 차단
+	   boolean needLogin =
+	         uri.startsWith("/members/memberUpdate") ||
+	         uri.startsWith("/memberDelete");
+
+	   if (needLogin && session.getAttribute("isLogin") == null) {
+	      session.setAttribute("loginMsg", "로그인이 필요한 서비스 입니다");
+	      response.sendRedirect("/members/login");
+	      return false;
+	   }
+	   return true; 
 	}
-
+	
+//	   @Override
+//	   public boolean preHandle(HttpServletRequest request,
+//	         HttpServletResponse response, Object handler) throws Exception {
+//	      
+//	      log.info("##########LoginCheckInterceptor - preHandle()##########");
+//
+//	      HttpSession session = request.getSession();
+//	      
+//	      String uri = request.getRequestURI();
+//	      if (uri.equals("/members/login") || uri.equals("/members/signUp")) {
+//	          return true; // 예외 처리
+//	      }
+//	      if (session.getAttribute("isLogin") == null) {
+//	          response.sendRedirect("/members/login");
+//	          session.setAttribute("loginMsg", "로그인이 필요한 서비스 입니다");
+//	          return false;
+//	      }
+//	      return true; 
+//	   }
 	/*
 	 * postHandle() 메서드는 클라이언트 요청이 들어오고 컨트롤러가 정상적으로
 	 * 실행된 이후에 공통적으로 적용할 추가 기능이 있을 때 주로 사용한다.

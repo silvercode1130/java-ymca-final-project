@@ -11,10 +11,10 @@
 			</div>
 			
 			<div>
-				<form action="/views/member/memberUpdate" id="memberUpdateForm" name="memberUpdateForm" method="post">					
+				<form action="/members/memberUpdate" id="memberUpdateForm" name="memberUpdateForm" method="post">					
 					<div id="memId" name="memId">
 						<label>아이디</label>
-						<input type="text" name="id" id="id"  readonly>
+						<input type="text" name="id" id="id" th:value="${memberVO.memId}" readonly>
 						
 						<input type="hidden" id="gradeIdx" name="gradIdx" > <!-- th:value="${memberVO.memName}" -->
 						회원등급 <br>
@@ -23,27 +23,27 @@
 					
 					<div id="memName" name="memName">
 						<label>이름</label>
-						<input type="text" name="name" id="name" >
+						<input type="text" name="name" id="name" th:value="${memberVO.memName}">
 					</div>
 					
 					<div id="memEmail" name="memEmail">
 						<label>이메일</label>
-						<input type="text" name="email" id="email" >
+						<input type="text" name="email" id="email" th:value="${memberVO.memEmail}">
 					</div>
 					
 					<div id="memTel" name="memtel">
 						<label>전화번호</label>
-						<input type="text" name="tel" id="tel" >
+						<input type="text" name="tel" id="tel" th:value="${memberVO.memTel}">
 					</div>
 					
 					<div id="memBday" name="memBday">
 						<label>생년월일</label>
-						<input type="text" name="bday" id="bday" >
-					</div>
+						<input type="date" name="bday" id="bday" th:value="${memberVO.memBday}">
+					</div> 
 					
 					<div id="memPwd" name="memPwd">
 						<label>새 비밀번호</label>
-						<input type="password" name="pwd" id="pwd" >
+						<input type="password" name="pwd" id="pwd" th:value="${memberVO.memPwd}">
 					</div>
 
 					<div>

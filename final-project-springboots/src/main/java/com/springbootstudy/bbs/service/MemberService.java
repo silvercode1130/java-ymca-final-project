@@ -18,14 +18,14 @@ public class MemberService {
             String memPwd,
             String memName,
             String memTel,
-            String memEmail,
+            String fullEmail,
             String memIp,
             Long memRoleIdx,
             int memGradeIdx
     ) {
 
         memberMapper.insertMember(
-                memId, memPwd, memName, memTel, memEmail,
+                memId, memPwd, memName, memTel, fullEmail,
                 memIp, memRoleIdx, memGradeIdx
         );
     }
