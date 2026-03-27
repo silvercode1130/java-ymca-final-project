@@ -12,6 +12,13 @@
 	완전한 클래스 이름(패키지를 포함한 이름)을 지정하면 된다.   
 -->
 <mapper namespace="com.springbootstudy.bbs.mapper.MemberMapper" >
+	<!-- mem_idx 만들기!! -> mypage용 -->
+	<!-- 나중에 추가로 늘려야 할 수 있음!!! -->
+	<select id="myPage">
+		SELECT * FROM member
+		WHERE mem_idx = #{memIdx} 
+	</select>
+
 	<!-- role에 기본값 주기 -->
 	<select id="findDefaultRoleIdx" resultType="long">
 	    SELECT role_idx 
@@ -19,7 +26,6 @@
 	    ORDER BY role_idx ASC 
 	    LIMIT 1
 	</select>
-
 
 	<!-- 아이디 중복 체크 -->
     <select id="countByMemId" parameterType="string" resultType="int">
@@ -39,15 +45,38 @@
         #{memIp}, #{memRoleIdx}, #{memGradeIdx}
     )
 	</insert>
+	
+	<!-- 로그인 -->
 
-    <!-- 로그인 -->
-    <select id="loginMember" resultType="int">
+	<!-- 아이디 존재 여부 -->
+    <select id="checkId" parameterType="string" resultType="int">
         SELECT COUNT(*)
         FROM member
-        WHERE mem_Id = #{memId}
-          AND mem_Pwd = #{memPwd}
+        WHERE mem_id = #{memId}
     </select>
 
+    <!-- 비밀번호 조회 -->
+    <select id="getPassword" parameterType="string" resultType="string">
+        SELECT mem_pwd
+        FROM member
+        WHERE mem_id = #{memId}
+    </select>
+
+    <!-- 회원 정보 조회 -->
+    <select id="getMemberVO" parameterType="string" resultType="com.springbootstudy.bbs.domain.MemberVO">
+        SELECT *
+        FROM member
+        WHERE mem_id = #{memId}
+    </select>    
+    
+    
+    <!-- 탈퇴 -->
+    
+    <delete id="deleteMember" parameterType="string">
+	    DELETE FROM member
+	    WHERE mem_id = #{memId}
+	</delete>
+ 
 </mapper>	
 
 
