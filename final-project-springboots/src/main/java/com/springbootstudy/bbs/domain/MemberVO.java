@@ -10,7 +10,7 @@ import lombok.Data;
 public class MemberVO {
 
  private Long    memIdx;        // PK
- private String  memId;         // 로그인 ID
+ private String  memId;         // 로그인 ID 
  private String  memPwd;        // 비밀번호 해시
  private String  memName;       // 성명
  private String  memTel;        // 전화번호
