@@ -123,7 +123,7 @@ CREATE TABLE member (
     mem_idx		   BIGINT		 NOT NULL AUTO_INCREMENT COMMENT 'PK',
     mem_id         VARCHAR(50)   NOT NULL COMMENT '로그인 ID',
     mem_pwd        VARCHAR(255)  NOT NULL COMMENT '비밀번호 해시',
-    mem_name       VARCHAR(50)   DEFAULT NULL COMMENT '성명',
+    mem_name       VARCHAR(50)   DEFAULT NULL COMMENT '성명', 
     mem_tel        VARCHAR(20)   DEFAULT NULL COMMENT '전화번호',
     mem_email      VARCHAR(100)  DEFAULT NULL COMMENT '이메일',
     mem_ip         VARCHAR(100)  NOT NULL COMMENT 'IP 주소',

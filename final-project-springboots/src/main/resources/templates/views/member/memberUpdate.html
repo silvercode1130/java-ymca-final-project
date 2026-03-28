@@ -12,42 +12,44 @@
 			
 			<div>
 				<form action="/members/memberUpdate" id="memberUpdateForm" name="memberUpdateForm" method="post">					
-					<div id="memId" name="memId">
+					<div id="id" name="id">
 						<label>아이디</label>
-						<input type="text" name="id" id="id" th:value="${memberVO.memId}" readonly>
-						
-						<input type="hidden" id="gradeIdx" name="gradIdx" > <!-- th:value="${memberVO.memName}" -->
-						회원등급 <br>
-						<!-- ${grade_name} -->
+						<input type="text" name="memId" id="memId" th:value="${memberVO.memId}" readonly>
 					</div>
 					
-					<div id="memName" name="memName">
+					<!-- 추가한 부분 -->
+					<div id="grade" name="grade">
+						<label>회원등급</label>
+						<input type="text" name="gradeName" id="gradeName" th:value="${gradeName}" readonly>
+					</div>
+					
+					<div id="name" name="name">
 						<label>이름</label>
-						<input type="text" name="name" id="name" th:value="${memberVO.memName}">
+						<input type="text" name="memName" id="memName" th:value="${memberVO.memName}">
 					</div>
 					
-					<div id="memEmail" name="memEmail">
+					<div id="email" name="email">
 						<label>이메일</label>
-						<input type="text" name="email" id="email" th:value="${memberVO.memEmail}">
+						<input type="text" name="memEmail" id="memEmail" th:value="${memberVO.memEmail}">
 					</div>
 					
-					<div id="memTel" name="memtel">
+					<div id="tel" name="tel">
 						<label>전화번호</label>
-						<input type="text" name="tel" id="tel" th:value="${memberVO.memTel}">
+						<input type="text" name="memTel" id="memTel" th:value="${memberVO.memTel}">
 					</div>
 					
-					<div id="memBday" name="memBday">
+					<div id="bday" name="bday">
 						<label>생년월일</label>
-						<input type="date" name="bday" id="bday" th:value="${memberVO.memBday}">
+						<input type="date" name="memBday" id="memBday" th:value="${memberVO.memBday}">
 					</div> 
 					
-					<div id="memPwd" name="memPwd">
+					<div id="pwd" name="pwd">
 						<label>새 비밀번호</label>
-						<input type="password" name="pwd" id="pwd" th:value="${memberVO.memPwd}">
+						<input type="password" name="newPwd" id="newPwd" placeholder="🔒 변경할 비밀번호를 입력해주세요">
 					</div>
 
 					<div>
-						<button>정보 업데이트</button>
+						<button type="submit">정보 업데이트</button> 
 					</div>
 				</form>
 			</div>

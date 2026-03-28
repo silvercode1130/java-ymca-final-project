@@ -8,25 +8,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 
-/* HandlerInterceptor는 요청 경로마다 접근 제어를 다르게 하거나 특정 URL에 접근할 때
- * 공통적으로 처리해야 할 것이 있을 때 주로 사용한다. 앞의 프로젝트에서는 회원이 로그인
- * 상태인지 컨트롤러 메서드마다 세션을 체크해 로그인 상태를 체크 했기 때문에 동일한
- * 코드의 중복을 피할 수 없었다. 하지만 스프링프레임워크가 제공하는 HandlerInterceptor를
- * 구현해 애플리케이션에 적용하면 중복 코드를 줄일 수 있다. 이처럼 여러 요청 경로 또는
- * 여러 컨트롤러에서 공통으로 적용해야 할 기능을 구현할 때 HandlerInterceptor를
- * 사용하면 아주 유용하다.
- * 
- * HandlerInterceptor를 사용하면 다음과 같은 시점에 공통 기능을 적용할 수 있다.
- * 
- * 1. 컨트롤러 실행 전
- * 2. 컨트롤러 실행 후 - 아직 뷰가 생성되지 않았다.
- * 3. 뷰가 생성되고 클라이언트로 전송된 후
- * 
- * HandlerInterceptor 인터페이스에 정의된 추상 메서드는 모두 3개이며 
- * HandlerInterceptor를 구현하고 동작시키기 위해서는 Spring MVC 환경설정
- * 클래스에 Bean으로 등록하고 해당 인터셉터가 동작할 경로 패턴(PathPattern)을
- * 설정해야 한다.
- **/
 // 접속자가 로그인 상태인지 체크하는 인터셉터
 @Slf4j
 public class LoginCheckInterceptor implements HandlerInterceptor {
@@ -64,25 +45,6 @@ public class LoginCheckInterceptor implements HandlerInterceptor {
 	   return true; 
 	}
 	
-//	   @Override
-//	   public boolean preHandle(HttpServletRequest request,
-//	         HttpServletResponse response, Object handler) throws Exception {
-//	      
-//	      log.info("##########LoginCheckInterceptor - preHandle()##########");
-//
-//	      HttpSession session = request.getSession();
-//	      
-//	      String uri = request.getRequestURI();
-//	      if (uri.equals("/members/login") || uri.equals("/members/signUp")) {
-//	          return true; // 예외 처리
-//	      }
-//	      if (session.getAttribute("isLogin") == null) {
-//	          response.sendRedirect("/members/login");
-//	          session.setAttribute("loginMsg", "로그인이 필요한 서비스 입니다");
-//	          return false;
-//	      }
-//	      return true; 
-//	   }
 	/*
 	 * postHandle() 메서드는 클라이언트 요청이 들어오고 컨트롤러가 정상적으로
 	 * 실행된 이후에 공통적으로 적용할 추가 기능이 있을 때 주로 사용한다.

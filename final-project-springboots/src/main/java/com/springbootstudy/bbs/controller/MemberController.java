@@ -155,37 +155,7 @@ public class MemberController {
 
 		return "/views/member/pwdFind"; // ## 수정 - main 생기면 바꿔
 	}
-
-	// 회원정보 수정 -----------------------------------------------------------------
-
-	// memberUpdate.html - 창 띄우기
-	@GetMapping("/members/memberUpdate")
-	public String memberUpdate(HttpSession session, Model model) {
-
-		/*
-		 * 로그인 한 뒤 -> 회원 정보를 받아서 페이지를 열어야 함
-		 * 안그러면 500 에러
-		 * 회원정보를 받을려면 로그인 할 때 값을 담은 session과 model이 필요함
-		 */
-		// 로그인 정보 가져오기
-		MemberVO memberVO = (MemberVO) session.getAttribute("loginUser");
-
-		System.out.println("🔍 memberUpdate 접근!");
-		System.out.println("📝 세션 ID: " + session.getId());
-		System.out.println("📝 세션에 저장된 loginUser: " + memberVO);
-		System.out.println("📝 세션의 모든 속성: " +
-				java.util.Collections.list(session.getAttributeNames()));
-
-		// 로그인 안했으면 쫓아내기
-		if (memberVO == null) {
-			System.out.println("❌ 로그인 부탁드립니다");
-			return "redirect:/members/login";
-		}
-
-		model.addAttribute("memberVO", memberVO); 
-
-		return "views/member/memberUpdate";
-	}
+	
 
 	// 로그아웃 -----------------------------------------------------------------
 	
@@ -228,29 +198,6 @@ public class MemberController {
 
 	    return "redirect:/main";	
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
 
 }
