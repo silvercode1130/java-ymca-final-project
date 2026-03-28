@@ -226,7 +226,7 @@ public class MemberController {
 	        return null;  
 	    }
 
-	    return "redirect:/main";	// localhost:8080/main으로 가야하는데 localhost:8080으로 감
+	    return "redirect:/main";	
 	}
 	
 	
