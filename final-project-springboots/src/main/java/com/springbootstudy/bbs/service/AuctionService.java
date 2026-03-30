@@ -16,52 +16,75 @@ public class AuctionService {
 	@Autowired
 	private AuctionMapper auctionMapper;
 	
+	// 경매 구매요청 전체 리스트 조회
 	public List<AuctionListDTO> AuctionList() {
 		
 		// DB에서 리스트 가져오기
         List<AuctionListDTO> list = auctionMapper.auctionList();
         
-        // 현재 시간 (계산 기준)
-        LocalDateTime now = LocalDateTime.now();
-
         // 리스트를 하나씩 돌면서 '빈칸' 채우기
         for (AuctionListDTO dto : list) {
-            
-            // 절약율 계산: (희망가 - 최저가) / 희망가 * 100
-            if (dto.getAuctionTargetPrice() > 0 && dto.getMinBidPrice() > 0) {
-                double target = dto.getAuctionTargetPrice();
-                double minPrice = dto.getMinBidPrice();
-                
-                // 0으로 나누기 방지 및 정수형 반올림 계산
-                int rate = (int) Math.round(((target - minPrice) / target) * 100);
-                dto.setDiscountRate(rate); 
-            } 
-            else {
-                dto.setDiscountRate(0); // 입찰이 없으면 0%
-            }
-
-            // 남은 시간 계산: 마감일시 - 현재시간
-            if (dto.getAuctionEndAt() != null) {
-                LocalDateTime end = dto.getAuctionEndAt();
-                Duration duration = Duration.between(now, end);
-                
-                long days = duration.toDays();
-                long hours = duration.toHoursPart();
-                long minutes = duration.toMinutesPart();
-
-                if (duration.isNegative()) {
-                    dto.setTimeDisplay("마감된 경매");
-                } else if (days > 0) {
-                    dto.setTimeDisplay(days + "일 " + hours + "시간 남음");
-                } else if (hours > 0) {
-                    dto.setTimeDisplay(hours + "시간 " + minutes + "분 남음");
-                } else {
-                    dto.setTimeDisplay(minutes + "분 후 마감!");
-                }
-            }
+        	refine(dto);
         }
 		
         return list;
     }
 	
+	// 구매요청 상세보기 조회
+	public AuctionListDTO auctionDetail(Long auctionIdx) {
+		
+		AuctionListDTO detail = auctionMapper.auctionDetail(auctionIdx);
+		
+		if(detail != null) {
+			refine(detail);
+		}
+		
+		return detail;
+	}
+	
+	
+	
+	// 절약율 계산과 남은 시간 계산을 도와주는 메서드 
+	private void refine(AuctionListDTO dto) {
+		
+		// 절약율 계산: (희망가 - 최저가) / 희망가 * 100
+        if (dto.getAuctionTargetPrice() > 0 && dto.getMinBidPrice() > 0) {
+            double target = dto.getAuctionTargetPrice();
+            double minPrice = dto.getMinBidPrice();
+            
+            // 0으로 나누기 방지 및 정수형 반올림 계산
+            int rate = (int) Math.round(((target - minPrice) / target) * 100);
+            dto.setDiscountRate(rate); 
+        } 
+        else {
+            dto.setDiscountRate(0); // 입찰이 없으면 0%
+        }
+        
+
+        // 현재 시간 (계산 기준)
+        LocalDateTime now = LocalDateTime.now();
+
+        // 남은 시간 계산: 마감일시 - 현재시간
+        if (dto.getAuctionEndAt() != null) {
+            LocalDateTime end = dto.getAuctionEndAt();
+            Duration duration = Duration.between(now, end);
+            
+            long days = duration.toDays();
+            long hours = duration.toHoursPart();
+            long minutes = duration.toMinutesPart();
+
+            if (duration.isNegative()) {
+                dto.setTimeDisplay("마감된 경매");
+            } 
+            else if (days > 0) {
+                dto.setTimeDisplay(days + "일 " + hours + "시간 남음");
+            } 
+            else if (hours > 0) {
+                dto.setTimeDisplay(hours + "시간 " + minutes + "분 남음");
+            } 
+            else {
+                dto.setTimeDisplay(minutes + "분 후 마감!");
+            }
+        }
+	}
 }

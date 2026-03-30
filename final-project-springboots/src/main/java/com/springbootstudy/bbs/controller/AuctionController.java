@@ -8,6 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 
 import com.springbootstudy.bbs.domain.AuctionListDTO;
 import com.springbootstudy.bbs.domain.AuctionVO;
@@ -34,4 +36,22 @@ public class AuctionController {
         // "views/auction/auctionList.html" 화면으로 쟁반을 들고 이동
         return "views/auction/auctionList"; 
     }
+	
+	@GetMapping("/auction/auctionDetail/{auctionIdx}")
+	public String auctionDetail(@PathVariable("auctionIdx") Long auctionIdx, Model model) {
+	    
+	    // 서비스 호출
+	    AuctionListDTO detail = auctionService.auctionDetail(auctionIdx);
+	    
+	    // 만약 없는 글 번호라면? (예외 처리)
+	    if (detail == null) {
+	        return "redirect:/auction/list"; // 다시 리스트로
+	    }
+	    
+	    // 모델에 데이터 담기
+	    model.addAttribute("detail", detail);
+	    
+	    // 상세보기 화면으로 이동
+	    return "views/auction/auctionDetail"; 
+	}
 }

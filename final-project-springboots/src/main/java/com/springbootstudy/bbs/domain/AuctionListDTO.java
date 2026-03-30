@@ -9,7 +9,9 @@ public class AuctionListDTO {
     private Long auctionIdx;
     private String auctionTitle;
     private Long auctionTargetPrice;
-    private LocalDateTime auctionEndAt;
+    private LocalDateTime auctionEndAt;  // 입찰 마감일시
+    private String auctionDesc;			
+    private LocalDateTime 	auctionDecisionDeadline;// 결정 마감일
     
     // Item 관련 (이미지)
     private String itemThumbnailImg;
@@ -25,5 +27,4 @@ public class AuctionListDTO {
     private int discountRate;    // "13% 절약"
     private String timeDisplay;  // "1시간 45분"
     private String statusBadge;  // "마감 임박"
-    
 }

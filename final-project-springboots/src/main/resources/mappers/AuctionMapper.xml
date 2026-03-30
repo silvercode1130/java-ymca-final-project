@@ -18,6 +18,8 @@
 	    <result property="auctionTitle" column="auction_title" />
 	    <result property="auctionTargetPrice" column="auction_target_price" />
 	    <result property="auctionEndAt" column="auction_end_at" />
+	    <result property="auctionDesc" column="auction_desc" />
+	    <result property="auctionDecisionDeadline" column="auction_decision_deadline" />
 	    
 	    <result property="itemCategoryName" column="item_category_name" />
 	    
@@ -27,6 +29,7 @@
 	    <result property="bidCount" column="b_count" />
 	</resultMap>
 	
+	<!-- 경매 구매요청 전체 리스트 조회 -->
 	<select id="auctionList" resultMap="AuctionListMap">
 		SELECT 
 	        a.auction_idx, 
@@ -55,7 +58,32 @@
 	        i.item_thumbnail_img  ORDER BY a.auction_regdate DESC <!-- 최신순 정렬 -->
 	</select>
 	
-	
+	<!-- 구매요청 상세보기 조회 -->
+	<select id="auctionDetail" resultMap="AuctionListMap">
+		SELECT 
+	        a.auction_idx, 
+	        a.auction_title, 
+	        a.auction_desc, 
+	        a.auction_target_price, 
+	        a.auction_end_at,
+	        a.auction_decision_deadline,
+	        ic.item_category_name,
+	        i.item_thumbnail_img,
+	        COUNT(b.bid_idx) AS b_count,
+	        IFNULL(MIN(b.bid_price), 0) AS min_price
+	    FROM auction a
+	    LEFT JOIN item_category ic ON a.item_category_idx = ic.item_category_idx
+	    LEFT JOIN bid b ON a.auction_idx = b.auction_idx
+	    LEFT JOIN item i ON b.item_idx = i.item_idx
+	    WHERE a.auction_idx = #{auctionIdx}  
+	    GROUP BY a.auction_idx, 
+	        a.auction_title, 
+	        a.auction_desc, <!-- 상세 설명도 그룹에 포함 -->
+	        a.auction_target_price, 
+	        a.auction_end_at, 
+	        ic.item_category_name, 
+	        i.item_thumbnail_img
+	</select>
 	
 </mapper>	
 

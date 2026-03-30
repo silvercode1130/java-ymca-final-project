@@ -2,6 +2,8 @@ package com.springbootstudy.bbs.domain;
 
 import lombok.Data;
 
+import java.time.LocalDateTime;
+
 //아이템(상품) 정보
 @Data
 public class ItemVO {
@@ -13,7 +15,7 @@ public class ItemVO {
  private String  itemCondition;     // 상태 (NEW / USED_A / USED_B 등)
  private String  itemThumbnailImg;  // 썸네일 이미지
  private String  itemDetailImg;     // 상세 이미지
- private java.time.LocalDateTime itemRegdate;   // 등록일
+ private LocalDateTime itemRegdate; // 등록일
  private String  itemIsDeleted;     // 'Y' / 'N'
 
 }
