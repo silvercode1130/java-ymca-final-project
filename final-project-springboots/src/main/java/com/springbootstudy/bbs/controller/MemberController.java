@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,19 +36,6 @@ public class MemberController {
 	@Autowired
 	HttpSession session; 
 
-	// 임시 메인 - 메인 생기면 삭제 예정
-	@GetMapping("/main")
-	public String main(Model model, HttpSession session) {
-
-		// 로그인 정보가 있으면 model에 추가해서 template에서 사용 가능하게 함
-		 MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
-		 
-		 if (loginUser != null) {
-		 model.addAttribute("loginUser", loginUser);
-		 }
-
-		return "/fragments/main"; 
-	}
 
 	// 회원가입 -----------------------------------------------------------------
 
@@ -118,7 +106,7 @@ public class MemberController {
 	// login.html - 로그인 처리 기능	
 	@PostMapping("/members/login")
 	public String login(@RequestParam("memId") String memId, @RequestParam("memPwd") String memPwd, 
-			Model model, HttpSession session, RedirectAttributes ra
+			Model model, HttpSession session, RedirectAttributes ra  // RedirectAttributes cannot be resolved to a type
 			) throws ServletException, IOException {
 		
 		// MemberService 클래스를 사용해 로그인 성공여부 확인
