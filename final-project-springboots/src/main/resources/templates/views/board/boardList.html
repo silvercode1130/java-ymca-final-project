@@ -17,7 +17,7 @@
       <a class="nav-link active" href="/boards">커뮤니티</a>
       <a class="nav-link" href="/auctions">경매</a>
       <span th:if="${session.isLogin != null}">
-        <a class="nav-link" href="/mypage/profile" th:text="${session.isLogin.memName}">내 정보</a>
+        <a class="nav-link" href="/mypage/profile" th:text="${session.loginUser.memName}">내 정보</a>
         <form action="/views/member/logout" method="post" style="display:inline">
           <button type="submit" class="btn btn-sm" style="color:#aaa; background:none; border:none;">로그아웃</button>
         </form>
