@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="/bootstrap/bootstrap.min.css">
-  <title>내 참가 목록</title>
+  <title>마이 페이지 - 내 입찰 목록</title>
 </head>
 
 <body>
@@ -13,13 +13,13 @@
     <div class="profile-bid">
       <h2 class="mb-4">내 입찰 목록</h2>
       <div class="table-responsive">
-        <table class="table table-hover border text-center">
+        <table class="table table-hover border text-center align-middle">
           <thead class="table-light">
             <tr>
-              <th>경매 제목</th>
-              <th>나의 제안가</th>
-              <th>상태</th>
-              <th>입찰일시</th>
+              <th style="width: 45%;">경매 제목</th>
+              <th style="width: 20%;">나의 제안가</th>
+              <th style="width: 15%;">상태</th>
+              <th style="width: 20%;">입찰일시</th>
             </tr>
           </thead>
           <tbody>
@@ -31,7 +31,8 @@
               <td class="text-start">
                 <a th:href="@{/auction/detail/{idx}(idx=${bid.auctionIdx})}" 
                    class="text-decoration-none fw-bold text-dark">
-                   [[${bid.auctionTitle}]] </a>
+                   [[${bid.auctionTitle}]] 
+                </a>
               </td>
 
               <td class="fw-bold text-primary">
@@ -39,19 +40,27 @@
               </td>
 
               <td>
-                <span th:if="${bid.bidStatus == 'WIN'}" class="badge bg-success">낙찰됨</span>
-                <span th:if="${bid.bidStatus == 'ING'}" class="badge bg-info">입찰중</span>
-                <span th:if="${bid.bidStatus == 'FAIL'}" class="badge bg-danger">미선정</span>
+                <span th:text="${bid.bidStatusName}" 
+                      class="badge"
+                      th:classappend="${bid.bidStatusCode == 'won'} ? 'bg-success' : 
+                                     (${bid.bidStatusCode == 'normal'} ? 'bg-primary' : 'bg-danger')">
+                  상태
+                </span>
               </td>
 
-              <td th:text="${#temporals.format(bid.bidDate, 'yyyy-MM-dd HH:mm')}">2026-03-30 14:00</td>
+              <td th:text="${#temporals.format(bid.bidRegdate, 'yyyy-MM-dd HH:mm')}">
+                2026-03-30 14:00
+              </td>
             </tr>
           </tbody>
         </table>
       </div>
+      
+      <div class="text-end mt-4">
+        <a href="/mypage" class="btn btn-outline-secondary">마이페이지로 돌아가기</a>
+      </div>
     </div>
   </div>
-
   <script src="/bootstrap/bootstrap.bundle.min.js"></script>
 </body>
 </html>

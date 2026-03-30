@@ -3,6 +3,7 @@ package com.springbootstudy.bbs.mapper;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import com.springbootstudy.bbs.domain.AuctionVO;
 import com.springbootstudy.bbs.domain.BidVO;
@@ -25,7 +26,7 @@ public interface MyPageMapper {
 
   // 4. 내가 쓴 게시글 목록 조회
   // 서비스의 getBoardList와 연결됩니다.
-  public List<BoardVO> getBoardListByMemIdx(long memIdx);
+  public List<BoardVO> getBoardListByMemIdx(@Param("memIdx") Long memIdx);
 
   // 5. 단건 조회 기능 (필요 시 사용)
   public AuctionVO getAuction(long auctionIdx);

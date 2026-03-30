@@ -1,22 +1,23 @@
 package com.springbootstudy.bbs.domain;
 
 import java.time.LocalDateTime;
-
 import lombok.Data;
 
-//입찰(판매자 제안)
 @Data
 public class BidVO {
-
-  private Long bidIdx; // PK
-  private Long auctionIdx; // FK → auction
-  private Long bidderIdx; // FK → member
-  private Long itemIdx; // FK → item (실제 제안 상품)
-  private Long bidPrice; // 제안 가격
-  private Integer bidQuantity; // 수량
-  private String bidMessage; // 제안 조건/설명
-  private Integer bidStatusIdx; // FK → bid_status (NORMAL/WON/LOST/CANCELED)
-  private LocalDateTime bidRegdate; // 등록일
-  private LocalDateTime bidModdate; // 수정/취소일 추적
+  private Long bidIdx;
+  private Long auctionIdx;
+  private Long bidderIdx;
+  private Long itemIdx;
+  private Long bidPrice;
+  private Integer bidQuantity;
+  private String bidMessage;
+  private Integer bidStatusIdx;
+  private LocalDateTime bidRegdate;
+  private LocalDateTime bidModdate;
   private String auctionTitle;
+
+  // 조인(Join) 결과를 담기 위한 추가 필드
+  private String bidStatusName; // 예: 낙찰, 입찰중
+  private String bidStatusCode; // 예: won, normal
 }
