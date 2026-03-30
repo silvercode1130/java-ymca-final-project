@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/bootstrap/bootstrap.min.css">
+  <title>내 게시글 목록</title>
+</head>
+
+<body>
+  <div class="container mt-5">
+    <div class="profile-boards">
+      <h2 class="mb-4">내가 쓴 게시글</h2>
+      <div class="table-responsive">
+        <table class="table table-hover border text-center">
+          <thead class="table-light">
+            <tr>
+              <th style="width: 10%;">번호</th>
+              <th style="width: 50%;">제목</th>
+              <th style="width: 25%;">작성일</th>
+              <th style="width: 15%;">조회수</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr th:if="${#lists.isEmpty(boars)}">
+              <td colspan="4" class="text-center text-muted py-5">작성한 게시글이 없습니다.</td>
+            </tr>
+
+            <tr th:each="board : ${boards}">
+              <td th:text="${board.boardIdx}">1</td>
+              <td class="text-start">
+                <a th:href="@{/board/detail/{idx}(idx=${board.boardIdx})}" 
+                   class="text-decoration-none fw-bold text-dark">
+                  [[${board.title}]]
+                </a>
+              </td>
+              <td th:text="${#temporals.format(board.regDate, 'yyyy-MM-dd HH:mm')}">2026-03-30 10:00</td>
+              <td>
+                <span class="badge rounded-pill bg-light text-dark border" th:text="${board.readCount}">0</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      
+      <div class="text-end mt-3">
+        <a href="/mypage" class="btn btn-outline-secondary">마이페이지로 돌아가기</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="/bootstrap/bootstrap.bundle.min.js"></script>
+</body>
+</html>

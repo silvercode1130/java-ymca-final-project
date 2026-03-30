@@ -24,16 +24,24 @@
           </thead>
           <tbody>
             <tr th:if="${#lists.isEmpty(auctions)}">
-              <td colspan="5" class="text-center text-muted">등록하거나 참가한 경매가 없습니다.</td>
+              <td colspan="4" class="text-center text-muted py-5">등록된 경매 내역이 없습니다.</td>
             </tr>
-            <tr th:each="acution : ${auctions}">
+            <tr th:each="auction : ${auctions}">
+              <td th:text="${auction.category}">축구</td>
+
               <td>
-                <a th:href="@{/acution/detail/{idx}(idx=${autction.auctionIdx})}" class="text-decoration-none fw-bold text-dark">
-                  [[${aution.title}]]
+                <span th:if="${auction.status == 'ING'}" class="badge bg-success me-1">진행중</span>
+                <span th:if="${auction.status == 'END'}" class="badge bg-secondary me-1">종료</span>
+
+                <a th:href="@{/auction/detail/{idx}(idx=${auction.auctionIdx})}"
+                  class="text-decoration-none fw-bold text-dark">
+                  [[${auction.title}]]
                 </a>
               </td>
-              <td th:text="${acution.bidCount} + '회'">0회</td>
-              <td th:text="${#temporals.format(auction.endDate, 'yyyy-MM-dd HH:mm')}">2026-03-25</td>
+
+              <td th:text="${#temporals.format(auction.endDate, 'yyyy-MM-dd HH:mm')}">2026-03-25 15:00</td>
+
+              <td class="text-primary fw-bold" th:text="${auction.bidCount} + '회'">0회</td>
             </tr>
           </tbody>
         </table>
