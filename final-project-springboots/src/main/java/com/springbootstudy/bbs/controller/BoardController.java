@@ -30,29 +30,37 @@ public class BoardController {
     // ── 게시판 목록 (전체 or 카테고리별) ─────────────────────
     // /boards → 전체 목록 (커뮤니티 홈)
     @GetMapping
-    public String home(Model model) {
-        model.addAttribute("boardTypes", boardService.getBoardTypes());
-        model.addAttribute("boards",     boardService.getBoards(null, null));
-        model.addAttribute("typeCode",   null);
+    public String home(
+            @RequestParam(value = "keyword",    required = false) String keyword,
+            @RequestParam(value = "searchType", required = false) String searchType,
+            Model model
+    ) {
+        model.addAttribute("boardTypes",  boardService.getBoardTypes());
+        model.addAttribute("boards",      boardService.getBoards(null, keyword, searchType));
+        model.addAttribute("typeCode",    null);
         model.addAttribute("currentType", null);
+        model.addAttribute("keyword",     keyword);
+        model.addAttribute("searchType",  searchType);
         return "views/board/boardList";
     }
 
     // /boards/{typeCode} → 특정 게시판 목록
     @GetMapping("/{typeCode}")
     public String list(
-            @PathVariable("typeCode")                        String typeCode,
-            @RequestParam(value = "keyword", required = false) String keyword,
+            @PathVariable("typeCode")                              String typeCode,
+            @RequestParam(value = "keyword",    required = false)  String keyword,
+            @RequestParam(value = "searchType", required = false)  String searchType,
             Model model
     ) {
         BoardTypeVO currentType = boardService.getBoardTypeByCode(typeCode);
         if (currentType == null) return "redirect:/boards";
 
         model.addAttribute("boardTypes",   boardService.getBoardTypes());
-        model.addAttribute("boards",       boardService.getBoards(typeCode, keyword));
+        model.addAttribute("boards",       boardService.getBoards(typeCode, keyword, searchType));
         model.addAttribute("typeCode",     typeCode);
         model.addAttribute("currentType",  currentType);
         model.addAttribute("keyword",      keyword);
+        model.addAttribute("searchType",   searchType);
         return "views/board/boardList";
     }
 
@@ -97,14 +105,14 @@ public class BoardController {
             HttpServletRequest request,
             HttpSession session
     ) {
-        MemberVO loginMember = (MemberVO) session.getAttribute("loginMember");
-        if (loginMember == null) return "redirect:/views/member/login.do";
+        MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
+        if (loginUser == null) return "redirect:/views/member/login.do";
 
         BoardTypeVO boardType = boardService.getBoardTypeByCode(typeCode);
         if (boardType == null) return "redirect:/boards";
 
         BoardVO board = new BoardVO();
-        board.setMemIdx(loginMember.getMemIdx());
+        board.setMemIdx(loginUser.getMemIdx());
         board.setBoardTypeIdx(boardType.getBoardTypeIdx());
         board.setBoardTitle(boardTitle);
         board.setBoardContent(boardContent);
@@ -121,11 +129,11 @@ public class BoardController {
             @PathVariable("boardIdx") Long   boardIdx,
             Model model, HttpSession session
     ) {
-        MemberVO loginMember = (MemberVO) session.getAttribute("loginMember");
-        if (loginMember == null) return "redirect:/views/member/login";
+        MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
+        if (loginUser == null) return "redirect:/views/member/login";
 
         BoardVO board = boardService.getBoardDetail(boardIdx);
-        if (!board.getMemIdx().equals(loginMember.getMemIdx())) {
+        if (!board.getMemIdx().equals(loginUser.getMemIdx())) {
             return "redirect:/boards/" + typeCode + "/" + boardIdx;
         }
         model.addAttribute("board",    board);
@@ -142,8 +150,8 @@ public class BoardController {
             @RequestParam("boardContent") String boardContent,
             HttpSession session
     ) {
-        MemberVO loginMember = (MemberVO) session.getAttribute("loginMember");
-        if (loginMember == null) return "redirect:/views/member/login.do";
+        MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
+        if (loginUser == null) return "redirect:/views/member/login.do";
 
         BoardVO board = new BoardVO();
         board.setBoardIdx(boardIdx);
@@ -160,8 +168,8 @@ public class BoardController {
             @PathVariable("boardIdx") Long   boardIdx,
             HttpSession session
     ) {
-        MemberVO loginMember = (MemberVO) session.getAttribute("loginMember");
-        if (loginMember == null) return "redirect:/views/member/login.do";
+        MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
+        if (loginUser == null) return "redirect:/views/member/login.do";
 
         boardService.removeBoard(boardIdx);
         return "redirect:/boards/" + typeCode;
@@ -177,12 +185,12 @@ public class BoardController {
             HttpServletRequest request,
             HttpSession session
     ) {
-        MemberVO loginMember = (MemberVO) session.getAttribute("loginMember");
-        if (loginMember == null) return "redirect:/views/member/login.do";
+        MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
+        if (loginUser == null) return "redirect:/views/member/login.do";
 
         ReplyVO reply = new ReplyVO();
         reply.setBoardIdx(boardIdx);
-        reply.setMemIdx(loginMember.getMemIdx());
+        reply.setMemIdx(loginUser.getMemIdx());
         reply.setReplyContent(replyContent);
         reply.setReplyIp(getClientIp(request));
 
@@ -198,8 +206,8 @@ public class BoardController {
             @RequestParam("boardIdx")  Long   boardIdx,
             HttpSession session
     ) {
-        MemberVO loginMember = (MemberVO) session.getAttribute("loginMember");
-        if (loginMember == null) return "redirect:/views/member/login";
+        MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
+        if (loginUser == null) return "redirect:/views/member/login";
 
         boardService.removeReply(replyIdx);
         return "redirect:/boards/" + typeCode + "/" + boardIdx;
