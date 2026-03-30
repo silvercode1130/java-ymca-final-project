@@ -15,4 +15,10 @@ public interface AuctionMapper {
 	
 	// 구매요청 상세보기 조회
 	AuctionListDTO auctionDetail(Long auctionIdx);
+	
+	// 아이템 정보 저장 (이미지, 브랜드 등)
+    int insertItem(AuctionListDTO dto);
+    
+    // 경매글 저장
+    int insertAuction(AuctionListDTO dto);
 }

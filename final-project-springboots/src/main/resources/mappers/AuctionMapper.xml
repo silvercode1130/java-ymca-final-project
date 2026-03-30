@@ -20,6 +20,8 @@
 	    <result property="auctionEndAt" column="auction_end_at" />
 	    <result property="auctionDesc" column="auction_desc" />
 	    <result property="auctionDecisionDeadline" column="auction_decision_deadline" />
+	    <result property="auctionStatusIdx" column="auction_status_idx" />
+	    <result property="auctionStatusName" column="auction_status_name" />
 	    
 	    <result property="itemCategoryName" column="item_category_name" />
 	    
@@ -67,11 +69,13 @@
 	        a.auction_target_price, 
 	        a.auction_end_at,
 	        a.auction_decision_deadline,
+	        s.auction_status_name,
 	        ic.item_category_name,
 	        i.item_thumbnail_img,
 	        COUNT(b.bid_idx) AS b_count,
 	        IFNULL(MIN(b.bid_price), 0) AS min_price
 	    FROM auction a
+	    JOIN auction_status s ON a.auction_status_idx = s.auction_status_idx
 	    LEFT JOIN item_category ic ON a.item_category_idx = ic.item_category_idx
 	    LEFT JOIN bid b ON a.auction_idx = b.auction_idx
 	    LEFT JOIN item i ON b.item_idx = i.item_idx
@@ -84,6 +88,23 @@
 	        ic.item_category_name, 
 	        i.item_thumbnail_img
 	</select>
+	
+	<insert id="insertItem" useGeneratedKeys="true" keyProperty="itemIdx">
+	    INSERT INTO item (item_name, item_category_idx, item_brand, item_condition, item_thumbnail_img, item_regdate)
+	    VALUES (#{auctionTitle}, #{itemCategoryIdx}, #{itemBrand}, 'NEW', #{itemThumbnailImg}, NOW())
+	</insert>
+	
+	<insert id="insertAuction">
+	    INSERT INTO auction (
+	        buyer_idx, item_category_idx, auction_title, auction_desc, 
+	        auction_target_price, auction_start_at, auction_end_at, 
+	        auction_decision_deadline, auction_status_idx, auction_regdate
+	    ) VALUES (
+	        #{buyerIdx}, #{itemCategoryIdx}, #{auctionTitle}, #{auctionDesc}, 
+	        #{auctionTargetPrice}, NOW(), #{auctionEndAt}, 
+	        #{auctionDecisionDeadline}, 1, NOW()
+	    )
+	</insert>
 	
 </mapper>	
 

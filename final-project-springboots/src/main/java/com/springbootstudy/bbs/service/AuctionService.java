@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.springbootstudy.bbs.domain.AuctionListDTO;
 import com.springbootstudy.bbs.mapper.AuctionMapper;
@@ -87,4 +88,14 @@ public class AuctionService {
             }
         }
 	}
+	
+	@Transactional
+    public void registerAuction(AuctionListDTO dto) {
+        // 아이템 정보 저장 (브랜드 등 포함)
+        auctionMapper.insertItem(dto);
+        
+        // 경매 정보 저장 
+        auctionMapper.insertAuction(dto);
+    }
+	
 }

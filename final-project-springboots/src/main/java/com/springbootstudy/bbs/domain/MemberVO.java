@@ -9,19 +9,19 @@ import lombok.Data;
 @Data
 public class MemberVO {
 
- private Long    memIdx;        // PK
- private String  memId;         // 로그인 ID
- private String  memPwd;        // 비밀번호 해시
- private String  memName;       // 성명
- private String  memTel;        // 전화번호
- private String  memEmail;      // 이메일
- private String  memIp;         // IP 주소
- private Integer memRoleIdx;    // FK → role.role_idx (권한 등급) 
- private Integer memGradeIdx;   // FK → grade.grade_idx (신용도 등급)
- private LocalDate     memBday;     // 생일
- private LocalDateTime memRegdate;  // 가입일
- private String  memIsDeleted;   // 'Y' / 'N' (삭제 여부)
- private LocalDateTime memDeldate;  // 탈퇴일
+ private Long    		memIdx;        	// PK
+ private String  		memId;         	// 로그인 ID
+ private String  		memPwd;        	// 비밀번호 해시
+ private String  		memName;      	// 성명
+ private String  		memTel;       	// 전화번호
+ private String  		memEmail;      	// 이메일
+ private String  		memIp;         	// IP 주소
+ private Integer 		memRoleIdx;    	// FK → role.role_idx (권한 등급) 
+ private Integer 		memGradeIdx;   	// FK → grade.grade_idx (신용도 등급)
+ private LocalDate     	memBday;     	// 생일
+ private LocalDateTime 	memRegdate;  	// 가입일
+ private String  		memIsDeleted;   // 'Y' / 'N' (삭제 여부)
+ private LocalDateTime 	memDeldate;  	// 탈퇴일
 
 }
 

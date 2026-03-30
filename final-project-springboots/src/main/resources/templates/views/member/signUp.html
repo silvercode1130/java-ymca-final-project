@@ -2,6 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layouts/main_layout}">
+     
 
 <th:block layout:fragment="content">
 
@@ -117,6 +118,7 @@
             let memName = document.querySelector("#memName").value.trim();
             let memTel = document.querySelector("#memTel").value.trim();
             let memEmail = document.querySelector("#memEmail").value.trim();
+            let emailDomain = document.querySelector("#emailDomain").value.trim();
             let agree1 = document.querySelector("input[name='agree']").checked;
 
             let btn = document.querySelector("input[name='signUpBtn']");
@@ -129,6 +131,7 @@
                 memName !== "" &&
                 memTel !== "" &&
                 memEmail !== "" &&
+                emailDomain !== "" && 
                 agree1 === true &&
                 isIdDuplicate === false &&
                 isPwdOk === true;
@@ -143,6 +146,30 @@
                 btn.style.cursor = "pointer";
             }
         }
+        
+        
+        // 이메일 자동 입력(도메인)
+        $(function() {
+		   $("#selectDomain").on("change", function() {
+		     let str = $(this).val();
+		     
+		     console.log("선택값:", str); 
+		      
+		      if(str == "custom") {
+		         $("#emailDomain").val("");         
+		         $("#emailDomain").prop("readonly", false); 
+		
+		      } else if (str == "naver") {
+		         $("#emailDomain").val("@naver.com");
+		         $("#emailDomain").prop("readonly", true);
+		         
+		      } else if (str == "google") {
+		         $("#emailDomain").val("@gmail.com");
+		         $("#emailDomain").prop("readonly", true);
+		               
+		      }  
+		   });
+		});
     </script>
 
     <div class="row my-5" id="global-content">
@@ -185,8 +212,16 @@
                 <div class="row my-3">
                     <div class="col-8 offset-2">
                         <label for="memEmail" class="form-label">이메일</label>
-                        <input type="email" class="form-control" name="memEmail" id="memEmail"
-                               placeholder="✉️ your@email.com" oninput="checkValid()">
+                        <input type="text" class="form-control" name="memEmail" id="memEmail"
+                               placeholder="✉️ yourEmail" oninput="checkValid()">
+                        <input type="text" class="form-control" name="emailDomain" id="emailDomain"
+                               placeholder="@email.com" oninput="checkValid()">
+                               
+                        <select id="selectDomain">
+                        	<option value="custom">직접입력</option>
+                        	<option value="naver">네이버</option>
+                        	<option value="google">구글</option>
+                        </select>
                     </div>
                 </div>
 
