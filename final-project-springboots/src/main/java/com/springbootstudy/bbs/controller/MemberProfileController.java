@@ -41,7 +41,6 @@ public class MemberProfileController {
 			return "redirect:/members/login"; 
 		}
 		
-		// err
 		String gradeName = memberProfileMapper.selectGradeNameByMemId(memberVO.getMemId());
 		
 		model.addAttribute("memberVO", memberVO); 

@@ -1,0 +1,91 @@
+package com.springbootstudy.bbs.controller;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import com.springbootstudy.bbs.domain.MemberAddrVO;
+import com.springbootstudy.bbs.domain.MemberVO;
+import com.springbootstudy.bbs.service.MemberAddrService;
+import com.springbootstudy.bbs.service.MemberService;
+
+import jakarta.servlet.http.HttpSession;
+
+@Controller
+public class MemberAddrController {
+
+	@Autowired
+	private MemberAddrService memberAddrService;
+	
+	// 주소등록창 -----------------------------------------------------------------
+	
+	@GetMapping("/members/memberAddrUpdate") 
+	public String memberAddrUpdate() {
+		
+		return "/views/member/memberAddrUpdate"; 
+	}
+	
+	// memberAddrUpdate.html 의 Ajax 저장용
+	@PostMapping("/member/updateAddrAjax.do")
+	@ResponseBody
+	public int updateAddr(MemberAddrVO vo) {
+
+	    int result = memberAddrService.registerAddr(vo);
+
+	    return result;
+	}
+//    @PostMapping("/member/updateAddrAjax.do")
+//    @ResponseBody
+//    public String updateAddrAjax(
+//            @RequestParam("memZipcode") String memZipcode,
+//            @RequestParam("memAddr") String memAddr,
+//            @RequestParam(value = "memAddrDetail", required = false) String memAddrDetail,
+//            @RequestParam("memidx") Long memIdx) {
+//
+//        MemberAddrVO vo = new MemberAddrVO();
+//        vo.setMemZipcode(memZipcode);
+//        vo.setMemAddr(memAddr);
+//        vo.setMemAddrDetail(memAddrDetail);
+//        vo.setMemIdx(memIdx);
+//        vo.setIsPrimary("N");
+//
+//        int result = memberAddrService.registerAddr(vo); 
+//
+//        return result > 0 ? "ok" : "fail";
+//    }
+
+	// 주소목록창 -----------------------------------------------------------------
+
+	// 창만 띄우기
+//	@GetMapping("/members/memberAddr")
+//	public String memberAddr() {
+//
+//		return "/views/member/memberAddr";
+//	} 
+	
+	// 저장된 값 보여주기
+    @GetMapping("/members/memberAddr")
+    public String memberAddr(HttpSession session, Model model) {
+
+    	// 로그인 안했으면 쫓아내기
+        MemberVO loginMember = (MemberVO) session.getAttribute("member");
+        if (loginMember == null) {
+            return "redirect:/members/login";
+        }
+
+        List<MemberAddrVO> addrList = memberAddrService.selectAddrList(loginMember.getMemIdx());
+        model.addAttribute("addrList", addrList);
+
+        return "/views/member/memberAddr";
+    }
+
+
+
+}

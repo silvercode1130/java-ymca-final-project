@@ -122,7 +122,7 @@ public class MemberController {
 		    return "redirect:/members/login"; 
 		}		
 		
-		// 로그인을 성공하면 회원 정보를 DB에서 가져와 세션에 저장한다.
+		// 로그인을 성공하면 회원 정보를 DB에서 가져와 세션에 저장
 		MemberVO memberVO = memberService.getMemberVO(memId);
 		session.setAttribute("isLogin", true);
 		session.setAttribute("loginId", memId);
@@ -152,7 +152,7 @@ public class MemberController {
 		// 세션 지움
 		session.invalidate();
 		
-		return "redirect:/main"; // err - 메인이 아니라 로그인으로 튕김
+		return "redirect:/main"; 
 	}
 	
 	
