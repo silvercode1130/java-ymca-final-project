@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-		xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"		
-		layout:decorate="~{layouts/main_layout}">
+		xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"> 
 
 	<th:block layout:fragment="content">
 		<script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
@@ -10,7 +9,7 @@
 			</div>
 			
 			<div>
-				<form action="/members/memberAddr" id="memberAddr" name="memberAddrForm" method="post">					
+				<form action="/members/memberAddrUpdate" id="memberAddr" name="memberAddrForm">					
 					<table border="1">
 						<thead>
 							<tr>
@@ -33,16 +32,16 @@
 							
 							<tr th:if="${addrList == null or #lists.isEmpty(addrList)}">
 					            <td colspan="4" style="text-align: center; height: 50px;">
-					                등록된 배송지가 없습니다
+					                <span style="color: gray; font-size: 12px;">등록된 배송지가 없습니다</span>
 					            </td>
 					        </tr>
 						</tbody>
 					</table> 
 					
-					<div>
-						<input type="button" onclick="location.href='/members/memberAddrUpdate'">  
-					</div>
+					<button type="button" onclick="location.href='/members/memberAddrUpdate'">
+					    주소 추가
+					</button>
 				</form> 
 			</div>
-	</th:block>
+	</th:block> 
 </html>		

@@ -1,9 +1,12 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layouts/main_layout}">
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 
 <th:block layout:fragment="content">
+
+<script th:src="@{/js/jquery-3.7.1.min.js}"></script>
+<script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+
     <script type="text/javascript">
     	// 주소창 띄우기
         function findAddr() {
@@ -25,7 +28,7 @@
             const memAddrDetail = document.getElementById("memAddrDetail").value;
             
             // 2. [실무형] 회원 번호 체크
-            const memidxInput = document.getElementById("memidx");
+            const memidxInput = document.getElementById("memIdx");
             if (!memidxInput || memidxInput.value === "" || memidxInput.value === "0") {
                 alert("로그인 정보가 없습니다. 다시 로그인해 주세요!");
                 location.href = "/login"; // 로그인 페이지로 유도
@@ -50,7 +53,7 @@
             })
             .then(res => res.text())
             .then(result => {
-                if (result.trim() === "ok") { 
+                if (result.trim() === "1") { 
                     alert("✓ 성공적으로 저장되었습니다!");
                     location.href = "/members/memberAddr"; 
                 } else {
@@ -68,7 +71,8 @@
     <div>
         <form action="/members/memberAddr" id="memberAddrUpdate" method="post">		
         	
-        	<input type="hidden" id="memIdx" name="memIdx" th:value="${session.member.memIdx}">
+        	<!-- 여기가 에러 -->
+        	<input type="hidden" id="memIdx" name="memIdx" th:value="${member.memIdx}">
         			
             <div>
                 <input type="text" id="memZipcode" name="memZipcode" placeholder="✉️ 우편번호" readonly>

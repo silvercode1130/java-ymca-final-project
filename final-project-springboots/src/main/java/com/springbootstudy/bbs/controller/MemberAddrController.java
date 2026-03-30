@@ -27,9 +27,17 @@ public class MemberAddrController {
 	// 주소등록창 -----------------------------------------------------------------
 	
 	@GetMapping("/members/memberAddrUpdate") 
-	public String memberAddrUpdate() {
-		
-		return "/views/member/memberAddrUpdate"; 
+	public String memberAddrUpdate(HttpSession session, Model model) {
+
+	    MemberVO loginMember = (MemberVO) session.getAttribute("loginUser");
+
+	    if (loginMember == null) {
+	        return "redirect:/members/login";
+	    }
+
+	    model.addAttribute("member", loginMember); 
+
+	    return "/views/member/memberAddrUpdate"; 
 	}
 	
 	// memberAddrUpdate.html 의 Ajax 저장용
@@ -62,20 +70,13 @@ public class MemberAddrController {
 //    }
 
 	// 주소목록창 -----------------------------------------------------------------
-
-	// 창만 띄우기
-//	@GetMapping("/members/memberAddr")
-//	public String memberAddr() {
-//
-//		return "/views/member/memberAddr";
-//	} 
 	
 	// 저장된 값 보여주기
     @GetMapping("/members/memberAddr")
     public String memberAddr(HttpSession session, Model model) {
 
     	// 로그인 안했으면 쫓아내기
-        MemberVO loginMember = (MemberVO) session.getAttribute("member");
+        MemberVO loginMember = (MemberVO) session.getAttribute("loginUser");
         if (loginMember == null) {
             return "redirect:/members/login";
         }
@@ -83,8 +84,8 @@ public class MemberAddrController {
         List<MemberAddrVO> addrList = memberAddrService.selectAddrList(loginMember.getMemIdx());
         model.addAttribute("addrList", addrList);
 
-        return "/views/member/memberAddr";
-    }
+        return "/views/member/memberAddr"; 
+    } 
 
 
 

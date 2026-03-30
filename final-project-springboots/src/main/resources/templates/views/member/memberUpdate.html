@@ -1,10 +1,64 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-		xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"		
-		layout:decorate="~{layouts/main_layout}">
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+     
 
 	<th:block layout:fragment="content">
 		<script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+		
+		<script type="text/javascript">
+			// 전화번호 - 010-xxxx-xxxx 형식
+	        function formatTel(input) {
+	            let value = input.value.replace(/[^0-9]/g, "");
+	
+	            if (value.length <= 3) {
+	                input.value = value;
+	            } else if (value.length <= 7) {
+	                input.value = value.substring(0, 3) + "-" + value.substring(3);
+	            } else {
+	                input.value = value.substring(0, 3) + "-" +
+	                              value.substring(3, 7) + "-" +
+	                              value.substring(7, 11);
+	            }
+	        } 
+
+			
+	        document.addEventListener("DOMContentLoaded", function() {
+
+	            const form = document.getElementById("memberUpdateForm");
+	            const inputs = form.querySelectorAll("input");
+	            const submitBtn = form.querySelector("button[type='submit']");
+
+	            // 초기값 저장
+	            const initialValues = {};
+
+	            inputs.forEach(input => {
+	                initialValues[input.name] = input.value;
+	            });
+
+	            // 버튼 처음엔 비활성화
+	            submitBtn.disabled = true;
+
+	            // 변경 감지
+	            inputs.forEach(input => {
+	                input.addEventListener("input", checkChanged);
+	            });
+
+	            function checkChanged() {
+	                let isChanged = false;
+
+	                inputs.forEach(input => {
+	                    if (initialValues[input.name] !== input.value) {
+	                        isChanged = true;
+	                    }
+	                });
+
+	                submitBtn.disabled = !isChanged;
+	            }
+
+	        });
+		</script>
+		
 			<div>
 				<h2>내 정보 수정</h2>
 				<span style="color: gray; font-size: 12px;">회원 정보를 업데이트하세요</span>
@@ -35,7 +89,8 @@
 					
 					<div id="tel" name="tel">
 						<label>전화번호</label>
-						<input type="text" name="memTel" id="memTel" th:value="${memberVO.memTel}">
+						<input type="text" class="form-control" name="memTel" id="memTel" th:value="${memberVO.memTel}"
+                               maxlength="13" oninput="formatTel(this)">
 					</div>
 					
 					<div id="bday" name="bday">
@@ -43,13 +98,14 @@
 						<input type="date" name="memBday" id="memBday" th:value="${memberVO.memBday}">
 					</div> 
 					
+					<!-- ##추가 - 기존 비밀번호와 같다면 disabled도 안풀어주고 글 하나 적어주자!! -->
 					<div id="pwd" name="pwd">
 						<label>새 비밀번호</label>
 						<input type="password" name="newPwd" id="newPwd" placeholder="🔒 변경할 비밀번호를 입력해주세요">
 					</div>
 
 					<div>
-						<button type="submit">정보 업데이트</button> 
+						<button type="submit" disabled>정보 업데이트</button> 
 					</div>
 				</form>
 			</div>
