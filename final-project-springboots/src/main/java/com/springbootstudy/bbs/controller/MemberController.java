@@ -34,20 +34,20 @@ public class MemberController {
 	HttpServletRequest request;
 
 	@Autowired
-	HttpSession session; 
+	HttpSession session;
 
 	// 임시 메인 - 메인 생기면 삭제 예정
 	@GetMapping("/fragments/main")
 	public String main(Model model, HttpSession session) {
 
 		// 로그인 정보가 있으면 model에 추가해서 template에서 사용 가능하게 함
-		 MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
-		 
-		 if (loginUser != null) {
-		 model.addAttribute("loginUser", loginUser);
-		 }
+		MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
 
-		return "/fragments/main"; 
+		if (loginUser != null) {
+			model.addAttribute("loginUser", loginUser);
+		}
+
+		return "/fragments/main";
 	}
 
 	// 회원가입 -----------------------------------------------------------------
@@ -111,36 +111,35 @@ public class MemberController {
 
 		return "/views/member/login";
 	}
-//	// 세션, 서블릿 리퀘스트를 넣고 -> 서비스 들고 옴(model로)
-//
-	// login.html - 로그인 처리 기능	
+
+	// // 세션, 서블릿 리퀘스트를 넣고 -> 서비스 들고 옴(model로)
+	//
+	// login.html - 로그인 처리 기능
 	@PostMapping("/views/member/login")
-	public String login(@RequestParam("memId") String memId, @RequestParam("memPwd") String memPwd, 
-			Model model, HttpSession session, RedirectAttributes ra
-			) throws ServletException, IOException {
-		
+	public String login(@RequestParam("memId") String memId, @RequestParam("memPwd") String memPwd,
+			Model model, HttpSession session, RedirectAttributes ra) throws ServletException, IOException {
+
 		// MemberService 클래스를 사용해 로그인 성공여부 확인
 		int result = memberService.login(memId, memPwd);
-		
-		if(result == -1) { // 회원 아이디가 존재하지 않으면
-			ra.addFlashAttribute("error", "존재하지 않는 아이디입니다.");
-		    return "redirect:/member/loginForm";
 
-			
-		} else if(result == 0) { // 비밀번호가 틀리면
+		if (result == -1) { // 회원 아이디가 존재하지 않으면
+			ra.addFlashAttribute("error", "존재하지 않는 아이디입니다.");
+			return "redirect:/member/loginForm";
+
+		} else if (result == 0) { // 비밀번호가 틀리면
 			ra.addFlashAttribute("error", "비밀번호가 틀립니다.");
-		    return "redirect:/member/loginForm";
-		}		
-		
+			return "redirect:/member/loginForm";
+		}
+
 		// 로그인을 성공하면 회원 정보를 DB에서 가져와 세션에 저장한다.
 		MemberVO memberVO = memberService.getMemberVO(memId);
 		session.setAttribute("isLogin", true);
 		session.setAttribute("loginId", memId);
-		
+
 		session.setAttribute("loginUser", memberVO);
 		System.out.println("memberVO.name : " + memberVO.getMemName());
-		
-		return "redirect:/fragments/main"; 
+
+		return "redirect:/fragments/main";
 	}
 
 	// 비번찾기 -----------------------------------------------------------------
@@ -185,68 +184,43 @@ public class MemberController {
 	}
 
 	// 로그아웃 -----------------------------------------------------------------
-	
+
 	@GetMapping("/memberLogout")
-	public String logout(HttpSession session) {	
-		
+	public String logout(HttpSession session) {
+
 		session.invalidate();
-		
+
 		return "redirect:/fragments/main";
 	}
-	
-	
+
 	// 탈퇴 --------------------------------------------------------------------
-	
+
 	@GetMapping("/memberDelete")
 	public String deleteMember(HttpSession session, HttpServletResponse response) throws IOException {
 
-	    String memId = (String) session.getAttribute("loginId");
+		String memId = (String) session.getAttribute("loginId");
 
-	    // 로그인도 안하고 가입하려 하면 로그인 화면으로
-	    if(memId == null) {
-	        return "redirect:/views/member/login";
-	    }
+		// 로그인도 안하고 가입하려 하면 로그인 화면으로
+		if (memId == null) {
+			return "redirect:/views/member/login";
+		}
 
-	    int result = memberService.deleteMember(memId);
+		int result = memberService.deleteMember(memId);
 
-	    if(result == 1) {
-	        session.invalidate(); // 세션 제거
+		if (result == 1) {
+			session.invalidate(); // 세션 제거
 
-	        // 탈퇴 시 띄울 alert창
-	        response.setContentType("text/html; charset=utf-8");
-	        PrintWriter out = response.getWriter();
-	        out.println("<script>");
-	        out.println(" alert('회원 탈퇴가 완료되었습니다.');");
-	        out.println(" location.href='/';");
-	        out.println("</script>");
-	        return null;
-	    }
+			// 탈퇴 시 띄울 alert창
+			response.setContentType("text/html; charset=utf-8");
+			PrintWriter out = response.getWriter();
+			out.println("<script>");
+			out.println(" alert('회원 탈퇴가 완료되었습니다.');");
+			out.println(" location.href='/';");
+			out.println("</script>");
+			return null;
+		}
 
-	    return "redirect:/fragments/main";	
+		return "redirect:/fragments/main";
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 
 }

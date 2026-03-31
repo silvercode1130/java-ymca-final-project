@@ -26,5 +26,3 @@ public class BoardVO {
  private String         boardTypeCode;  // 게시판 타입 코드 (JOIN)
  private String			memNickname;	// 작성자 닉네임 (JOIN)
 }
-
-
