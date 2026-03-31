@@ -27,7 +27,11 @@ public class BoardService {
 
     // ── 게시글 목록 ──────────────────────────────────────────
     public List<BoardVO> getBoards(String typeCode, String keyword) {
-        return boardMapper.findBoards(typeCode, keyword);
+        return boardMapper.findBoards(typeCode, keyword, null);
+    }
+    
+    public List<BoardVO> getBoards(String typeCode, String keyword, String searchType) {
+        return boardMapper.findBoards(typeCode, keyword, searchType);
     }
 
     // ── 게시글 상세 (조회수 포함) ─────────────────────────────
