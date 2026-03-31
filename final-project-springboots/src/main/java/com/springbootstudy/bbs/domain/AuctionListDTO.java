@@ -20,7 +20,8 @@ public class AuctionListDTO {
     private Long itemIdx;     // 아이템 PK (저장할 때 필요)
     private String itemBrand; // 브랜드 칸
     
-    // ItemCategory 관련 (카테고리 이름)
+    // ItemCategory 관련 (카테고리 번호, 이름)
+    private Integer itemCategoryIdx;
     private String itemCategoryName;
     
     // Bid 관련 (계산이 필요한 정보들 - 쿼리에서 가져올 것)

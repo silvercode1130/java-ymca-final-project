@@ -90,12 +90,37 @@ public class AuctionService {
 	}
 	
 	@Transactional
-    public void registerAuction(AuctionListDTO dto) {
-        // 아이템 정보 저장 (브랜드 등 포함)
-        auctionMapper.insertItem(dto);
-        
-        // 경매 정보 저장 
-        auctionMapper.insertAuction(dto);
-    }
+	public void registerAuction(AuctionListDTO dto) {
+
+	    // 희망 최대가 검증
+	    if (dto.getAuctionTargetPrice() == null || dto.getAuctionTargetPrice() <= 0) {
+	        throw new IllegalArgumentException("희망 최대가는 0원보다 커야 합니다.");
+	    }
+	    if (dto.getAuctionTargetPrice() % 100 != 0) {
+	        throw new IllegalArgumentException("희망 최대가는 100원 단위로 입력해야 합니다.");
+	    }
+
+	    // 입찰 마감일 검증
+	    LocalDateTime now = LocalDateTime.now();
+	    if (dto.getAuctionEndAt() == null || dto.getAuctionEndAt().isBefore(now)) {
+	        throw new IllegalArgumentException("입찰 마감일은 현재 시간 이후여야 합니다.");
+	    }
+
+	    // 결정 마감일 검증
+	    if (dto.getAuctionDecisionDeadline() == null || dto.getAuctionDecisionDeadline().isBefore(now)) {
+	        throw new IllegalArgumentException("결정 마감일은 현재 시간 이후여야 합니다.");
+	    }
+	    if (dto.getAuctionDecisionDeadline().isBefore(dto.getAuctionEndAt())) {
+	        throw new IllegalArgumentException("결정 마감일은 입찰 마감일 이후여야 합니다.");
+	    }
+	    LocalDateTime maxDeadline = dto.getAuctionEndAt().plusDays(3);
+	    if (dto.getAuctionDecisionDeadline().isAfter(maxDeadline)) {
+	        throw new IllegalArgumentException("결정 마감일은 입찰 마감일로부터 3일을 초과할 수 없습니다.");
+	    }
+
+	    // DB 저장
+	    auctionMapper.insertItem(dto);
+	    auctionMapper.insertAuction(dto);
+	}
 	
 }

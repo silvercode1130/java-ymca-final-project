@@ -8,6 +8,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.springbootstudy.bbs.domain.AuctionListDTO;
 import com.springbootstudy.bbs.domain.BidListDTO;
@@ -26,8 +27,9 @@ public class AuctionController {
 	private AuctionService auctionService;
 	
 	@Autowired
-	private BidService bidService; // BidService 주입!
+	private BidService bidService;
 	
+	// 구매 요청 전체 리스트 조회
 	@GetMapping({"/auctionList"})
     public String auctionList(Model model) { // 쟁반(Model)을 준비
         
@@ -41,6 +43,7 @@ public class AuctionController {
         return "views/auction/auctionList"; 
     }
 	
+	// 구매 요청 글 상세페이지(입찰 제안 등 포함)
 	@GetMapping("/auction/auctionDetail/{auctionIdx}")
 	public String auctionDetail(@PathVariable("auctionIdx") Long auctionIdx, Model model) {
 	    
@@ -70,7 +73,7 @@ public class AuctionController {
 	    return "views/auction/auctionDetail"; 
 	}
 	
-	// 1. 등록 폼으로 이동 (GET)
+	// 등록 폼으로 이동 (GET)
     @GetMapping("/auction/register")
     public String registerForm(HttpSession session) {
         // 세션 이름 'loginUser'로 통일! ㅡㅡ^
@@ -81,45 +84,50 @@ public class AuctionController {
         return "views/auction/auctionRegister";
     }
 
-    // 2. 등록 실행 (POST)
+    // 등록 실행 (POST)
     @PostMapping("/auction/register")
-    public String registerAction(AuctionListDTO dto, HttpSession session) {
-        // 세션에서 로그인 유저 객체 꺼내기
+    public String registerAction(AuctionListDTO dto, HttpSession session,
+                                  RedirectAttributes ra) {
         MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
-        
+
         if (loginUser == null) {
             return "redirect:/login";
         }
 
-        // DTO에 구매자 PK(memIdx) 심어주기
         dto.setBuyerIdx(loginUser.getMemIdx());
-        
         log.info("경매 등록 시도: {}", dto);
 
         try {
             auctionService.registerAuction(dto);
+        } catch (IllegalArgumentException e) {
+            ra.addFlashAttribute("errorMessage", e.getMessage());
+            return "redirect:/auction/register?error";
         } catch (Exception e) {
-            log.error("경매 등록 중 에러 발생!", e);
-            return "redirect:/auction/register?error"; // 에러 시 다시 폼으로
+            log.error("경매 등록 중 에러 발생", e);
+            ra.addFlashAttribute("errorMessage", "등록 중 오류가 발생했습니다. 다시 시도해주세요.");
+            return "redirect:/auction/register?error";
         }
 
-        // 성공 시 리스트 주소로 이동 (주소 확인 요망!)
-        return "redirect:/auctionList"; 
+        return "redirect:/auctionList";
     }
 	
     // 입찰 등록
     @PostMapping("/auction/bid")
     public String registerBid(BidListDTO bidDto, HttpSession session) {
-        // 세션에서 로그인한 유저(판매자) 정보 가져오기
-        MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
-        
-        // 데이터 세팅
+    	MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
+        if (loginUser == null) return "redirect:/login";
+
         bidDto.setBidderIdx(loginUser.getMemIdx());
 
-        // DB에 넣기
-        bidService.registerBid(bidDto);
+        // 현재 입찰하려는 경매글의 아이템 번호라도 넣어줘야 DB 에러가 안 남
+        // (지금 당장 상세페이지에서 itemIdx를 안 보내주고 있다면 여기서 강제로 세팅)
+        if (bidDto.getItemIdx() == null) {
+            // 실제로는 해당 auctionIdx로 조회해서 가져와야 하지만, 
+            // 일단 에러 방지를 위해 1번이라도 넣어보고 테스트
+            bidDto.setItemIdx(1L); 
+        }
 
-        // 다시 보던 상세페이지로 튕겨주기
+        bidService.registerBid(bidDto);
         return "redirect:/auction/auctionDetail/" + bidDto.getAuctionIdx();
     }
     

@@ -27,22 +27,26 @@
 	<insert id="insertBid">
 	    INSERT INTO bid (
 	        auction_idx, 
-	        mem_idx, 
+	        bidder_idx,
+	        item_idx,    
 	        bid_price, 
-	        bid_count, 
+	        bid_quantity, 
 	        bid_message, 
 	        bid_status_idx, 
 	        bid_regdate
 	    ) VALUES (
 	        #{auctionIdx}, 
-	        #{memIdx}, 
+	        #{bidderIdx}, 
+	        #{itemIdx}, 
 	        #{bidPrice}, 
-	        #{bidCount}, 
+	        #{bidQuantity},
 	        #{bidMessage}, 
-	        1, -- 1: 기본 대기 상태
+	        1, 
 	        NOW()
 	    )
 	</insert>
+	
+	
 	
 </mapper>	
 
