@@ -3,65 +3,49 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="/bootstrap/bootstrap.min.css">
   <title>마이 페이지 - 내 경매 목록</title>
 </head>
 
 <body>
   <div class="container mt-5">
-    <div class="profile-auction">
-      <h2 class="mb-4">내 경매 목록</h2>
-      <div class="table-responsive">
-        <table class="table table-hover border text-center align-middle">
-          <thead class="table-light">
-            <tr>
-              <th style="width: 10%;">번호</th>
-              <th style="width: 50%;">제목 및 상태</th>
-              <th style="width: 25%;">마감일시</th>
-              <th style="width: 15%;">입찰 건수</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr th:if="${#lists.isEmpty(auctions)}">
-              <td colspan="4" class="text-center text-muted py-5">등록된 경매 내역이 없습니다.</td>
-            </tr>
-
-            <tr th:each="auction : ${auctions}">
-              <td th:text="${auction.auctionIdx}">1</td>
-
-              <td class="text-start">
-                <span th:text="${auction.auctionStatusName}" 
-                      th:classappend="${auction.auctionStatusCode == 'open'} ? 'badge bg-success' : 'badge bg-secondary'"
-                      class="me-2">
-                  상태
-                </span>
-
-                <a th:href="@{/auction/detail/{idx}(idx=${auction.auctionIdx})}"
-                   class="text-decoration-none fw-bold text-dark">
-                  [[${auction.auctionTitle}]]
-                </a>
-              </td>
-
-              <td th:text="${#temporals.format(auction.auctionEndAt, 'yyyy-MM-dd HH:mm')}">
-                2026-03-25 15:00
-              </td>
-
-              <td class="text-primary fw-bold">
-                <span th:text="${auction.bidCount}">0</span>회
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      
-      <div class="text-end mt-4">
-        <a href="/mypage" class="btn btn-outline-secondary">마이페이지로 돌아가기</a>
-      </div>
+    <h2 class="mb-4">내 경매 목록</h2>
+    <div class="table-responsive">
+      <table class="table table-hover border text-center align-middle">
+        <thead class="table-light">
+          <tr>
+            <th style="width: 10%;">번호</th>
+            <th style="width: 50%;">제목 및 상태</th>
+            <th style="width: 25%;">마감일시</th>
+            <th style="width: 15%;">입찰 건수</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr th:if="${#lists.isEmpty(auctions)}">
+                        <td colspan="4" class="text-center text-muted py-5">등록된 경매 내역이 없습니다.</td>
+                    </tr>
+                    <tr th:each="auction : ${auctions}">
+                        <td th:text="${auction.auctionIdx}">1</td>
+                        <td class="text-start">
+                            <span th:text="${auction.auctionStatusName}" 
+                                  th:classappend="${auction.auctionStatusCode == 'open'} ? 'bg-success' : 'bg-secondary'"
+                                  class="badge me-2">상태</span>
+                            <a th:href="@{/auction/detail/{idx}(idx=${auction.auctionIdx})}" class="text-decoration-none fw-bold text-dark">
+                                [[${auction.auctionTitle}]]
+                            </a>
+                            <div class="small text-muted mt-1" th:if="${auction.auctionTargetPrice != null}">
+                                희망 최대가: <span th:text="${#numbers.formatInteger(auction.auctionTargetPrice, 3, 'COMMA')}">0</span>원
+                            </div>
+                        </td>
+                        <td th:text="${#temporals.format(auction.auctionEndAt, 'yyyy-MM-dd HH:mm')}">마감일</td>
+                        <td class="text-primary fw-bold"><span th:text="${auction.bidCount}">0</span>회</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="text-end mt-4">
+            <a href="/mypage" class="btn btn-outline-secondary">마이페이지로 돌아가기</a>
+        </div>
     </div>
-  </div>
-
-  <script src="/bootstrap/bootstrap.bundle.min.js"></script>
 </body>
-
 </html>

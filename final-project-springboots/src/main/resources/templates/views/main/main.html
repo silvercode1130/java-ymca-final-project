@@ -1,21 +1,196 @@
 <!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>Insert title here</title>
-</head>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layouts/main_layout}">
 <body>
-	메인 없으면 로그인 안돼요! <br>
-	로그인 생기기 전 까지는 임시로 넣어둘게요! <br>
-	홈 컨트롤러에 로그인 세션 지우면 작동 안하니까 빼지 말아주세요ㅠㅠ <br>
-	
-	<hr>
-	
-   <input type="button" value="회원가입" onclick="location.href='/members/signUp'">
-   <input type="button" value="로그인" onclick="location.href='/members/login'">
-   <input type="button" value="회원 정보 수정" onclick="location.href='/members/memberUpdate'">
-   <input type="button" value="주소 수정" onclick="location.href='/members/memberAddr'">
-   <input type="button" value="로그아웃" onclick="location.href='/memberLogout'">
-   <input type="submit" value="회원 탈퇴" onclick="location.href='/memberDelete' ">
+	<div layout:fragment="content">
+
+		<!-- Hero Slider: 지금은 첫 슬라이드만 정적으로 -->
+		<div class="relative h-[375px] md:h-[450px] overflow-hidden">
+			<div class="relative h-full">
+				<div class="absolute inset-0">
+					<img
+						src="https://images.unsplash.com/photo-1461896836934-ffe607ba8211?q=80&w=2000"
+						alt="당신을 위한 모든 제안" class="w-full h-full object-cover">
+					<div
+						class="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent"></div>
+				</div>
+				<div class="absolute inset-0 flex items-center">
+					<div class="mx-auto max-w-7xl px-4 w-full">
+						<div class="max-w-2xl">
+							<h1
+								class="text-3xl md:text-4xl font-bold text-white mb-1 leading-tight whitespace-nowrap">
+								당신을 위한 모든 제안</h1>
+							<div
+								class="text-4xl md:text-5xl font-black text-[#AFFF00] mb-4 leading-tight whitespace-nowrap">
+								pickQ</div>
+							<p
+								class="text-base md:text-lg text-gray-200 mb-6 whitespace-nowrap">
+								온라인 발품은 그만! pickQ로 한큐에 해결하세요.</p>
+							<a th:href="@{/auctions/new}">
+								<button
+									class="inline-flex items-center bg-[#AFFF00] text-black hover:bg-[#AFFF00]/90 font-bold text-base px-6 py-3 rounded">
+									<span class="mr-2">＋</span> 지금 시작하기
+								</button>
+							</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- 카테고리 바: 우선 간단히 버튼만 -->
+		<div class="border-b border-gray-200 bg-white">
+			<div
+				class="mx-auto max-w-7xl px-4 py-3 flex gap-2 overflow-x-auto text-sm">
+				<button
+					class="px-3 py-1.5 rounded-full bg-black text-white whitespace-nowrap">전체</button>
+				<button
+					class="px-3 py-1.5 rounded-full bg-gray-100 text-gray-700 whitespace-nowrap">구기종목</button>
+				<button
+					class="px-3 py-1.5 rounded-full bg-gray-100 text-gray-700 whitespace-nowrap">라켓스포츠</button>
+				<button
+					class="px-3 py-1.5 rounded-full bg-gray-100 text-gray-700 whitespace-nowrap">헬스/홈트</button>
+				<button
+					class="px-3 py-1.5 rounded-full bg-gray-100 text-gray-700 whitespace-nowrap">아웃도어</button>
+				<button
+					class="px-3 py-1.5 rounded-full bg-gray-100 text-gray-700 whitespace-nowrap">수영/수상</button>
+			</div>
+		</div>
+
+		<!-- 지금 가장 핫한 요청 (mockHotAuctions) -->
+		<div
+			class="bg-gradient-to-b from-gray-50 to-white py-12 border-b border-gray-200">
+			<div class="mx-auto max-w-7xl px-4">
+				<div class="flex items-center justify-between mb-6">
+					<div class="flex items-center gap-3">
+						<span class="text-orange-500 text-2xl">🔥</span>
+						<h2 class="text-2xl font-bold text-gray-900">지금 가장 핫한 요청</h2>
+					</div>
+					<a href="#">
+						<button class="text-gray-600 hover:text-[#7CBD00] text-sm">
+							전체보기 →</button>
+					</a>
+				</div>
+
+				<div
+					class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
+					<!-- hot1 -->
+					<a href="#" class="block group">
+						<div class="hover:opacity-90 transition-opacity">
+							<div
+								class="relative aspect-square mb-2 overflow-hidden rounded-lg border border-gray-200 bg-gray-50">
+								<img
+									src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=400"
+									alt="나이키 에어맥스 270 사이즈 270 새상품 삽니다"
+									class="w-full h-full object-cover">
+								<div
+									class="absolute top-2 right-2 bg-orange-500 text-white px-2 py-1 rounded text-xs font-bold">
+									조회 1200+</div>
+							</div>
+							<div>
+								<h3 class="text-sm text-gray-900 truncate mb-1">나이키 에어맥스
+									270 사이즈 270 새상품 삽니다</h3>
+								<div
+									class="flex items-center justify-between text-xs text-gray-500 mb-1">
+									<span>제안 34건</span> <span>1시간 20분</span>
+								</div>
+								<div class="flex items-center justify-between">
+									<span class="text-xs text-gray-500">최저가</span> <span
+										class="text-base font-bold text-[#7CBD00]"> 95,000원 </span>
+								</div>
+							</div>
+						</div>
+					</a>
+
+					<!-- hot2 -->
+					<a href="#" class="block group">
+						<div class="hover:opacity-90 transition-opacity">
+							<div
+								class="relative aspect-square mb-2 overflow-hidden rounded-lg border border-gray-200 bg-gray-50">
+								<img
+									src="https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?q=80&w=400"
+									alt="요넥스 배드민턴 라켓 아스트록스99 중고 A급 구함"
+									class="w-full h-full object-cover">
+								<div
+									class="absolute top-2 right-2 bg-orange-500 text-white px-2 py-1 rounded text-xs font-bold">
+									조회 900+</div>
+							</div>
+							<div>
+								<h3 class="text-sm text-gray-900 truncate mb-1">요넥스 배드민턴 라켓
+									아스트록스99 중고 A급 구함</h3>
+								<div
+									class="flex items-center justify-between text-xs text-gray-500 mb-1">
+									<span>제안 28건</span> <span>2시간 15분</span>
+								</div>
+								<div class="flex items-center justify-between">
+									<span class="text-xs text-gray-500">최저가</span> <span
+										class="text-base font-bold text-[#7CBD00]"> 145,000원 </span>
+								</div>
+							</div>
+						</div>
+					</a>
+
+					<!-- hot3 -->
+					<a href="#" class="block group">
+						<div class="hover:opacity-90 transition-opacity">
+							<div
+								class="relative aspect-square mb-2 overflow-hidden rounded-lg border border-gray-200 bg-gray-50">
+								<img
+									src="https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?q=80&w=400"
+									alt="캘러웨이 골프채 풀세트 아이언+우드+퍼터 구합니다"
+									class="w-full h-full object-cover">
+								<div
+									class="absolute top-2 right-2 bg-orange-500 text-white px-2 py-1 rounded text-xs font-bold">
+									조회 800+</div>
+							</div>
+							<div>
+								<h3 class="text-sm text-gray-900 truncate mb-1">캘러웨이 골프채
+									풀세트 아이언+우드+퍼터 구합니다</h3>
+								<div
+									class="flex items-center justify-between text-xs text-gray-500 mb-1">
+									<span>제안 19건</span> <span>3시간</span>
+								</div>
+								<div class="flex items-center justify-between">
+									<span class="text-xs text-gray-500">최저가</span> <span
+										class="text-base font-bold text-[#7CBD00]"> 650,000원 </span>
+								</div>
+							</div>
+						</div>
+					</a>
+
+					<!-- hot4 -->
+					<a href="#" class="block group">
+						<div class="hover:opacity-90 transition-opacity">
+							<div
+								class="relative aspect-square mb-2 overflow-hidden rounded-lg border border-gray-200 bg-gray-50">
+								<img
+									src="https://images.unsplash.com/photo-1546519638-68e109498ffc?q=80&w=400"
+									alt="스팔딩 NBA 공식 농구공 새상품 삽니다" class="w-full h-full object-cover">
+								<div
+									class="absolute top-2 right-2 bg-orange-500 text-white px-2 py-1 rounded text-xs font-bold">
+									조회 1500+</div>
+							</div>
+							<div>
+								<h3 class="text-sm text-gray-900 truncate mb-1">스팔딩 NBA 공식
+									농구공 새상품 삽니다</h3>
+								<div
+									class="flex items-center justify-between text-xs text-gray-500 mb-1">
+									<span>제안 41건</span> <span>45분</span>
+								</div>
+								<div class="flex items-center justify-between">
+									<span class="text-xs text-gray-500">최저가</span> <span
+										class="text-base font-bold text-[#7CBD00]"> 52,000원 </span>
+								</div>
+							</div>
+						</div>
+					</a>
+				</div>
+			</div>
+		</div>
+
+		<!-- 마감 임박 / 신규 요청 섹션도 mockAuctions 중 일부만 골라서 같은 패턴으로 카드 몇 개 하드코딩해두면 됨 -->
+
+	</div>
 </body>
 </html>
