@@ -28,5 +28,3 @@ public class BoardVO {
  private String			memId;			// 작성자 아이디 (JOIN)
  private int			replyCount;		// 댓글 수 (서브쿼리)
 }
-
-

@@ -1,299 +1,295 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layouts/main_layout}">
-     
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layouts/main_layout}">
+<head>
+<meta charset="UTF-8">
+<title>회원가입 - PickQ</title>
+<script th:src="@{/js/jquery-3.7.1.min.js}"></script>
+</head>
+<body>
+	<th:block layout:fragment="content">
 
-<th:block layout:fragment="content">
+		<script type="text/javascript">
+    let isIdDuplicate = true;
 
-    <script type="text/javascript">	
-        let isIdDuplicate = true;
+    // 전화번호 - 010-xxxx-xxxx 형식
+    function formatTel(input) {
+      let value = input.value.replace(/[^0-9]/g, "");
 
-        // 전화번호 - 010-xxxx-xxxx 형식
-        function formatTel(input) {
-            let value = input.value.replace(/[^0-9]/g, "");
+      if (value.length <= 3) {
+        input.value = value;
+      } else if (value.length <= 7) {
+        input.value = value.substring(0, 3) + "-" + value.substring(3);
+      } else {
+        input.value = value.substring(0, 3) + "-" +
+                      value.substring(3, 7) + "-" +
+                      value.substring(7, 11);
+      }
+      checkValid();
+    }
 
-            if (value.length <= 3) {
-                input.value = value;
-            } else if (value.length <= 7) {
-                input.value = value.substring(0, 3) + "-" + value.substring(3);
-            } else {
-                input.value = value.substring(0, 3) + "-" +
-                              value.substring(3, 7) + "-" +
-                              value.substring(7, 11);
-            }
-            checkValid();
+    // 아이디 중복 체크
+    function idCheck() {
+      let memId = document.querySelector("#memId").value.trim();
+      let memIdMsg = document.querySelector("#memIdMsg");
+
+      let idReg = /^[A-Za-z0-9]{5,}$/;
+      if (!idReg.test(memId)) {
+        memIdMsg.style.color = "red";
+        memIdMsg.textContent = "✘ 영문 + 숫자 5글자 이상으로 입력해주세요.";
+        isIdDuplicate = true;
+        checkValid();
+        return;
+      }
+
+      fetch("/members/check_id?memId=" + encodeURIComponent(memId))
+        .then(r => {
+          if (!r.ok) {
+            throw new Error("HTTP " + r.status);
+          }
+          return r.text();
+        })
+        .then(data => {
+          let result = data.trim();
+
+          if (result === "ok") {
+            memIdMsg.style.color = "gray";
+            memIdMsg.textContent = "✔ 사용 가능한 아이디입니다.";
+            isIdDuplicate = false;
+          } else {
+            memIdMsg.style.color = "red";
+            memIdMsg.textContent = "✘ 이미 사용 중인 아이디입니다.";
+            isIdDuplicate = true;
+          }
+
+          checkValid();
+        })
+        .catch(err => {
+          console.log("에러 발생:", err);
+          memIdMsg.style.color = "red";
+          memIdMsg.textContent = "✘ 중복 확인 중 오류가 발생했습니다.";
+          isIdDuplicate = true;
+          checkValid();
+        });
+    }
+
+    // 비밀번호 검사
+    function pwdCheck() {
+      let pwd = document.querySelector("#memPwd").value.trim();
+      let pwdCheckValue = document.querySelector("#memPwdCheck").value.trim();
+      let msg = document.querySelector("#memPwdMsg");
+
+      let pwdReg = /^[A-Za-z0-9]{5,}$/;
+
+      if (pwd === "" && pwdCheckValue === "") {
+        msg.textContent = "";
+        checkValid();
+        return false;
+      }
+
+      if (!pwdReg.test(pwd)) {
+        msg.style.color = "red";
+        msg.textContent = "✘ 영문 + 숫자 5글자 이상으로 입력해주세요.";
+        checkValid();
+        return false;
+      }
+
+      if (pwd === pwdCheckValue) {
+        msg.style.color = "gray";
+        msg.textContent = "✔ 사용 가능한 비밀번호입니다.";
+        checkValid();
+        return true;
+      } else {
+        msg.style.color = "red";
+        msg.textContent = "✘ 비밀번호가 일치하지 않습니다.";
+        checkValid();
+        return false;
+      }
+    }
+
+    // 내부 판정용
+    function pwdCheckSilent(pwd, pwdCheckValue) {
+      let pwdReg = /^[A-Za-z0-9]{5,}$/;
+      return pwdReg.test(pwd) && pwd === pwdCheckValue;
+    }
+
+    // 최종 유효성 검사
+    function checkValid() {
+      let memId = document.querySelector("#memId").value.trim();
+      let memPwd = document.querySelector("#memPwd").value.trim();
+      let memPwdCheck = document.querySelector("#memPwdCheck").value.trim();
+      let memName = document.querySelector("#memName").value.trim();
+      let memTel = document.querySelector("#memTel").value.trim();
+      let memEmail = document.querySelector("#memEmail").value.trim();
+      let emailDomain = document.querySelector("#emailDomain").value.trim();
+      let agree1 = document.querySelector("input[name='agree']").checked;
+
+      let btn = document.querySelector("input[name='signUpBtn']");
+      let isPwdOk = pwdCheckSilent(memPwd, memPwdCheck);
+
+      let isValid =
+        memId !== "" &&
+        memPwd !== "" &&
+        memPwdCheck !== "" &&
+        memName !== "" &&
+        memTel !== "" &&
+        memEmail !== "" &&
+        emailDomain !== "" &&
+        agree1 === true &&
+        isIdDuplicate === false &&
+        isPwdOk === true;
+
+      btn.disabled = !isValid;
+
+      if (!isValid) {
+        btn.style.opacity = "0.5";
+        btn.style.cursor = "not-allowed";
+      } else {
+        btn.style.opacity = "1";
+        btn.style.cursor = "pointer";
+      }
+    }
+
+    // 이메일 자동 입력(도메인)
+    $(function () {
+      $("#selectDomain").on("change", function () {
+        let str = $(this).val();
+
+        if (str === "custom") {
+          $("#emailDomain").val("");
+          $("#emailDomain").prop("readonly", false);
+        } else if (str === "naver") {
+          $("#emailDomain").val("@naver.com");
+          $("#emailDomain").prop("readonly", true);
+        } else if (str === "google") {
+          $("#emailDomain").val("@gmail.com");
+          $("#emailDomain").prop("readonly", true);
         }
+      });
+    });
+  </script>
 
-        // 아이디 중복 체크
-        function idCheck() {
-		    let memId = document.querySelector("#memId").value.trim();
-		    let memIdMsg = document.querySelector("#memIdMsg");
-		
-		    let idReg = /^[A-Za-z0-9]{5,}$/;
-		    if (!idReg.test(memId)) {
-		        memIdMsg.style.color = "red";
-		        memIdMsg.textContent = "✘ 영문 + 숫자 5글자 이상으로 입력해주세요.";
-		        isIdDuplicate = true;
-		        checkValid();
-		        return;
-		    }
-		
-		    fetch("/views/member/check_id?memId=" + encodeURIComponent(memId))
-		        .then(r => {
-		            if (!r.ok) {
-		                throw new Error("HTTP " + r.status);
-		            }
-		            return r.text();
-		        })
-		        .then(data => {
-		            let result = data.trim();
-		
-		            if (result === "ok") {
-		                memIdMsg.style.color = "gray";
-		                memIdMsg.textContent = "✔ 사용 가능한 아이디입니다.";
-		                isIdDuplicate = false;
-		            } else {
-		                memIdMsg.style.color = "red";
-		                memIdMsg.textContent = "✘ 이미 사용 중인 아이디입니다.";
-		                isIdDuplicate = true;
-		            }
-		
-		            checkValid();
-		        })
-		        .catch(err => {
-		            console.log("에러 발생:", err);
-		            memIdMsg.style.color = "red";
-		            memIdMsg.textContent = "✘ 중복 확인 중 오류가 발생했습니다.";
-		            isIdDuplicate = true;
-		            checkValid();
-		        });
-		}
+		<div class="row my-5" id="global-content">
+			<div class="col">
+				<div class="row my-3 text-center">
+					<div class="col">
+						<h2 class="fs-3 fw-bold">회원 정보 입력</h2>
+						<p style="color: gray; font-size: 12px;">모든 항목을 정확히 입력해주세요</p>
+					</div>
+				</div>
 
-        // 비밀번호 검사
-        function pwdCheck() {
-            let pwd = document.querySelector("#memPwd").value.trim();
-            let pwdCheckValue = document.querySelector("#memPwdCheck").value.trim();
-            let msg = document.querySelector("#memPwdMsg");
+				<form class="signUp" th:action="@{/members/signUp}" method="post"
+					id="signUpForm">
 
-            let pwdReg = /^[A-Za-z0-9]{5,}$/;
+					<!-- 임시 지정 -->
+					<input type="hidden" name="memIp" value="127.0.0.1"> <input
+						type="hidden" name="memRoleIdx" value="1"> <input
+						type="hidden" name="memGradeIdx" value="1">
 
-            if (pwd === "" && pwdCheckValue === "") {
-                msg.textContent = "";
-                checkValid();
-                return false;
-            }
+					<div class="row my-3">
+						<div class="col-8 offset-2">
+							<label for="memName" class="form-label">이름</label> <input
+								type="text" class="form-control" name="memName" id="memName"
+								placeholder="👤 홍길동" oninput="checkValid()">
+						</div>
+					</div>
 
-            if (!pwdReg.test(pwd)) {
-                msg.style.color = "red";
-                msg.textContent = "✘ 영문 + 숫자 5글자 이상으로 입력해주세요.";
-                checkValid();
-                return false;
-            }
+					<div class="row my-3">
+						<div class="col-8 offset-2">
+							<label for="memTel" class="form-label">전화번호</label> <input
+								type="text" class="form-control" name="memTel" id="memTel"
+								placeholder="📞 010-1234-5678" maxlength="13"
+								oninput="formatTel(this)">
+						</div>
+					</div>
 
-            if (pwd === pwdCheckValue) {
-                msg.style.color = "gray";
-                msg.textContent = "✔ 사용 가능한 비밀번호입니다.";
-                checkValid();
-                return true;
-            } else {
-                msg.style.color = "red";
-                msg.textContent = "✘ 비밀번호가 일치하지 않습니다.";
-                checkValid();
-                return false;
-            }
-        }
+					<div class="row my-3">
+						<div class="col-8 offset-2">
+							<label for="memEmail" class="form-label">이메일</label> <input
+								type="text" class="form-control" name="memEmail" id="memEmail"
+								placeholder="✉️ yourEmail" oninput="checkValid()"> <input
+								type="text" class="form-control" name="emailDomain"
+								id="emailDomain" placeholder="@email.com" oninput="checkValid()">
 
-        // 내부 판정용
-        function pwdCheckSilent(pwd, pwdCheckValue) {
-            let pwdReg = /^[A-Za-z0-9]{5,}$/;
-            return pwdReg.test(pwd) && pwd === pwdCheckValue;
-        }
+							<select id="selectDomain">
+								<option value="custom">직접입력</option>
+								<option value="naver">네이버</option>
+								<option value="google">구글</option>
+							</select>
+						</div>
+					</div>
 
-        // 최종 유효성 검사
-        function checkValid() {
-            let memId = document.querySelector("#memId").value.trim();
-            let memPwd = document.querySelector("#memPwd").value.trim();
-            let memPwdCheck = document.querySelector("#memPwdCheck").value.trim();
-            let memName = document.querySelector("#memName").value.trim();
-            let memTel = document.querySelector("#memTel").value.trim();
-            let memEmail = document.querySelector("#memEmail").value.trim();
-            let emailDomain = document.querySelector("#emailDomain").value.trim();
-            let agree1 = document.querySelector("input[name='agree']").checked;
+					<div class="row my-3">
+						<div class="col-8 offset-2">
+							<label for="memId" class="form-label">아이디</label>
+							<div class="row">
+								<div class="col-6">
+									<input type="text" class="form-control" name="memId" id="memId"
+										placeholder="🏷️ your ID" oninput="checkValid()">
+								</div>
+								<div class="col-4">
+									<input type="button" class="btn btn-warning" value="중복확인"
+										onclick="idCheck()">
+								</div>
+							</div>
 
-            let btn = document.querySelector("input[name='signUpBtn']");
-            let isPwdOk = pwdCheckSilent(memPwd, memPwdCheck);
+							<span id="memIdMsg"
+								style="font-size: 12px; color: gray; margin-top: 4px;"></span><br>
+							<span style="font-size: 12px; color: gray; margin-top: 4px;">
+								✓ 알파벳 + 숫자로만 조합해주세요 (5글자 이상) </span>
+						</div>
+					</div>
 
-            let isValid =
-                memId !== "" &&
-                memPwd !== "" &&
-                memPwdCheck !== "" &&
-                memName !== "" &&
-                memTel !== "" &&
-                memEmail !== "" &&
-                emailDomain !== "" && 
-                agree1 === true &&
-                isIdDuplicate === false &&
-                isPwdOk === true;
+					<div class="row my-3">
+						<div class="col-8 offset-2">
+							<label for="memPwd" class="form-label">비밀번호</label> <input
+								type="password" class="form-control" name="memPwd" id="memPwd"
+								placeholder="🔒 ••••••••" oninput="pwdCheck()"> <span
+								id="memPwdMsg"
+								style="font-size: 12px; color: gray; margin-top: 4px;"></span><br>
+							<span style="font-size: 12px; color: gray; margin-top: 4px;">
+								✓ 알파벳 + 숫자로만 조합해주세요 (5글자 이상) </span>
+						</div>
+					</div>
 
-            btn.disabled = !isValid;
+					<div class="row my-3">
+						<div class="col-8 offset-2">
+							<label for="memPwdCheck" class="form-label">비밀번호 확인</label> <input
+								type="password" class="form-control" name="memPwdCheck"
+								id="memPwdCheck" placeholder="🔒 ••••••••" oninput="pwdCheck()">
+						</div>
+					</div>
 
-            if (!isValid) {
-                btn.style.opacity = "0.5";
-                btn.style.cursor = "not-allowed";
-            } else {
-                btn.style.opacity = "1";
-                btn.style.cursor = "pointer";
-            }
-        }
-        
-        
-        // 이메일 자동 입력(도메인)
-        $(function() {
-		   $("#selectDomain").on("change", function() {
-		     let str = $(this).val();
-		     
-		     console.log("선택값:", str); 
-		      
-		      if(str == "custom") {
-		         $("#emailDomain").val("");         
-		         $("#emailDomain").prop("readonly", false); 
-		
-		      } else if (str == "naver") {
-		         $("#emailDomain").val("@naver.com");
-		         $("#emailDomain").prop("readonly", true);
-		         
-		      } else if (str == "google") {
-		         $("#emailDomain").val("@gmail.com");
-		         $("#emailDomain").prop("readonly", true);
-		               
-		      }  
-		   });
-		});
-    </script>
+					<div class="row my-3">
+						<div class="col-8 offset-2">
+							<label style="cursor: pointer;"> <input type="checkbox"
+								name="agree" onchange="checkValid()"> 이용약관 및 개인정보 처리 방침에
+								동의 합니다
+							</label>
+							<div>
+								<span style="font-size: 12px; color: gray;"> 회원가입을 위해서는
+									약관 동의가 필수입니다 </span>
+							</div>
+						</div>
+					</div>
 
-    <div class="row my-5" id="global-content">
-        <div class="col">
-            <div class="row my-3 text-center">
-                <div class="col">
-                    <h2 class="fs-3 fw-bold">회원 정보 입력</h2>
-                    <p style="color: gray; font-size: 12px;">모든 항목을 정확히 입력해주세요</p>
-                </div>
-            </div>
+					<div class="row mb-3 mt-5">
+						<div class="col-8 offset-2">
+							<input type="submit" name="signUpBtn" value="✔️ 회원가입 완료"
+								class="btn btn-primary" disabled>
+						</div>
+					</div>
 
-            <form class="signUp"
-                  th:action="@{/views/member/signUp}"
-                  method="post"
-                  id="signUpForm">
+					<div class="row my-3" th:if="${errorMessage}">
+						<div class="col-8 offset-2">
+							<span th:text="${errorMessage}" style="color: red;"></span>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
 
-				<!-- 임시 지정 -->
-                <input type="hidden" name="memIp" value="127.0.0.1">
-                <input type="hidden" name="memRoleIdx" value="1">
-                <input type="hidden" name="memGradeIdx" value="1">
-
-                <div class="row my-3">
-                    <div class="col-8 offset-2">
-                        <label for="memName" class="form-label">이름</label>
-                        <input type="text" class="form-control" name="memName" id="memName"
-                               placeholder="👤 홍길동" oninput="checkValid()">
-                    </div>
-                </div>
-
-                <div class="row my-3">
-                    <div class="col-8 offset-2">
-                        <label for="memTel" class="form-label">전화번호</label>
-                        <input type="text" class="form-control" name="memTel" id="memTel"
-                               placeholder="📞 010-1234-5678"
-                               maxlength="13"
-                               oninput="formatTel(this)">
-                    </div>
-                </div>
-
-                <div class="row my-3">
-                    <div class="col-8 offset-2">
-                        <label for="memEmail" class="form-label">이메일</label>
-                        <input type="text" class="form-control" name="memEmail" id="memEmail"
-                               placeholder="✉️ yourEmail" oninput="checkValid()">
-                        <input type="text" class="form-control" name="emailDomain" id="emailDomain"
-                               placeholder="@email.com" oninput="checkValid()">
-                               
-                        <select id="selectDomain">
-                        	<option value="custom">직접입력</option>
-                        	<option value="naver">네이버</option>
-                        	<option value="google">구글</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="row my-3">
-                    <div class="col-8 offset-2">
-                        <label for="memId" class="form-label">아이디</label>
-                        <div class="row">
-                            <div class="col-6">
-                                <input type="text" class="form-control" name="memId" id="memId"
-                                       placeholder="🏷️ your ID" oninput="checkValid()">
-                            </div>
-                            <div class="col-4">
-                                <input type="button" class="btn btn-warning" value="중복확인" onclick="idCheck()">
-                            </div>
-                        </div>
-
-                        <span id="memIdMsg" style="font-size:12px; color:gray; margin-top:4px;"></span><br>
-                        <span style="font-size:12px; color:gray; margin-top:4px;">
-                            ✓ 알파벳 + 숫자로만 조합해주세요 (5글자 이상)
-                        </span>
-                    </div>
-                </div>
-
-                <div class="row my-3">
-                    <div class="col-8 offset-2">
-                        <label for="memPwd" class="form-label">비밀번호</label>
-                        <input type="password" class="form-control" name="memPwd" id="memPwd"
-                               placeholder="🔒 ••••••••" oninput="pwdCheck()">
-
-                        <span id="memPwdMsg" style="font-size:12px; color:gray; margin-top:4px;"></span><br>
-                        <span style="font-size:12px; color:gray; margin-top:4px;">
-                            ✓ 알파벳 + 숫자로만 조합해주세요 (5글자 이상)
-                        </span>
-                    </div>
-                </div>
-
-                <div class="row my-3">
-                    <div class="col-8 offset-2">
-                        <label for="memPwdCheck" class="form-label">비밀번호 확인</label>
-                        <input type="password" class="form-control" name="memPwdCheck" id="memPwdCheck"
-                               placeholder="🔒 ••••••••" oninput="pwdCheck()">
-                    </div>
-                </div>
-
-                <div class="row my-3">
-                    <div class="col-8 offset-2">
-                        <label style="cursor:pointer;">
-                            <input type="checkbox" name="agree" onchange="checkValid()">
-                            이용약관 및 개인정보 처리 방침에 동의 합니다
-                        </label>
-                        <div>
-                            <span style="font-size:12px; color:gray;">
-                                회원가입을 위해서는 약관 동의가 필수입니다
-                            </span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row mb-3 mt-5">
-                    <div class="col-8 offset-2">
-                        <input type="submit" name="signUpBtn" value="✔️ 회원가입 완료"
-                               class="btn btn-primary" disabled>
-                    </div>
-                </div>
-
-                <div class="row my-3" th:if="${errorMessage}">
-                    <div class="col-8 offset-2">
-                        <span th:text="${errorMessage}" style="color:red;"></span>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
-</th:block>
+	</th:block>
+</body>
 </html>
