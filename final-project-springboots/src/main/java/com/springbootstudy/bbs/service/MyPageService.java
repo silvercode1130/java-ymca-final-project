@@ -22,7 +22,11 @@ public class MyPageService {
 
   // 1. 회원 정보 조회
   public MemberVO getMember(long memIdx) {
-    return myPageMapper.getMember(memIdx);
+    MemberVO member = myPageMapper.getMember(memIdx);
+    if (member == null) {
+      log.error("존재하지 않는 회원 번호 조회: {}", memIdx);
+    }
+    return member;
   }
 
   // 2. 내 경매 목록 조회 (입찰 수 포함)

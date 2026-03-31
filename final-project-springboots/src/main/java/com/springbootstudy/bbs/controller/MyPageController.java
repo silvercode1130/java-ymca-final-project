@@ -3,6 +3,7 @@ package com.springbootstudy.bbs.controller;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+
 import com.springbootstudy.bbs.domain.MemberVO;
 import com.springbootstudy.bbs.service.MyPageService;
 
@@ -18,7 +19,7 @@ public class MyPageController {
     return (MemberVO) session.getAttribute("loginUser");
   }
 
-  @GetMapping("mypage/board")
+  @GetMapping("/mypage/board")
   public String getMyboards(HttpSession session, Model model) {
     MemberVO member = getSessionUser(session);
     if (member == null)
@@ -28,7 +29,7 @@ public class MyPageController {
     return "views/mystatus/myboardview";
   }
 
-  @GetMapping("mypage/auctions")
+  @GetMapping("/mypage/auctions")
   public String getAuctionList(HttpSession session, Model model) {
     MemberVO member = getSessionUser(session);
     if (member == null)
@@ -38,7 +39,7 @@ public class MyPageController {
     return "views/mystatus/auctionview";
   }
 
-  @GetMapping("mypage/bids")
+  @GetMapping("/mypage/bids")
   public String getBidList(HttpSession session, Model model) {
     MemberVO member = getSessionUser(session);
     if (member == null)

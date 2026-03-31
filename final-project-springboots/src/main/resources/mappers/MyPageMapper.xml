@@ -3,31 +3,33 @@
 
 <mapper namespace="com.springbootstudy.bbs.mapper.MyPageMapper">
 
-	<select id="getMember" parameterType="long"
-		resultType="MemberVO"> SELECT mem_idx, mem_id, mem_name, mem_email FROM member WHERE mem_idx =
-		#{memIdx} </select>
+	<select id="getMember" parameterType="long" resultType="MemberVO"> SELECT m.mem_idx, m.mem_id,
+		m.mem_name, m.mem_email, p.mem_nickname, p.mem_img, g.grade_name FROM member m LEFT JOIN
+		member_profile p ON m.mem_idx = p.mem_idx JOIN grade g ON m.mem_grade_idx = g.grade_idx WHERE
+		m.mem_idx = #{memIdx} </select>
 
-	<select id="getAuctionList" resultType="AuctionVO"> SELECT a.auction_idx AS auctionIdx,
-		a.buyer_idx AS buyerIdx, a.item_category_idx AS itemCategoryIdx, a.auction_title AS
-		auctionTitle, a.auction_desc AS auctionDesc, a.auction_target_price AS auctionTargetPrice,
-		a.auction_start_at AS auctionStartAt, a.auction_end_at AS auctionEndAt,
-		a.auction_decision_deadline AS auctionDecisionDeadline, a.auction_status_idx AS
-		auctionStatusIdx, a.auction_regdate AS auctionRegdate, a.auction_view_count AS auctionViewCount,
-		s.auction_status_name AS auctionStatusName, s.auction_status_code AS auctionStatusCode, (SELECT
-		COUNT(*) FROM bid b WHERE b.auction_idx = a.auction_idx) AS bidCount FROM auction a INNER JOIN
-		auction_status s ON a.auction_status_idx = s.auction_status_idx WHERE a.buyer_idx = #{buyerIdx}
-		ORDER BY a.auction_regdate DESC </select>
+	<select id="getAuctionList" resultType="AuctionVO"> SELECT a.*, s.auction_status_name FROM auction
+		a INNER JOIN auction_status s ON a.auction_status_idx = s.auction_status_idx WHERE a.buyer_idx =
+		#{memIdx} ORDER BY a.auction_regdate DESC </select>
 
-	<select id="getBoardListByMemIdx" parameterType="long" resultType="BoardVO"> SELECT b.board_idx AS
-		boardIdx, b.board_title AS boardTitle, b.board_regdate AS boardRegdate, b.board_view_count AS
-		boardViewCount, b.mem_idx AS memIdx, t.board_type_name AS boardTypeName, t.board_type_code AS
-		boardTypeCode FROM board b JOIN board_type t ON b.board_type_idx = t.board_type_idx WHERE
-		b.mem_idx = #{memIdx} AND b.board_is_deleted = 'N' ORDER BY b.board_regdate DESC </select>
+	<select id="getBoardListByMemIdx" parameterType="long"
+		resultType="BoardVO"> SELECT b.board_idx AS boardIdx, b.board_title AS boardTitle,
+		b.board_regdate AS boardRegdate, b.board_view_count AS boardViewCount, b.mem_idx AS memIdx,
+		t.board_type_name AS boardTypeName, t.board_type_code AS boardTypeCode FROM board b JOIN
+		board_type t ON b.board_type_idx = t.board_type_idx WHERE b.mem_idx = #{memIdx} AND
+		b.board_is_deleted = 'N' ORDER BY b.board_regdate DESC </select>
 
 	<select id="findBoardById" resultType="BoardVO"> SELECT b.board_idx AS boardIdx, b.mem_idx AS
 		memIdx, b.board_title AS boardTitle, b.board_content AS boardContent, b.board_regdate AS
 		boardRegdate, b.board_view_count AS boardViewCount, m.mem_name AS memName, t.board_type_code AS
 		boardTypeCode FROM board b JOIN member m ON b.mem_idx = m.mem_idx JOIN board_type t ON
 		b.board_type_idx = t.board_type_idx WHERE b.board_idx = #{boardIdx} AND b.board_is_deleted = 'N' </select>
+
+	<select id="getBidListByMemIdx" parameterType="long" resultType="BidVO"> SELECT b.bid_idx AS
+		bidIdx, b.auction_idx AS auctionIdx, b.bid_price AS bidPrice, b.bid_regdate AS bidRegdate,
+		s.bid_status_name AS bidStatusName, a.auction_title AS auctionTitle, i.item_name AS itemName
+		FROM bid b JOIN auction a ON b.auction_idx = a.auction_idx JOIN bid_status s ON b.bid_status_idx
+		= s.bid_status_idx JOIN item i ON b.item_idx = i.item_idx WHERE b.bidder_idx = #{memIdx} ORDER
+		BY b.bid_regdate DESC </select>
 
 </mapper>
