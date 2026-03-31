@@ -106,7 +106,7 @@ public class BoardController {
             HttpSession session
     ) {
         MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
-        if (loginUser == null) return "redirect:/views/member/login.do";
+        if (loginUser == null) return "redirect:/members/login";
 
         BoardTypeVO boardType = boardService.getBoardTypeByCode(typeCode);
         if (boardType == null) return "redirect:/boards";
@@ -130,7 +130,7 @@ public class BoardController {
             Model model, HttpSession session
     ) {
         MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
-        if (loginUser == null) return "redirect:/views/member/login";
+        if (loginUser == null) return "redirect:/members/login";
 
         BoardVO board = boardService.getBoardDetail(boardIdx);
         if (!board.getMemIdx().equals(loginUser.getMemIdx())) {
@@ -151,7 +151,7 @@ public class BoardController {
             HttpSession session
     ) {
         MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
-        if (loginUser == null) return "redirect:/views/member/login.do";
+        if (loginUser == null) return "redirect:/members/login";
 
         BoardVO board = new BoardVO();
         board.setBoardIdx(boardIdx);
@@ -169,7 +169,7 @@ public class BoardController {
             HttpSession session
     ) {
         MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
-        if (loginUser == null) return "redirect:/views/member/login.do";
+        if (loginUser == null) return "redirect:/members/login";
 
         boardService.removeBoard(boardIdx);
         return "redirect:/boards/" + typeCode;
@@ -186,7 +186,7 @@ public class BoardController {
             HttpSession session
     ) {
         MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
-        if (loginUser == null) return "redirect:/views/member/login.do";
+        if (loginUser == null) return "redirect:/members/login";
 
         ReplyVO reply = new ReplyVO();
         reply.setBoardIdx(boardIdx);
@@ -207,7 +207,7 @@ public class BoardController {
             HttpSession session
     ) {
         MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
-        if (loginUser == null) return "redirect:/views/member/login";
+        if (loginUser == null) return "redirect:/members/login";
 
         boardService.removeReply(replyIdx);
         return "redirect:/boards/" + typeCode + "/" + boardIdx;
