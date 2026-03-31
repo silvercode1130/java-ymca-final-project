@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.springbootstudy.bbs.domain.MemberVO;
 import com.springbootstudy.bbs.mapper.MemberMapper;
@@ -34,7 +35,7 @@ public class MemberController {
 	HttpServletRequest request;
 
 	@Autowired
-	HttpSession session; 
+	HttpSession session;
 
 
 	// 회원가입 -----------------------------------------------------------------
@@ -101,23 +102,22 @@ public class MemberController {
 
 		return "/views/member/login"; 
 	}
-//	// 세션, 서블릿 리퀘스트를 넣고 -> 서비스 들고 옴(model로)
-//
-	// login.html - 로그인 처리 기능	
-	@PostMapping("/members/login")
-	public String login(@RequestParam("memId") String memId, @RequestParam("memPwd") String memPwd, 
-			Model model, HttpSession session, RedirectAttributes ra  // RedirectAttributes cannot be resolved to a type
-			) throws ServletException, IOException {
-		
+
+	// // 세션, 서블릿 리퀘스트를 넣고 -> 서비스 들고 옴(model로)
+	//
+	// login.html - 로그인 처리 기능
+	@PostMapping("/member/login")
+	public String login(@RequestParam("memId") String memId, @RequestParam("memPwd") String memPwd,
+			Model model, HttpSession session, RedirectAttributes ra) throws ServletException, IOException {
+
 		// MemberService 클래스를 사용해 로그인 성공여부 확인
 		int result = memberService.login(memId, memPwd);
-		
-		if(result == -1) { // 회원 아이디가 존재하지 않으면
+
+		if (result == -1) { // 회원 아이디가 존재하지 않으면
 			ra.addFlashAttribute("error", "존재하지 않는 아이디입니다.");
 		    return "redirect:/members/login";
 
-			
-		} else if(result == 0) { // 비밀번호가 틀리면
+		} else if (result == 0) { // 비밀번호가 틀리면
 			ra.addFlashAttribute("error", "비밀번호가 틀립니다.");
 		    return "redirect:/members/login"; 
 		}		
@@ -145,7 +145,7 @@ public class MemberController {
 	
 
 	// 로그아웃 -----------------------------------------------------------------
-	
+
 	@GetMapping("/memberLogout")
 	public String logout(HttpSession session) {	
 		
@@ -154,14 +154,13 @@ public class MemberController {
 		
 		return "redirect:/main"; 
 	}
-	
-	
+
 	// 탈퇴 --------------------------------------------------------------------
-	
+
 	@GetMapping("/memberDelete")
 	public String deleteMember(HttpSession session, HttpServletResponse response) throws IOException {
 
-	    String memId = (String) session.getAttribute("loginId");
+		String memId = (String) session.getAttribute("loginId");
 
 	    // 로그인도 안하고 가입하려 하면 로그인 화면으로
 	    if(memId == null) {
@@ -170,8 +169,8 @@ public class MemberController {
 
 	    int result = memberService.deleteMember(memId); 
 
-	    if(result == 1) {
-	        session.invalidate(); // 세션 제거
+		if (result == 1) {
+			session.invalidate(); // 세션 제거
 
 	        // 탈퇴 시 띄울 alert창
 	        response.setContentType("text/html; charset=utf-8");

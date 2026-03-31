@@ -21,8 +21,9 @@ public interface BoardMapper {
     // ── 게시글 ───────────────────────────────────────────────
     // 목록 (typeCode 기반)
     List<BoardVO> findBoards(
-            @Param("typeCode") String typeCode,
-            @Param("keyword")  String keyword
+            @Param("typeCode") 	String typeCode,
+            @Param("keyword")  	String keyword,
+            @Param("searchType")String searchType
     );
 
     // 상세
