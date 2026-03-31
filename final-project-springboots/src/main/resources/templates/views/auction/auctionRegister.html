@@ -2,63 +2,76 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
-<title>Insert title here</title>
+<title>역경매 구매 요청</title>
 </head>
 <body>
-	
-	<div class="register-container">
-	    <h2>📣 역경매 구매 요청하기</h2>
-	    <form action="/auction/register" method="post">
-	        <div class="input-group">
-	            <label>카테고리 *</label>
-	            <select name="itemCategoryIdx" required>
-	                <option value="5">헬스/홈트 용품</option>
-	                <option value="2">라켓/배트/클럽</option>
-	            </select>
-	        </div>
-	
-	        <div class="input-group">
-	            <label>요청 제목 *</label>
-	            <input type="text" name="auctionTitle" placeholder="예: 요넥스 라켓 구해요" required>
-	        </div>
-	
-	        <div class="input-group">
-	            <label>브랜드명</label>
-	            <input type="text" name="itemBrand" placeholder="예: 요넥스, 멜킨">
-	        </div>
-	
-	        <div class="input-group">
-	            <label>희망 최대가 (₩) *</label>
-	            <input type="number" name="auctionTargetPrice" required>
-	        </div>
-	
-	        <div class="input-group">
-	            <label>이미지 URL *</label>
-	            <input type="text" name="itemThumbnailImg" placeholder="이미지 주소를 입력하세요" required>
-	        </div>
-	
-	        <div class="date-grid">
-	            <div>
-	                <label>입찰 마감일 *</label>
-	                <input type="datetime-local" name="auctionEndAt" required>
-	            </div>
-	            <div>
-	                <label>결정 마감일 *</label>
-	                <input type="datetime-local" name="auctionDecisionDeadline" required>
-	            </div>
-	        </div>
-	
-	        <div class="input-group">
-	            <label>상세 설명 *</label>
-	            <textarea name="auctionDesc" rows="5" placeholder="원하는 상품의 상태나 조건을 적어주세요" required></textarea>
-	        </div>
-	
-	        <div class="btn-area">
-	            <button type="submit">요청 등록하기</button>
-	            <button type="button" onclick="history.back()">취소</button>
-	        </div>
-	    </form>
-	</div>
-		
+
+<div class="register-container">
+    <h2>📣 역경매 구매 요청하기</h2>
+
+    <!-- 에러 메시지 표시 -->
+    <div th:if="${errorMessage}" style="color:red; margin-bottom:10px;">
+        ⚠️ [[${errorMessage}]]
+    </div>
+
+    <form action="/auction/register" method="post" id="registerForm">
+        <div class="input-group">
+            <label>카테고리 *</label>
+            <select name="itemCategoryIdx" required>
+                <option value="5">헬스/홈트 용품</option>
+                <option value="2">라켓/배트/클럽</option>
+            </select>
+        </div>
+
+        <div class="input-group">
+            <label>요청 제목 *</label>
+            <input type="text" name="auctionTitle" placeholder="예: 요넥스 라켓 구해요" required>
+        </div>
+
+        <div class="input-group">
+            <label>브랜드명</label>
+            <input type="text" name="itemBrand" placeholder="예: 요넥스, 멜킨">
+        </div>
+
+        <div class="input-group">
+            <label>희망 최대가 (₩) *</label>
+            <input type="number" name="auctionTargetPrice"
+                   min="100" step="100"
+                   placeholder="100원 단위로 입력해주세요" required>
+            <small style="color:gray;">100원 단위 이상, 음수 불가</small>
+        </div>
+
+        <div class="input-group">
+            <label>이미지 URL (선택)</label>
+            <input type="text" name="itemThumbnailImg"
+                   placeholder="이미지 주소를 입력하세요 (선택사항)">
+        </div>
+
+        <div class="date-grid">
+            <div>
+                <label>입찰 마감일 *</label>
+                <input type="datetime-local" name="auctionEndAt" id="auctionEndAt" required>
+                <small style="color:gray;">현재 시점 이후만 선택 가능</small>
+            </div>
+            <div>
+                <label>결정 마감일 *</label>
+                <input type="datetime-local" name="auctionDecisionDeadline"
+                       id="auctionDecisionDeadline" required>
+                <small style="color:gray;">입찰 마감일로부터 최대 3일 이내</small>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label>상세 설명 *</label>
+            <textarea name="auctionDesc" rows="5"
+                      placeholder="원하는 상품의 상태나 조건을 적어주세요" required></textarea>
+        </div>
+
+        <div class="btn-area">
+            <button type="submit">요청 등록하기</button>
+            <button type="button" onclick="history.back()">취소</button>
+        </div>
+    </form>
+</div>
 </body>
 </html>

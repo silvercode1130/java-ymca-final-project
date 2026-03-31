@@ -13,4 +13,6 @@ public class BidListDTO extends BidVO {
     
     // bid_status 테이블에서 가져올 한글 상태명 (일반, 낙찰 등)
     private String bidStatusName; 
+    
+    private Long itemIdx;
 }
