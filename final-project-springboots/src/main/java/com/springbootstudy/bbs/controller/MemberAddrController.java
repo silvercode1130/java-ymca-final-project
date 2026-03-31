@@ -45,8 +45,10 @@ public class MemberAddrController {
 	@ResponseBody
 	public int updateAddr(MemberAddrVO vo) {
 
+		// 두개 확인 필요
 	    int result = memberAddrService.registerAddr(vo);
-
+	    vo.setIsPrimary("N");
+	    
 	    return result;
 	}
 //    @PostMapping("/member/updateAddrAjax.do")
@@ -83,6 +85,7 @@ public class MemberAddrController {
 
         List<MemberAddrVO> addrList = memberAddrService.selectAddrList(loginMember.getMemIdx());
         model.addAttribute("addrList", addrList);
+        model.addAttribute("member", loginMember);
 
         return "/views/member/memberAddr"; 
     } 

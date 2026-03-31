@@ -49,7 +49,8 @@
                 body: "memZipcode=" + encodeURIComponent(memZipcode) +
                       "&memAddr=" + encodeURIComponent(memAddr) +
                       "&memAddrDetail=" + encodeURIComponent(memAddrDetail) +
-                      "&memidx=" + encodeURIComponent(sendIdx)
+                      "&memIdx=" + encodeURIComponent(sendIdx) + 
+                      "&isPrimary=N"
             })
             .then(res => res.text())
             .then(result => {

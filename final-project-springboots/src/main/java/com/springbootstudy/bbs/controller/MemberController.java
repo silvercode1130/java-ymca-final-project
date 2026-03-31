@@ -106,7 +106,7 @@ public class MemberController {
 	// login.html - 로그인 처리 기능	
 	@PostMapping("/members/login")
 	public String login(@RequestParam("memId") String memId, @RequestParam("memPwd") String memPwd, 
-			Model model, HttpSession session, RedirectAttributes ra  // RedirectAttributes cannot be resolved to a type
+			Model model, HttpSession session, RedirectAttributes ra 
 			) throws ServletException, IOException {
 		
 		// MemberService 클래스를 사용해 로그인 성공여부 확인
@@ -120,7 +120,7 @@ public class MemberController {
 		} else if(result == 0) { // 비밀번호가 틀리면
 			ra.addFlashAttribute("error", "비밀번호가 틀립니다.");
 		    return "redirect:/members/login"; 
-		}		
+		}		 
 		
 		// 로그인을 성공하면 회원 정보를 DB에서 가져와 세션에 저장
 		MemberVO memberVO = memberService.getMemberVO(memId);

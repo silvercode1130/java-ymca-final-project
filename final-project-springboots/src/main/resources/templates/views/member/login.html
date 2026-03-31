@@ -47,6 +47,11 @@
             <div class="my-3">
                 <input class="form-control" id="memPwd" name="memPwd" type="password" placeholder="🔒 ••••••••">
             </div>
+            
+            <!-- 로그인 실패 시 -->
+            <div th:if="${error}">
+			    <span th:text="${error}" style="color: gray; font-size: 12px;">아이디나 비밀번호가 틀렸습니다</span>
+			</div>
 
             <div class="my-3">
                 <input type="submit" class="btn btn-dark w-100" value="로그인">

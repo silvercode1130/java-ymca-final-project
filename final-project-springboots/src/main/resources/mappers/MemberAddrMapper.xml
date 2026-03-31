@@ -32,11 +32,19 @@
 
     <!-- 주소 리스트 조회 -->
     <select id="selectAddrList" resultType="MemberAddrVO">
+	    SELECT 
+	        a.*,
+	        m.mem_tel
+	    FROM member_addr a
+	    JOIN member m ON a.mem_idx = m.mem_idx
+	    WHERE a.mem_idx = #{memIdx}
+	</select>
+<!--     <select id="selectAddrList" resultType="MemberAddrVO">
         SELECT *
         FROM member_addr
         WHERE mem_idx = #{memIdx}
         ORDER BY addr_idx DESC
-    </select>
+    </select> -->
  
 </mapper>	
 
