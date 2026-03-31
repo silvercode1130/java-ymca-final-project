@@ -102,46 +102,39 @@ public class MemberController {
 
 		return "/views/member/login"; 
 	}
-<<<<<<< HEAD
-//	// 세션, 서블릿 리퀘스트를 넣고 -> 서비스 들고 옴(model로)
-//
-	// login.html - 로그인 처리 기능	
-	@PostMapping("/members/login")
-	public String login(@RequestParam("memId") String memId, @RequestParam("memPwd") String memPwd, 
-			Model model, HttpSession session, RedirectAttributes ra 
-			) throws ServletException, IOException {
-		
-=======
-
-	// // 세션, 서블릿 리퀘스트를 넣고 -> 서비스 들고 옴(model로)
+	
+	// 세션, 서블릿 리퀘스트를 넣고 -> 서비스 들고 옴(model로)
 	//
 	// login.html - 로그인 처리 기능
-	@PostMapping("/member/login")
-	public String login(@RequestParam("memId") String memId, @RequestParam("memPwd") String memPwd,
-			Model model, HttpSession session, RedirectAttributes ra) throws ServletException, IOException {
+	@PostMapping("/members/login")
+	public String login(@RequestParam("memId") String memId,
+	                    @RequestParam("memPwd") String memPwd,
+	                    Model model,
+	                    HttpSession session,
+	                    RedirectAttributes ra) throws ServletException, IOException {
 
->>>>>>> 2bd7b49b28e0dfa3dfda9ea969edb8cc2b5cbbac
-		// MemberService 클래스를 사용해 로그인 성공여부 확인
-		int result = memberService.login(memId, memPwd);
+	    // 로그인 성공 여부 확인
+	    int result = memberService.login(memId, memPwd);
 
-		if (result == -1) { // 회원 아이디가 존재하지 않으면
-			ra.addFlashAttribute("error", "존재하지 않는 아이디입니다.");
-		    return "redirect:/members/login";
+	    if (result == -1) { // 아이디 없음
+	        ra.addFlashAttribute("error", "존재하지 않는 아이디입니다.");
+	        return "redirect:/members/login";
 
-		} else if (result == 0) { // 비밀번호가 틀리면
-			ra.addFlashAttribute("error", "비밀번호가 틀립니다.");
-		    return "redirect:/members/login"; 
-		}		 
-		
-		// 로그인을 성공하면 회원 정보를 DB에서 가져와 세션에 저장
-		MemberVO memberVO = memberService.getMemberVO(memId);
-		session.setAttribute("isLogin", true);
-		session.setAttribute("loginId", memId);
-		
-		session.setAttribute("loginUser", memberVO); 
-		System.out.println("memberVO.name : " + memberVO.getMemName());
-		
-		return "redirect:/main"; 
+	    } else if (result == 0) { // 비밀번호 틀림
+	        ra.addFlashAttribute("error", "비밀번호가 틀립니다.");
+	        return "redirect:/members/login";
+	    }
+
+	    // 로그인 성공 → 회원 정보 세션 저장
+	    MemberVO memberVO = memberService.getMemberVO(memId);
+
+	    session.setAttribute("isLogin", true);
+	    session.setAttribute("loginId", memId);
+	    session.setAttribute("loginUser", memberVO);
+
+	    System.out.println("memberVO.name : " + memberVO.getMemName());
+
+	    return "redirect:/main";
 	}
 
 	// 비번찾기 -----------------------------------------------------------------
