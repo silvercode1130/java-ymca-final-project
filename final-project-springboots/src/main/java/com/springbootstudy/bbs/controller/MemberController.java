@@ -98,13 +98,19 @@ public class MemberController {
 
 	// login.html - 창 띄우기
 	@GetMapping("/members/login")
-	public String login() {
+	public String loginForm(HttpSession session, Model model) {
 
-		return "/views/member/login"; 
+	    String msg = (String) session.getAttribute("loginMsg");
+
+	    if (msg != null) {
+	        model.addAttribute("loginMsg", msg);
+	        session.removeAttribute("loginMsg"); 
+	    }
+
+	    return "views/member/login";
 	}
 	
 	// 세션, 서블릿 리퀘스트를 넣고 -> 서비스 들고 옴(model로)
-	//
 	// login.html - 로그인 처리 기능
 	@PostMapping("/members/login")
 	public String login(@RequestParam("memId") String memId,
