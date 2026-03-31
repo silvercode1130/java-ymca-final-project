@@ -106,7 +106,7 @@ public class MemberController {
 	// // 세션, 서블릿 리퀘스트를 넣고 -> 서비스 들고 옴(model로)
 	//
 	// login.html - 로그인 처리 기능
-	@PostMapping("/member/login")
+	@PostMapping("/members/login")
 	public String login(@RequestParam("memId") String memId, @RequestParam("memPwd") String memPwd,
 			Model model, HttpSession session, RedirectAttributes ra) throws ServletException, IOException {
 
