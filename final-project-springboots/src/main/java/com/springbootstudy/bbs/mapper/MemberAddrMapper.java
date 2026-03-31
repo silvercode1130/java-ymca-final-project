@@ -11,6 +11,9 @@ public interface MemberAddrMapper {
 
     // 주소 등록
     int insertAddr(MemberAddrVO memberAddrVO);
-	List<MemberAddrVO> selectAddrList(Long memIdx); 
+	List<MemberAddrVO> selectAddrList(Long memIdx);
+	
+	// 대표 주소 하나만 등록하기
+	void resetPrimaryAddr(Long memIdx); 
 
 }
