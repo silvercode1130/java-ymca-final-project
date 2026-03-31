@@ -18,7 +18,7 @@ public interface MyPageMapper {
 
   // 2. 내 경매 목록 조회 (입찰 수 포함)
   // 서비스의 getAuctionList와 연결됩니다.
-  public List<AuctionVO> getAuctionList(long memIdx);
+  public List<AuctionVO> getAuctionList(@Param("memIdx") long memIdx);
 
   // 3. 내 입찰 참여 내역 조회
   // 서비스의 getBidList와 연결됩니다.
