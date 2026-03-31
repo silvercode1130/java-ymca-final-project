@@ -32,7 +32,7 @@
                 <span class="badge bg-info text-dark" th:text="${board.boardTypeName}">게시판명</span>
               </td>
               <td class="text-start">
-                <a th:href="@{/board/detail/{idx}(idx=${board.boardIdx})}"
+                <a th:href="@{/{typeCode}(typeCode=${board.boardTypeCode})/{idx}(idx=${board.boardIdx})}"
                    class="text-decoration-none fw-bold text-dark">
                    [[${board.boardTitle}]]
                 </a>

@@ -26,7 +26,7 @@ public class MemberAddrController {
 	
 	// 주소등록창 -----------------------------------------------------------------
 	
-	@GetMapping("/members/memberAddrUpdate") 
+	@GetMapping("/members/address/new") 
 	public String memberAddrUpdate(HttpSession session, Model model) {
 
 	    MemberVO loginMember = (MemberVO) session.getAttribute("loginUser");
@@ -55,7 +55,7 @@ public class MemberAddrController {
 	// 주소목록창 -----------------------------------------------------------------
 	
 	// 저장된 값 보여주기
-    @GetMapping("/members/memberAddr")
+    @GetMapping("/members/address")
     public String memberAddr(HttpSession session, Model model) {
 
     	// 로그인 안했으면 쫓아내기
