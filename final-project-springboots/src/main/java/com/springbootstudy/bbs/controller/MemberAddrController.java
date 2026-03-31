@@ -45,29 +45,12 @@ public class MemberAddrController {
 	@ResponseBody
 	public int updateAddr(MemberAddrVO vo) {
 
+		// 두개 확인 필요
 	    int result = memberAddrService.registerAddr(vo);
-
+	    vo.setIsPrimary("N");
+	    
 	    return result;
 	}
-//    @PostMapping("/member/updateAddrAjax.do")
-//    @ResponseBody
-//    public String updateAddrAjax(
-//            @RequestParam("memZipcode") String memZipcode,
-//            @RequestParam("memAddr") String memAddr,
-//            @RequestParam(value = "memAddrDetail", required = false) String memAddrDetail,
-//            @RequestParam("memidx") Long memIdx) {
-//
-//        MemberAddrVO vo = new MemberAddrVO();
-//        vo.setMemZipcode(memZipcode);
-//        vo.setMemAddr(memAddr);
-//        vo.setMemAddrDetail(memAddrDetail);
-//        vo.setMemIdx(memIdx);
-//        vo.setIsPrimary("N");
-//
-//        int result = memberAddrService.registerAddr(vo); 
-//
-//        return result > 0 ? "ok" : "fail";
-//    }
 
 	// 주소목록창 -----------------------------------------------------------------
 	
@@ -83,6 +66,7 @@ public class MemberAddrController {
 
         List<MemberAddrVO> addrList = memberAddrService.selectAddrList(loginMember.getMemIdx());
         model.addAttribute("addrList", addrList);
+        model.addAttribute("member", loginMember);
 
         return "/views/member/memberAddr"; 
     } 
