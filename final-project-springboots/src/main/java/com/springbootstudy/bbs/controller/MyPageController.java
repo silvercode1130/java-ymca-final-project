@@ -19,7 +19,7 @@ public class MyPageController {
     return (MemberVO) session.getAttribute("loginUser");
   }
 
-  @GetMapping("/mypage/board")
+  @GetMapping("/mypage/boards")
   public String getMyboards(HttpSession session, Model model) {
     MemberVO member = getSessionUser(session);
     if (member == null)
@@ -46,6 +46,6 @@ public class MyPageController {
       return "redirect:/members/login";
 
     model.addAttribute("bids", myPageService.getBidList(member.getMemIdx()));
-    return "/mystatus/bidview";
+    return "views/mystatus/bidview";
   }
 }
