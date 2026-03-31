@@ -22,7 +22,7 @@ public class MyPageController {
   public String getMyboards(HttpSession session, Model model) {
     MemberVO member = getSessionUser(session);
     if (member == null)
-      return "redirect:/views/member/login";
+      return "redirect:/members/login";
 
     model.addAttribute("boards", myPageService.getBoardList(member.getMemIdx()));
     return "views/mystatus/myboardview";
@@ -32,7 +32,7 @@ public class MyPageController {
   public String getAuctionList(HttpSession session, Model model) {
     MemberVO member = getSessionUser(session);
     if (member == null)
-      return "redirect:/views/member/login";
+      return "redirect:/members/login";
 
     model.addAttribute("auctions", myPageService.getAuctionList(member.getMemIdx()));
     return "views/mystatus/auctionview";
@@ -42,9 +42,9 @@ public class MyPageController {
   public String getBidList(HttpSession session, Model model) {
     MemberVO member = getSessionUser(session);
     if (member == null)
-      return "redirect:/views/member/login";
+      return "redirect:/members/login";
 
     model.addAttribute("bids", myPageService.getBidList(member.getMemIdx()));
-    return "views/mystatus/bidview";
+    return "/mystatus/bidview";
   }
 }
