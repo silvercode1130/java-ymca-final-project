@@ -5,6 +5,17 @@
 <title>Insert title here</title>
 </head>
 <body>
-
+	메인 없으면 로그인 안돼요! <br>
+	로그인 생기기 전 까지는 임시로 넣어둘게요! <br>
+	홈 컨트롤러에 로그인 세션 지우면 작동 안하니까 빼지 말아주세요ㅠㅠ <br>
+	
+	<hr>
+	
+   <input type="button" value="회원가입" onclick="location.href='/members/signUp'">
+   <input type="button" value="로그인" onclick="location.href='/members/login'">
+   <input type="button" value="회원 정보 수정" onclick="location.href='/members/memberUpdate'">
+   <input type="button" value="주소 수정" onclick="location.href='/members/memberAddr'">
+   <input type="button" value="로그아웃" onclick="location.href='/memberLogout'">
+   <input type="submit" value="회원 탈퇴" onclick="location.href='/memberDelete' ">
 </body>
 </html>

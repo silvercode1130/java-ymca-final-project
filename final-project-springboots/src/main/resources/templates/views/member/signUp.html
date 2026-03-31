@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layouts/main_layout}">
-     
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+      
+<script th:src="@{/js/jquery-3.7.1.min.js}"></script>
 
 <th:block layout:fragment="content">
 
@@ -39,7 +39,7 @@
 		        return;
 		    }
 		
-		    fetch("/views/member/check_id?memId=" + encodeURIComponent(memId))
+		    fetch("/members/check_id?memId=" + encodeURIComponent(memId))
 		        .then(r => {
 		            if (!r.ok) {
 		                throw new Error("HTTP " + r.status);
@@ -182,7 +182,7 @@
             </div>
 
             <form class="signUp"
-                  th:action="@{/views/member/signUp}"
+                  th:action="@{/members/signUp}"
                   method="post"
                   id="signUpForm">
 

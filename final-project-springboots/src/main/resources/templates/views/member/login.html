@@ -1,11 +1,10 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layouts/main_layout}">
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 
 <th:block layout:fragment="content">
 
-<form th:action="@{/views/member/login}" method="post">
+<form th:action="@{/members/login}" method="post">
 
 	<script type="text/javascript">
 		//필수 항목 체크 안되면 못 넘어가게 하는 기능
@@ -54,7 +53,7 @@
             </div>
 
             <div class="text-center">
-                <a th:href="@{/views/member/signUp}">
+                <a th:href="@{/members/signUp}">
                     회원가입
                 </a>
             </div>

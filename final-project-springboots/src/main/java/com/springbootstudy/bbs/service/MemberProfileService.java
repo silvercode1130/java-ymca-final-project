@@ -7,7 +7,7 @@ import com.springbootstudy.bbs.domain.MemberVO;
 import com.springbootstudy.bbs.mapper.MemberMapper;
 
 @Service
-public class MemberService {
+public class MemberProfileService {
 
 	@Autowired
     private MemberMapper memberMapper;

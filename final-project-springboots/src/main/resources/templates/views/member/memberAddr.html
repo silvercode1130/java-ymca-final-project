@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+		xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"> 
+
+	<th:block layout:fragment="content">
+		<script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+			<div>
+				<h2>배송지 관리</h2>
+			</div>
+			
+			<div>
+				<form action="/members/memberAddrUpdate" id="memberAddr" name="memberAddrForm">					
+					<table border="1">
+						<thead>
+							<tr>
+								<td>대표 배송지</td> 
+								<td>주소</td>
+								<td>연락처</td>
+								<td>관리</td>
+							</tr>
+						</thead>
+						<tbody>
+							<tr th:each="addr : ${addrList}">
+								<td th:text="${addr.isPrimary}"></td>
+								<td th:text="${addr.memAddr}"></td>
+								<td th:text="${addr.memTel}"></td>
+								<td>
+									<button type="button" class="btn-update">수정</button>
+            						<button type="button" class="btn-delete">삭제</button>
+								</td>
+							</tr> 
+							
+							<tr th:if="${addrList == null or #lists.isEmpty(addrList)}">
+					            <td colspan="4" style="text-align: center; height: 50px;">
+					                <span style="color: gray; font-size: 12px;">등록된 배송지가 없습니다</span>
+					            </td>
+					        </tr>
+						</tbody>
+					</table> 
+					
+					<button type="button" onclick="location.href='/members/memberAddrUpdate'">
+					    주소 추가
+					</button>
+				</form> 
+			</div>
+	</th:block> 
+</html>		
