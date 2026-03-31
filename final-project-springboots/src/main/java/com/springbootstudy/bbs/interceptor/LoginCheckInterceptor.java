@@ -12,15 +12,15 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class LoginCheckInterceptor implements HandlerInterceptor {
 
-	/*
-	 * preHandle() 메서드는 클라이언트의 요청이 들어오고 컨트롤러가 실행되기
-	 * 전에 공통으로 적용할 기능을 구현할 때 사용한다.
-	 * 예를 들면 특정 요청에 대해 로그인이 되어 있지 않으면 컨트롤러를 실행하지
-	 * 않거나 컨트롤러를 실행하기 전에 그 컨트롤러에서 필요한 정보를 생성해
-	 * 넘겨 줄 필요가 있을 때 preHandler() 메서드를 이용해 구현하면 된다.
-	 * 이 메서드가 false를 반환하면 다음으로 연결된 HandlerInterceptor
-	 * 또는 컨트롤러 자체를 실행하지 않게 할 수 있다.
-	 **/
+   /*
+    * preHandle() 메서드는 클라이언트의 요청이 들어오고 컨트롤러가 실행되기
+    * 전에 공통으로 적용할 기능을 구현할 때 사용한다.
+    * 예를 들면 특정 요청에 대해 로그인이 되어 있지 않으면 컨트롤러를 실행하지
+    * 않거나 컨트롤러를 실행하기 전에 그 컨트롤러에서 필요한 정보를 생성해
+    * 넘겨 줄 필요가 있을 때 preHandler() 메서드를 이용해 구현하면 된다.
+    * 이 메서드가 false를 반환하면 다음으로 연결된 HandlerInterceptor
+    * 또는 컨트롤러 자체를 실행하지 않게 할 수 있다.
+    **/
 
 	 // 로그인 실패 시 띄워주는 인터셉터
 	@Override
@@ -65,16 +65,16 @@ public class LoginCheckInterceptor implements HandlerInterceptor {
 		response.setHeader("Cache-Control", "no-cache");
 	}
 
-	/*
-	 * afterCompletion() 메서드는 클라이언트의 요청을 처리하고 뷰를 생성해
-	 * 클라이언트로 전송한 후에 호출된다. 클라이언트 실행 중에 예외가 발생하게 되면
-	 * 이 메서드 4번째 파라미터로 예외 정보를 받을 수 있다. 예외가 발생하지 않으면
-	 * 4번째 파라미터는 null을 받게 된다.
-	 **/
-	@Override
-	public void afterCompletion(HttpServletRequest request,
-			HttpServletResponse response, Object handler, Exception ex)
-			throws Exception {
-		log.info("##########LoginCheckInterceptor - afterCompletion()##########");
-	}
+   /*
+    * afterCompletion() 메서드는 클라이언트의 요청을 처리하고 뷰를 생성해
+    * 클라이언트로 전송한 후에 호출된다. 클라이언트 실행 중에 예외가 발생하게 되면
+    * 이 메서드 4번째 파라미터로 예외 정보를 받을 수 있다. 예외가 발생하지 않으면
+    * 4번째 파라미터는 null을 받게 된다.
+    **/
+   @Override
+   public void afterCompletion(HttpServletRequest request,
+         HttpServletResponse response, Object handler, Exception ex)
+         throws Exception {
+      log.info("##########LoginCheckInterceptor - afterCompletion()##########");
+   }
 }
