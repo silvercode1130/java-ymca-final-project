@@ -51,25 +51,6 @@ public class MemberAddrController {
 	    
 	    return result;
 	}
-//    @PostMapping("/member/updateAddrAjax.do")
-//    @ResponseBody
-//    public String updateAddrAjax(
-//            @RequestParam("memZipcode") String memZipcode,
-//            @RequestParam("memAddr") String memAddr,
-//            @RequestParam(value = "memAddrDetail", required = false) String memAddrDetail,
-//            @RequestParam("memidx") Long memIdx) {
-//
-//        MemberAddrVO vo = new MemberAddrVO();
-//        vo.setMemZipcode(memZipcode);
-//        vo.setMemAddr(memAddr);
-//        vo.setMemAddrDetail(memAddrDetail);
-//        vo.setMemIdx(memIdx);
-//        vo.setIsPrimary("N");
-//
-//        int result = memberAddrService.registerAddr(vo); 
-//
-//        return result > 0 ? "ok" : "fail";
-//    }
 
 	// 주소목록창 -----------------------------------------------------------------
 	
