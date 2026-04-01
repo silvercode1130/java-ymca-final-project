@@ -26,8 +26,8 @@ public class MemberAddrController {
 	
 	// 주소등록창 -----------------------------------------------------------------
 	
-	@GetMapping("/members/memberAddrUpdate") 
-	public String memberAddrUpdate(HttpSession session, Model model) {
+	@GetMapping("/members/memberAddrInsert") 
+	public String memberAddrInsert(HttpSession session, Model model) {
 
 	    MemberVO loginMember = (MemberVO) session.getAttribute("loginUser");
 
@@ -37,13 +37,13 @@ public class MemberAddrController {
 
 	    model.addAttribute("member", loginMember); 
 
-	    return "/views/member/memberAddrUpdate"; 
+	    return "/views/member/memberAddrInsert"; 
 	}
 	
 	// memberAddrUpdate.html 의 Ajax 저장용
-	@PostMapping("/member/updateAddrAjax.do")
+	@PostMapping("/member/insertAddrAjax.do")
 	@ResponseBody
-	public int updateAddr(MemberAddrVO vo) {
+	public int insertAddr(MemberAddrVO vo) {
 
 		// 두개 확인 필요
 	    int result = memberAddrService.registerAddr(vo);
@@ -83,11 +83,44 @@ public class MemberAddrController {
     }
     
     
+    // 주소 수정 -----------------------------------------------------------------
+    
+    @GetMapping("/members/memberAddrUpdate")
+    public String updateAddrForm(@RequestParam("addrIdx") Long addrIdx,HttpSession session, Model model) { 
+    	
+    	// 로그인 정보 받아오기
+        MemberVO loginMember = (MemberVO) session.getAttribute("loginUser");
+        
+        // 로그인 안했으면 쫓아내기
+        if (loginMember == null) {
+            return "redirect:/members/login";
+        }
+        
+        MemberAddrVO addr = memberAddrService.selectOne(addrIdx);
+    	
+        // 로그인 세션
+    	model.addAttribute("member", loginMember); 
+    	model.addAttribute("addr", addr);
+    	
+    	return "/views/member/memberAddrUpdate"; 
+    }
     
     
+    @PostMapping("/member/updateAddrAjax.do")
+    @ResponseBody
+    public int updateAddr(MemberAddrVO vo) {
+
+        return memberAddrService.updateAddr(vo);
+    }
     
-    
-    
+//    @PostMapping("/member/updateAddrAjax.do")
+//    public String updateAddr(MemberAddrVO vo) { 
+//    	
+//	    int result = memberAddrService.registerAddr(vo);
+//	    vo.setIsPrimary("N");
+//	    
+//	    return result; 
+//    }
     
     
     

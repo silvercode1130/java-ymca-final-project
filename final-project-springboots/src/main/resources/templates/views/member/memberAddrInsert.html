@@ -29,7 +29,6 @@
             const memAddrDetail = document.getElementById("memAddrDetail").value;
             const isPrimaryCheckbox = document.getElementById("isPrimary");
             const isPrimary = isPrimaryCheckbox.checked ? "Y" : "N";
-            const addrIdx = document.getElementById("addrIdx").value;
             
             // 회원 번호 체크
             const memidxInput = document.getElementById("memIdx");
@@ -47,21 +46,19 @@
                 return;
             }
 
-            fetch("/member/updateAddrAjax.do", {
+            fetch("/member/insertAddrAjax.do", {
                 method: "POST",
                 headers: { "Content-Type": "application/x-www-form-urlencoded" },
-                body: 
-                    "addrIdx=" + encodeURIComponent(addrIdx) +
-                    "&memZipcode=" + encodeURIComponent(memZipcode) +
-                    "&memAddr=" + encodeURIComponent(memAddr) +
-                    "&memAddrDetail=" + encodeURIComponent(memAddrDetail) +
-                    "&memIdx=" + encodeURIComponent(sendIdx) + 
-                    "&isPrimary=" + encodeURIComponent(isPrimary)
+                body: "memZipcode=" + encodeURIComponent(memZipcode) +
+                      "&memAddr=" + encodeURIComponent(memAddr) +
+                      "&memAddrDetail=" + encodeURIComponent(memAddrDetail) +
+                      "&memIdx=" + encodeURIComponent(sendIdx) + 
+                      "&isPrimary=" + encodeURIComponent(isPrimary)
             })
             .then(res => res.text())
             .then(result => {
                 if (result.trim() === "1") { 
-                    alert("✓ 성공적으로 수정되었습니다!");
+                    alert("✓ 성공적으로 저장되었습니다!");
                     location.href = "/members/memberAddr"; 
                 } else {
                     alert("✗ 저장 실패: 다시 시도해 주세요.");
@@ -86,18 +83,17 @@
     </script>
 
     <div>
-        <h2>배송지 추가</h2>
+        <h2>배송지 관리</h2>
     </div>
     
     <div>
-        <form action="/members/memberAddrUpdate" id="memberAddrUpdate" method="post">		
+        <form action="/members/memberAddr" id="memberAddrInsert" method="post">		
         	
         	<input type="hidden" id="memIdx" name="memIdx" th:value="${member.memIdx}">
-        	<input type="hidden" id="addrIdx" name="addrIdx" th:value="${addr.addrIdx}">
-        	        	
+        	
         	<div>
 			    <input type="checkbox" id="isPrimary" name="isPrimary" value="Y">
-			    <label for="isPrimary">대표 주소지로 수정하기</label>
+			    <label for="isPrimary">대표 주소지로 등록하기</label>
 			</div>
         			
             <div>

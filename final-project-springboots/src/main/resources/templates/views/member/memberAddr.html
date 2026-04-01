@@ -42,7 +42,7 @@
 								<td th:text="${addr.memAddr}"></td>
 								<td th:text="${member.memTel}"></td>
 								<td>
-									<button type="button" class="btn-update">수정</button>
+									<button type="button" class="btn-update" th:onclick="|location.href='@{/members/memberAddrUpdate(addrIdx=${addr.addrIdx})}'|">수정</button>
             						<button type="button" class="btn-delete" th:onclick="|deleteAddr(${addr.addrIdx})|">삭제</button>
 								</td>
 							</tr> 
@@ -55,7 +55,7 @@
 						</tbody>
 					</table> 
 					
-					<button type="button" onclick="location.href='/members/memberAddrUpdate'">
+					<button type="button" onclick="location.href='/members/memberAddrInsert'">
 					    주소 추가
 					</button>
 				</form> 

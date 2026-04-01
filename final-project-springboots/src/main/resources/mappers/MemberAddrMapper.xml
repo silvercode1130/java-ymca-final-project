@@ -52,6 +52,23 @@
 	    DELETE FROM member_addr
 	    WHERE addr_idx = #{addrIdx}
 	</delete>
+	
+	<!-- 주소 수정 -->
+	<select id="selectOne" resultType="com.springbootstudy.bbs.domain.MemberAddrVO">
+	    SELECT *
+	    FROM member_addr
+	    WHERE addr_idx = #{addrIdx}
+	</select>
+	
+	<update id="updateAddr"> 
+	    UPDATE member_addr
+	    SET 
+	        mem_zipcode = #{memZipcode},
+	        mem_addr = #{memAddr},
+	        mem_addr_detail = #{memAddrDetail},
+	        is_primary = #{isPrimary}
+	    WHERE addr_idx = #{addrIdx}
+	</update> 
  
 </mapper>	
 
