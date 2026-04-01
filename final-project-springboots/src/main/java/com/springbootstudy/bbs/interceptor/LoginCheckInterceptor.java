@@ -33,14 +33,17 @@ public class LoginCheckInterceptor implements HandlerInterceptor {
 	   String uri = request.getRequestURI();
 
 	   // 로그인 필요한 경로는 차단
+	   // 여기에 등록 안하면 인터셉터 안뜹니다!!
+	   // 다른분들의 페이지는 나중에 추가하겠습니다!
 	   boolean needLogin =
 	         uri.startsWith("/members/memberUpdate") ||
-	         uri.startsWith("/memberDelete");
+	         uri.startsWith("/members/memberAddr") ||
+	         uri.startsWith("/memberDelete"); 
 
 	   if (needLogin && session.getAttribute("isLogin") == null) {
 	      session.setAttribute("loginMsg", "로그인이 필요한 서비스 입니다");
 	      response.sendRedirect("/members/login");
-	      return false;
+	      return false; 
 	   }
 	   return true; 
 	}

@@ -55,7 +55,7 @@ public class MemberAddrController {
 	// 주소목록창 -----------------------------------------------------------------
 	
 	// 저장된 값 보여주기
-    @GetMapping("/members/memberAddr")
+    @GetMapping("/members/memberAddr") 
     public String memberAddr(HttpSession session, Model model) {
 
     	// 로그인 안했으면 쫓아내기
