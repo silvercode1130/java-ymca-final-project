@@ -15,5 +15,8 @@ public interface MemberAddrMapper {
 	
 	// 대표 주소 하나만 등록하기
 	void resetPrimaryAddr(Long memIdx); 
+	
+	// 주소 삭제
+	void deleteAddr(Long addrIdx);
 
 }

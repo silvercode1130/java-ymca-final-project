@@ -72,5 +72,24 @@ public class MemberAddrController {
     } 
 
 
+    // 주소 삭제 -----------------------------------------------------------------
+    
+    @PostMapping("/members/addrDelete")
+    public String deleteAddr(@RequestParam("addrIdx") Long addrIdx) {
+
+        memberAddrService.deleteAddr(addrIdx);
+
+        return "redirect:/members/memberAddr"; 
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 
 }

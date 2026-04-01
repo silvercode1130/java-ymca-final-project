@@ -4,12 +4,29 @@
 
 	<th:block layout:fragment="content">
 		<script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+		
+		<script>
+			function deleteAddr(addrIdx) {
+			    if(confirm("주소를 삭제하시겠습니까?")) {
+			        document.getElementById("deleteAddrIdx").value = addrIdx;
+			        
+			        let form = document.getElementById("memberAddr");
+			        form.action = "/members/addrDelete";
+			        form.method = "post";
+			        
+			        form.submit();
+			    }
+			}
+			</script>
 			<div>
 				<h2>배송지 관리</h2>
 			</div>
 			
 			<div>
-				<form action="/members/memberAddrUpdate" id="memberAddr" name="memberAddrForm">					
+				<form action="/members/memberAddrUpdate" id="memberAddr" name="memberAddrForm">		
+				
+				<input type="hidden" name="addrIdx" id="deleteAddrIdx">
+							
 					<table border="1">
 						<thead>
 							<tr>
@@ -26,7 +43,7 @@
 								<td th:text="${member.memTel}"></td>
 								<td>
 									<button type="button" class="btn-update">수정</button>
-            						<button type="button" class="btn-delete">삭제</button>
+            						<button type="button" class="btn-delete" th:onclick="|deleteAddr(${addr.addrIdx})|">삭제</button>
 								</td>
 							</tr> 
 							

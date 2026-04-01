@@ -30,6 +30,12 @@ public class MemberAddrService {
     public List<MemberAddrVO> selectAddrList(Long memIdx) {
         return memberAddrMapper.selectAddrList(memIdx);
     }
+    
+    
+    // 주소 삭제
+    public void deleteAddr(Long addrIdx) {
+        memberAddrMapper.deleteAddr(addrIdx);
+    }
  
 
 }
