@@ -45,6 +45,10 @@
 	    FROM member_addr a
 	    JOIN member m ON a.mem_idx = m.mem_idx
 	    WHERE a.mem_idx = #{memIdx}
+	    
+	    ORDER BY 
+	        a.is_primary DESC,   -- 대표주소지가 최상단으로!
+	        a.addr_idx DESC      
 	</select>
 
 	<!-- 주소 삭제 -->

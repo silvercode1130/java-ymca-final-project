@@ -136,7 +136,7 @@ public class MemberController {
 	    MemberVO memberVO = memberService.getMemberVO(memId);
 
 	    session.setAttribute("isLogin", true);
-	    session.setAttribute("loginId", memId);
+	    session.setAttribute("loginId", memId); 
 	    session.setAttribute("loginUser", memberVO);
 
 	    System.out.println("memberVO.name : " + memberVO.getMemName());

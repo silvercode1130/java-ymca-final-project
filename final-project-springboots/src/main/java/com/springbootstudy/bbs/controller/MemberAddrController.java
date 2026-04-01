@@ -35,9 +35,9 @@ public class MemberAddrController {
 	        return "redirect:/members/login";
 	    }
 
-	    model.addAttribute("member", loginMember); 
+	    model.addAttribute("member", loginMember);  
 
-	    return "/views/member/memberAddrInsert"; 
+	    return "/views/member/memberAddrInsert";  
 	}
 	
 	// memberAddrUpdate.html 의 Ajax 저장용
@@ -112,17 +112,5 @@ public class MemberAddrController {
 
         return memberAddrService.updateAddr(vo);
     }
-    
-//    @PostMapping("/member/updateAddrAjax.do")
-//    public String updateAddr(MemberAddrVO vo) { 
-//    	
-//	    int result = memberAddrService.registerAddr(vo);
-//	    vo.setIsPrimary("N");
-//	    
-//	    return result; 
-//    }
-    
-    
-    
 
 }
