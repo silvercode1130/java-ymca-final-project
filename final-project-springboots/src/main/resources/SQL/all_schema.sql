@@ -203,6 +203,7 @@ CREATE TABLE auction (
     auction_idx               BIGINT        NOT NULL AUTO_INCREMENT COMMENT 'PK',
     buyer_idx                 BIGINT        NOT NULL COMMENT 'FK → member.mem_idx (구매자)',
     item_category_idx         INT           NOT NULL COMMENT 'FK → item_category',
+    item_idx                  BIGINT        DEFAULT NULL COMMENT 'FK → item (구매자가 올린 상품 정보)',
     auction_title             VARCHAR(200)  NOT NULL COMMENT '경매 제목',
     auction_desc              TEXT          NOT NULL COMMENT '경매 설명',
     auction_target_price      BIGINT        DEFAULT NULL COMMENT '희망 최대가 (nullable)',
@@ -225,7 +226,9 @@ CREATE TABLE auction (
     CONSTRAINT fk_auction_item_category
         FOREIGN KEY (item_category_idx) REFERENCES item_category(item_category_idx),
     CONSTRAINT fk_auction_status
-        FOREIGN KEY (auction_status_idx) REFERENCES auction_status(auction_status_idx)
+        FOREIGN KEY (auction_status_idx) REFERENCES auction_status(auction_status_idx),
+    CONSTRAINT fk_auction_item 
+        FOREIGN KEY (item_idx) REFERENCES item(item_idx)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='역경매 요청 테이블';
 
 -- 3-2) BID (입찰)

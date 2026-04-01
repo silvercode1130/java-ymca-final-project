@@ -15,4 +15,6 @@ public class BidListDTO extends BidVO {
     private String bidStatusName; 
     
     private Long itemIdx;
+    private Integer itemCategoryIdx;
+    private String itemThumbnailImg; // 입찰 제안 이미지
 }

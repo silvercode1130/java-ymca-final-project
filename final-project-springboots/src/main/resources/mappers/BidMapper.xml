@@ -28,7 +28,8 @@
 	    INSERT INTO bid (
 	        auction_idx, 
 	        bidder_idx,
-	        item_idx,    
+	        item_idx,
+	        item_category_idx,    
 	        bid_price, 
 	        bid_quantity, 
 	        bid_message, 
@@ -37,7 +38,8 @@
 	    ) VALUES (
 	        #{auctionIdx}, 
 	        #{bidderIdx}, 
-	        #{itemIdx}, 
+	        #{itemIdx},
+	        #{itemCategoryIdx}, 
 	        #{bidPrice}, 
 	        #{bidQuantity},
 	        #{bidMessage}, 

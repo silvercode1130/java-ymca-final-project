@@ -32,6 +32,16 @@ public class BidService {
     
     // 입찰 등록
     public void registerBid(BidListDTO bidDto) {
+
+        // 입찰가 검증 - 음수/0 방지
+        if (bidDto.getBidPrice() == null || bidDto.getBidPrice() <= 0) {
+            throw new IllegalArgumentException("제안 가격은 0원보다 커야 합니다.");
+        }
+        // 100원 단위 검증
+        if (bidDto.getBidPrice() % 100 != 0) {
+            throw new IllegalArgumentException("제안 가격은 100원 단위로 입력해야 합니다.");
+        }
+
         bidMapper.insertBid(bidDto);
     }
 }

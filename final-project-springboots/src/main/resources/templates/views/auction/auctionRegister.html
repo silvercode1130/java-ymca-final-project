@@ -3,29 +3,39 @@
 <head>
 <meta charset="UTF-8">
 <title>역경매 구매 요청</title>
+<script src="/js/auctionRegister.js"></script>
 </head>
 <body>
 
 <div class="register-container">
     <h2>📣 역경매 구매 요청하기</h2>
 
-    <!-- 에러 메시지 표시 -->
     <div th:if="${errorMessage}" style="color:red; margin-bottom:10px;">
         ⚠️ [[${errorMessage}]]
     </div>
 
-    <form action="/auction/register" method="post" id="registerForm">
+    <!-- enctype 반드시 필요! 없으면 파일 전송 안 됨 -->
+    <form action="/auction/register" method="post" id="registerForm"
+          enctype="multipart/form-data">
+
         <div class="input-group">
             <label>카테고리 *</label>
             <select name="itemCategoryIdx" required>
-                <option value="5">헬스/홈트 용품</option>
+                <option value="1">공/볼</option>
                 <option value="2">라켓/배트/클럽</option>
+                <option value="3">보호대/보호장비</option>
+                <option value="4">의류/신발</option>
+                <option value="5">헬스/홈트 용품</option>
+                <option value="6">아웃도어/캠핑 스포츠</option>
+                <option value="7">수영/수상 스포츠 용품</option>
+                <option value="8">액세서리/잡화</option>
             </select>
         </div>
 
         <div class="input-group">
             <label>요청 제목 *</label>
-            <input type="text" name="auctionTitle" placeholder="예: 요넥스 라켓 구해요" required>
+            <input type="text" name="auctionTitle"
+                   placeholder="예: 요넥스 라켓 구해요" required>
         </div>
 
         <div class="input-group">
@@ -41,16 +51,23 @@
             <small style="color:gray;">100원 단위 이상, 음수 불가</small>
         </div>
 
+        <!-- URL 방식 → 파일 업로드 방식으로 변경 -->
         <div class="input-group">
-            <label>이미지 URL (선택)</label>
-            <input type="text" name="itemThumbnailImg"
-                   placeholder="이미지 주소를 입력하세요 (선택사항)">
+            <label>이미지 (선택)</label>
+            <input type="file" name="thumbnailFile" accept="image/*"
+                   id="thumbnailFile">
+            <small style="color:gray;">이미지 파일을 선택해주세요 (선택사항)</small>
+            <!-- 미리보기 -->
+            <div id="previewBox" style="margin-top:8px; display:none;">
+                <img id="previewImg" style="max-width:200px; max-height:150px; border:1px solid #ddd; border-radius:4px;">
+            </div>
         </div>
 
         <div class="date-grid">
             <div>
                 <label>입찰 마감일 *</label>
-                <input type="datetime-local" name="auctionEndAt" id="auctionEndAt" required>
+                <input type="datetime-local" name="auctionEndAt"
+                       id="auctionEndAt" required>
                 <small style="color:gray;">현재 시점 이후만 선택 가능</small>
             </div>
             <div>

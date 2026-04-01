@@ -117,7 +117,9 @@ public class AuctionService {
 	    if (dto.getAuctionDecisionDeadline().isAfter(maxDeadline)) {
 	        throw new IllegalArgumentException("결정 마감일은 입찰 마감일로부터 3일을 초과할 수 없습니다.");
 	    }
-
+	    
+	    
+	    
 	    // DB 저장
 	    auctionMapper.insertItem(dto);
 	    auctionMapper.insertAuction(dto);

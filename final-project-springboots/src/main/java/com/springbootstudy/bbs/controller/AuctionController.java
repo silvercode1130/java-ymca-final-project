@@ -1,6 +1,8 @@
 package com.springbootstudy.bbs.controller;
 
+import java.io.File;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -8,6 +10,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.springbootstudy.bbs.domain.AuctionListDTO;
@@ -84,17 +88,39 @@ public class AuctionController {
         return "views/auction/auctionRegister";
     }
 
-    // 등록 실행 (POST)
+ // 등록 실행 (POST) - 파일 업로드 추가
     @PostMapping("/auction/register")
-    public String registerAction(AuctionListDTO dto, HttpSession session,
+    public String registerAction(AuctionListDTO dto,
+                                  @RequestParam(value = "thumbnailFile", required = false) MultipartFile thumbnailFile,
+                                  HttpSession session,
                                   RedirectAttributes ra) {
         MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
-
-        if (loginUser == null) {
-            return "redirect:/login";
-        }
+        if (loginUser == null) return "redirect:/login";
 
         dto.setBuyerIdx(loginUser.getMemIdx());
+
+        // 파일 업로드 처리
+        if (thumbnailFile != null && !thumbnailFile.isEmpty()) {
+            try {
+                // 저장할 폴더 경로 (프로젝트 내 static/uploads/)
+                String uploadDir = System.getProperty("user.dir") + "/src/main/resources/static/uploads/";
+                File dir = new File(uploadDir);
+                if (!dir.exists()) dir.mkdirs(); // 폴더 없으면 생성
+
+                // UUID로 파일명 중복 방지
+                String fileName = UUID.randomUUID().toString() + "_" + thumbnailFile.getOriginalFilename();
+                thumbnailFile.transferTo(new File(uploadDir + fileName));
+
+                // DB에는 URL 경로로 저장
+                dto.setItemThumbnailImg("/uploads/" + fileName);
+            } catch (Exception e) {
+                log.error("이미지 업로드 실패", e);
+                dto.setItemThumbnailImg(null);
+            }
+        } else {
+            dto.setItemThumbnailImg(null);
+        }
+
         log.info("경매 등록 시도: {}", dto);
 
         try {
@@ -110,24 +136,55 @@ public class AuctionController {
 
         return "redirect:/auctionList";
     }
-	
-    // 입찰 등록
+
+    // 입찰 등록 - 임시코드 제거 + 파일 업로드 + 검증 추가
     @PostMapping("/auction/bid")
-    public String registerBid(BidListDTO bidDto, HttpSession session) {
-    	MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
+    public String registerBid(BidListDTO bidDto,
+                               @RequestParam(value = "bidImageFile", required = false) MultipartFile bidImageFile,
+                               HttpSession session,
+                               RedirectAttributes ra) {
+        MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
         if (loginUser == null) return "redirect:/login";
 
         bidDto.setBidderIdx(loginUser.getMemIdx());
 
-        // 현재 입찰하려는 경매글의 아이템 번호라도 넣어줘야 DB 에러가 안 남
-        // (지금 당장 상세페이지에서 itemIdx를 안 보내주고 있다면 여기서 강제로 세팅)
-        if (bidDto.getItemIdx() == null) {
-            // 실제로는 해당 auctionIdx로 조회해서 가져와야 하지만, 
-            // 일단 에러 방지를 위해 1번이라도 넣어보고 테스트
-            bidDto.setItemIdx(1L); 
+        // 본인 경매 입찰 방지
+        AuctionListDTO auction = auctionService.auctionDetail(bidDto.getAuctionIdx());
+        if (auction == null) {
+            ra.addFlashAttribute("bidError", "존재하지 않는 경매입니다.");
+            return "redirect:/auctionList";
+        }
+        if (auction.getBuyerIdx().equals(loginUser.getMemIdx())) {
+            ra.addFlashAttribute("bidError", "본인이 등록한 경매에는 입찰할 수 없습니다.");
+            return "redirect:/auction/auctionDetail/" + bidDto.getAuctionIdx();
         }
 
-        bidService.registerBid(bidDto);
+        // 임시코드 제거 → 실제 경매에서 itemIdx, itemCategoryIdx 가져오기
+        bidDto.setItemIdx(auction.getItemIdx());
+        bidDto.setItemCategoryIdx(auction.getItemCategoryIdx());
+
+        // 입찰 이미지 업로드 처리
+        if (bidImageFile != null && !bidImageFile.isEmpty()) {
+            try {
+                String uploadDir = System.getProperty("user.dir") + "/src/main/resources/static/uploads/";
+                File dir = new File(uploadDir);
+                if (!dir.exists()) dir.mkdirs();
+
+                String fileName = UUID.randomUUID().toString() + "_" + bidImageFile.getOriginalFilename();
+                bidImageFile.transferTo(new File(uploadDir + fileName));
+                bidDto.setItemThumbnailImg("/uploads/" + fileName);
+            } catch (Exception e) {
+                log.error("입찰 이미지 업로드 실패", e);
+            }
+        }
+
+        try {
+            bidService.registerBid(bidDto);
+        } catch (IllegalArgumentException e) {
+            ra.addFlashAttribute("bidError", e.getMessage());
+            return "redirect:/auction/auctionDetail/" + bidDto.getAuctionIdx();
+        }
+
         return "redirect:/auction/auctionDetail/" + bidDto.getAuctionIdx();
     }
     
