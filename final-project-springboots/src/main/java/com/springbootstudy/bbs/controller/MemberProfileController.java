@@ -1,5 +1,7 @@
 package com.springbootstudy.bbs.controller;
 
+import java.io.File;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -24,48 +26,85 @@ public class MemberProfileController {
 	// 회원 프로필 띄우기 ---------------------------------------------------------------
 	
 	// 프로필 조회 (페이지 이동)
-    @GetMapping("members/memberProfileUpdate")
-    public String memberProfile(HttpSession session, Model model) {
-    	
-    	MemberVO loginMember = (MemberVO) session.getAttribute("loginUser");
+	@GetMapping("members/memberProfileUpdate")
+	public String memberProfile(HttpSession session, Model model) {
 
-    	// 로그인 안했으면 로그인 창으로 
+	    MemberVO loginMember = (MemberVO) session.getAttribute("loginUser");
+
+	    // 로그인 안하면 로그인 부터
 	    if (loginMember == null) {
 	        return "redirect:/members/login";
 	    }
-	    
-	    Long memIdx = ((MemberVO)session.getAttribute("loginUser")).getMemIdx();
-	    
-        MemberProfileVO profile = memberProfileService.getProfile(memIdx); 
-        
-        model.addAttribute("profile", profile);
 
-        return "/views/member/memberProfileUpdate"; 
-    }
+	    Long memIdx = loginMember.getMemIdx();
+	    MemberProfileVO profile = memberProfileService.getProfile(memIdx);
+
+	    // null 방지용
+	    if (profile == null) {
+	        profile = new MemberProfileVO();
+	    }
+
+	    model.addAttribute("profile", profile);
+
+	    return "/views/member/memberProfileUpdate";
+	}
 
     
     // 프로필 저장 (수정)
     @PostMapping("members/memberProfileUpdate")
-    public String updateProfile(MemberProfileVO vo, @RequestParam("memImgFile") MultipartFile memImgFile) {
-    	
-    	if (!memImgFile.isEmpty()) {
-            // 실제 파일 저장 로직 (나중에 파일 이름 추출해서 vo.setMemImg에 넣기)
-            String fileName = memImgFile.getOriginalFilename();
-            vo.setMemImg(fileName); // DB에는 파일 이름만 쏙!
+    public String updateProfile(MemberProfileVO vo,
+                                @RequestParam("memImgFile") MultipartFile memImgFile) throws Exception {
+
+        if (!memImgFile.isEmpty()) {
+
+            String uploadDir = "C:/upload/finalProfile/";
+
+            File dir = new File(uploadDir);
+            if (!dir.exists()) {
+                dir.mkdirs();
+            }
             
-            System.out.println("파일 이름: " + fileName);
-            System.out.println("파일 크기: " + memImgFile.getSize());
+            String fileName = memImgFile.getOriginalFilename();
+            File dest = new File(uploadDir + fileName);
+            memImgFile.transferTo(dest);
+
+            vo.setMemImg(fileName);  
         }
-    	
+
+        System.out.println("파일 크기: " + memImgFile.getSize());
         System.out.println("memIdx: " + vo.getMemIdx());
         System.out.println("닉네임: " + vo.getMemNickname());
         System.out.println("소개: " + vo.getMemIntro());
-        System.out.println("파일: " + memImgFile.getOriginalFilename());  
+        System.out.println("파일: " + memImgFile.getOriginalFilename());
+        System.out.println("isEmpty: " + memImgFile.isEmpty());
 
         memberProfileService.updateProfile(vo);
 
-        return "redirect:/members/memberProfileUpdate?memIdx=" + vo.getMemIdx();  
+        return "redirect:/members/memberProfileUpdate?memIdx=" + vo.getMemIdx();
     }
+//    @PostMapping("members/memberProfileUpdate")
+//    public String updateProfile(MemberProfileVO vo, @RequestParam("memImgFile") MultipartFile memImgFile) {
+//    	
+//    	
+////    	if (!memImgFile.isEmpty()) {
+////            // 실제 파일 저장 로직 (나중에 파일 이름 추출해서 vo.setMemImg에 넣기)
+////            String fileName = memImgFile.getOriginalFilename();
+////            vo.setMemImg(fileName); // DB에는 파일 이름만 쏙!
+////            
+////            
+////        }
+//    	
+//    	// null 떠서 체크! 컨트롤러는 정상....
+//        System.out.println("파일 크기: " + memImgFile.getSize());
+//        System.out.println("memIdx: " + vo.getMemIdx());
+//        System.out.println("닉네임: " + vo.getMemNickname());
+//        System.out.println("소개: " + vo.getMemIntro());
+//        System.out.println("파일: " + memImgFile.getOriginalFilename());  
+//
+//        memberProfileService.updateProfile(vo);
+//
+//        return "redirect:/members/memberProfileUpdate?memIdx=" + vo.getMemIdx();  
+//    }
 
 	
 	

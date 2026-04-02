@@ -15,7 +15,7 @@
 			function previewImage(input) {
 			    if (input.files && input.files[0]) {
 			        const reader = new FileReader();
-			        reader.onload = function(e) { //  reader.onload = function(e) { err
+			        reader.onload = function(e) { 
 			            $('#preview').attr('src', e.target.result);
 			        }
 			        reader.readAsDataURL(input.files[0]);
@@ -33,6 +33,7 @@
 		<div>
 			프로필 <br>
 			JPG, PNG 파일 (최대 100MB) <br>
+			<img id="preview" th:if="${profile.memImg != null}" th:src="@{'/upload/finalProfile/' + ${profile.memImg}}" width="150">
               <button type="button"
                       onclick="document.getElementById('fileInput').click();">
                 이미지 변경
