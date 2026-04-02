@@ -125,4 +125,28 @@ public class AuctionService {
 	    auctionMapper.insertAuction(dto);
 	}
 	
+	// =====================================================
+	// 4번: 마감 경매 상태 자동 업데이트
+	// 입찰 마감일 지난 경매:
+	//   - 입찰 있으면 → 2 (마감)
+	//   - 입찰 없으면 → 3 (유찰)
+	// =====================================================
+	@Transactional
+	public void updateExpiredAuctions() {
+	    List<AuctionListDTO> expiredList = auctionMapper.findExpiredAuctions();
+
+	    for (AuctionListDTO dto : expiredList) {
+	        // bidCount가 null이면 0으로 처리
+	        int bidCount = dto.getBidCount() != null ? dto.getBidCount() : 0;
+
+	        if (bidCount > 0) {
+	            // 입찰 있음 → 마감 (2)
+	            auctionMapper.updateAuctionStatus(dto.getAuctionIdx(), 2);
+	        } else {
+	            // 입찰 없음 → 유찰 (3)
+	            auctionMapper.updateAuctionStatus(dto.getAuctionIdx(), 3);
+	        }
+	    }
+	}
+	
 }

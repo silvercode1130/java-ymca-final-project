@@ -26,24 +26,22 @@
 	
 	<insert id="insertBid">
 	    INSERT INTO bid (
-	        auction_idx, 
+	        auction_idx,
 	        bidder_idx,
 	        item_idx,
-	        item_category_idx,    
-	        bid_price, 
-	        bid_quantity, 
-	        bid_message, 
-	        bid_status_idx, 
+	        bid_price,
+	        bid_quantity,
+	        bid_message,
+	        bid_status_idx,
 	        bid_regdate
 	    ) VALUES (
-	        #{auctionIdx}, 
-	        #{bidderIdx}, 
+	        #{auctionIdx},
+	        #{bidderIdx},
 	        #{itemIdx},
-	        #{itemCategoryIdx}, 
-	        #{bidPrice}, 
+	        #{bidPrice},
 	        #{bidQuantity},
-	        #{bidMessage}, 
-	        1, 
+	        #{bidMessage},
+	        1,
 	        NOW()
 	    )
 	</insert>

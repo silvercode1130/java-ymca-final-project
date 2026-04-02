@@ -37,6 +37,9 @@ public class AuctionController {
 	@GetMapping({"/auctionList"})
     public String auctionList(Model model) { // 쟁반(Model)을 준비
         
+		// 페이지 열릴 때마다 마감된 경매 상태 자동 업데이트
+	    auctionService.updateExpiredAuctions();
+		
         // 서비스한테서 리스트를 가져옴
         List<AuctionListDTO> list = auctionService.AuctionList();
         
@@ -51,6 +54,9 @@ public class AuctionController {
 	@GetMapping("/auction/auctionDetail/{auctionIdx}")
 	public String auctionDetail(@PathVariable("auctionIdx") Long auctionIdx, Model model) {
 	    
+		// 상세 페이지 열릴 때도 상태 업데이트
+	    auctionService.updateExpiredAuctions();
+		
 	    // 서비스 호출
 	    AuctionListDTO detail = auctionService.auctionDetail(auctionIdx);
 	    
@@ -137,7 +143,7 @@ public class AuctionController {
         return "redirect:/auctionList";
     }
 
-    // 입찰 등록 - 임시코드 제거 + 파일 업로드 + 검증 추가
+    // 입찰 등록
     @PostMapping("/auction/bid")
     public String registerBid(BidListDTO bidDto,
                                @RequestParam(value = "bidImageFile", required = false) MultipartFile bidImageFile,
@@ -148,20 +154,21 @@ public class AuctionController {
 
         bidDto.setBidderIdx(loginUser.getMemIdx());
 
-        // 본인 경매 입찰 방지
+        // 경매 정보 조회
         AuctionListDTO auction = auctionService.auctionDetail(bidDto.getAuctionIdx());
         if (auction == null) {
             ra.addFlashAttribute("bidError", "존재하지 않는 경매입니다.");
             return "redirect:/auctionList";
         }
-        if (auction.getBuyerIdx().equals(loginUser.getMemIdx())) {
+
+        // 본인 경매 입찰 방지 - null 안전하게 Objects.equals 사용
+        if (java.util.Objects.equals(auction.getBuyerIdx(), loginUser.getMemIdx())) {
             ra.addFlashAttribute("bidError", "본인이 등록한 경매에는 입찰할 수 없습니다.");
             return "redirect:/auction/auctionDetail/" + bidDto.getAuctionIdx();
         }
 
-        // 임시코드 제거 → 실제 경매에서 itemIdx, itemCategoryIdx 가져오기
+        // 실제 경매에서 itemIdx 가져오기
         bidDto.setItemIdx(auction.getItemIdx());
-        bidDto.setItemCategoryIdx(auction.getItemCategoryIdx());
 
         // 입찰 이미지 업로드 처리
         if (bidImageFile != null && !bidImageFile.isEmpty()) {

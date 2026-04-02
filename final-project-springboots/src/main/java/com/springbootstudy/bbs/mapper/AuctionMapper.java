@@ -3,6 +3,7 @@ package com.springbootstudy.bbs.mapper;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import com.springbootstudy.bbs.domain.AuctionListDTO;
 import com.springbootstudy.bbs.domain.AuctionVO;
@@ -21,4 +22,10 @@ public interface AuctionMapper {
     
     // 경매글 저장
     int insertAuction(AuctionListDTO dto);
+    
+    
+    List<AuctionListDTO> findExpiredAuctions();
+    
+    
+    int updateAuctionStatus(@Param("auctionIdx") Long auctionIdx, @Param("statusIdx") int statusIdx);
 }
