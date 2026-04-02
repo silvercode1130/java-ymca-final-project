@@ -137,7 +137,7 @@ public class MemberController {
 
 	    session.setAttribute("isLogin", true);
 	    session.setAttribute("loginId", memId); 
-	    session.setAttribute("loginUser", memberVO);
+	    session.setAttribute("loginUser", memberVO); // 로그인 세션!!
 
 	    System.out.println("memberVO.name : " + memberVO.getMemName());
 

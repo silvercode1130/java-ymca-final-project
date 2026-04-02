@@ -93,7 +93,12 @@ public class MemberAddrController {
         
         // 로그인 안했으면 쫓아내기
         if (loginMember == null) {
-            return "redirect:/members/login";
+            return "redirect:/members/login"; 
+        }
+        
+        // 주소가 없어도 쫓아내기
+        if (addrIdx == null) {
+            return "redirect:/members/memberAddr";
         }
         
         MemberAddrVO addr = memberAddrService.selectOne(addrIdx);
