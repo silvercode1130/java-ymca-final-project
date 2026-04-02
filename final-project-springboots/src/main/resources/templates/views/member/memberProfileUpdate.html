@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<form class="memberProfileUpdate" action="/members/memberProfileUpdate" method="post" enctype="multipart/form-data">
+		
+		<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+	
+		<script type="text/javascript">
+			// 이미지 미리보기
+			function previewImage(input) {
+			    if (input.files && input.files[0]) {
+			        const reader = new FileReader();
+			        reader.onload = function(e) { //  reader.onload = function(e) { err
+			            $('#preview').attr('src', e.target.result);
+			        }
+			        reader.readAsDataURL(input.files[0]);
+			    }
+			}
+		</script>
+	
+		<input type="hidden" name="memIdx" th:value="${session.loginUser.memIdx}">
+	
+		<div>
+			<h2>나의 프로필</h2> 
+			<span>프로필 이미지, 닉네임, 자기소개를 수정하세요</span>
+		</div>
+		
+		<div>
+			프로필 <br>
+			JPG, PNG 파일 (최대 100MB) <br>
+              <button type="button"
+                      onclick="document.getElementById('fileInput').click();">
+                이미지 변경
+              </button> 
+              <input type="file" name="memImgFile" id="fileInput" onchange="previewImage(this)" style="display:none;"> 
+		</div>
+		
+		<div>
+			<label>닉네임</label>
+			<input name="memNickname" id="memNickname" type="text" th:value="${profile.memNickname}" placeholder="ex) 픽큐"> <br>
+			<span>2~10자 이내로 입력해주세요</span>
+		</div>
+		
+		<div>
+			<label>자기소개</label>
+			<textarea name="memIntro" id="memIntro" th:text="${profile.memIntro}" rows="" cols="" placeholder="픽큐 회원님들에게 나를 알려보세요! 👋"></textarea> <br>
+			<span>최대 200자까지 입력 가능합니다</span>
+		</div>
+		
+		<div>
+			<input type="submit" value="프로필 업데이트">
+		</div>
+		
+	</form>
+</body>
+</html>

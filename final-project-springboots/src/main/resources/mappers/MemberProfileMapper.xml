@@ -12,6 +12,43 @@
 	완전한 클래스 이름(패키지를 포함한 이름)을 지정하면 된다.   
 -->
 <mapper namespace="com.springbootstudy.bbs.mapper.MemberProfileMapper" >
+
+	<!-- 조회 -->
+    <select id="selectProfileByMemIdx" resultType="com.springbootstudy.bbs.domain.MemberProfileVO">
+	    SELECT
+	        mem_idx       AS memIdx,
+	        mem_nickname  AS memNickname,
+	        mem_intro     AS memIntro,
+	        mem_img       AS memImg
+	    FROM member_profile
+	    WHERE mem_idx = #{memIdx}
+	</select>
+
+    <!-- 등록 -->
+    <insert id="insertProfile">
+        INSERT INTO member_profile (
+            mem_idx,
+            mem_nickname,
+            mem_intro,
+            mem_img
+        )
+        VALUES (
+            #{memIdx},
+            #{memNickname},
+            #{memIntro},
+            #{memImg}
+        )
+    </insert>
+
+    <!-- 수정 -->
+    <update id="updateProfile">
+        UPDATE member_profile
+        SET 
+            mem_nickname = #{memNickname},
+            mem_intro    = #{memIntro},
+            mem_img      = #{memImg}
+        WHERE mem_idx = #{memIdx}
+    </update>
 	
 
 </mapper>	
