@@ -17,6 +17,9 @@ public interface MemberProfileMapper {
 
     // 수정용
     void updateProfile(MemberProfileVO vo);
+    
+    // 닉네임 중복 체크
+    int countByNickname(String memNickname); 
 
 
 

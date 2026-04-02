@@ -18,7 +18,7 @@ public class MemberProfileService {
 	// 조회
     public MemberProfileVO getProfile(Long memIdx) {
     	
-    	System.out.println("memberProfileService.java 진입 완료(insert)"); // insert 중인데 update -> insert가 뜸... 꼬인듯
+    	System.out.println("memberProfileService.java 진입 완료(insert)"); 
     	
         return memberProfileMapper.selectProfileByMemIdx(memIdx); 
     }
@@ -36,6 +36,11 @@ public class MemberProfileService {
         } else {
             memberProfileMapper.updateProfile(vo);
         }
+    }
+    
+    // 닉네임 중복 체크
+    public int checkNickname(String memNickname) {
+        return memberProfileMapper.countByNickname(memNickname);
     }
 
 }

@@ -10,18 +10,131 @@
 		
 		<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 	
-		<script type="text/javascript">
-			// 이미지 미리보기
-			function previewImage(input) {
-			    if (input.files && input.files[0]) {
-			        const reader = new FileReader();
-			        reader.onload = function(e) { 
-			            $('#preview').attr('src', e.target.result);
-			        }
-			        reader.readAsDataURL(input.files[0]);
-			    }
-			}
-		</script>
+		<script>
+		$(document).ready(function() {
+
+		    let isNicknameOk = true;
+
+		    // 🔥 기존 이미지 파일명 추출
+		    let originalImg = $('#preview').attr('src') 
+		        ? $('#preview').attr('src').split('/').pop()
+		        : "";
+
+		    // 🔥 초기 데이터
+		    let originalData = {
+		        nickname: $('#memNickname').val(),
+		        intro: $('#memIntro').val(),
+		        img: originalImg
+		    };
+
+		    // 닉네임 입력
+		    $('#memNickname').on('input', function() {
+		        let nickname = $(this).val().trim();
+
+		        if (nickname.length < 2 || nickname.length > 10) {
+		            $('#nicknameMsg').text("닉네임 2~10자 이내로 작성해주세요");
+		            isNicknameOk = false;
+		            validateAndCheck();
+		            return;
+		        }
+
+		        if (nickname === originalData.nickname) {
+		            $('#nicknameMsg').text("사용 가능한 닉네임 입니다");
+		            isNicknameOk = true;
+		            validateAndCheck();
+		            return;
+		        }
+
+		        $.ajax({
+		            url: '/members/checkNickname',
+		            type: 'POST',
+		            data: { memNickname: nickname },
+		            success: function(res) {
+		                if (res > 0) {
+		                    $('#nicknameMsg').text("이미 사용중인 닉네임 입니다");
+		                    isNicknameOk = false;
+		                } else {
+		                    $('#nicknameMsg').text("사용 가능한 닉네임 입니다");
+		                    isNicknameOk = true;
+		                }
+		                validateAndCheck();
+		            },
+		            error: function() {
+		                $('#nicknameMsg').text("확인 실패하였습니다 다시 시도해주세요");
+		                isNicknameOk = false;
+		                validateAndCheck();
+		            }
+		        });
+		    });
+
+		    // 자기소개
+		    $('#memIntro').on('input', validateAndCheck);
+
+		    // 파일 변경
+		    $('#fileInput').on('change', validateAndCheck);
+
+		    function validateAndCheck() {
+		        let nickname = $('#memNickname').val().trim();
+		        let intro = $('#memIntro').val().trim();
+
+		        let isValid = true;
+		        let isChanged = false;
+
+		        // 닉네임 검증
+		        if (nickname.length < 2 || nickname.length > 10) {
+		            $('#nicknameMsg').text("닉네임 2~10자 이내로 작성해주세요");
+		            isValid = false;
+		        }
+
+		        if (!isNicknameOk) {
+		            isValid = false;
+		        }
+
+		        // 자기소개 검증
+		        if (intro.length === 0 || intro.length > 200) {
+		            $('#introMsg').text("자기소개 1~200자 이내로 작성해주세요");
+		            isValid = false;
+		        } else {
+		            $('#introMsg').text("");
+		        }
+
+		        // 🔥 이미지 비교 핵심
+		        let selectedFile = $('#fileInput')[0].files[0];
+		        let isImageChanged = false;
+
+		        if (selectedFile) {
+		            if (selectedFile.name !== originalData.img) {
+		                isImageChanged = true;
+		            }
+		        }
+
+		        // 🔥 변경 감지
+		        if (
+		            originalData.nickname !== nickname ||
+		            originalData.intro !== intro ||
+		            isImageChanged
+		        ) {
+		            isChanged = true;
+		        }
+
+		        // 버튼 제어
+		        $('input[type="submit"]').prop('disabled', !(isValid && isChanged));
+		    }
+
+		    // 이미지 미리보기
+		    window.previewImage = function(input) {
+		        if (input.files && input.files[0]) {
+		            const reader = new FileReader();
+		            reader.onload = function(e) {
+		                $('#preview').attr('src', e.target.result);
+		            }
+		            reader.readAsDataURL(input.files[0]);
+		        }
+		    }
+
+		    validateAndCheck();
+		});
+		</script> 
 	
 		<input type="hidden" name="memIdx" th:value="${session.loginUser.memIdx}">
 	
@@ -45,16 +158,18 @@
 			<label>닉네임</label>
 			<input name="memNickname" id="memNickname" type="text" th:value="${profile.memNickname}" placeholder="ex) 픽큐"> <br>
 			<span>2~10자 이내로 입력해주세요</span>
+			<div id="nicknameMsg" style="color:red; font-size:12px;"></div>
 		</div>
 		
 		<div>
 			<label>자기소개</label>
 			<textarea name="memIntro" id="memIntro" th:text="${profile.memIntro}" rows="" cols="" placeholder="픽큐 회원님들에게 나를 알려보세요! 👋"></textarea> <br>
 			<span>최대 200자까지 입력 가능합니다</span>
+			<div id="introMsg" style="color:red; font-size:12px;"></div>
 		</div>
 		
 		<div>
-			<input type="submit" value="프로필 업데이트">
+			<input type="submit" value="프로필 업데이트" disabled>
 		</div>
 		
 	</form>
