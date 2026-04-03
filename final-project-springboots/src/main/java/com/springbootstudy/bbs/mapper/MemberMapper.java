@@ -25,9 +25,9 @@ public interface MemberMapper {
 	// 회원 조회 
 	int countByMemId(@Param("memId") String memId);
 
-	
-	
+
 	// 로그인 =============================================
+	
 	
     // 아이디 존재 여부 체크
     int checkId(String memId);
@@ -40,6 +40,14 @@ public interface MemberMapper {
     
     // 탈퇴
     int deleteMember(String memId);
+    
+    
+    // 회원정보 수정 =============================================
 
+    
+    // 회원정보 수정
+ 	void update(MemberVO vo);
+ 	MemberVO selectOneFromId(String memId); 
+ 	String selectGradeNameByMemId(String memId);	// grade만 따로 조회
 
 }

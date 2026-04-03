@@ -30,6 +30,30 @@ public class MemberAddrService {
     public List<MemberAddrVO> selectAddrList(Long memIdx) {
         return memberAddrMapper.selectAddrList(memIdx);
     }
+    
+    
+    // 주소 삭제
+    public void deleteAddr(Long addrIdx) {
+        memberAddrMapper.deleteAddr(addrIdx);
+    }
+    
+    
+    // 주소 수정
+    @Transactional
+    public int updateAddr(MemberAddrVO vo) {
+
+        // 대표주소 체크했으면 기존 대표주소 초기화
+        if ("Y".equals(vo.getIsPrimary())) {
+            memberAddrMapper.resetPrimaryAddr(vo.getMemIdx());
+        }
+
+        return memberAddrMapper.updateAddr(vo);
+    }
+
+	public MemberAddrVO selectOne(Long addrIdx) {
+		// TODO Auto-generated method stub
+		return memberAddrMapper.selectOne(addrIdx); 
+	}
  
 
 }

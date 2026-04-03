@@ -3,6 +3,7 @@ package com.springbootstudy.bbs.mapper;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import com.springbootstudy.bbs.domain.MemberAddrVO;
 
@@ -14,6 +15,13 @@ public interface MemberAddrMapper {
 	List<MemberAddrVO> selectAddrList(Long memIdx);
 	
 	// 대표 주소 하나만 등록하기
-	void resetPrimaryAddr(Long memIdx); 
+	void resetPrimaryAddr(@Param("memIdx") Long memIdx);
+	
+	// 주소 삭제
+	void deleteAddr(Long addrIdx);
 
+	// 주소 수정
+	int updateAddr(MemberAddrVO vo);
+	MemberAddrVO selectOne(Long addrIdx);
+	
 }

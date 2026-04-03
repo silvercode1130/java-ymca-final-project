@@ -4,9 +4,12 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-// 인터셉터용! (코드리뷰나 회의 시 의견을 듣고 반대의사가 많으시면 삭제하겠습니다!!)
+// 인터셉터용
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import com.springbootstudy.bbs.interceptor.LoginCheckInterceptor;
+
+// 프로필 이미지 등록용
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 
 /* @Configuration 애노테이션은 스프링 환경설정과 스프링 빈(Spring Bean)을 
  * 등록하기 위한 애노테이션 이다. 이 애노테이션은 스프링 Bean을 등록할 때
@@ -16,7 +19,7 @@ import com.springbootstudy.bbs.interceptor.LoginCheckInterceptor;
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
-	// 인터셉터용! (코드리뷰나 회의 시 의견을 듣고 반대의사가 많으시면 삭제하겠습니다!!)
+	// 인터셉터
 	@Override
 	public void addInterceptors(InterceptorRegistry registry) {
 		registry.addInterceptor(new LoginCheckInterceptor())
@@ -42,5 +45,17 @@ public class WebConfig implements WebMvcConfigurer {
 		 **/
 		registry.addViewController("/writeForm").setViewName("views/writeForm");
 		registry.addViewController("/writeBoard").setViewName("views/writeForm");
+	}
+	
+	// 프로필 이미지 업로드 기능
+	@Override
+	public void addResourceHandlers(ResourceHandlerRegistry registry) {
+		registry
+			.addResourceHandler("/upload/**")
+			.addResourceLocations("file:///C:/upload/");
+		
+		registry
+			.addResourceHandler("/upload/finalProfile/**")
+			.addResourceLocations("file:///C:/upload/finalProfile/");
 	}
 }

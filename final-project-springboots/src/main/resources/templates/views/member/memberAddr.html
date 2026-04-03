@@ -10,70 +10,62 @@
 </head>
 <body>
 	<th:block layout:fragment="content">
-
-		<div class="min-h-[calc(100vh-200px)] bg-gray-50 py-8">
-			<div class="mx-auto max-w-5xl px-4">
-
-				<!-- 페이지 타이틀 -->
-				<div class="mb-6">
-					<h1 class="text-2xl font-bold text-gray-900 mb-1">배송지 관리</h1>
-					<p class="text-sm text-gray-600">주문 시 사용할 배송지를 관리하세요</p>
-				</div>
-
-				<!-- 배송지 리스트 -->
-				<form th:action="@{/members/memberAddrUpdate}" id="memberAddr"
-					name="memberAddrForm">
-
-					<div class="space-y-4">
-
-						<!-- 등록된 배송지 없을 때 -->
-						<div th:if="${addrList == null or #lists.isEmpty(addrList)}"
-							class="bg-white border border-gray-200 rounded-xl py-10 text-center text-sm text-gray-500">
-							등록된 배송지가 없습니다.</div>
-
-						<!-- 배송지 카드들 -->
-						<div th:each="addr : ${addrList}"
-							class="bg-white border border-gray-200 rounded-xl p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3"
-							th:classappend="${addr.isPrimary} == 'Y' ? ' ring-2 ring-[#7CBD00]' : ''">
-
-							<div>
-								<div class="flex items-center gap-2 mb-1">
-									<span class="text-sm font-semibold text-gray-900"
-										th:text="${addr.addrName != null} ? ${addr.addrName} : '배송지'">자택</span>
-									<span th:if="${addr.isPrimary} == 'Y'"
-										class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-[#7CBD00] text-white">
-										대표 배송지 </span>
-								</div>
-
-								<div class="text-sm text-gray-900">
-									<span th:text="${addr.memAddr}">서울시 강남구 테헤란로 123</span>
-								</div>
-								<div class="text-xs text-gray-500 mt-1">
-									연락처: <span th:text="${member.memTel}">010-1234-5678</span>
-								</div>
-							</div>
-
-							<div class="flex gap-2 md:justify-end">
-								<button type="button"
-									class="px-3 py-1.5 rounded-md border border-gray-300 text-xs text-gray-700 bg-white hover:bg-gray-50 btn-update">
-									수정</button>
-								<button type="button"
-									class="px-3 py-1.5 rounded-md border border-red-300 text-xs text-red-600 bg-white hover:bg-red-50 btn-delete">
-									삭제</button>
-							</div>
-						</div>
-
-					</div>
-
-					<!-- 주소 추가 버튼 -->
-					<div class="mt-6 flex justify-end">
-						<button type="button"
-							onclick="location.href='/members/memberAddrUpdate'"
-							class="inline-flex items-center px-4 py-2 rounded-md bg-[#7CBD00] text-white text-sm font-semibold hover:bg-[#6BAD00]">
-							+ 새 배송지 추가</button>
-					</div>
-
-				</form>
+		<script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+		
+		<script>
+			function deleteAddr(addrIdx) {
+			    if(confirm("주소를 삭제하시겠습니까?")) {
+			        document.getElementById("deleteAddrIdx").value = addrIdx;
+			        
+			        let form = document.getElementById("memberAddr");
+			        form.action = "/members/addrDelete";
+			        form.method = "post";
+			        
+			        form.submit();
+			    }
+			}
+			</script>
+			<div>
+				<h2>배송지 관리</h2>
+			</div>
+			
+			<div>
+				<form action="/members/memberAddrUpdate" id="memberAddr" name="memberAddrForm">		
+				
+				<input type="hidden" name="addrIdx" id="deleteAddrIdx">
+							
+					<table border="1">
+						<thead>
+							<tr>
+								<td>대표 배송지</td> 
+								<td>주소</td>
+								<td>연락처</td>
+								<td>관리</td>
+							</tr>
+						</thead>
+						<tbody>
+							<tr th:each="addr : ${addrList}">
+								<td th:text="${addr.isPrimary}"></td>
+								<td th:text="${addr.memAddr}"></td>
+								<td th:text="${member.memTel}"></td>
+								<td>
+									<button type="button" class="btn-update" th:onclick="|location.href='@{/members/memberAddrUpdate(addrIdx=${addr.addrIdx})}'|">수정</button>
+            						<button type="button" class="btn-delete" th:onclick="|deleteAddr(${addr.addrIdx})|">삭제</button>
+								</td>
+							</tr> 
+							
+							<tr th:if="${addrList == null or #lists.isEmpty(addrList)}">
+					            <td colspan="4" style="text-align: center; height: 50px;">
+					                <span style="color: gray; font-size: 12px;">등록된 배송지가 없습니다</span>
+					            </td>
+					        </tr>
+						</tbody>
+					</table> 
+					
+					<button type="button" onclick="location.href='/members/memberAddrInsert'">
+					    주소 추가
+					</button>
+				</form> 
 			</div>
 		</div>
 

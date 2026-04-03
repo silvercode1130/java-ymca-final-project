@@ -72,6 +72,13 @@ public class MemberService {
         return memberMapper.deleteMember(memId);
     }
 
+    
+    // 회원정보 수정 -----------------------------------------------------
+    
+    public void updateMember(MemberVO vo) {
+        memberMapper.update(vo);
+    }
+
 	
 
 
