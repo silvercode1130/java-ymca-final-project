@@ -59,9 +59,25 @@
             <p th:text="${detail.auctionDesc}">여기에 설명이 나옵니다.</p>
         </div>
 
-        <div class="btn-group">
-            <button type="button" onclick="history.back()">목록으로</button>
-        </div>
+        <!-- 목록으로 버튼 옆에 경매 삭제 버튼 추가 -->
+		<div class="btn-group">
+		    <button type="button" onclick="history.back()">목록으로</button>
+		
+		    <!-- 본인 경매 + 진행중일 때만 수정/삭제 버튼 표시 -->
+		    <th:block th:if="${session.loginUser != null
+		                      and session.loginUser.memIdx == detail.buyerIdx
+		                      and detail.auctionStatusIdx == 1}">
+		        <a th:href="@{/auction/edit/{id}(id=${detail.auctionIdx})}">
+		            <button type="button">구매요청 수정</button>
+		        </a>
+		        <form th:action="@{/auction/delete/{id}(id=${detail.auctionIdx})}"
+		              method="post"
+		              onsubmit="return confirm('정말 삭제하시겠습니까?')"
+		              style="display:inline;">
+		            <button type="submit">구매요청 삭제</button>
+		        </form>
+		    </th:block>
+		</div>
     </div>
 
     <!-- 4번: 진행중(1)일 때만 입찰 폼 표시, 나머지 상태면 마감 안내 -->
@@ -129,25 +145,76 @@
 
 
     <table class="bid-table">
-        <thead>
-            <tr>
-                <th>번호</th>
-                <th>판매자 이름</th>
-                <th>제안가</th>
-                <th>제안일</th>
-                <th>상태</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr th:each="bid, status : ${bidList}">
-                <td th:text="${status.count}">1</td>
-                <td th:text="${bid.memName}">신**</td>
-                <td th:text="${#numbers.formatInteger(bid.bidPrice, 0, 'COMMA')} + '원'">50,000원</td>
-                <td th:text="${#temporals.format(bid.bidRegdate, 'yyyy-MM-dd')}">2026-03-30</td>
-                <td th:text="${bid.bidStatusName}">일반</td>
-            </tr>
-        </tbody>
-    </table>
+	    <thead>
+	        <tr>
+	            <th>번호</th>
+	            <th>판매자 이름</th>
+	            <th>제안가</th>
+	            <th>제안일</th>
+	            <th>상태</th>
+	            <th th:if="${session.loginUser != null}">관리</th>
+	        </tr>
+	    </thead>
+	    <tbody>
+	        <tr th:each="bid, status : ${bidList}">
+	            <!-- 입찰 번호 클릭하면 상세로 이동 (구매자만) -->
+				<td>
+				    <a th:if="${session.loginUser != null and session.loginUser.memIdx == detail.buyerIdx}"
+				       th:href="@{/auction/bid/detail/{id}(id=${bid.bidIdx})}"
+				       th:text="${status.count}">1</a>
+				    <span th:if="${session.loginUser == null or session.loginUser.memIdx != detail.buyerIdx}"
+				          th:text="${status.count}">1</span>
+				</td>
+	
+	            <!-- 구매자는 실명, 나머지는 마스킹 -->
+	            <td>
+	                <span th:if="${session.loginUser != null
+	                              and session.loginUser.memIdx == detail.buyerIdx}"
+	                      th:text="${bid.realMemName}">신정은</span>
+	                <span th:if="${session.loginUser == null
+	                              or session.loginUser.memIdx != detail.buyerIdx}"
+	                      th:text="${bid.memName}">신**</span>
+	            </td>
+	
+	            <td th:text="${#numbers.formatInteger(bid.bidPrice, 0, 'COMMA')} + '원'">50,000원</td>
+	            <td th:text="${#temporals.format(bid.bidRegdate, 'yyyy-MM-dd')}">2026-03-30</td>
+	            <td th:text="${bid.bidStatusName}">일반</td>
+	
+	            <td th:if="${session.loginUser != null}">
+	                <!-- 구매자: 낙찰 버튼 (진행중인 입찰에만) -->
+	                <form th:if="${session.loginUser.memIdx == detail.buyerIdx
+	                              and bid.bidStatusIdx == 1
+	                              and detail.auctionStatusIdx == 1}"
+	                      th:action="@{/auction/bid/win/{id}(id=${bid.bidIdx})}"
+	                      method="post"
+	                      style="display:inline;"
+	                      onsubmit="return confirm('이 입찰을 낙찰하시겠습니까?')">
+	                    <input type="hidden" name="auctionIdx" th:value="${detail.auctionIdx}">
+	                    <button type="submit" style="color:blue;">낙찰</button>
+	                </form>
+	
+	                <!-- 판매자: 수정/취소 버튼 (진행중인 입찰에만) -->
+	                <th:block th:if="${session.loginUser.memIdx == bid.bidderIdx
+	                                  and bid.bidStatusIdx == 1}">
+	                    <a th:href="@{/auction/bid/edit/{id}(id=${bid.bidIdx})}">
+	                        <button type="button">수정</button>
+	                    </a>
+	                    <form th:action="@{/auction/bid/delete/{id}(id=${bid.bidIdx})}"
+	                          method="post"
+	                          style="display:inline;"
+	                          onsubmit="return confirm('입찰을 취소하시겠습니까?')">
+	                        <input type="hidden" name="auctionIdx" th:value="${detail.auctionIdx}">
+	                        <button type="submit" style="color:red;">취소</button>
+	                    </form>
+	                </th:block>
+	
+	                <!-- 그 외 -->
+	                <span th:if="${session.loginUser.memIdx != detail.buyerIdx
+	                              and session.loginUser.memIdx != bid.bidderIdx}">-</span>
+	            </td>
+	        </tr>
+	    </tbody>
+	</table>
 <script src="/js/auctionDetail.js"></script>
 </body>
 </html>

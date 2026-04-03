@@ -28,4 +28,10 @@ public interface AuctionMapper {
     
     
     int updateAuctionStatus(@Param("auctionIdx") Long auctionIdx, @Param("statusIdx") int statusIdx);
+    
+    // 경매 삭제 - 소프트 딜리트 
+    int softDeleteAuction(@Param("auctionIdx") Long auctionIdx, @Param("buyerIdx") Long buyerIdx);
+    
+    // 경매 수정
+    int updateAuction(AuctionListDTO dto);
 }

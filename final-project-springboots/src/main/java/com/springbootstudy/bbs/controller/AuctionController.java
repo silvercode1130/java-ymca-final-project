@@ -195,4 +195,168 @@ public class AuctionController {
         return "redirect:/auction/auctionDetail/" + bidDto.getAuctionIdx();
     }
     
+    // 경매 삭제 (소프트 딜리트)
+    @PostMapping("/auction/delete/{auctionIdx}")
+    public String deleteAuction(@PathVariable("auctionIdx") Long auctionIdx,
+                                  HttpSession session,
+                                  RedirectAttributes ra) {
+        MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
+        if (loginUser == null) return "redirect:/login";
+
+        try {
+            auctionService.deleteAuction(auctionIdx, loginUser.getMemIdx());
+            ra.addFlashAttribute("successMessage", "구매요청이 삭제되었습니다.");
+        } catch (IllegalArgumentException e) {
+            ra.addFlashAttribute("errorMessage", e.getMessage());
+        }
+
+        return "redirect:/auctionList";
+    }
+
+    // 입찰 삭제 (소프트 딜리트)
+    @PostMapping("/auction/bid/delete/{bidIdx}")
+    public String deleteBid(@PathVariable("bidIdx") Long bidIdx,
+                             @RequestParam("auctionIdx") Long auctionIdx,
+                             HttpSession session,
+                             RedirectAttributes ra) {
+        MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
+        if (loginUser == null) return "redirect:/login";
+
+        try {
+            bidService.deleteBid(bidIdx, loginUser.getMemIdx());
+            ra.addFlashAttribute("successMessage", "입찰이 취소되었습니다.");
+        } catch (IllegalArgumentException e) {
+            ra.addFlashAttribute("bidError", e.getMessage());
+        }
+
+        return "redirect:/auction/auctionDetail/" + auctionIdx;
+    }
+    
+    // 경매 수정 폼 (GET)
+    @GetMapping("/auction/edit/{auctionIdx}")
+    public String editAuctionForm(@PathVariable("auctionIdx") Long auctionIdx,
+                                   HttpSession session, Model model) {
+        MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
+        if (loginUser == null) return "redirect:/login";
+
+        AuctionListDTO detail = auctionService.auctionDetail(auctionIdx);
+        if (detail == null || !detail.getBuyerIdx().equals(loginUser.getMemIdx())) {
+            return "redirect:/auctionList";
+        }
+
+        model.addAttribute("auction", detail);
+        return "views/auction/auctionEdit";
+    }
+
+    // 경매 수정 실행 (POST)
+    @PostMapping("/auction/edit/{auctionIdx}")
+    public String editAuction(@PathVariable("auctionIdx") Long auctionIdx,
+                               AuctionListDTO dto,
+                               HttpSession session,
+                               RedirectAttributes ra) {
+        MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
+        if (loginUser == null) return "redirect:/login";
+
+        dto.setAuctionIdx(auctionIdx);
+        dto.setBuyerIdx(loginUser.getMemIdx());
+
+        try {
+            auctionService.updateAuction(dto);
+            ra.addFlashAttribute("successMessage", "구매요청이 수정되었습니다.");
+        } catch (IllegalArgumentException e) {
+            ra.addFlashAttribute("errorMessage", e.getMessage());
+            return "redirect:/auction/edit/" + auctionIdx;
+        }
+
+        return "redirect:/auction/auctionDetail/" + auctionIdx;
+    }
+
+    // 입찰 상세 (GET) - 구매자만 접근 가능
+    @GetMapping("/auction/bid/detail/{bidIdx}")
+    public String bidDetail(@PathVariable("bidIdx") Long bidIdx,
+                             HttpSession session, Model model) {
+        MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
+        if (loginUser == null) return "redirect:/login";
+
+        BidListDTO bid = bidService.findBidById(bidIdx);
+        if (bid == null) return "redirect:/auctionList";
+
+        // 해당 경매의 구매자인지 확인
+        AuctionListDTO auction = auctionService.auctionDetail(bid.getAuctionIdx());
+        if (auction == null || !auction.getBuyerIdx().equals(loginUser.getMemIdx())) {
+            return "redirect:/auction/auctionDetail/" + bid.getAuctionIdx();
+        }
+
+        model.addAttribute("bid", bid);
+        model.addAttribute("auction", auction);
+        return "views/bid/bidDetail";
+    }
+
+    // 입찰 수정 폼 (GET)
+    @GetMapping("/auction/bid/edit/{bidIdx}")
+    public String editBidForm(@PathVariable("bidIdx") Long bidIdx,
+                               HttpSession session, Model model) {
+        MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
+        if (loginUser == null) return "redirect:/login";
+
+        BidListDTO bid = bidService.findBidById(bidIdx);
+        if (bid == null || !bid.getBidderIdx().equals(loginUser.getMemIdx())) {
+            return "redirect:/auctionList";
+        }
+
+        model.addAttribute("bid", bid);
+        return "views/auction/bidEdit";
+    }
+
+    // 입찰 수정 실행 (POST)
+    @PostMapping("/auction/bid/edit/{bidIdx}")
+    public String editBid(@PathVariable("bidIdx") Long bidIdx,
+                           BidListDTO bidDto,
+                           HttpSession session,
+                           RedirectAttributes ra) {
+        MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
+        if (loginUser == null) return "redirect:/login";
+
+        bidDto.setBidIdx(bidIdx);
+        bidDto.setBidderIdx(loginUser.getMemIdx());
+
+        try {
+            bidService.updateBid(bidDto);
+            ra.addFlashAttribute("successMessage", "입찰이 수정되었습니다.");
+        } catch (IllegalArgumentException e) {
+            ra.addFlashAttribute("errorMessage", e.getMessage());
+            return "redirect:/auction/bid/edit/" + bidIdx;
+        }
+
+        return "redirect:/auction/auctionDetail/" + bidDto.getAuctionIdx();
+    }
+
+    // 낙찰 처리 (POST) - 구매자만 가능
+    @PostMapping("/auction/bid/win/{bidIdx}")
+    public String selectWinner(@PathVariable("bidIdx") Long bidIdx,
+                                 @RequestParam("auctionIdx") Long auctionIdx,
+                                 HttpSession session,
+                                 RedirectAttributes ra) {
+        MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
+        if (loginUser == null) return "redirect:/login";
+
+        // 해당 경매의 구매자인지 확인
+        AuctionListDTO auction = auctionService.auctionDetail(auctionIdx);
+        if (auction == null || !auction.getBuyerIdx().equals(loginUser.getMemIdx())) {
+            ra.addFlashAttribute("bidError", "권한이 없습니다.");
+            return "redirect:/auction/auctionDetail/" + auctionIdx;
+        }
+
+        try {
+            bidService.selectWinner(bidIdx, auctionIdx);
+            // 경매 상태도 마감(2)으로 변경
+            auctionService.updateExpiredAuctions();
+            ra.addFlashAttribute("successMessage", "낙찰 처리가 완료되었습니다!");
+        } catch (IllegalArgumentException e) {
+            ra.addFlashAttribute("bidError", e.getMessage());
+        }
+
+        return "redirect:/auction/auctionDetail/" + auctionIdx;
+    }
+    
 }

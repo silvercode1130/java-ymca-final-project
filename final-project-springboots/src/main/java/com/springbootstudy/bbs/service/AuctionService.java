@@ -149,4 +149,44 @@ public class AuctionService {
 	    }
 	}
 	
+	// 경매 삭제 - 소프트 딜리트
+	@Transactional
+	public void deleteAuction(Long auctionIdx, Long buyerIdx) {
+	    int result = auctionMapper.softDeleteAuction(auctionIdx, buyerIdx);
+	    if (result == 0) {
+	        throw new IllegalArgumentException("삭제 권한이 없거나 존재하지 않는 경매입니다.");
+	    }
+	}
+	
+	// 경매 수정
+	@Transactional
+	public void updateAuction(AuctionListDTO dto) {
+	    // 희망 최대가 검증
+	    if (dto.getAuctionTargetPrice() == null || dto.getAuctionTargetPrice() <= 0) {
+	        throw new IllegalArgumentException("희망 최대가는 0원보다 커야 합니다.");
+	    }
+	    if (dto.getAuctionTargetPrice() % 100 != 0) {
+	        throw new IllegalArgumentException("희망 최대가는 100원 단위로 입력해야 합니다.");
+	    }
+	    LocalDateTime now = LocalDateTime.now();
+	    if (dto.getAuctionEndAt() == null || dto.getAuctionEndAt().isBefore(now)) {
+	        throw new IllegalArgumentException("입찰 마감일은 현재 시간 이후여야 합니다.");
+	    }
+	    if (dto.getAuctionDecisionDeadline() == null || dto.getAuctionDecisionDeadline().isBefore(now)) {
+	        throw new IllegalArgumentException("결정 마감일은 현재 시간 이후여야 합니다.");
+	    }
+	    if (dto.getAuctionDecisionDeadline().isBefore(dto.getAuctionEndAt())) {
+	        throw new IllegalArgumentException("결정 마감일은 입찰 마감일 이후여야 합니다.");
+	    }
+	    LocalDateTime maxDeadline = dto.getAuctionEndAt().plusDays(3);
+	    if (dto.getAuctionDecisionDeadline().isAfter(maxDeadline)) {
+	        throw new IllegalArgumentException("결정 마감일은 입찰 마감일로부터 3일을 초과할 수 없습니다.");
+	    }
+
+	    int result = auctionMapper.updateAuction(dto);
+	    if (result == 0) {
+	        throw new IllegalArgumentException("수정 권한이 없거나 수정할 수 없는 상태입니다.");
+	    }
+	}
+	
 }
