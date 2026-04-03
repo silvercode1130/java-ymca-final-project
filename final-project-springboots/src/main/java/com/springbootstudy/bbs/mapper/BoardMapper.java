@@ -21,9 +21,25 @@ public interface BoardMapper {
     // ── 게시글 ───────────────────────────────────────────────
     // 목록 (typeCode 기반)
     List<BoardVO> findBoards(
-            @Param("typeCode") 	String typeCode,
-            @Param("keyword")  	String keyword,
-            @Param("searchType")String searchType
+            @Param("typeCode")    String typeCode,
+            @Param("keyword")     String keyword,
+            @Param("searchType")  String searchType
+    );
+
+    // 목록 (페이징)
+    List<BoardVO> findBoardsPaged(
+            @Param("typeCode")    String typeCode,
+            @Param("keyword")     String keyword,
+            @Param("searchType")  String searchType,
+            @Param("offset")      int    offset,
+            @Param("limit")       int    limit
+    );
+
+    // 전체 게시글 수
+    int countBoards(
+            @Param("typeCode")    String typeCode,
+            @Param("keyword")     String keyword,
+            @Param("searchType")  String searchType
     );
 
     // 상세

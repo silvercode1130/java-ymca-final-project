@@ -28,7 +28,7 @@
   display: flex; justify-content: space-between; align-items: center;
   margin-bottom: 1.2rem;
 }
-.page-title { color: #fff; font-weight: 700; font-size: 1.4rem; }
+.page-title { color: #0d0d0d; font-weight: 700; font-size: 1.4rem; }
 
 .btn-write {
   background: #c6f135; color: #121212; font-weight: 700; border: none;
@@ -73,14 +73,14 @@
 }
 
 /* ── 게시글 상세 ───────────────────────────────────────── */
-.board-card { background: #1e1e1e; border-radius: 12px; padding: 2rem; margin-bottom: 1.5rem; }
+.board-card { background: #c6f135; border-radius: 12px; padding: 2rem; margin-bottom: 1.5rem; }
 .board-title { font-size: 1.5rem; font-weight: 700; color: #fff; margin-bottom: .5rem; }
 .board-meta { font-size: .82rem; color: #777; margin-bottom: 1.5rem; }
 .board-meta span { margin-right: 1rem; }
 .board-content { line-height: 1.8; color: #ccc; white-space: pre-wrap; }
 
 /* ── 댓글 ──────────────────────────────────────────────── */
-.reply-section { background: #1e1e1e; border-radius: 12px; padding: 1.5rem; }
+.reply-section { background: #888888; border-radius: 12px; padding: 1.5rem; }
 .reply-section h5 { color: #c6f135; font-weight: 700; margin-bottom: 1rem; }
 .reply-item { border-bottom: 1px solid #2a2a2a; padding: .8rem 0; }
 .reply-item:last-child { border-bottom: none; }
@@ -95,7 +95,7 @@
 .reply-toggle:hover { color: #c6f135; }
 
 /* ── 글쓰기/수정 폼 ────────────────────────────────────── */
-.write-card { background: #1e1e1e; border-radius: 12px; padding: 2rem; max-width: 760px; margin: 0 auto; }
+.write-card { background: #888888; border-radius: 12px; padding: 2rem; max-width: 760px; margin: 0 auto; }
 .write-card h4 { color: #c6f135; font-weight: 700; margin-bottom: 1.5rem; }
 .board-badge {
   background: #c6f135; color: #121212; font-size: .8rem; font-weight: 700;

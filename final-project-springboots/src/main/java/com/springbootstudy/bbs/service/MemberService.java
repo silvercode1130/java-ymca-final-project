@@ -9,10 +9,10 @@ import com.springbootstudy.bbs.mapper.MemberMapper;
 @Service
 public class MemberService {
 
-	@Autowired
+   @Autowired
     private MemberMapper memberMapper;
 
-	// 회원가입 처리
+   // 회원가입 처리
     public void insertMember(
             String memId,
             String memPwd,
@@ -29,21 +29,21 @@ public class MemberService {
                 memIp, memRoleIdx, memGradeIdx
         );
     }
-	
-	// 회원 가입시 아이디 중복을 체크하는 메서드	
-	public boolean overlapIdCheck(String memId) {
-		MemberVO member = memberMapper.getMemberVO(memId);
-		
-		if(member == null) {
-			return false; 
-		}  
-		return true; 
-	}
-	
-	
-	// 로그인 ===============================================
-	
-	public int login(String memId, String memPwd) {
+   
+   // 회원 가입시 아이디 중복을 체크하는 메서드   
+   public boolean overlapIdCheck(String memId) {
+      MemberVO member = memberMapper.getMemberVO(memId);
+      
+      if(member == null) {
+         return false; 
+      }  
+      return true; 
+   }
+   
+   
+   // 로그인 ===============================================
+   
+   public int login(String memId, String memPwd) {
 
         // 아이디 확인
         int count = memberMapper.checkId(memId);
@@ -72,7 +72,14 @@ public class MemberService {
         return memberMapper.deleteMember(memId);
     }
 
-	
+    
+    // 회원정보 수정 -----------------------------------------------------
+    
+    public void updateMember(MemberVO vo) {
+        memberMapper.update(vo);
+    }
+
+   
 
 
 }

@@ -29,9 +29,21 @@ public class BoardService {
     public List<BoardVO> getBoards(String typeCode, String keyword) {
         return boardMapper.findBoards(typeCode, keyword, null);
     }
-    
+
     public List<BoardVO> getBoards(String typeCode, String keyword, String searchType) {
         return boardMapper.findBoards(typeCode, keyword, searchType);
+    }
+
+    // ── 게시글 목록 (페이징) ──────────────────────────────────
+    public List<BoardVO> getBoardsPaged(String typeCode, String keyword, String searchType, int page) {
+        int limit  = 10;
+        int offset = (page - 1) * limit;
+        return boardMapper.findBoardsPaged(typeCode, keyword, searchType, offset, limit);
+    }
+
+    // ── 게시글 전체 수 ────────────────────────────────────────
+    public int countBoards(String typeCode, String keyword, String searchType) {
+        return boardMapper.countBoards(typeCode, keyword, searchType);
     }
 
     // ── 게시글 상세 (조회수 포함) ─────────────────────────────

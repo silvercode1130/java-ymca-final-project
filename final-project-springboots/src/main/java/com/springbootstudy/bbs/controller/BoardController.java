@@ -33,14 +33,14 @@ public class BoardController {
     public String home(
             @RequestParam(value = "keyword",    required = false) String keyword,
             @RequestParam(value = "searchType", required = false) String searchType,
+            @RequestParam(value = "page", defaultValue = "1")     int    page,
             Model model
     ) {
-        model.addAttribute("boardTypes",  boardService.getBoardTypes());
-        model.addAttribute("boards",      boardService.getBoards(null, keyword, searchType));
+        int totalCount = boardService.countBoards(null, keyword, searchType);
+        addPagingAttributes(model, null, keyword, searchType, page, totalCount);
+        model.addAttribute("boards",      boardService.getBoardsPaged(null, keyword, searchType, page));
         model.addAttribute("typeCode",    null);
         model.addAttribute("currentType", null);
-        model.addAttribute("keyword",     keyword);
-        model.addAttribute("searchType",  searchType);
         return "views/board/boardList";
     }
 
@@ -50,33 +50,61 @@ public class BoardController {
             @PathVariable("typeCode")                              String typeCode,
             @RequestParam(value = "keyword",    required = false)  String keyword,
             @RequestParam(value = "searchType", required = false)  String searchType,
+            @RequestParam(value = "page", defaultValue = "1")      int    page,
             Model model
     ) {
         BoardTypeVO currentType = boardService.getBoardTypeByCode(typeCode);
         if (currentType == null) return "redirect:/boards";
 
-        model.addAttribute("boardTypes",   boardService.getBoardTypes());
-        model.addAttribute("boards",       boardService.getBoards(typeCode, keyword, searchType));
+        int totalCount = boardService.countBoards(typeCode, keyword, searchType);
+        addPagingAttributes(model, typeCode, keyword, searchType, page, totalCount);
+        model.addAttribute("boards",       boardService.getBoardsPaged(typeCode, keyword, searchType, page));
         model.addAttribute("typeCode",     typeCode);
         model.addAttribute("currentType",  currentType);
-        model.addAttribute("keyword",      keyword);
-        model.addAttribute("searchType",   searchType);
         return "views/board/boardList";
     }
+    
+    // ── 페이징 공통 처리 ──────────────────────────────────────
+    private void addPagingAttributes(Model model, String typeCode, String keyword,
+                                     String searchType, int page, int totalCount) {
+        int pageSize  = 10; // 페이지당 게시글 수
+        int blockSize = 10; // 페이지 블록 크기
+        int totalPages = (int) Math.ceil((double) totalCount / pageSize);
+        if (totalPages == 0) totalPages = 1;
+        if (page < 1) page = 1;
+        if (page > totalPages) page = totalPages;
 
+        int blockStart = ((page - 1) / blockSize) * blockSize + 1;
+        int blockEnd   = Math.min(blockStart + blockSize - 1, totalPages);
+
+        model.addAttribute("boardTypes",  boardService.getBoardTypes());
+        model.addAttribute("keyword",     keyword);
+        model.addAttribute("searchType",  searchType);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages",  totalPages);
+        model.addAttribute("blockStart",  blockStart);
+        model.addAttribute("blockEnd",    blockEnd);
+        model.addAttribute("totalCount",  totalCount);
+    }
+    
     // ── 게시글 상세 ──────────────────────────────────────────
     @GetMapping("/{typeCode}/{boardIdx}")
     public String detail(
             @PathVariable("typeCode")  String typeCode,
             @PathVariable("boardIdx")  Long   boardIdx,
+            @RequestParam(value = "from", required = false) String from,
             Model model
     ) {
         BoardVO       board   = boardService.getBoardDetail(boardIdx);
         List<ReplyVO> replies = boardService.getReplies(boardIdx);
 
+        // from=all 이면 전체 목록, 없거나 카테고리코드면 해당 카테고리 목록
+        String backUrl = "all".equals(from) ? "/boards" : "/boards/" + typeCode;
+
         model.addAttribute("board",      board);
         model.addAttribute("replies",    replies);
         model.addAttribute("typeCode",   typeCode);
+        model.addAttribute("backUrl",    backUrl);
         model.addAttribute("boardTypes", boardService.getBoardTypes());
         return "views/board/boardDetail";
     }
@@ -85,6 +113,7 @@ public class BoardController {
     @GetMapping("/{typeCode}/new")
     public String newForm(
             @PathVariable("typeCode") String typeCode,
+            @RequestParam(value = "from", required = false) String from,
             Model model
     ) {
         BoardTypeVO currentType = boardService.getBoardTypeByCode(typeCode);
@@ -93,6 +122,7 @@ public class BoardController {
         model.addAttribute("boardTypes",  boardService.getBoardTypes());
         model.addAttribute("currentType", currentType);
         model.addAttribute("typeCode",    typeCode);
+        model.addAttribute("from",        from);
         return "views/board/boardNew";
     }
 
@@ -102,6 +132,7 @@ public class BoardController {
             @PathVariable("typeCode")     String  typeCode,
             @RequestParam("boardTitle")   String  boardTitle,
             @RequestParam("boardContent") String  boardContent,
+            @RequestParam(value = "from", required = false) String from,
             HttpServletRequest request,
             HttpSession session
     ) {
@@ -119,7 +150,8 @@ public class BoardController {
         board.setBoardIp(getClientIp(request));
 
         boardService.writeBoard(board);
-        return "redirect:/boards/" + typeCode + "/" + board.getBoardIdx();
+        // from=all 이면 전체 목록, 아니면 해당 카테고리 목록
+        return "all".equals(from) ? "redirect:/boards" : "redirect:/boards/" + typeCode;
     }
 
     // ── 게시글 수정 폼 ───────────────────────────────────────
