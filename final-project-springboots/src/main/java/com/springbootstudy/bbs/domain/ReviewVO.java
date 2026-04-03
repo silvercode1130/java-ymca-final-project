@@ -9,17 +9,21 @@ import lombok.Data;
 
 @Data
 public class ReviewVO {
-	private Long reviewIdx;			// PK
-	private Long reviewWriterIdx;	// 리뷰 작성자
-	private Long reviewTargetIdx;	// 리뷰 대상자
-	private Long auctionIdx;		// 역경매
+	private Long reviewIdx;	// pk - 리뷰
 	
-	private String reviewTitle;		// 리뷰 제목
-	private String reviewContent;	// 리뷰 내용
-	private Integer  reviewStar;	// 리뷰 별점 (1 ~ 5점 까지 가능)
+	private Long buyer_idx;   // fk - 구매자(리뷰하는 자)
+	private Long bidder_idx;  // fk - 입찰자(리뷰 대상자)
+	private Long auction_idx; // fk - 역경매(해당 경매)
+	private Long bidIdx; 	  // fk - 입찰(해당 입찰)
 	
-	private LocalDateTime reviewRegdate;	// 리뷰 작성일
-	private String reviewIsDeleted;			// 리뷰 삭제 여부 default N 	--> Y = 탈퇴 x / N = 탈퇴 o
-	private LocalDateTime reviewDeldate;	// 리뷰 삭제일
+	private String reviewTitle;	  // 리뷰 제목
+	private String reviewContent; // 리뷰 내용
+	private int reviewStar;	  	  // 별점
+	
+	private LocalDateTime reviewRegdate; // 리뷰 작성일
+	private String reviewIsDelete;		 // 리뷰 삭제 여부 - default N (N / Y)
+	private LocalDateTime reviewDelete;  // 리뷰 삭제일
+	
+	
 	
 }
