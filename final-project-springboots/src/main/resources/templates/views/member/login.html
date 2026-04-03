@@ -4,8 +4,6 @@
 
 <th:block layout:fragment="content">
 
-<form th:action="@{/members/login}" method="post">
-
 	<script type="text/javascript">
 		//필수 항목 체크 안되면 못 넘어가게 하는 기능
 		function checkValid() {
@@ -36,28 +34,7 @@
 	</script> 
 
     <div class="row my-5">
-        <div class="col-6 offset-3">
-
-            <h2 class="text-center">로그인</h2>
-            
-            <!-- 로그인 필요한 기능에 로그인 안할 시 리다이렉트 된 창에 뜰 문구 -->
-            <div th:if="${loginMsg}">
-			    <span th:text="${loginMsg}"></span>
-			</div>
-
-            <div class="my-3">
-                <input class="form-control" id="memId" name="memId" placeholder="🏷️ your ID">
-            </div>
-
-            <div class="my-3">
-                <input class="form-control" id="memPwd" name="memPwd" type="password" placeholder="🔒 ••••••••">
-            </div>
-            
-            <!-- 로그인 실패 시 -->
-            <div th:if="${error}">
-			    <span th:text="${error}" style="color: gray; font-size: 12px;">아이디나 비밀번호가 틀렸습니다</span>
-			</div>
-
+        <div class="col-6 offset-3">            
 				<!-- 카드 -->
 				<div class="bg-white border border-gray-200 rounded-xl shadow-sm">
 					<div class="border-b border-gray-200 px-6 py-4">
@@ -94,10 +71,10 @@
 										placeholder="••••••••" oninput="checkValid()">
 								</div>
 							</div>
-
+							
 							<!-- 에러 메시지 -->
 							<div th:if="${error}" class="text-sm text-red-500">
-								<span th:text="${error}">아이디나 비밀번호가 틀렸습니다</span>
+								<span th:text="${error}" style="color: gray; font-size: 12px;">아이디나 비밀번호가 틀렸습니다</span>
 							</div>
 
 							<!-- 로그인 버튼 -->

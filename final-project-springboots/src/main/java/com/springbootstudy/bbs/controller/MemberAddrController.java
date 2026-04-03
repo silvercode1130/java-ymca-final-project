@@ -32,7 +32,7 @@ public class MemberAddrController {
 	    MemberVO loginMember = (MemberVO) session.getAttribute("loginUser");
 
 	    if (loginMember == null) {
-	        return "redirect:/members/login";
+	        return "redirect:/members/login"; 
 	    }
 
 	    model.addAttribute("member", loginMember);  

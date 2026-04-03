@@ -19,7 +19,7 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
-	// 인터셉터용! (코드리뷰나 회의 시 의견을 듣고 반대의사가 많으시면 삭제하겠습니다!!)
+	// 인터셉터
 	@Override
 	public void addInterceptors(InterceptorRegistry registry) {
 		registry.addInterceptor(new LoginCheckInterceptor())
