@@ -73,12 +73,12 @@
     <!-- 탈퇴 -->
     
     <delete id="deleteMember" parameterType="string">
-       DELETE FROM member
-       WHERE mem_id = #{memId}
-   </delete>
-   
-   
-       <update id="update">
+	    DELETE FROM member
+	    WHERE mem_id = #{memId}
+	</delete>
+	
+	
+		 <update id="update">
         UPDATE member
         SET mem_name = #{memName},
             mem_email = #{memEmail},
@@ -104,7 +104,7 @@
     </select>
  
  
-</mapper>   
+</mapper>	
 
 
 

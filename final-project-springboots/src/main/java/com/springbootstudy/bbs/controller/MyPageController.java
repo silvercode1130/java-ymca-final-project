@@ -33,7 +33,7 @@ public class MyPageController {
   public String getAuctionList(HttpSession session, Model model) {
     MemberVO member = getSessionUser(session);
     if (member == null)
-      return "redirect:/members/login";
+      return "redirect:/members/login"; 
 
     model.addAttribute("auctions", myPageService.getAuctionList(member.getMemIdx()));
     return "views/mystatus/auctionview";

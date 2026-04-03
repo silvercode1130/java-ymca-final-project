@@ -79,7 +79,7 @@ public class MemberService {
         memberMapper.update(vo);
     }
 
-   
+	
 
 
 }
