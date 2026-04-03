@@ -36,7 +36,7 @@ public class MemberController {
 	HttpServletRequest request;
 
 	@Autowired
-	HttpSession session;
+	HttpSession session; 
 
 
 	// 회원가입 -----------------------------------------------------------------
@@ -99,8 +99,13 @@ public class MemberController {
 
 	// login.html - 창 띄우기
 	@GetMapping("/members/login")
-	public String loginForm(HttpSession session, Model model) {
+	public String loginForm(HttpServletResponse response, HttpSession session, Model model) {
 
+		// 뒤로가기 했을 때 로그인 안풀리는 기능
+		response.setHeader("Cache-Control", "no-store, no-cache, must-revalidate");
+	    response.setHeader("Pragma", "no-cache");
+	    response.setDateHeader("Expires", 0);
+		
 	    String msg = (String) session.getAttribute("loginMsg");
 
 	    if (msg != null) {

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	거래한 판매자 등등을 검색한 뒤
+	최근 거래 목록이 뜨면 선택
+	아래에 리뷰창이 뜨고
+	리뷰를 작성 후 버튼을 누르면 전송 됨
+		<input type="hidden" name="buyer_idx" value="${loginUser.mem_idx}">
+		<input type="hidden" name="bidder_idx" value="${bid.bidder_idx}">
+    	<input type="hidden" name="auction_idx" value="${auction.auction_idx}">
+    	<input type="hidden" name="bid_idx" value="${bid.bid_idx}">
+	
+		<div>
+			<h2>리뷰 작성하기</h2>
+		</div>
+		
+		<form action="review/reviewWrite" method="get" class="search-box">
+		    <select name="searchType">
+		    	<option value="">판매자/입찰자</option>
+		        <option value=""></option>
+		        <option value=""></option>
+		    </select>
+		    
+		    <input type="text" name="keyword" placeholder="검색어를 입력하세요">
+		    
+		    <!-- ## 추가 - 검색어 없을 떈 disabled -->
+		    <button type="submit">검색</button>
+		</form>
+		
+</body>
+</html>

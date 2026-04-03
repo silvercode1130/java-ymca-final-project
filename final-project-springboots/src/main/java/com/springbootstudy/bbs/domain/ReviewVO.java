@@ -24,6 +24,4 @@ public class ReviewVO {
 	private String reviewIsDelete;		 // 리뷰 삭제 여부 - default N (N / Y)
 	private LocalDateTime reviewDelete;  // 리뷰 삭제일
 	
-	
-	
 }
