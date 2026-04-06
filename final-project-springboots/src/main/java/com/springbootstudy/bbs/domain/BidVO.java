@@ -15,6 +15,5 @@ public class BidVO {
   private Integer bidStatusIdx;
   private LocalDateTime bidRegdate;
   private LocalDateTime bidModdate;
-  private String auctionTitle;
 
 }
