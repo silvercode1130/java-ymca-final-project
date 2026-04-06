@@ -61,15 +61,12 @@
 
         <!-- 목록으로 버튼 옆에 경매 삭제 버튼 추가 -->
 		<div class="btn-group">
-		    <button type="button" onclick="history.back()">목록으로</button>
+		    <button type="button" th:onclick="@{|location.href='/auctionList'|}">목록으로</button>
 		
-		    <!-- 본인 경매 + 진행중일 때만 수정/삭제 버튼 표시 -->
+		    <!-- 본인 경매 + 진행중일 때만 삭제 버튼 표시 -->
 		    <th:block th:if="${session.loginUser != null
 		                      and session.loginUser.memIdx == detail.buyerIdx
 		                      and detail.auctionStatusIdx == 1}">
-		        <a th:href="@{/auction/edit/{id}(id=${detail.auctionIdx})}">
-		            <button type="button">구매요청 수정</button>
-		        </a>
 		        <form th:action="@{/auction/delete/{id}(id=${detail.auctionIdx})}"
 		              method="post"
 		              onsubmit="return confirm('정말 삭제하시겠습니까?')"
@@ -181,24 +178,21 @@
 	            <td th:text="${bid.bidStatusName}">일반</td>
 	
 	            <td th:if="${session.loginUser != null}">
-	                <!-- 구매자: 낙찰 버튼 (진행중인 입찰에만) -->
-	                <form th:if="${session.loginUser.memIdx == detail.buyerIdx
-	                              and bid.bidStatusIdx == 1
-	                              and detail.auctionStatusIdx == 1}"
-	                      th:action="@{/auction/bid/win/{id}(id=${bid.bidIdx})}"
-	                      method="post"
-	                      style="display:inline;"
-	                      onsubmit="return confirm('이 입찰을 낙찰하시겠습니까?')">
-	                    <input type="hidden" name="auctionIdx" th:value="${detail.auctionIdx}">
-	                    <button type="submit" style="color:blue;">낙찰</button>
-	                </form>
+	                <!-- 구매자: 낙찰 버튼 (입찰 마감(2) 됐을 때만 활성화!) -->
+					<form th:if="${session.loginUser.memIdx == detail.buyerIdx
+					              and bid.bidStatusIdx == 1
+					              and detail.auctionStatusIdx == 2}"
+					      th:action="@{/auction/bid/win/{id}(id=${bid.bidIdx})}"
+					      method="post"
+					      style="display:inline;"
+					      onsubmit="return confirm('이 입찰을 낙찰하시겠습니까?')">
+					    <input type="hidden" name="auctionIdx" th:value="${detail.auctionIdx}">
+					    <button type="submit" style="color:blue;">낙찰</button>
+					</form>
 	
-	                <!-- 판매자: 수정/취소 버튼 (진행중인 입찰에만) -->
+	                <!-- 판매자: 취소 버튼 (진행중인 입찰에만) -->
 	                <th:block th:if="${session.loginUser.memIdx == bid.bidderIdx
 	                                  and bid.bidStatusIdx == 1}">
-	                    <a th:href="@{/auction/bid/edit/{id}(id=${bid.bidIdx})}">
-	                        <button type="button">수정</button>
-	                    </a>
 	                    <form th:action="@{/auction/bid/delete/{id}(id=${bid.bidIdx})}"
 	                          method="post"
 	                          style="display:inline;"
