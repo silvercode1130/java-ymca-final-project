@@ -3,6 +3,11 @@ function toggleReplyForm(replyIdx) {
   el.style.display = el.style.display === 'none' ? 'block' : 'none';
 }
 
+function toggleEditForm(replyIdx) {
+  const el = document.getElementById('editForm-' + replyIdx);
+  el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
+
 function validateReply(textarea) {
   if (textarea.value.trim().length < 3) {
     alert('댓글은 3글자 이상 입력해주세요.');

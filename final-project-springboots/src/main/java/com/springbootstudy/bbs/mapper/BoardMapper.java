@@ -91,6 +91,9 @@ public interface BoardMapper {
     // 원댓 ref 업데이트 (insert 후 자기 idx로 세팅)
     void updateReplyRef(ReplyVO reply);
 
+    // 댓글 수정
+    int updateReply(ReplyVO reply);
+
     // 삭제 (soft delete)
     int deleteReply(@Param("replyIdx") Long replyIdx);
 }

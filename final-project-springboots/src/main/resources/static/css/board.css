@@ -77,7 +77,7 @@
 .board-title { font-size: 1.5rem; font-weight: 700; color: #0d0d0d; margin-bottom: .5rem; }
 .board-meta { font-size: .82rem; color: #0d0d0d; margin-bottom: 1.5rem; }
 .board-meta span { margin-right: 1rem; }
-.board-content { line-height: 1.8; color: #ccc; white-space: pre-wrap; }
+.board-content { line-height: 1.8; color: #0d0d0d; white-space: pre-wrap; }
 
 /* ── 댓글 ──────────────────────────────────────────────── */
 .reply-section { background: #888888; border-radius: 12px; padding: 1.5rem; }

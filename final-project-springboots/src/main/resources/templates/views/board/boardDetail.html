@@ -65,6 +65,20 @@
         </span>
         <div class="flex-grow-1">
           <div class="reply-content" th:text="${r.replyContent}"></div>
+          <!-- 인라인 수정 폼 -->
+          <div th:id="'editForm-' + ${r.replyIdx}" style="display:none; margin-top:.5rem;">
+            <form th:action="@{/boards/{tc}/{id}/replies/{rid}/edit(tc=${typeCode}, id=${board.boardIdx}, rid=${r.replyIdx})}"
+                  method="post" class="reply-form"
+                  onsubmit="return validateReply(this.querySelector('textarea'))">
+              <input type="hidden" name="replyPage" th:value="${replyPage}">
+              <input type="hidden" name="sortType" th:value="${sortType}">
+              <textarea name="replyContent" rows="2" class="form-control form-control-sm mb-1"
+                        th:text="${r.replyContent}"></textarea>
+              <button type="submit" class="btn btn-lime btn-sm">저장</button>
+              <button type="button" class="btn btn-ghost btn-sm"
+                      th:onclick="'toggleEditForm(' + ${r.replyIdx} + ')'">취소</button>
+            </form>
+          </div>
           <div class="reply-meta d-flex gap-3">
             <span th:text="${r.memNickname != null} ? ${r.memNickname} : ${r.memId}">작성자</span>
             <span th:text="${#temporals.format(r.replyRegdate, 'MM-dd HH:mm')}"></span>
@@ -102,13 +116,19 @@
             </form>
           </div>
         </div>
-        <form th:if="${session.loginUser != null and session.loginUser.memIdx == r.memIdx}"
-              th:action="@{/boards/{tc}/replies/{rid}/delete(tc=${typeCode}, rid=${r.replyIdx})}"
-              method="post">
-          <input type="hidden" name="boardIdx" th:value="${board.boardIdx}">
-          <button type="submit" class="btn btn-danger-soft btn-sm"
-                  onclick="return confirm('삭제하시겠습니까?')">✕</button>
-        </form>
+        <div th:if="${session.loginUser != null and session.loginUser.memIdx == r.memIdx}"
+             class="d-flex gap-1">
+          <!-- 수정 버튼 -->
+          <button type="button" class="btn btn-ghost btn-sm"
+                  th:onclick="'toggleEditForm(' + ${r.replyIdx} + ')'">✏️</button>
+          <!-- 삭제 버튼 -->
+          <form th:action="@{/boards/{tc}/replies/{rid}/delete(tc=${typeCode}, rid=${r.replyIdx})}"
+                method="post">
+            <input type="hidden" name="boardIdx" th:value="${board.boardIdx}">
+            <button type="submit" class="btn btn-danger-soft btn-sm"
+                    onclick="return confirm('삭제하시겠습니까?')">✕</button>
+          </form>
+        </div>
       </div>
     </div>
 

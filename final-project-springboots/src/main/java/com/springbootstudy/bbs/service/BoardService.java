@@ -122,6 +122,14 @@ public class BoardService {
         }
     }
 
+    // ── 댓글 수정 ────────────────────────────────────────────
+    public int editReply(Long replyIdx, String replyContent) {
+        ReplyVO reply = new ReplyVO();
+        reply.setReplyIdx(replyIdx);
+        reply.setReplyContent(replyContent);
+        return boardMapper.updateReply(reply);
+    }
+
     // ── 댓글 삭제 ────────────────────────────────────────────
     public int removeReply(Long replyIdx) {
         return boardMapper.deleteReply(replyIdx);

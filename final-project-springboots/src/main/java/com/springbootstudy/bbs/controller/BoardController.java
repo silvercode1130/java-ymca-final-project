@@ -274,6 +274,33 @@ public class BoardController {
                 + "?replyPage=" + targetPage + "&sortType=" + sortType;
     }
 
+    // ── 댓글 수정 ────────────────────────────────────────────
+    @PostMapping("/{typeCode}/{boardIdx}/replies/{replyIdx}/edit")
+    public String editReply(
+            @PathVariable("typeCode")  String typeCode,
+            @PathVariable("boardIdx")  Long   boardIdx,
+            @PathVariable("replyIdx")  Long   replyIdx,
+            @RequestParam("replyContent") String replyContent,
+            @RequestParam(value = "replyPage", defaultValue = "1") int replyPage,
+            @RequestParam(value = "sortType", defaultValue = "oldest") String sortType,
+            HttpSession session
+    ) {
+        MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
+        if (loginUser == null) return "redirect:/members/login";
+
+        ReplyVO existing = boardService.getReplies(boardIdx).stream()
+                .filter(r -> r.getReplyIdx().equals(replyIdx))
+                .findFirst().orElse(null);
+        if (existing == null || !existing.getMemIdx().equals(loginUser.getMemIdx())) {
+            return "redirect:/boards/" + typeCode + "/" + boardIdx + "?replyPage=" + replyPage + "&sortType=" + sortType;
+        }
+
+        if (replyContent != null && replyContent.trim().length() >= 3) {
+            boardService.editReply(replyIdx, replyContent.trim());
+        }
+        return "redirect:/boards/" + typeCode + "/" + boardIdx + "?replyPage=" + replyPage + "&sortType=" + sortType;
+    }
+
     // ── 댓글 삭제 ────────────────────────────────────────────
     @PostMapping("/{typeCode}/replies/{replyIdx}/delete")
     public String deleteReply(

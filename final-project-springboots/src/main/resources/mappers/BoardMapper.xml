@@ -340,6 +340,14 @@
         WHERE reply_idx = #{replyIdx}
     </update>
 
+    <!-- 댓글 수정 -->
+    <update id="updateReply">
+        UPDATE reply
+        SET reply_content = #{replyContent},
+            reply_moddate = NOW()
+        WHERE reply_idx = #{replyIdx}
+    </update>
+
     <!-- 댓글 삭제 (soft) -->
     <update id="deleteReply">
         UPDATE reply
