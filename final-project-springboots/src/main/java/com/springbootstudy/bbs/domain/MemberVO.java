@@ -21,7 +21,7 @@ public class MemberVO {
  private LocalDate     	memBday;     	// 생일
  private LocalDateTime 	memRegdate;  	// 가입일
  private String  		memIsDeleted;   // 'Y' / 'N' (삭제 여부)
- private LocalDateTime 	memDeldate;  	// 탈퇴일
+ private LocalDateTime 	memDeldate;  	// 탈퇴일 
 
 }
 

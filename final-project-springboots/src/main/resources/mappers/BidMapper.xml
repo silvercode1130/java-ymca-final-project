@@ -13,40 +13,94 @@
 -->
 <mapper namespace="com.springbootstudy.bbs.mapper.BidMapper">
 	
+	<!-- 입찰 리스트 조회 -->
 	<select id="BidList" resultType="BidListDTO">
-	    SELECT 
-	        b.*, 
-	        m.mem_name,           bs.bid_status_name AS bidStatusName
+	    SELECT
+	        b.*,
+	        m.mem_name AS realMemName,
+	        m.mem_name,
+	        bs.bid_status_name AS bidStatusName
 	    FROM bid b
 	    JOIN member m ON b.bidder_idx = m.mem_idx
 	    JOIN bid_status bs ON b.bid_status_idx = bs.bid_status_idx
 	    WHERE b.auction_idx = #{auctionIdx}
+	      AND b.bid_status_idx != 4
 	    ORDER BY b.bid_regdate DESC
 	</select>
 	
+	<!-- 입찰 삭제 - 소프트 딜리트 -->
+	<update id="softDeleteBid">
+	    UPDATE bid
+	    SET bid_status_idx = 4,
+	        bid_moddate = NOW()
+	    WHERE bid_idx = #{bidIdx}
+	      AND bidder_idx = #{bidderIdx}
+	</update>
+	
 	<insert id="insertBid">
 	    INSERT INTO bid (
-	        auction_idx, 
+	        auction_idx,
 	        bidder_idx,
-	        item_idx,    
-	        bid_price, 
-	        bid_quantity, 
-	        bid_message, 
-	        bid_status_idx, 
+	        item_idx,
+	        bid_price,
+	        bid_quantity,
+	        bid_message,
+	        bid_status_idx,
 	        bid_regdate
 	    ) VALUES (
-	        #{auctionIdx}, 
-	        #{bidderIdx}, 
-	        #{itemIdx}, 
-	        #{bidPrice}, 
+	        #{auctionIdx},
+	        #{bidderIdx},
+	        #{itemIdx},
+	        #{bidPrice},
 	        #{bidQuantity},
-	        #{bidMessage}, 
-	        1, 
+	        #{bidMessage},
+	        1,
 	        NOW()
 	    )
 	</insert>
 	
+	<!-- 특정 입찰 낙찰 처리 -->
+	<update id="selectWinnerBid">
+	    UPDATE bid
+	    SET bid_status_idx = 2,
+	        bid_moddate = NOW()
+	    WHERE bid_idx = #{bidIdx}
+	      AND auction_idx = #{auctionIdx}
+	</update>
 	
+	<!-- 해당 경매의 나머지 입찰 실패 처리 -->
+	<update id="rejectOtherBids">
+	    UPDATE bid
+	    SET bid_status_idx = 3,
+	        bid_moddate = NOW()
+	    WHERE auction_idx = #{auctionIdx}
+	      AND bid_idx != #{bidIdx}
+	      AND bid_status_idx = 1
+	</update>
+	
+	<!-- 입찰 단건 조회 (상세페이지, 수정용) -->
+	<select id="findBidById" resultType="BidListDTO">
+	    SELECT
+	        b.*,
+	        m.mem_name AS realMemName,
+	        bs.bid_status_name AS bidStatusName
+	    FROM bid b
+	    JOIN member m ON b.bid_idx = m.mem_idx
+	    JOIN bid_status bs ON b.bid_status_idx = bs.bid_status_idx
+	    WHERE b.bid_idx = #{bidIdx}
+	</select>
+	
+	<!-- 입찰 수정 -->
+	<update id="updateBid">
+	    UPDATE bid
+	    SET bid_price = #{bidPrice},
+	        bid_quantity = #{bidQuantity},
+	        bid_message = #{bidMessage},
+	        bid_moddate = NOW()
+	    WHERE bid_idx = #{bidIdx}
+	      AND bidder_idx = #{bidderIdx}
+	      AND bid_status_idx = 1
+	</update>
 	
 </mapper>	
 

@@ -1,51 +1,40 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	layout:decorate="~{layouts/main_layout}">
-<head>
-<meta charset="UTF-8">
-<title>로그인 - PickQ</title>
-</head>
-<body>
-	<th:block layout:fragment="content">
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 
-		<script type="text/javascript">
-			// 필수 항목 체크 안되면 못 넘어가게 하는 기능
-			function checkValid() {
-				let memId = document.querySelector("#memId").value.trim();
-				let memPwd = document.querySelector("#memPwd").value.trim();
-				let btn = document.querySelector("input[name='loginBtn']");
+<th:block layout:fragment="content">
 
-				let isValid = memId !== "" && memPwd !== "";
+	<script type="text/javascript">
+		//필수 항목 체크 안되면 못 넘어가게 하는 기능
+		function checkValid() {
+		    // 변수 선언
+		    let memId = document.querySelector("#memId").value.trim();
+		    let memPwd = document.querySelector("#memPwd").value.trim();
+	
+		    let btn = document.querySelector("input[name='loginBtn']");
+	
+		    // 모든 값을 입력해야 버튼 활성화		
+		    let isValid =
+		    	memId !== "" &&
+		    	memPwd !== "";
+	
+		    // 버튼 활성화 / 비활성화
+		    btn.disabled = !isValid;	
+	
+		    // 비활성화 시 css 변경
+		    if (!isValid) {
+		        btn.style.opacity = "0.5";
+		        btn.style.cursor = "not-allowed";
+		    } 
+		    else {
+		        btn.style.opacity = "1";
+		        btn.style.cursor = "pointer";
+		    }
+		}
+	</script> 
 
-				btn.disabled = !isValid;
-
-				if (!isValid) {
-					btn.style.opacity = "0.5";
-					btn.style.cursor = "not-allowed";
-				} else {
-					btn.style.opacity = "1";
-					btn.style.cursor = "pointer";
-				}
-			}
-		</script>
-
-		<div
-			class="min-h-[calc(100vh-200px)] flex items-center justify-center px-4 py-12 bg-gray-50">
-			<div class="w-full max-w-md">
-
-				<!-- 상단 아이콘 + 타이틀 -->
-				<div class="text-center mb-8">
-					<div class="flex justify-center mb-4">
-						<div
-							class="flex h-16 w-16 items-center justify-center rounded-2xl bg-[#7CBD00]">
-							<span class="text-3xl text-white">⚡</span>
-						</div>
-					</div>
-					<h1 class="text-3xl font-bold text-gray-900 mb-2">로그인</h1>
-					<p class="text-gray-600">pickQ에 오신 것을 환영합니다</p>
-				</div>
-
+    <div class="row my-5">
+        <div class="col-6 offset-3">            
 				<!-- 카드 -->
 				<div class="bg-white border border-gray-200 rounded-xl shadow-sm">
 					<div class="border-b border-gray-200 px-6 py-4">
@@ -82,10 +71,10 @@
 										placeholder="••••••••" oninput="checkValid()">
 								</div>
 							</div>
-
+							
 							<!-- 에러 메시지 -->
 							<div th:if="${error}" class="text-sm text-red-500">
-								<span th:text="${error}">아이디나 비밀번호가 틀렸습니다</span>
+								<span th:text="${error}" style="color: gray; font-size: 12px;">아이디나 비밀번호가 틀렸습니다</span>
 							</div>
 
 							<!-- 로그인 버튼 -->
