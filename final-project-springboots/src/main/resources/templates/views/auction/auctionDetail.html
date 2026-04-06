@@ -8,9 +8,9 @@
     <div class="container">
 
         <!-- 이미지 null 처리 추가 -->
-        <div class="detail-image-box" th:if="${detail.itemThumbnailImg != null and detail.itemThumbnailImg != ''}">
-            <img th:src="${detail.itemThumbnailImg}" alt="경매 이미지">
-        </div>
+		<div class="detail-image-box" th:if="${detail.auctionThumbnailImg != null and detail.auctionThumbnailImg != ''}">
+		    <img th:src="${detail.auctionThumbnailImg}" alt="경매 이미지">
+		</div>
 
         <h2 th:text="${detail.auctionTitle}">경매 제목</h2>
 
@@ -61,13 +61,13 @@
 
         <!-- 목록으로 버튼 옆에 경매 삭제 버튼 추가 -->
 		<div class="btn-group">
-		    <button type="button" th:onclick="@{|location.href='/auctionList'|}">목록으로</button>
+		    <button type="button" th:onclick="@{|location.href='/auctions'|}">목록으로</button>
 		
 		    <!-- 본인 경매 + 진행중일 때만 삭제 버튼 표시 -->
 		    <th:block th:if="${session.loginUser != null
 		                      and session.loginUser.memIdx == detail.buyerIdx
 		                      and detail.auctionStatusIdx == 1}">
-		        <form th:action="@{/auction/delete/{id}(id=${detail.auctionIdx})}"
+		        <form th:action="@{/auctions/{id}/delete(id=${detail.auctionIdx})}"
 		              method="post"
 		              onsubmit="return confirm('정말 삭제하시겠습니까?')"
 		              style="display:inline;">
@@ -95,7 +95,7 @@
                       or session.loginUser.memIdx != detail.buyerIdx)}">
         <h3>💰 입찰하기</h3>
 
-        <form id="bidForm" action="/auction/bid" method="post"
+        <form id="bidForm" th:action="@{/auctions/{id}/bids(id=${detail.auctionIdx})}" method="post"
               enctype="multipart/form-data">
             <input type="hidden" name="auctionIdx" th:value="${detail.auctionIdx}">
 
@@ -107,7 +107,9 @@
                     <img id="bidPreviewImg" style="max-width:200px; max-height:150px; border:1px solid #ddd; border-radius:4px;">
                 </div>
             </div>
-
+			
+			<input type="hidden" name="itemCategoryIdx" th:value="${detail.itemCategoryIdx}">
+			
             <div class="input-group">
                 <label>제안 가격 (₩)</label>
                 <input type="number" name="bidPrice" id="bidPrice"
@@ -157,7 +159,7 @@
 	            <!-- 입찰 번호 클릭하면 상세로 이동 (구매자만) -->
 				<td>
 				    <a th:if="${session.loginUser != null and session.loginUser.memIdx == detail.buyerIdx}"
-				       th:href="@{/auction/bid/detail/{id}(id=${bid.bidIdx})}"
+				       th:href="@{/bids/{id}(id=${bid.bidIdx})}"
 				       th:text="${status.count}">1</a>
 				    <span th:if="${session.loginUser == null or session.loginUser.memIdx != detail.buyerIdx}"
 				          th:text="${status.count}">1</span>
@@ -182,7 +184,7 @@
 					<form th:if="${session.loginUser.memIdx == detail.buyerIdx
 					              and bid.bidStatusIdx == 1
 					              and detail.auctionStatusIdx == 2}"
-					      th:action="@{/auction/bid/win/{id}(id=${bid.bidIdx})}"
+					      th:action="@{/auctions/{aId}/bids/{bId}/win(aId=${detail.auctionIdx},bId=${bid.bidIdx})}"
 					      method="post"
 					      style="display:inline;"
 					      onsubmit="return confirm('이 입찰을 낙찰하시겠습니까?')">
@@ -193,7 +195,7 @@
 	                <!-- 판매자: 취소 버튼 (진행중인 입찰에만) -->
 	                <th:block th:if="${session.loginUser.memIdx == bid.bidderIdx
 	                                  and bid.bidStatusIdx == 1}">
-	                    <form th:action="@{/auction/bid/delete/{id}(id=${bid.bidIdx})}"
+	                    <form th:action="@{/bids/{id}/cancel(id=${bid.bidIdx})}"
 	                          method="post"
 	                          style="display:inline;"
 	                          onsubmit="return confirm('입찰을 취소하시겠습니까?')">

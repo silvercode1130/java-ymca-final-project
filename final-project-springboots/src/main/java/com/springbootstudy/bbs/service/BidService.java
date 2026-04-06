@@ -6,7 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.springbootstudy.bbs.domain.AuctionListDTO;
 import com.springbootstudy.bbs.domain.BidListDTO;
+import com.springbootstudy.bbs.mapper.AuctionMapper;
 import com.springbootstudy.bbs.mapper.BidMapper;
 
 
@@ -15,6 +17,9 @@ public class BidService {
 	
 	@Autowired
 	private BidMapper bidMapper;
+	
+	@Autowired
+	private AuctionMapper auctionMapper;
 	
 	// 입찰 리스트 조회
     public List<BidListDTO> BidList(Long auctionIdx) {
@@ -42,7 +47,12 @@ public class BidService {
         if (bidDto.getBidPrice() % 1000 != 0) {
             throw new IllegalArgumentException("제안 가격은 1000원 단위로 입력해야 합니다.");
         }
-
+        
+        // 아이템 정보 저장
+        if(bidDto.getItemName() == null) bidDto.setItemName("입찰 제안 상품"); 
+        bidMapper.insertItem(bidDto);
+        
+        // 입찰 저장
         bidMapper.insertBid(bidDto);
     }
     
@@ -57,13 +67,14 @@ public class BidService {
     // 낙찰 처리 (구매자가 선택)
     @Transactional
     public void selectWinner(Long bidIdx, Long auctionIdx) {
-        // 선택된 입찰 낙찰
         int result = bidMapper.selectWinnerBid(bidIdx, auctionIdx);
         if (result == 0) {
             throw new IllegalArgumentException("낙찰 처리에 실패했습니다.");
         }
         // 나머지 입찰 실패 처리
         bidMapper.rejectOtherBids(auctionIdx, bidIdx);
+        // 경매 상태 즉시 마감(2)으로 변경 - 같은 트랜잭션 안에서!
+        auctionMapper.updateAuctionStatus(auctionIdx, 2);
     }
 
     // 입찰 단건 조회

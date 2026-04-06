@@ -12,6 +12,9 @@ public interface BidMapper {
 	// 특정 경매글에 달린 입찰 리스트 가져오기
     List<BidListDTO> BidList(Long auctionIdx);
     
+    // 아이템 등록 
+    void insertItem(BidListDTO bidDto);
+    
     // 입찰 등록하기
     int insertBid(BidListDTO bidDto);
     

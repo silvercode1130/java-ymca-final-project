@@ -17,19 +17,34 @@ public class AuctionService {
 	@Autowired
 	private AuctionMapper auctionMapper;
 	
-	// 경매 구매요청 전체 리스트 조회
-	public List<AuctionListDTO> AuctionList() {
-		
-		// DB에서 리스트 가져오기
-        List<AuctionListDTO> list = auctionMapper.auctionList();
-        
-        // 리스트를 하나씩 돌면서 '빈칸' 채우기
-        for (AuctionListDTO dto : list) {
-        	refine(dto);
-        }
-		
-        return list;
-    }
+	// AuctionList - 검색/카테고리 필터 추가
+	public List<AuctionListDTO> AuctionList(String keyword, Integer categoryIdx) {
+	    List<AuctionListDTO> list = auctionMapper.auctionList(keyword, categoryIdx);
+	    for (AuctionListDTO dto : list) {
+	        refine(dto);
+	    }
+	    return list;
+	}
+
+	// 수동 마감 (구매자가 직접 종료)
+	@Transactional
+	public void closeAuction(Long auctionIdx, Long buyerIdx) {
+	    AuctionListDTO detail = auctionMapper.auctionDetail(auctionIdx);
+	    if (detail == null || !detail.getBuyerIdx().equals(buyerIdx)) {
+	        throw new IllegalArgumentException("권한이 없습니다.");
+	    }
+	    if (detail.getAuctionStatusIdx() != 1) {
+	        throw new IllegalArgumentException("진행중인 경매만 마감할 수 있습니다.");
+	    }
+	    // 입찰 있으면 마감(2), 없으면 유찰(3)
+	    int statusIdx = (detail.getBidCount() != null && detail.getBidCount() > 0) ? 2 : 3;
+	    auctionMapper.updateAuctionStatus(auctionIdx, statusIdx);
+	}
+
+	// 상태 직접 변경 (유찰 처리 등)
+	public void updateAuctionStatus(Long auctionIdx, int statusIdx) {
+	    auctionMapper.updateAuctionStatus(auctionIdx, statusIdx);
+	}
 	
 	// 구매요청 상세보기 조회
 	public AuctionListDTO auctionDetail(Long auctionIdx) {
@@ -118,10 +133,6 @@ public class AuctionService {
 	        throw new IllegalArgumentException("결정 마감일은 입찰 마감일로부터 3일을 초과할 수 없습니다.");
 	    }
 	    
-	    
-	    
-	    // DB 저장
-	    auctionMapper.insertItem(dto);
 	    auctionMapper.insertAuction(dto);
 	}
 	

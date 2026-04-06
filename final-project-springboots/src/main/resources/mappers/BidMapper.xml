@@ -37,6 +37,26 @@
 	      AND bidder_idx = #{bidderIdx}
 	</update>
 	
+	<!-- 아이템 등록 -->
+	<insert id="insertItem" useGeneratedKeys="true" keyProperty="itemIdx" keyColumn="item_idx">
+	    INSERT INTO item (
+	        item_name,
+	        item_category_idx,
+	        item_thumbnail_img,
+	        item_condition,
+	        item_regdate,
+	        item_is_deleted
+	    ) VALUES (
+	        #{itemName},      
+	        #{itemCategoryIdx},
+	        #{itemThumbnailImg},
+	        'NEW',            
+	        NOW(),
+	        'N'
+	    )
+	</insert>
+	
+	<!-- 입찰 등록 -->
 	<insert id="insertBid">
 	    INSERT INTO bid (
 	        auction_idx,

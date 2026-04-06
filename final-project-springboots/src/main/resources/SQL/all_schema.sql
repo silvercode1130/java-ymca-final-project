@@ -8,7 +8,7 @@ GRANT ALL PRIVILEGES ON *.* TO 'final'@'localhost' WITH GRANT OPTION;
 -- 3. 설정한 권한을 지금 바로 적용하기 (새로고침 느낌)
 FLUSH PRIVILEGES;
 
--- 4. 방 만들기 (이름은 마음대로! 보통 프로젝트명으로)
+-- 4. 방 만들기 (이름은 마음대로 보통 프로젝트명으로)
 CREATE DATABASE final_project; 
 
 -- 5. 방 안으로 들어가기 (이걸 해야 에러가 안 남)
@@ -203,7 +203,7 @@ CREATE TABLE auction (
     auction_idx               BIGINT        NOT NULL AUTO_INCREMENT COMMENT 'PK',
     buyer_idx                 BIGINT        NOT NULL COMMENT 'FK → member.mem_idx (구매자)',
     item_category_idx         INT           NOT NULL COMMENT 'FK → item_category',
-    item_idx                  BIGINT        DEFAULT NULL COMMENT 'FK → item (구매자가 올린 상품 정보)',
+    auction_thumbnail_img     VARCHAR(200)  DEFAULT NULL COMMENT '경매 썸네일',
     auction_title             VARCHAR(200)  NOT NULL COMMENT '경매 제목',
     auction_desc              TEXT          NOT NULL COMMENT '경매 설명',
     auction_target_price      BIGINT        DEFAULT NULL COMMENT '희망 최대가 (nullable)',
@@ -226,9 +226,7 @@ CREATE TABLE auction (
     CONSTRAINT fk_auction_item_category
         FOREIGN KEY (item_category_idx) REFERENCES item_category(item_category_idx),
     CONSTRAINT fk_auction_status
-        FOREIGN KEY (auction_status_idx) REFERENCES auction_status(auction_status_idx),
-    CONSTRAINT fk_auction_item 
-        FOREIGN KEY (item_idx) REFERENCES item(item_idx)
+        FOREIGN KEY (auction_status_idx) REFERENCES auction_status(auction_status_idx)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='역경매 요청 테이블';
 
 -- 3-2) BID (입찰)

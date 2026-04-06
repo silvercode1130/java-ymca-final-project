@@ -16,8 +16,7 @@ public class AuctionListDTO {
     private String  auctionStatusName;  // 한글 상태명 (진행중/마감/유찰/취소 등)
     
     // Item 관련 (이미지)
-    private String itemThumbnailImg;
-    private Long itemIdx;     // 아이템 PK (저장할 때 필요)
+    private String auctionThumbnailImg;  // 이미지 - auction 테이블에 직접 저장
     private String itemBrand; // 브랜드 칸
     
     // ItemCategory 관련 (카테고리 번호, 이름)
