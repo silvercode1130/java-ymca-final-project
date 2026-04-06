@@ -11,7 +11,9 @@
 <body>
 <th:block layout:fragment="content">
 <div class="container py-4" style="max-width: 860px;">
-
+  <div class="mt-3">
+    <a class="btn btn-ghost btn-sm" th:href="${backUrl}">← 목록으로</a>
+  </div>
   <!-- 게시글 본문 -->
   <div class="board-card">
     <div class="board-title" th:text="${board.boardTitle}"></div>
@@ -164,9 +166,7 @@
     </div>
   </div>
 
-  <div class="mt-3">
-    <a class="btn btn-ghost btn-sm" th:href="${backUrl}">← 목록으로</a>
-  </div>
+
 
 </div>
 
