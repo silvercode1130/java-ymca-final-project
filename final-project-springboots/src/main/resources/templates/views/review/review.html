@@ -17,7 +17,8 @@
 				<thead>
 					<th:if>
 						<tr>
-							<th>상품명/제목</th> 
+							<th>거래 제목</th>
+							<th>상품명</th> 
 							<th>별점</th>      
 							<th>리뷰 작성일</th>
 		                    <th>관리</th>
@@ -25,10 +26,11 @@
 					</th:if>
 				</thead>
 				<tbody>
-					<tr>
-						<td></td>
-						<td></td>
-						<td></td>
+					<tr th:each="review : ${reviewList}">
+						<td>${review.auctionTitle}</td>
+						<td>${review.itemName}</td>
+						<td>${review.reviewStar}</td>
+						<td>${review.reviewRegdate}</td>
 						<td>
 							<button type="button">조회</button>
                         	<button type="button">삭제</button>

@@ -253,7 +253,7 @@ CREATE TABLE bid (
         FOREIGN KEY (item_idx) REFERENCES item(item_idx),
     CONSTRAINT fk_bid_status
         FOREIGN KEY (bid_status_idx) REFERENCES bid_status(bid_status_idx)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='입찰 테이블';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='입찰 테이블'; 
 
 
 /* ==========================================

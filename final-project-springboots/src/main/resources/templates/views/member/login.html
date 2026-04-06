@@ -39,12 +39,15 @@
 				<div class="bg-white border border-gray-200 rounded-xl shadow-sm">
 					<div class="border-b border-gray-200 px-6 py-4">
 						<h2 class="text-lg font-semibold text-gray-900">계정 정보 입력</h2>
-						<p class="text-sm text-gray-600 mt-1">아이디와 비밀번호를 입력해주세요</p>
 					</div>
 
 					<div class="px-6 py-6">
 						<form th:action="@{/members/login}" method="post"
 							class="space-y-6">
+							
+							<div style="font-weight: bold;" th:if="${loginMsg}">
+							    <span th:text="${loginMsg}"></span>
+							</div>
 
 							<!-- 아이디 -->
 							<div class="space-y-2">

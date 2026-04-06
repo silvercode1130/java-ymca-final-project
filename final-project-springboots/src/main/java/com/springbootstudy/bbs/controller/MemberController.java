@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,245 +25,260 @@ import jakarta.servlet.http.HttpSession;
 @Controller
 public class MemberController {
 
-	@Autowired
-	private MemberService memberService;
+   @Autowired
+   private MemberService memberService;
 
-	@Autowired
-	private MemberMapper memberMapper;
+   @Autowired
+   private MemberMapper memberMapper;
 
-	@Autowired
-	HttpServletRequest request;
+   @Autowired
+   HttpServletRequest request;
 
-	@Autowired
-	HttpSession session; 
+   @Autowired
+   HttpSession session; 
 
 
-	// 회원가입 -----------------------------------------------------------------
+   // 회원가입 -----------------------------------------------------------------
 
-	// signUp.html - 창 띄우기
-	@GetMapping("/members/signUp")
-	public String signUp() {
+   // signUp.html - 창 띄우기
+   @GetMapping("/members/signUp")
+   public String signUp() {
 
-		return "/views/member/signUp"; 
-	}
+      return "/views/member/signUp"; 
+   }
 
-	// signUp.html - 회원가입 처리 기능
-	// 회원가입 처리
-	@PostMapping("/members/signUp")
-	public String signUp(
-			@RequestParam("memId") String memId,
-			@RequestParam("memPwd") String memPwd,
-			@RequestParam("memName") String memName,
-			@RequestParam("memTel") String memTel,
-			@RequestParam("memEmail") String memEmail,
-			@RequestParam("emailDomain") String emailDomain,
-			@RequestParam("memIp") String memIp,
-			@RequestParam("memRoleIdx") Long memRoleIdx,
-			@RequestParam("memGradeIdx") int memGradeIdx,
-			Model model) {
-		
-		String fullEmail = memEmail + emailDomain;
+   // signUp.html - 회원가입 처리 기능
+   // 회원가입 처리
+   @PostMapping("/members/signUp")
+   public String signUp(
+         @RequestParam("memId") String memId,
+         @RequestParam("memPwd") String memPwd,
+         @RequestParam("memName") String memName,
+         @RequestParam("memTel") String memTel,
+         @RequestParam("memEmail") String memEmail,
+         @RequestParam("emailDomain") String emailDomain,
+         @RequestParam("memIp") String memIp,
+         @RequestParam("memRoleIdx") Long memRoleIdx,
+         @RequestParam("memGradeIdx") int memGradeIdx,
+         Model model) {
+      
+      String fullEmail = memEmail + emailDomain;
 
-		try {
-			memberService.insertMember(
-					memId, memPwd, memName, memTel, fullEmail,
-					memIp, memRoleIdx, memGradeIdx);
+      try {
+         memberService.insertMember(
+               memId, memPwd, memName, memTel, fullEmail,
+               memIp, memRoleIdx, memGradeIdx);
 
-			return "redirect:/main";
+         return "redirect:/main";
 
-		} catch (Exception e) {
-			e.printStackTrace();
+      } catch (Exception e) {
+         e.printStackTrace();
 
-			model.addAttribute("errorMessage", "회원가입 실패하였습니다");
-			return "views/member/signUp";  
-		}
-	}
+         model.addAttribute("errorMessage", "회원가입 실패하였습니다");
+         return "views/member/signUp";  
+      }
+   }
 
-	// signUp.html - 중복 아이디 검사
-	@ResponseBody
-	@GetMapping("/members/check_id")
-	public String check_id(@RequestParam("memId") String memId) {
+   // signUp.html - 중복 아이디 검사
+   @ResponseBody
+   @GetMapping("/members/check_id")
+   public String check_id(@RequestParam("memId") String memId) {
 
-		int count = memberMapper.countByMemId(memId);
-		boolean isDuplicate = count > 0; 
+      int count = memberMapper.countByMemId(memId);
+      boolean isDuplicate = count > 0; 
 
-		if (isDuplicate) {
-			return "duplicate"; 
-		} else {
-			return "ok";
-		}
-	}
+      if (isDuplicate) {
+         return "duplicate"; 
+      } else {
+         return "ok";
+      }
+   }
 
-	// 로그인 -----------------------------------------------------------------
+   // 로그인 -----------------------------------------------------------------
 
-	// login.html - 창 띄우기
-	@GetMapping("/members/login")
-	public String loginForm(HttpServletResponse response, HttpSession session, Model model) {
+   // login.html - 창 띄우기
+   @GetMapping("/members/login")
+   public String loginForm(@RequestParam(value = "redirect", required = false) String redirect, 
+		   		HttpServletResponse response, HttpSession session, Model model) {
 
-		// 뒤로가기 했을 때 로그인 안풀리는 기능
-		response.setHeader("Cache-Control", "no-store, no-cache, must-revalidate");
-	    response.setHeader("Pragma", "no-cache");
-	    response.setDateHeader("Expires", 0);
-		
-	    String msg = (String) session.getAttribute("loginMsg");
+       // 뒤로가기 했을 때 로그인 안풀리는 기능
+       response.setHeader("Cache-Control", "no-store, no-cache, must-revalidate");
+       response.setHeader("Pragma", "no-cache");
+       response.setDateHeader("Expires", 0);
+       
+       // 새로고침 했을 때 로그인 안풀리는 기능
+       if (session.getAttribute("loginUser") != null) {
+           return "redirect:/main"; 
+       }
+      
+       String msg = (String) session.getAttribute("loginMsg");
 
-	    if (msg != null) {
-	        model.addAttribute("loginMsg", msg);
-	        session.removeAttribute("loginMsg"); 
-	    }
+       // 로그인 메시지
+       if (msg != null) {
+           model.addAttribute("loginMsg", msg);
+           session.removeAttribute("loginMsg"); 
+       }
+       
+       // 로그인(인터셉터) 후 보던 페이지로 돌아오기
+       if (redirect != null) model.addAttribute("redirect", redirect);
 
-	    return "views/member/login";
-	}
-	
-	// 세션, 서블릿 리퀘스트를 넣고 -> 서비스 들고 옴(model로)
-	// login.html - 로그인 처리 기능
-	@PostMapping("/members/login")
-	public String login(@RequestParam("memId") String memId,
-	                    @RequestParam("memPwd") String memPwd,
-	                    Model model,
-	                    HttpSession session,
-	                    RedirectAttributes ra) throws ServletException, IOException {
 
-	    // 로그인 성공 여부 확인
-	    int result = memberService.login(memId, memPwd);
+       return "views/member/login";
+   }
+   
+   // 세션, 서블릿 리퀘스트를 넣고 -> 서비스 들고 옴(model로)
+   // login.html - 로그인 처리 기능
+   @PostMapping("/members/login")
+   public String login(@RequestParam("memId") String memId,
+                       @RequestParam("memPwd") String memPwd,
+                       @RequestParam(value = "redirect", required = false) String redirect,
+                       Model model,
+                       HttpSession session,
+                       RedirectAttributes ra) throws ServletException, IOException {
 
-	    if (result == -1) { // 아이디 없음
-	        ra.addFlashAttribute("error", "존재하지 않는 아이디입니다.");
-	        return "redirect:/members/login";
+       // 로그인 성공 여부 확인
+       int result = memberService.login(memId, memPwd);
 
-	    } else if (result == 0) { // 비밀번호 틀림
-	        ra.addFlashAttribute("error", "비밀번호가 틀립니다.");
-	        return "redirect:/members/login";
-	    }
+       if (result == -1) { // 아이디 없음
+           ra.addFlashAttribute("error", "존재하지 않는 아이디입니다.");
+           return "redirect:/members/login"; 
 
-	    // 로그인 성공 → 회원 정보 세션 저장
-	    MemberVO memberVO = memberService.getMemberVO(memId);
+       } else if (result == 0) { // 비밀번호 틀림
+           ra.addFlashAttribute("error", "비밀번호가 틀립니다.");
+           return "redirect:/members/login";
+       }
 
-	    session.setAttribute("isLogin", true);
-	    session.setAttribute("loginId", memId); 
-	    session.setAttribute("loginUser", memberVO); // 로그인 세션!!
+       // 로그인 성공 → 회원 정보 세션 저장
+       MemberVO memberVO = memberService.getMemberVO(memId);
 
-	    System.out.println("memberVO.name : " + memberVO.getMemName());
+       session.setAttribute("isLogin", true);
+       session.setAttribute("loginId", memId); 
+       session.setAttribute("loginUser", memberVO); // 로그인 세션!! 
+       
+       // 결제용 index 추가
+       session.setAttribute("memIdx", memberVO.getMemIdx()); 
 
-	    return "redirect:/main";
-	}
+       System.out.println("memberVO.name : " + memberVO.getMemName());
 
-	// 비번찾기 -----------------------------------------------------------------
-	// 회원정보 수정 / 삭제 기능이 구현 된 이후 구현할 예정!!
+       return "redirect:/main";
+   }
 
-	// pwdFind.html - 창 띄우기
-	@GetMapping("/members/pwdFind")
-	public String pwdFind() {
+   // 비번찾기 -----------------------------------------------------------------
+   // 회원정보 수정 / 삭제 기능이 구현 된 이후 구현할 예정!!
 
-		return "/views/member/pwdFind"; // ## 수정 - main 생기면 바꿔
-	}
-	
+   // pwdFind.html - 창 띄우기
+   @GetMapping("/members/pwdFind")
+   public String pwdFind() {
 
-	// 로그아웃 -----------------------------------------------------------------
+      return "/views/member/pwdFind"; // ## 수정 - main 생기면 바꿔
+   }
+   
 
-	@RequestMapping("/members/logout")
-	public String logout(HttpSession session) {	
-		
-		// 세션 지움
-		session.invalidate();
-		
-		return "redirect:/main"; 
-	}
+   // 로그아웃 -----------------------------------------------------------------
 
-	// 탈퇴 --------------------------------------------------------------------
+   @RequestMapping("/members/logout")
+   public String logout(HttpSession session) {   
+      
+      // 세션 지움
+      session.invalidate();
+      
+      return "redirect:/main"; 
+   }
 
-	@GetMapping("/memberDelete")
-	public String deleteMember(HttpSession session, HttpServletResponse response) throws IOException {
+   // 탈퇴 --------------------------------------------------------------------
 
-		String memId = (String) session.getAttribute("loginId");
+   @GetMapping("/memberDelete")
+   public String deleteMember(HttpSession session, HttpServletResponse response) throws IOException {
 
-	    // 로그인도 안하고 가입하려 하면 로그인 화면으로
-	    if(memId == null) {
-	        return "redirect:/members/login";
-	    }
+      String memId = (String) session.getAttribute("loginId");
 
-	    int result = memberService.deleteMember(memId); 
+       // 로그인도 안하고 가입하려 하면 로그인 화면으로
+       if(memId == null) {
+           return "redirect:/members/login";
+       }
 
-		if (result == 1) {
-			session.invalidate(); // 세션 제거
+       int result = memberService.deleteMember(memId); 
 
-	        // 탈퇴 시 띄울 alert창
-	        response.setContentType("text/html; charset=utf-8");
-	        PrintWriter out = response.getWriter();
-	        out.println("<script>");
-	        out.println(" alert('회원 탈퇴가 완료되었습니다.');");
-	        out.println(" location.href='/main';");
-	        out.println("</script>");
-	        return null;  
-	    }
+      if (result == 1) {
+         session.invalidate(); // 세션 제거
 
-	    return "redirect:/main";	
-	}
-	
-	
-	// 회원정보 수정 -----------------------------------------------------------------
+           // 탈퇴 시 띄울 alert창
+           response.setContentType("text/html; charset=utf-8");
+           PrintWriter out = response.getWriter();
+           out.println("<script>");
+           out.println(" alert('회원 탈퇴가 완료되었습니다.');");
+           out.println(" location.href='/main';");
+           out.println("</script>");
+           return null;  
+       }
 
-		// memberUpdate.html - 창 띄우기
-		@GetMapping("/members/memberUpdate")
-		public String memberUpdate(HttpSession session, Model model) {
+       return "redirect:/main";   
+   }
+   
+   
+   // 회원정보 수정 -----------------------------------------------------------------
 
-			/*
-			 * 로그인 한 뒤 -> 회원 정보를 받아서 페이지를 열어야 함
-			 * 안그러면 500 에러
-			 * 회원정보를 받을려면 로그인 할 때 값을 담은 session과 model이 필요함
-			 */
-			// 로그인 정보 가져오기
-			MemberVO memberVO = (MemberVO) session.getAttribute("loginUser");
+      // memberUpdate.html - 창 띄우기
+      @GetMapping("/members/memberUpdate")
+      public String memberUpdate(HttpSession session, Model model) {
 
-			// 로그인 안했으면 쫓아내기
-			if (memberVO == null) {
-				return "redirect:/members/login"; 
-			}
-			
-			String gradeName = memberMapper.selectGradeNameByMemId(memberVO.getMemId());
-			
-			model.addAttribute("memberVO", memberVO); 
-			model.addAttribute("gradeName", gradeName);	
+         /*
+          * 로그인 한 뒤 -> 회원 정보를 받아서 페이지를 열어야 함
+          * 안그러면 500 에러
+          * 회원정보를 받을려면 로그인 할 때 값을 담은 session과 model이 필요함
+          */
+         // 로그인 정보 가져오기
+         MemberVO memberVO = (MemberVO) session.getAttribute("loginUser");
 
-			return "views/member/memberUpdate"; 
-		}
-		
-		// memberUpdate.html - 수정하기
-		@PostMapping("/members/memberUpdate")
-		public String memberUpdate(MemberVO vo,
-		        @RequestParam(value="newPwd", required = false) String newPwd,
-		        HttpSession session) {
-			 
-			// 세션에서 회원 조회
-			MemberVO sessionUser = (MemberVO) session.getAttribute("loginUser");
+         // 로그인 안했으면 쫓아내기
+         if (memberVO == null) {
+            return "redirect:/members/login"; 
+         }
+         
+         String gradeName = memberMapper.selectGradeNameByMemId(memberVO.getMemId());
+         
+         model.addAttribute("memberVO", memberVO); 
+         model.addAttribute("gradeName", gradeName);   
 
-		    // null이면 로그인부터
-		    if (sessionUser == null) {
-		    	return "redirect:/members/login"; 
-		    }
+         return "views/member/memberUpdate"; 
+      }
+      
+      // memberUpdate.html - 수정하기
+      @PostMapping("/members/memberUpdate")
+      public String memberUpdate(MemberVO vo,
+              @RequestParam(value="newPwd", required = false) String newPwd,
+              HttpSession session) {
+          
+         // 세션에서 회원 조회
+         MemberVO sessionUser = (MemberVO) session.getAttribute("loginUser");
 
-		    // not null 값 값 넣기
-		    vo.setMemId(sessionUser.getMemId());
-		    vo.setMemIdx(sessionUser.getMemIdx());
-		    vo.setMemGradeIdx(sessionUser.getMemGradeIdx());
-		    vo.setMemIp(sessionUser.getMemIp());
+          // null이면 로그인부터
+          if (sessionUser == null) {
+             return "redirect:/members/login"; 
+          }
 
-		    // 비번 발급
-		    if (newPwd != null && !newPwd.isEmpty()) {
-		        vo.setMemPwd(newPwd);
-		    } else {
-		        vo.setMemPwd(sessionUser.getMemPwd());
-		    }
+          // not null 값 값 넣기
+          vo.setMemId(sessionUser.getMemId());
+          vo.setMemIdx(sessionUser.getMemIdx());
+          vo.setMemGradeIdx(sessionUser.getMemGradeIdx());
+          vo.setMemIp(sessionUser.getMemIp());
 
-		    //memberMapper.update(vo);	
-		    memberService.updateMember(vo);
+          // 비번 발급
+          if (newPwd != null && !newPwd.isEmpty()) {
+              vo.setMemPwd(newPwd);
+          } else {
+              vo.setMemPwd(sessionUser.getMemPwd());
+          }
 
-		    // 수정된 정보로 저장
-		    MemberVO updated = memberMapper.selectOneFromId(vo.getMemId()); 
-		    session.setAttribute("loginUser", updated);
+          //memberMapper.update(vo);   
+          memberService.updateMember(vo);
 
-		    return "redirect:/main"; 
-		} 
+          // 수정된 정보로 저장
+          MemberVO updated = memberMapper.selectOneFromId(vo.getMemId()); 
+          session.setAttribute("loginUser", updated);
+
+          return "redirect:/main"; 
+      } 
 
 
 }
