@@ -3,18 +3,25 @@ package com.springbootstudy.bbs.service;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.springbootstudy.bbs.domain.BidListDTO;
 import com.springbootstudy.bbs.mapper.BidMapper;
 
+import lombok.RequiredArgsConstructor;
+
 
 @Service
+@RequiredArgsConstructor
 public class BidService {
 	
 	@Autowired
 	private BidMapper bidMapper;
+	
+	@Autowired
+	private SimpMessagingTemplate messagingTemplate;
 	
 	// 입찰 리스트 조회
     public List<BidListDTO> BidList(Long auctionIdx) {
@@ -32,18 +39,35 @@ public class BidService {
     }
     
     // 입찰 등록
+    @Transactional
     public void registerBid(BidListDTO bidDto) {
 
         // 입찰가 검증 - 음수/0 방지
         if (bidDto.getBidPrice() == null || bidDto.getBidPrice() <= 0) {
             throw new IllegalArgumentException("제안 가격은 0원보다 커야 합니다.");
         }
-        // 100원 단위 검증
+        // 1000원 단위 검증
         if (bidDto.getBidPrice() % 1000 != 0) {
             throw new IllegalArgumentException("제안 가격은 1000원 단위로 입력해야 합니다.");
         }
 
         bidMapper.insertBid(bidDto);
+        
+        // 웹소켓 알림 발행
+        
+        Long auctionIdx = bidDto.getAuctionIdx();
+        Long bidIdx = bidDto.getBidIdx();
+        Long bidderIdx = bidDto.getBidderIdx();
+        
+        BidEventMessage event = new BidEventMessage (
+        		"Bid_CREATED",
+        		auctionIdx,
+        		bidIdx,
+        		bidderIdx,
+        		bidDto.getBidPrice()
+        		);
+        
+        messagingTemplate.convertAndSend("/topic/auction/"+auctionIdx, event);
     }
     
     // 입찰 삭제 - 소프트 딜리트
@@ -84,5 +108,6 @@ public class BidService {
             throw new IllegalArgumentException("수정 권한이 없거나 이미 처리된 입찰입니다.");
         }
     }
+    
     
 }
