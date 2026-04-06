@@ -34,14 +34,24 @@
 			      <div class="page-title"
 			           th:text="${currentType != null} ? ${currentType.boardTypeName} : '전체 게시판'">전체 게시판</div>
 			      <!-- 카테고리 목록: 바로 글쓰기 / 전체 목록: 카테고리 선택 모달 -->
+			      <!-- 로그인 O: 기존 동작 -->
 			      <span th:if="${session.loginUser != null}">
 			        <a th:if="${typeCode != null}"
 			           th:href="@{/boards/{tc}/new(tc=${typeCode})}"
 			           class="btn-write">+ 글쓰기</a>
-					<button th:if="${typeCode == null}" 
+					<button th:if="${typeCode == null}"
 						class="btn-write" style="cursor: pointer;"
 						onclick="document.getElementById('categoryModal').style.display='flex'">+ 글쓰기</button>
 				</span>
+			      <!-- 로그인 X: 로그인 페이지로 이동 -->
+			      <span th:if="${session.loginUser == null}">
+			        <a th:if="${typeCode != null}"
+			           th:href="@{/members/login(redirect='/boards/' + ${typeCode} + '/new')}"
+			           class="btn-write">+ 글쓰기</a>
+			        <a th:if="${typeCode == null}"
+			           th:href="@{/members/login(redirect='/boards?page=' + ${currentPage})}"
+			           class="btn-write">+ 글쓰기</a>
+			      </span>
 			</div>
 	
 			<!-- 카테고리 선택 모달 (전체 목록 글쓰기용) -->
@@ -104,7 +114,7 @@
 							class="badge-type" th:text="${b.boardTypeName}"></a>
 						</td>
 						<td>
-							<a th:href="${typeCode == null} ? @{/boards/{tc}/{id}(tc=${b.boardTypeCode}, id=${b.boardIdx}, from='all')} : @{/boards/{tc}/{id}(tc=${b.boardTypeCode}, id=${b.boardIdx})}">
+							<a th:href="${typeCode == null} ? @{/boards/{tc}/{id}(tc=${b.boardTypeCode}, id=${b.boardIdx}, from='all', page=${currentPage})} : @{/boards/{tc}/{id}(tc=${b.boardTypeCode}, id=${b.boardIdx}, page=${currentPage})}">
 								<span th:text="${b.boardTitle}"></span>
 							</a>
 							<span th:if="${b.replyCount > 0}" class="reply-count"> 💬

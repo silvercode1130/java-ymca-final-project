@@ -93,19 +93,41 @@ public class BoardController {
             @PathVariable("typeCode")  String typeCode,
             @PathVariable("boardIdx")  Long   boardIdx,
             @RequestParam(value = "from", required = false) String from,
+            @RequestParam(value = "page", defaultValue = "1") int page,
+            @RequestParam(value = "replyPage", defaultValue = "1") int replyPage,
+            @RequestParam(value = "sortType", defaultValue = "oldest") String sortType,
             Model model
     ) {
-        BoardVO       board   = boardService.getBoardDetail(boardIdx);
-        List<ReplyVO> replies = boardService.getReplies(boardIdx);
+        BoardVO board = boardService.getBoardDetail(boardIdx);
 
-        // from=all 이면 전체 목록, 없거나 카테고리코드면 해당 카테고리 목록
-        String backUrl = "all".equals(from) ? "/boards" : "/boards/" + typeCode;
+        int replyPageSize  = 20;
+        int replyBlockSize = 10;
+        int totalReplies   = boardService.getReplyCount(boardIdx); // 전체 댓글 수 기준
+        int totalReplyPages = (int) Math.ceil((double) totalReplies / replyPageSize);
+        if (totalReplyPages == 0) totalReplyPages = 1;
+        if (replyPage < 1) replyPage = 1;
+        if (replyPage > totalReplyPages) replyPage = totalReplyPages;
 
-        model.addAttribute("board",      board);
-        model.addAttribute("replies",    replies);
-        model.addAttribute("typeCode",   typeCode);
-        model.addAttribute("backUrl",    backUrl);
-        model.addAttribute("boardTypes", boardService.getBoardTypes());
+        int replyBlockStart = ((replyPage - 1) / replyBlockSize) * replyBlockSize + 1;
+        int replyBlockEnd   = Math.min(replyBlockStart + replyBlockSize - 1, totalReplyPages);
+
+        List<ReplyVO> replies = boardService.getRepliesPaged(boardIdx, replyPage, sortType);
+
+        String backUrl = "all".equals(from)
+                ? "/boards?page=" + page
+                : "/boards/" + typeCode + "?page=" + page;
+
+        model.addAttribute("board",            board);
+        model.addAttribute("replies",          replies);
+        model.addAttribute("typeCode",         typeCode);
+        model.addAttribute("backUrl",          backUrl);
+        model.addAttribute("boardTypes",       boardService.getBoardTypes());
+        model.addAttribute("replyPage",        replyPage);
+        model.addAttribute("totalReplyPages",  totalReplyPages);
+        model.addAttribute("replyBlockStart",  replyBlockStart);
+        model.addAttribute("replyBlockEnd",    replyBlockEnd);
+        model.addAttribute("totalReplies",     totalReplies);
+        model.addAttribute("sortType",         sortType);
         return "views/board/boardDetail";
     }
 
@@ -214,6 +236,8 @@ public class BoardController {
             @PathVariable("boardIdx") Long   boardIdx,
             @RequestParam("replyContent") String replyContent,
             @RequestParam(value = "parentReplyIdx", required = false) Long parentReplyIdx,
+            @RequestParam(value = "replyPage", defaultValue = "1") int replyPage,
+            @RequestParam(value = "sortType", defaultValue = "oldest") String sortType,
             HttpServletRequest request,
             HttpSession session
     ) {
@@ -226,8 +250,28 @@ public class BoardController {
         reply.setReplyContent(replyContent);
         reply.setReplyIp(getClientIp(request));
 
-        boardService.writeReply(reply, parentReplyIdx);
-        return "redirect:/boards/" + typeCode + "/" + boardIdx;
+        int result = boardService.writeReply(reply, parentReplyIdx);
+        if (result == -1) {
+            return "redirect:/boards/" + typeCode + "/" + boardIdx
+                    + "?replyPage=" + replyPage + "&sortType=" + sortType + "&replyLimitExceeded=true";
+        }
+
+        // 등록 후 자신의 댓글이 있는 페이지 계산
+        int totalRootReplies = boardService.getReplyCount(boardIdx); // 전체 댓글 수 기준
+        int totalReplyPages = (int) Math.ceil((double) totalRootReplies / 20);
+        if (totalReplyPages == 0) totalReplyPages = 1;
+
+        int targetPage;
+        if (parentReplyIdx == null) {
+            // 원댓글: 등록순이면 마지막 페이지, 최신순이면 1페이지
+            targetPage = "oldest".equals(sortType) ? totalReplyPages : 1;
+        } else {
+            // 대댓글: 현재 보던 페이지 유지
+            targetPage = replyPage;
+        }
+
+        return "redirect:/boards/" + typeCode + "/" + boardIdx
+                + "?replyPage=" + targetPage + "&sortType=" + sortType;
     }
 
     // ── 댓글 삭제 ────────────────────────────────────────────

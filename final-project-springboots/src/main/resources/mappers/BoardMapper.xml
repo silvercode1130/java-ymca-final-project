@@ -162,9 +162,13 @@
                b.board_moddate,
                b.board_is_deleted,
                bt.board_type_code,
-               bt.board_type_name
+               bt.board_type_name,
+               mp.mem_nickname,
+               m.mem_id
         FROM board b
-        LEFT JOIN board_type bt ON b.board_type_idx = bt.board_type_idx
+        LEFT JOIN board_type bt     ON b.board_type_idx = bt.board_type_idx
+        LEFT JOIN member_profile mp ON b.mem_idx = mp.mem_idx
+        LEFT JOIN member m          ON b.mem_idx = m.mem_idx
         WHERE b.board_idx = #{boardIdx}
           AND b.board_is_deleted = 'N'
     </select>
@@ -220,23 +224,68 @@
           AND reply_is_deleted = 'N'
     </select>
 
-    <!-- 댓글 목록 -->
-    <select id="findRepliesByBoard" resultType="ReplyVO">
-        SELECT reply_idx,
-               board_idx,
-               mem_idx,
-               reply_content,
-               reply_ip,
-               reply_regdate,
-               reply_moddate,
-               reply_is_deleted,
-               reply_ref,
-               reply_step,
-               reply_depth
+    <!-- 댓글 목록 (페이징) -->
+    <select id="findRepliesByBoardPaged" resultType="ReplyVO">
+        SELECT r.reply_idx,
+               r.board_idx,
+               r.mem_idx,
+               r.reply_content,
+               r.reply_ip,
+               r.reply_regdate,
+               r.reply_moddate,
+               r.reply_is_deleted,
+               r.reply_ref,
+               r.reply_step,
+               r.reply_depth,
+               mp.mem_nickname,
+               m.mem_id
+        FROM reply r
+        LEFT JOIN member m          ON r.mem_idx = m.mem_idx
+        LEFT JOIN member_profile mp ON r.mem_idx = mp.mem_idx
+        WHERE r.board_idx = #{boardIdx}
+          AND r.reply_is_deleted = 'N'
+        <choose>
+            <when test="sortType == 'latest'">
+                ORDER BY r.reply_ref DESC, r.reply_step ASC
+            </when>
+            <otherwise>
+                ORDER BY r.reply_ref ASC, r.reply_step ASC
+            </otherwise>
+        </choose>
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <!-- 원댓글 수 (페이징 기준: depth=0인 원댓글 그룹 수) -->
+    <select id="countRootRepliesByBoard" resultType="int">
+        SELECT COUNT(DISTINCT reply_ref)
         FROM reply
         WHERE board_idx = #{boardIdx}
           AND reply_is_deleted = 'N'
-        ORDER BY reply_ref ASC, reply_step ASC
+          AND reply_depth = 0
+    </select>
+
+
+    <!-- 댓글 목록 -->
+    <select id="findRepliesByBoard" resultType="ReplyVO">
+        SELECT r.reply_idx,
+               r.board_idx,
+               r.mem_idx,
+               r.reply_content,
+               r.reply_ip,
+               r.reply_regdate,
+               r.reply_moddate,
+               r.reply_is_deleted,
+               r.reply_ref,
+               r.reply_step,
+               r.reply_depth,
+               mp.mem_nickname,
+               m.mem_id
+        FROM reply r
+        LEFT JOIN member m          ON r.mem_idx = m.mem_idx
+        LEFT JOIN member_profile mp ON r.mem_idx = mp.mem_idx
+        WHERE r.board_idx = #{boardIdx}
+          AND r.reply_is_deleted = 'N'
+        ORDER BY r.reply_ref DESC, r.reply_step ASC
     </select>
 
     <!-- 댓글 등록 -->

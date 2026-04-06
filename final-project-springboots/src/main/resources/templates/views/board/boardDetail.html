@@ -19,7 +19,7 @@
       <span>📂 <a th:href="@{/boards/{tc}(tc=${board.boardTypeCode})}"
                   th:text="${board.boardTypeName}"
                   style="color:#c6f135; text-decoration:none;"></a></span>
-      <span>✍️ <span th:text="${board.memIdx}">작성자</span></span>
+      <span>✍️ <span th:text="${board.memNickname != null} ? ${board.memNickname} : ${board.memId}">작성자</span></span>
       <span>👁 <span th:text="${board.boardViewCount}">0</span></span>
       <span>🕐 <span th:text="${#temporals.format(board.boardRegdate, 'yyyy-MM-dd HH:mm')}"></span></span>
     </div>
@@ -41,8 +41,23 @@
 
   <!-- 댓글 섹션 -->
   <div class="reply-section">
-    <h5>💬 댓글 <span th:text="${#lists.size(replies)}">0</span>개</h5>
+    <div class="d-flex justify-content-between align-items-center mb-2">
+      <h5 class="mb-0">💬 댓글 <span th:text="${totalReplies}">0</span>개</h5>
+      <!-- 정렬 선택 -->
+      <div>
+        <a th:href="@{/boards/{tc}/{id}(tc=${typeCode}, id=${board.boardIdx}, replyPage=1, sortType='oldest')}"
+           class="btn btn-sm"
+           th:classappend="${sortType == 'oldest'} ? ' btn-lime' : ' btn-ghost'">등록순</a>
+        <a th:href="@{/boards/{tc}/{id}(tc=${typeCode}, id=${board.boardIdx}, replyPage=1, sortType='latest')}"
+           class="btn btn-sm"
+           th:classappend="${sortType == 'latest'} ? ' btn-lime' : ' btn-ghost'">최신순</a>
+      </div>
+    </div>
 
+    <!-- 대댓글 초과 알림 (alert) -->
+    <th:block th:if="${param.replyLimitExceeded != null}">
+      <script>alert('대댓글은 최대 3개까지만 작성할 수 있습니다.');</script>
+    </th:block>
     <div th:each="r : ${replies}" class="reply-item">
       <div class="d-flex align-items-start gap-2">
         <span th:style="'margin-left:' + (${r.replyDepth} * 20) + 'px'">
@@ -51,15 +66,34 @@
         <div class="flex-grow-1">
           <div class="reply-content" th:text="${r.replyContent}"></div>
           <div class="reply-meta d-flex gap-3">
-            <span th:text="${r.memIdx}">작성자</span>
+            <span th:text="${r.memNickname != null} ? ${r.memNickname} : ${r.memId}">작성자</span>
             <span th:text="${#temporals.format(r.replyRegdate, 'MM-dd HH:mm')}"></span>
-            <span class="reply-toggle"
-                  th:onclick="'toggleReplyForm(' + ${r.replyIdx} + ')'">↩ 답글</span>
+            <!-- 로그인 O -->
+            <th:block th:if="${session.loginUser != null}">
+              <span th:if="${r.replyDepth < 3}"
+                    class="reply-toggle"
+                    th:onclick="'toggleReplyForm(' + ${r.replyIdx} + ')'">↩ 답글</span>
+              <span th:if="${r.replyDepth >= 3}"
+                    class="reply-toggle"
+                    onclick="alert('더 이상 답글을 작성할 수 없습니다.')">↩ 답글</span>
+            </th:block>
+            <!-- 로그인 X -->
+            <th:block th:if="${session.loginUser == null}">
+              <a th:if="${r.replyDepth < 3}"
+                 th:href="@{/members/login(redirect='/boards/' + ${typeCode} + '/' + ${board.boardIdx} + '?replyPage=' + ${replyPage} + '&openReply=' + ${r.replyIdx})}"
+                 class="reply-toggle" style="text-decoration:none;">↩ 답글</a>
+              <span th:if="${r.replyDepth >= 3}"
+                    class="reply-toggle"
+                    onclick="alert('더 이상 답글을 작성할 수 없습니다.')">↩ 답글</span>
+            </th:block>
           </div>
           <div th:id="'replyForm-' + ${r.replyIdx}" style="display:none; margin-top:.5rem;">
             <form th:action="@{/boards/{tc}/{id}/replies(tc=${typeCode}, id=${board.boardIdx})}"
-                  method="post" class="reply-form">
+                  method="post" class="reply-form"
+                  onsubmit="return validateReply(this.querySelector('textarea'))">
               <input type="hidden" name="parentReplyIdx" th:value="${r.replyIdx}">
+              <input type="hidden" name="replyPage" th:value="${replyPage}">
+              <input type="hidden" name="sortType" th:value="${sortType}">
               <textarea name="replyContent" rows="2" class="form-control form-control-sm mb-1"
                         placeholder="답글을 입력하세요"></textarea>
               <button type="submit" class="btn btn-lime btn-sm">등록</button>
@@ -80,14 +114,33 @@
 
     <div th:if="${session.loginUser != null}" class="mt-3">
       <form th:action="@{/boards/{tc}/{id}/replies(tc=${typeCode}, id=${board.boardIdx})}"
-            method="post" class="reply-form">
+            method="post" class="reply-form"
+            onsubmit="return validateReply(this.querySelector('textarea'))">
+        <input type="hidden" name="replyPage" th:value="${replyPage}">
+        <input type="hidden" name="sortType" th:value="${sortType}">
         <textarea name="replyContent" rows="3" class="form-control mb-2"
                   placeholder="댓글을 입력하세요"></textarea>
         <button type="submit" class="btn btn-lime btn-sm">💬 댓글 등록</button>
       </form>
     </div>
     <div th:if="${session.loginUser == null}" class="mt-3" style="color:#666; font-size:.9rem;">
-      댓글을 작성하려면 <a th:href="@{/members/login(redirect='/boards/' + ${typeCode} + '/' + ${board.boardIdx})}" style="color:#c6f135">로그인</a>이 필요합니다.
+      댓글을 작성하려면 <a th:href="@{/members/login(redirect='/boards/' + ${typeCode} + '/' + ${board.boardIdx})}" style="color:#c6f135">로그인</a>이 필요합니다. <!-- 수정되었음 -->
+
+    </div>
+
+    <!-- 댓글 페이지네이션 -->
+    <div class="pagination-wrap" th:if="${totalReplyPages > 1}">
+      <a th:if="${replyBlockStart > 1}"
+         th:href="@{/boards/{tc}/{id}(tc=${typeCode}, id=${board.boardIdx}, replyPage=${replyBlockStart - 1}, sortType=${sortType})}"
+         class="page-btn">이전</a>
+      <a th:each="p : ${#numbers.sequence(replyBlockStart, replyBlockEnd)}"
+         th:href="@{/boards/{tc}/{id}(tc=${typeCode}, id=${board.boardIdx}, replyPage=${p}, sortType=${sortType})}"
+         th:text="${p}"
+         class="page-btn"
+         th:classappend="${p == replyPage} ? ' active' : ''"></a>
+      <a th:if="${replyBlockEnd < totalReplyPages}"
+         th:href="@{/boards/{tc}/{id}(tc=${typeCode}, id=${board.boardIdx}, replyPage=${replyBlockEnd + 1}, sortType=${sortType})}"
+         class="page-btn">다음</a>
     </div>
   </div>
 
@@ -99,12 +152,7 @@
 
 <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
 <script th:src="@{/bootstrap/bootstrap.bundle.min.js}"></script>
-<script>
-function toggleReplyForm(replyIdx) {
-  const el = document.getElementById('replyForm-' + replyIdx);
-  el.style.display = el.style.display === 'none' ? 'block' : 'none';
-}
-</script>
+<script th:src="@{/js/reply.js}"></script>
 </th:block>
 </body>
 </html>

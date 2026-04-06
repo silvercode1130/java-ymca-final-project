@@ -72,16 +72,26 @@ public class BoardService {
         return boardMapper.findRepliesByBoard(boardIdx);
     }
 
+    // ── 댓글 목록 (페이징) ────────────────────────────────────
+    public List<ReplyVO> getRepliesPaged(Long boardIdx, int page, String sortType) {
+        int limit  = 20;
+        int offset = (page - 1) * limit;
+        return boardMapper.findRepliesByBoardPaged(boardIdx, offset, limit, sortType);
+    }
+
+    // ── 원댓글 그룹 수 (페이징 기준) ──────────────────────────
+    public int countRootReplies(Long boardIdx) {
+        return boardMapper.countRootRepliesByBoard(boardIdx);
+    }
+
     // ── 댓글 등록 ────────────────────────────────────────────
     // parentReplyIdx == null 이면 원댓, 있으면 대댓
     public int writeReply(ReplyVO reply, Long parentReplyIdx) {
         if (parentReplyIdx == null) {
-            // 원댓: ref/step/depth 모두 0으로 insert 후 ref = 자기 idx로 update
             reply.setReplyRef(0);
             reply.setReplyStep(0);
             reply.setReplyDepth(0);
             boardMapper.insertReply(reply);
-            // ref를 자기 자신 idx로 세팅 (원댓 그룹 식별자)
             ReplyVO update = new ReplyVO();
             update.setReplyIdx(reply.getReplyIdx());
             update.setReplyRef(reply.getReplyIdx().intValue());
@@ -94,15 +104,17 @@ public class BoardService {
             boardMapper.updateReplyRef(update);
             return 1;
         } else {
-            // 대댓: 부모 댓글 정보 조회
             ReplyVO parent = boardMapper.findReplyById(parentReplyIdx);
             int ref   = parent.getReplyRef();
             int step  = parent.getReplyStep();
             int depth = parent.getReplyDepth();
 
-            // 같은 ref 그룹에서 step > 부모 step 인 것들 +1 밀기
-            boardMapper.shiftReplyStep(reply.getBoardIdx(), ref, step);
+            // 대댓글 depth 3 제한 (대대대댓글까지만 허용)
+            if (depth >= 3) {
+                return -1; // 제한 초과
+            }
 
+            boardMapper.shiftReplyStep(reply.getBoardIdx(), ref, step);
             reply.setReplyRef(ref);
             reply.setReplyStep(step + 1);
             reply.setReplyDepth(depth + 1);

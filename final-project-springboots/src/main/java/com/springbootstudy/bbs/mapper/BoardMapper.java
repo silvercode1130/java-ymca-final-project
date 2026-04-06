@@ -63,6 +63,18 @@ public interface BoardMapper {
     // ── 댓글 ─────────────────────────────────────────────────
     List<ReplyVO> findRepliesByBoard(@Param("boardIdx") Long boardIdx);
 
+    // 댓글 목록 (페이징)
+    List<ReplyVO> findRepliesByBoardPaged(
+            @Param("boardIdx") Long boardIdx,
+            @Param("offset")   int  offset,
+            @Param("limit")    int  limit,
+            @Param("sortType") String sortType
+    );
+
+    // 원댓글 그룹 수 (페이징 기준)
+    int countRootRepliesByBoard(@Param("boardIdx") Long boardIdx);
+
+
     // 원댓 등록 (ref = 자기 자신 idx, step=0, depth=0)
     int insertReply(ReplyVO reply);
 

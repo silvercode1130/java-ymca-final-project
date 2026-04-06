@@ -73,9 +73,9 @@
 }
 
 /* ── 게시글 상세 ───────────────────────────────────────── */
-.board-card { background: #c6f135; border-radius: 12px; padding: 2rem; margin-bottom: 1.5rem; }
-.board-title { font-size: 1.5rem; font-weight: 700; color: #fff; margin-bottom: .5rem; }
-.board-meta { font-size: .82rem; color: #777; margin-bottom: 1.5rem; }
+.board-card { background: #fff; border-radius: 12px; padding: 2rem; margin-bottom: 1.5rem; }
+.board-title { font-size: 1.5rem; font-weight: 700; color: #0d0d0d; margin-bottom: .5rem; }
+.board-meta { font-size: .82rem; color: #0d0d0d; margin-bottom: 1.5rem; }
 .board-meta span { margin-right: 1rem; }
 .board-content { line-height: 1.8; color: #ccc; white-space: pre-wrap; }
 

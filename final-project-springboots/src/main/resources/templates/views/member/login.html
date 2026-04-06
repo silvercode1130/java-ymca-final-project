@@ -46,6 +46,14 @@
 						<form th:action="@{/members/login}" method="post"
 							class="space-y-6">
 
+							<!--
+							  [변경 필요] 아래 hidden input 추가:
+							  <input type="hidden" name="redirect" th:value="${redirect}">
+							  이유: boardDetail에서 로그인 링크 클릭 시 redirect 파라미터로 게시글 URL이 전달됨.
+							       이를 form에 hidden으로 유지해야 POST 로그인 처리 시 MemberController로 전달됨.
+							-->
+							<input type="hidden" name="redirect" th:value="${redirect}"> <!-- 수정되었음 -->
+
 							<!-- 아이디 -->
 							<div class="space-y-2">
 								<label for="memId" class="text-sm font-medium text-gray-900">아이디</label>
