@@ -1,10 +1,8 @@
 package com.springbootstudy.bbs.domain;
 
 import java.time.LocalDateTime;
-
 import lombok.Data;
 
-//역경매 요청(구매자 기준 경매)
 @Data
 public class AuctionVO {
 

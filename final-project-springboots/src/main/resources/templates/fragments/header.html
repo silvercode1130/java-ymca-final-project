@@ -1,67 +1,103 @@
 <!DOCTYPE html>
-	<!-- 강사님이랑 같은 thymeleaf식 회원가입 / 로그인 구현할 때 
-		필수적으로 있어야 해서 추가해뒀어요 (없으면 창 자체가 안떠요 - mai_layout.html 20번쯤 참고)
-		나중에 main 만드시는 분이 수정 부탁드려요 -->
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
-	<!--/* header  */-->
-	<!--/* header라는 프래그먼트를 정의	*/-->
-	<div th:fragment="header" class="row border-bottom border-primary">
-		<div class="col-4">
-			<!-- <p><img src="https://via.placeholder.com/200x100"></p> -->
-		</div>
-		<div class="col-8">
-			<div class="row">
-				<div class="col">
-					<ul class="nav justify-content-end">
-						<li class="nav-item">
-							<!--/* session에 isLogin 값을 비교해 로그인 상태인지 체크 */-->
-							<th:block th:unless="${session.isLogin}">
-								<a class="nav-link" th:href="@{loginForm}">로그인-폼</a>
-							</th:block>
-							<th:block th:if="${session.isLogin}">
-								<!--/* MemberController를 통해서 로그아웃 처리 */-->
-								<a class="nav-link" th:href="@{memberLogout}">로그아웃</a>
-							</th:block>
-						</li>
-						<li class="nav-item">
-							<th:block th:unless="${session.isLogin}">							
-								<a th:href="@{#}" class="nav-link" 
-									th:attrappend="data-bs-toggle='modal', data-bs-target='#loginModal'">							
-									로그아웃-모달
-								</a>
-							</th:block>
-							<th:block th:if="${session.isLogin}">
-								<!--/* 스프링 시큐리티 설정을 통해서 로그아웃 처리 */-->							
-								<a class="nav-link" th:href="@{logout}">로그아웃</a>
-							</th:block>
-						</li>
-						<li class="nav-item">
-							<a class="nav-link" href="boardList">게시 글 리스트</a>
-						</li>
-						<li class="nav-item">
-							<th:block th:unless="${session.isLogin}">
-								<a class="nav-link" href="joinForm">회원가입</a>
-							</th:block>
-							<th:block th:if="${session.isLogin}">
-								<a class="nav-link" href="memberUpdateForm">정보수정</a>
-							</th:block>
-						</li>
-						<li class="nav-item">
-							<a class="nav-link" href="#">주문/배송조회</a>
-						</li>
-						<li class="nav-item">
-							<a class="nav-link" href="#">고객센터</a>
-						</li>
-					</ul>
-				</div>
-			</div>
-			<div class="row">
-				<div class="col text-end pe-5 text-primary">					
-					<div th:if="${session.isLogin}">
-						안녕하세요 [[ ${session.member != null} ? ${session.member.id} ]]님
-					</div>					
-				</div>
-			</div>
-		</div>
-	</div>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<th:block th:fragment="header">
+
+  <header class="sticky top-0 z-50 bg-black shadow-sm">
+    <div class="mx-auto max-w-6xl px-4">
+      <div class="grid grid-cols-12 h-16 items-center gap-4">
+
+        <!-- Logo -->
+        <div class="col-span-6 md:col-span-3">
+          <a th:href="@{/}" class="flex items-center gap-3">
+            <!-- 로고 이미지 있으면 여기에 -->
+            <span class="text-xl font-bold text-white">⚡ PickQ</span>
+          </a>
+        </div>
+
+        <!-- GNB: 데스크탑 -->
+        <nav class="hidden md:flex col-span-6 items-center justify-center gap-4">
+          <a th:href="@{/auctionList}"
+             class="px-6 py-2 text-sm font-medium text-white hover:text-lime-400 hover:bg-white/5 rounded transition-colors">
+            경매
+          </a>
+          <a th:href="@{/boards}"
+             class="px-6 py-2 text-sm font-medium text-white hover:text-lime-400 hover:bg-white/5 rounded transition-colors">
+            커뮤니티
+          </a>
+          <a th:href="@{/mypage/auctions}"
+             class="px-6 py-2 text-sm font-medium text-white hover:text-lime-400 hover:bg-white/5 rounded transition-colors">
+            마이페이지
+          </a>
+          <a th:href="@{/#}"
+             class="px-6 py-2 text-sm font-medium text-white hover:text-lime-400 hover:bg-white/5 rounded transition-colors">
+            고객지원
+          </a>
+        </nav>
+
+        <!-- 오른쪽: 로그인 상태에 따라 분기 -->
+        <div class="col-span-6 md:col-span-3 flex items-center justify-end gap-3">
+
+          <!-- 로그인 O -->
+          <div class="hidden md:flex items-center gap-3"
+               th:if="${loginUser != null}">
+            <!-- 알림 버튼 (임시로 링크만) -->
+            <a th:href="@{/#}"
+               class="relative w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 transition-colors flex items-center justify-center">
+              <span class="text-white text-sm">🔔</span>
+              <!-- 새 알림 있을 때 동그라미 (임시 하드코딩, 나중에 조건 주입) -->
+              <span class="absolute top-1 right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-black"></span>
+            </a>
+
+            <!-- 내 정보 버튼 -->
+            <a th:href="@{/mypage/boards}"
+               class="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 transition-colors flex items-center justify-center">
+              <span class="text-white text-sm">👤</span>
+            </a>
+
+            <!-- 로그아웃 -->
+            <form th:action="@{/members/logout}" method="post" class="m-0">
+              <button type="submit"
+                      class="inline-flex items-center px-3 py-1.5 rounded text-sm bg-lime-400 text-black font-semibold hover:bg-lime-500 border-0">
+                로그아웃
+              </button>
+            </form>
+          </div>
+
+          <!-- 로그인 X -->
+          <div class="hidden md:flex items-center gap-2"
+               th:if="${loginUser == null}">
+            <a th:href="@{/members/login}"
+               class="px-3 py-1.5 rounded text-sm text-white hover:text-lime-400 hover:bg-white/10">
+              로그인
+            </a>
+            <!-- 회원가입 URL에 맞게 수정 -->
+            <a th:href="@{/members/signUp}"
+            	class="px-3 py-1.5 rounded text-sm bg-lime-400 text-black font-semibold hover:bg-lime-500">
+              회원가입
+            </a>
+          </div>
+
+          <!-- 모바일: 간단하게 링크만 -->
+          <div class="md:hidden flex items-center gap-2">
+            <a th:if="${loginUser != null}"
+               th:href="@{/mypage/boards}"
+               class="px-2 py-1 rounded text-xs bg-white/10 text-white">
+              <span th:text="${loginUser.memName}">내정보</span>
+            </a>
+            <a th:if="${loginUser == null}"
+               th:href="@{/members/login}"
+               class="px-2 py-1 rounded text-xs bg-lime-400 text-black">
+              로그인
+            </a>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  </header>
+
+</th:block>
+</body>
 </html>

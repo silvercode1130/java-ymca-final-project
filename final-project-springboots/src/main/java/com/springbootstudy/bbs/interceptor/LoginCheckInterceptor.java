@@ -22,48 +22,53 @@ public class LoginCheckInterceptor implements HandlerInterceptor {
     * 또는 컨트롤러 자체를 실행하지 않게 할 수 있다.
     **/
 
-    // 로그인 실패 시 띄워주는 인터셉터
-   @Override
-   public boolean preHandle(HttpServletRequest request,
-         HttpServletResponse response, Object handler) throws Exception {
+	 // 로그인 실패 시 띄워주는 인터셉터
+	@Override
+	public boolean preHandle(HttpServletRequest request,
+	      HttpServletResponse response, Object handler) throws Exception {
 
-      log.info("##########LoginCheckInterceptor - preHandle()##########");
+	   log.info("##########LoginCheckInterceptor - preHandle()##########");
 
-      HttpSession session = request.getSession();
-      String uri = request.getRequestURI();
+	   HttpSession session = request.getSession();
+	   String uri = request.getRequestURI();
 
-      // 로그인 필요한 경로는 차단
-      boolean needLogin =
-            uri.startsWith("/members/memberUpdate") ||
-            uri.startsWith("/memberDelete");
+	   // 로그인 필요한 경로는 차단
+	   // 여기에 등록 안하면 인터셉터 안뜹니다!!
+	   // 다른분들의 페이지는 나중에 끝나고 경로 추가할 부분 알려주세요!!
+	   boolean needLogin =
+	         uri.startsWith("/members/memberUpdate") ||
+	         uri.startsWith("/members/memberAddr") ||
+	         uri.startsWith("/members/memberAddrUpdate") ||
+	         uri.startsWith("/members/memberProfileUpdate") ||
+	         uri.startsWith("/memberDelete"); 
 
-      if (needLogin && session.getAttribute("isLogin") == null) {
-         session.setAttribute("loginMsg", "로그인이 필요한 서비스 입니다");
-         response.sendRedirect("/members/login");
-         return false;
-      }
-      return true; 
-   }
-   
-   /*
-    * postHandle() 메서드는 클라이언트 요청이 들어오고 컨트롤러가 정상적으로
-    * 실행된 이후에 공통적으로 적용할 추가 기능이 있을 때 주로 사용한다.
-    * 만약 컨트롤러 실행 중에 예외가 발생하게 되면 postHandle() 메서드는
-    * 호출되지 않는다.
-    **/
-   @Override
-   public void postHandle(HttpServletRequest request,
-         HttpServletResponse response, Object handler,
-         ModelAndView modelAndView) throws Exception {
-      log.info("##########LoginCheckInterceptor - postHandle()##########");
-      /*
-       * 수정 폼에서 수정 요청을 보내면서 비밀번호가 틀리면 자바스크립트로
-       * history.back()을 사용하는데 POST 요청에서 Redirect 시키지 않을 경우
-       * 브라우저에서 "양식 다시 제출 확인 - ERR_CACHE_MISS" 페이지가 뜰 수
-       * 있다. 이런 경우 응답 데이터에 노캐쉬 설정을 하면 해결할 수 있다.
-       **/
-      response.setHeader("Cache-Control", "no-cache");
-   }
+	   if (needLogin && session.getAttribute("isLogin") == null) {
+	      session.setAttribute("loginMsg", "로그인이 필요한 서비스 입니다");
+	      response.sendRedirect("/members/login");
+	      return false; 
+	   }
+	   return true; 
+	}
+	
+	/*
+	 * postHandle() 메서드는 클라이언트 요청이 들어오고 컨트롤러가 정상적으로
+	 * 실행된 이후에 공통적으로 적용할 추가 기능이 있을 때 주로 사용한다.
+	 * 만약 컨트롤러 실행 중에 예외가 발생하게 되면 postHandle() 메서드는
+	 * 호출되지 않는다.
+	 **/
+	@Override
+	public void postHandle(HttpServletRequest request,
+			HttpServletResponse response, Object handler,
+			ModelAndView modelAndView) throws Exception {
+		log.info("##########LoginCheckInterceptor - postHandle()##########");
+		/*
+		 * 수정 폼에서 수정 요청을 보내면서 비밀번호가 틀리면 자바스크립트로
+		 * history.back()을 사용하는데 POST 요청에서 Redirect 시키지 않을 경우
+		 * 브라우저에서 "양식 다시 제출 확인 - ERR_CACHE_MISS" 페이지가 뜰 수
+		 * 있다. 이런 경우 응답 데이터에 노캐쉬 설정을 하면 해결할 수 있다.
+		 **/
+		response.setHeader("Cache-Control", "no-cache");
+	}
 
    /*
     * afterCompletion() 메서드는 클라이언트의 요청을 처리하고 뷰를 생성해

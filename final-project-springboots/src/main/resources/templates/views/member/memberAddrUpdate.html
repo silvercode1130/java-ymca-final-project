@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+
+<th:block layout:fragment="content">
+
+<script th:src="@{/js/jquery-3.7.1.min.js}"></script>
+<script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+
+    <script type="text/javascript">
+	 	// 페이지 로드하면 이전 값 저장
+	    let originalValues = {};
+	
+	    window.addEventListener("DOMContentLoaded", function() {
+	        originalValues = {
+	            zipcode: document.getElementById("memZipcode").value,
+	            addr: document.getElementById("memAddr").value,
+	            addrDetail: document.getElementById("memAddrDetail").value,
+	            isPrimary: document.getElementById("isPrimary").checked
+	        };
+	        //checkAddrValid();
+	    });
+    
+	 	// 주소창 띄우기
+	    function findAddr() {
+	        new daum.Postcode({
+	            oncomplete: function(data) {
+	                $("#memZipcode").val(data.zonecode);
+	                $("#memAddr").val(data.address);
+	                $("#memAddrDetail").val("").focus(); 
+	                checkAddrValid(); 
+	            }
+	        }).open();
+	    }
+    	
+     // 주소 저장 버튼
+     function saveAddr() {
+            // 값 불러오기
+            const memZipcode    = document.getElementById("memZipcode").value;
+            const memAddr       = document.getElementById("memAddr").value;
+            const memAddrDetail = document.getElementById("memAddrDetail").value;
+            const isPrimaryCheckbox = document.getElementById("isPrimary");
+            const isPrimary = isPrimaryCheckbox.checked ? "Y" : "N";
+            const addrIdx = document.getElementById("addrIdx").value;
+            
+            // 회원 번호 체크
+            const memidxInput = document.getElementById("memIdx");
+            if (!memidxInput || memidxInput.value === "" || memidxInput.value === "0") {
+                alert("로그인 정보가 없습니다");
+                location.href = "members/login"; 
+                return; 
+            }
+            
+            const sendIdx = memidxInput.value;
+
+            // 필수 주소 입력값 검증
+            if (memZipcode === "" || memAddr === "") {
+                alert("주소를 전부 입력해주세요");
+                return;
+            }
+
+            fetch("/member/updateAddrAjax.do", {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: 
+                    "addrIdx=" + encodeURIComponent(addrIdx) +
+                    "&memZipcode=" + encodeURIComponent(memZipcode) +
+                    "&memAddr=" + encodeURIComponent(memAddr) +
+                    "&memAddrDetail=" + encodeURIComponent(memAddrDetail) +
+                    "&memIdx=" + encodeURIComponent(sendIdx) + 
+                    "&isPrimary=" + encodeURIComponent(isPrimary)
+            })
+            .then(res => res.text())
+            .then(result => {
+                if (result.trim() === "1") { 
+                    alert("✓ 성공적으로 수정되었습니다!");
+                    location.href = "/members/memberAddr"; 
+                } else {
+                    alert("✗ 저장 실패: 다시 시도해 주세요");
+                }
+            })
+            .catch(err => console.log("에러 발생: ", err));
+        }
+     
+	  	// 변경 여부 체크
+	     function isChanged() {
+	         const memZipcode    = document.getElementById("memZipcode").value.trim();
+	         const memAddr       = document.getElementById("memAddr").value.trim();
+	         const memAddrDetail = document.getElementById("memAddrDetail").value.trim();
+	         const isPrimary     = document.getElementById("isPrimary").checked;
+	
+	         // 하나라도 다르면 true
+	         return (
+	             memZipcode    !== originalValues.zipcode   ||
+	             memAddr       !== originalValues.addr      ||
+	             memAddrDetail !== originalValues.addrDetail ||
+	             isPrimary     !== originalValues.isPrimary
+	         );
+	     }
+	  	
+	 	 // 버튼 활성화 및 메시지
+	     function checkAddrValid() {
+	         const memZipcode = document.getElementById("memZipcode").value.trim();
+	         const memAddr = document.getElementById("memAddr").value.trim();
+	         const memAddrDetail = document.getElementById("memAddrDetail").value.trim();
+	         
+	         const saveBtn = document.getElementById("saveBtn");
+	         const noChangeMsg = document.getElementById("noChangeMsg");
+	         
+	         // 수정 x
+	         if (memZipcode === "" || memAddr === "" || memAddrDetail === "") {
+	             saveBtn.disabled = true;
+	             noChangeMsg.style.display = "none"; // 아직 입력 중이므로 메시지 숨김
+	             return;
+	         }
+
+	         // 변경사항에 따른 버튼 + 메시지
+	         if (isChanged()) {
+	             // 변경 사항 있음
+	             saveBtn.disabled = false;
+	             noChangeMsg.style.display = "none";
+	         } else {
+	             // 변경 사항 없음 
+	             saveBtn.disabled = true;
+	             noChangeMsg.style.display = "inline";
+	         }
+	     }
+    </script>
+
+    <div>
+        <h2>배송지 수정</h2>
+    </div>
+    
+    <div>
+        <form action="/members/memberAddrUpdate" id="memberAddrUpdate" method="post">		
+        	
+        	<input type="hidden" id="memIdx" name="memIdx" th:value="${member.memIdx}">
+        	<input type="hidden" id="addrIdx" name="addrIdx" th:value="${addr.addrIdx}">
+        	        	
+        	<div>
+			    <input type="checkbox" id="isPrimary" name="isPrimary" value="Y" 
+      						th:checked="${addr.isPrimary == 'Y'}" onchange="checkAddrValid()">
+			    <label for="isPrimary">대표 주소지로 수정하기</label>
+			</div>
+        			
+            <div>
+                <input type="text" id="memZipcode" name="memZipcode" placeholder="✉️ 우편번호" th:value="${addr.memZipcode}" readonly>
+                <input type="button" value="우편번호 찾기" onclick="findAddr()"> <br>
+                
+                <input type="text" id="memAddr" name="memAddr" placeholder="🏠 주소" th:value="${addr.memAddr}" readonly> <br>
+                
+                <input type="text" id="memAddrDetail" name="memAddrDetail" placeholder="🏠 상세주소" th:value="${addr.memAddrDetail}" oninput="checkAddrValid()">
+            </div>
+            
+            <div style="margin-top: 10px;">
+                <input type="button" id="saveBtn" value="주소 저장" onclick="saveAddr()" disabled>
+  				<span id="noChangeMsg" style="display:none; color:#e74c3c; font-size:13px; margin-left:8px;">수정된 정보가 없습니다</span>
+            </div>
+        </form> 
+    </div>
+</th:block>
+</html>

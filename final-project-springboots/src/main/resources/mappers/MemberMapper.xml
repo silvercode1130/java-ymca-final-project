@@ -76,6 +76,33 @@
 	    DELETE FROM member
 	    WHERE mem_id = #{memId}
 	</delete>
+	
+	
+		 <update id="update">
+        UPDATE member
+        SET mem_name = #{memName},
+            mem_email = #{memEmail},
+            mem_tel = #{memTel},
+            mem_bday = #{memBday},
+            mem_pwd = #{memPwd}
+        WHERE mem_id = #{memId}
+    </update>
+
+    <!-- 회원 정보 조회 -->
+    <select id="selectOneFromId" resultType="com.springbootstudy.bbs.domain.MemberVO">
+        SELECT *
+        FROM member
+        WHERE mem_id = #{memId}
+    </select>
+
+    <!-- 등급명 조회 -->
+    <select id="selectGradeNameByMemId" resultType="string">
+        SELECT g.grade_name
+        FROM member m
+        JOIN grade g ON m.mem_grade_idx = g.grade_idx
+        WHERE m.mem_id = #{memId}
+    </select>
+ 
  
 </mapper>	
 

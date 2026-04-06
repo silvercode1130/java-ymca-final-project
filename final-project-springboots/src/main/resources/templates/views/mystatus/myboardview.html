@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/bootstrap/bootstrap.min.css">
+  <title>마이 페이지 - 내 게시글 목록</title>
+</head>
+
+<body>
+  <div class="container mt-5">
+    <div class="profile-board">
+      <h2 class="mb-4">내 게시글 목록</h2>
+      <div class="table-responsive">
+        <table class="table table-hover border text-center align-middle">
+          <thead class="table-light">
+            <tr>
+              <th style="width: 15%;">게시판</th>
+              <th style="width: 50%;">제목</th>
+              <th style="width: 10%;">조회수</th>
+              <th style="width: 25%;">작성일</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr th:if="${#lists.isEmpty(boards)}">
+              <td colspan="4" class="text-center text-muted py-5">작성한 게시글이 없습니다.</td>
+            </tr>
+
+            <tr th:each="board : ${boards}">
+              <td>
+                <span class="badge bg-info text-dark" th:text="${board.boardTypeName}">게시판명</span>
+              </td>
+              <td class="text-start">
+                <a th:href="@{/{typeCode}(typeCode=${board.boardTypeCode})/{idx}(idx=${board.boardIdx})}"
+                   class="text-decoration-none fw-bold text-dark">
+                   [[${board.boardTitle}]]
+                </a>
+              </td>
+              <td th:text="${board.boardViewCount}">0</td>
+              <td th:text="${#temporals.format(board.boardRegdate, 'yyyy-MM-dd HH:mm')}">
+                2026-03-31 10:00
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="text-end mt-4">
+        <a href="/mypage" class="btn btn-outline-secondary">마이페이지로 돌아가기</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="/bootstrap/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
