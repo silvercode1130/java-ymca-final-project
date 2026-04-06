@@ -5,24 +5,22 @@ import lombok.Data;
 
 @Data
 public class AuctionVO {
-  private Long auctionIdx;
-  private Long buyerIdx;
-  private Integer itemCategoryIdx;
-  private String auctionTitle;
-  private String auctionDesc;
-  private Long auctionTargetPrice;
-  private Long auctionViewCount;
-  private LocalDateTime auctionStartAt;
-  private LocalDateTime auctionEndAt;
-  private LocalDateTime auctionDecisionDeadline;
-  private Integer auctionStatusIdx;
-  private LocalDateTime auctionRegdate;
-  private LocalDateTime auctionModdate;
-  private String auctionIsDeleted;
-  private LocalDateTime auctionDeldate;
-  private int bidCount;
 
-  // 조인(Join) 결과를 담기 위한 추가 필드 (HTML에서 사용)
-  private String auctionStatusName; // 예: 진행중, 마감
-  private String auctionStatusCode; // 예: open, closed
+ private Long    		auctionIdx;				// PK
+ private Long    		buyerIdx;				// FK → member.mem_idx
+ private Integer 		itemCategoryIdx;		// FK → item_category
+ private Long    		itemIdx;          		// FK → item (실제 제안 상품)
+ private String  		auctionTitle;			// 경매 제목
+ private String  		auctionDesc;			// 경매 설명
+ private Long    		auctionTargetPrice;		// 희망 최대가 (nullable)
+ private Long    		auctionViewCount;		// 조회수
+ private LocalDateTime 	auctionStartAt;			// 경매 시작일시
+ private LocalDateTime 	auctionEndAt;			// 입찰 마감일시
+ private LocalDateTime 	auctionDecisionDeadline;// 결정 마감일
+ private Integer 		auctionStatusIdx;		// FK → auction_status
+ private LocalDateTime 	auctionRegdate;			// 등록일
+ private LocalDateTime 	auctionModdate;    		// 수정일
+ private String        	auctionIsDeleted;  		// 'Y'/'N' 소프트 딜리트
+ private LocalDateTime 	auctionDeldate;    		// 삭제일
+
 }
