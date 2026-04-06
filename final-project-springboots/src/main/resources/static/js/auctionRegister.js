@@ -63,7 +63,7 @@ function showFieldError(fieldName, message) {
     setTimeout(() => errorEl.remove(), 3000);
 }
 
-// 폼 제출 유효성 검사 - 문제 있는 필드만 초기화!
+// 폼 제출 유효성 검사 - 문제 있는 필드만 초기화
 document.getElementById('registerForm').addEventListener('submit', function (e) {
     const targetPriceInput = document.querySelector('[name="auctionTargetPrice"]');
     const targetPrice = Number(targetPriceInput.value);
@@ -76,8 +76,8 @@ document.getElementById('registerForm').addEventListener('submit', function (e) 
         targetPriceInput.value = '';
         targetPriceInput.focus();
         hasError = true;
-    } else if (targetPrice % 100 !== 0) {
-        showFieldError('auctionTargetPrice', '100원 단위로 입력해주세요.');
+    } else if (targetPrice % 1000 !== 0) {
+        showFieldError('auctionTargetPrice', '1000원 단위로 입력해주세요.');
         targetPriceInput.value = '';
         targetPriceInput.focus();
         hasError = true;

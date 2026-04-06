@@ -96,8 +96,8 @@ public class AuctionService {
 	    if (dto.getAuctionTargetPrice() == null || dto.getAuctionTargetPrice() <= 0) {
 	        throw new IllegalArgumentException("희망 최대가는 0원보다 커야 합니다.");
 	    }
-	    if (dto.getAuctionTargetPrice() % 100 != 0) {
-	        throw new IllegalArgumentException("희망 최대가는 100원 단위로 입력해야 합니다.");
+	    if (dto.getAuctionTargetPrice() % 1000 != 0) {
+	        throw new IllegalArgumentException("희망 최대가는 1000원 단위로 입력해야 합니다.");
 	    }
 
 	    // 입찰 마감일 검증

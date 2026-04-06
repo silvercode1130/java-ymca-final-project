@@ -30,7 +30,7 @@ document.getElementById('bidImageFile').addEventListener('change', function () {
     }
 });
 
-// 입찰 폼 유효성 검사 - 가격 필드만 초기화!
+// 입찰 폼 유효성 검사 - 가격 필드만 초기화
 document.getElementById('bidForm').addEventListener('submit', function (e) {
     const bidPriceInput = document.getElementById('bidPrice');
     const bidPrice = Number(bidPriceInput.value);
@@ -41,8 +41,8 @@ document.getElementById('bidForm').addEventListener('submit', function (e) {
         bidPriceInput.value = ''; // 가격 필드만 초기화
         bidPriceInput.focus();
         hasError = true;
-    } else if (bidPrice % 100 !== 0) {
-        showFieldError('bidPrice', '100원 단위로 입력해주세요.');
+    } else if (bidPrice % 1000 !== 0) {
+        showFieldError('bidPrice', '1000원 단위로 입력해주세요.');
         bidPriceInput.value = ''; // 가격 필드만 초기화
         bidPriceInput.focus();
         hasError = true;
