@@ -48,6 +48,10 @@ public interface BoardMapper {
     // 조회수 +1
     void increaseViewCount(@Param("boardIdx") Long boardIdx);
 
+    // 좋아요 +1
+    void increaseBoardLike(@Param("boardIdx") Long boardIdx);
+    void increaseReplyLike(@Param("replyIdx") Long replyIdx);
+
     // 등록
     int insertBoard(BoardVO board);
 

@@ -157,6 +157,7 @@
                b.board_ip,
                b.board_thumbnail,
                b.board_view_count,
+               b.board_like_count,
                b.board_type_idx,
                b.board_regdate,
                b.board_moddate,
@@ -172,6 +173,18 @@
         WHERE b.board_idx = #{boardIdx}
           AND b.board_is_deleted = 'N'
     </select>
+
+    <!-- 게시글 좋아요 +1 -->
+    <update id="increaseBoardLike">
+        UPDATE board SET board_like_count = board_like_count + 1
+        WHERE board_idx = #{boardIdx}
+    </update>
+
+    <!-- 댓글 좋아요 +1 -->
+    <update id="increaseReplyLike">
+        UPDATE reply SET reply_like_count = reply_like_count + 1
+        WHERE reply_idx = #{replyIdx}
+    </update>
 
     <!-- 조회수 +1 -->
     <update id="increaseViewCount">
@@ -237,6 +250,7 @@
                r.reply_ref,
                r.reply_step,
                r.reply_depth,
+               r.reply_like_count,
                mp.mem_nickname,
                m.mem_id
         FROM reply r
@@ -278,6 +292,7 @@
                r.reply_ref,
                r.reply_step,
                r.reply_depth,
+               r.reply_like_count,
                mp.mem_nickname,
                m.mem_id
         FROM reply r

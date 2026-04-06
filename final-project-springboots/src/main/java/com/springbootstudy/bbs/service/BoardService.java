@@ -10,6 +10,8 @@ import com.springbootstudy.bbs.domain.BoardVO;
 import com.springbootstudy.bbs.domain.ReplyVO;
 import com.springbootstudy.bbs.mapper.BoardMapper;
 
+import jakarta.servlet.http.HttpSession;
+
 @Service
 public class BoardService {
 
@@ -46,9 +48,31 @@ public class BoardService {
         return boardMapper.countBoards(typeCode, keyword, searchType);
     }
 
+    // ── 게시글 좋아요 ─────────────────────────────────────────
+    public void likeBoardIfNotYet(Long boardIdx, HttpSession session) {
+        String key = "boardLike_" + boardIdx;
+        if (session.getAttribute(key) == null) {
+            boardMapper.increaseBoardLike(boardIdx);
+            session.setAttribute(key, true);
+        }
+    }
+
+    // ── 댓글 좋아요 ───────────────────────────────────────────
+    public void likeReplyIfNotYet(Long replyIdx, HttpSession session) {
+        String key = "replyLike_" + replyIdx;
+        if (session.getAttribute(key) == null) {
+            boardMapper.increaseReplyLike(replyIdx);
+            session.setAttribute(key, true);
+        }
+    }
+
     // ── 게시글 상세 (조회수 포함) ─────────────────────────────
-    public BoardVO getBoardDetail(Long boardIdx) {
-        boardMapper.increaseViewCount(boardIdx);
+    public BoardVO getBoardDetail(Long boardIdx, HttpSession session) {
+        String key = "boardView_" + boardIdx;
+        if (session.getAttribute(key) == null) {
+            boardMapper.increaseViewCount(boardIdx);
+            session.setAttribute(key, true);
+        }
         return boardMapper.findBoardById(boardIdx);
     }
 

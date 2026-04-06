@@ -96,9 +96,10 @@ public class BoardController {
             @RequestParam(value = "page", defaultValue = "1") int page,
             @RequestParam(value = "replyPage", defaultValue = "1") int replyPage,
             @RequestParam(value = "sortType", defaultValue = "oldest") String sortType,
-            Model model
+            Model model,
+            HttpSession session
     ) {
-        BoardVO board = boardService.getBoardDetail(boardIdx);
+        BoardVO board = boardService.getBoardDetail(boardIdx, session);
 
         int replyPageSize  = 20;
         int replyBlockSize = 10;
@@ -186,7 +187,7 @@ public class BoardController {
         MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
         if (loginUser == null) return "redirect:/members/login";
 
-        BoardVO board = boardService.getBoardDetail(boardIdx);
+        BoardVO board = boardService.getBoardDetail(boardIdx, session);
         if (!board.getMemIdx().equals(loginUser.getMemIdx())) {
             return "redirect:/boards/" + typeCode + "/" + boardIdx;
         }
@@ -272,6 +273,33 @@ public class BoardController {
 
         return "redirect:/boards/" + typeCode + "/" + boardIdx
                 + "?replyPage=" + targetPage + "&sortType=" + sortType;
+    }
+
+    // ── 게시글 좋아요 ─────────────────────────────────────────
+    @PostMapping("/{typeCode}/{boardIdx}/like")
+    public String likeBoard(
+            @PathVariable("typeCode") String typeCode,
+            @PathVariable("boardIdx") Long   boardIdx,
+            @RequestParam(value = "replyPage", defaultValue = "1") int replyPage,
+            @RequestParam(value = "sortType", defaultValue = "oldest") String sortType,
+            HttpSession session
+    ) {
+        boardService.likeBoardIfNotYet(boardIdx, session);
+        return "redirect:/boards/" + typeCode + "/" + boardIdx + "?replyPage=" + replyPage + "&sortType=" + sortType;
+    }
+
+    // ── 댓글 좋아요 ───────────────────────────────────────────
+    @PostMapping("/{typeCode}/{boardIdx}/replies/{replyIdx}/like")
+    public String likeReply(
+            @PathVariable("typeCode") String typeCode,
+            @PathVariable("boardIdx") Long   boardIdx,
+            @PathVariable("replyIdx") Long   replyIdx,
+            @RequestParam(value = "replyPage", defaultValue = "1") int replyPage,
+            @RequestParam(value = "sortType", defaultValue = "oldest") String sortType,
+            HttpSession session
+    ) {
+        boardService.likeReplyIfNotYet(replyIdx, session);
+        return "redirect:/boards/" + typeCode + "/" + boardIdx + "?replyPage=" + replyPage + "&sortType=" + sortType;
     }
 
     // ── 댓글 수정 ────────────────────────────────────────────
