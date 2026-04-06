@@ -12,7 +12,6 @@
 	완전한 클래스 이름(패키지를 포함한 이름)을 지정하면 된다.   
 -->
 <mapper namespace="com.springbootstudy.bbs.mapper.AuctionMapper">
-	
 	<resultMap id="AuctionListMap" type="com.springbootstudy.bbs.domain.AuctionListDTO">
 	    <id property="auctionIdx" column="auction_idx" />
 	    <result property="auctionTitle" column="auction_title" />
@@ -22,53 +21,26 @@
 	    <result property="auctionDecisionDeadline" column="auction_decision_deadline" />
 	    <result property="auctionStatusIdx" column="auction_status_idx" />
 	    <result property="auctionStatusName" column="auction_status_name" />
-	    
 	    <result property="itemCategoryName" column="item_category_name" />
-	    
 	    <result property="itemThumbnailImg" column="item_thumbnail_img" />
-	    
+	    <result property="itemIdx" column="item_idx" />
+	    <result property="itemCategoryIdx" column="item_category_idx" />
 	    <result property="minBidPrice" column="min_price" />
 	    <result property="bidCount" column="b_count" />
+	    <result property="buyerIdx" column="buyer_idx" />
 	</resultMap>
 	
-	<!-- 경매 구매요청 전체 리스트 조회 -->
+	<!-- 경매 리스트 조회 -->
 	<select id="auctionList" resultMap="AuctionListMap">
-		SELECT 
-	        a.auction_idx, 
-	        a.auction_title, 
-	        a.auction_target_price, 
+	    SELECT
+	        a.auction_idx,
+	        a.buyer_idx,
+	        a.item_category_idx,
+	        a.item_idx,
+	        a.auction_title,
+	        a.auction_target_price,
 	        a.auction_end_at,
-	        ic.item_category_name,
-	        i.item_thumbnail_img,
-	        <!-- 입찰 테이블에서 개수와 최저가 계산 -->
-	        COUNT(b.bid_idx) AS b_count,
-	        IFNULL(MIN(b.bid_price), 0) AS min_price
-	    FROM auction a
-	   	<!-- 카테고리 이름 가져오기 -->
-	    LEFT JOIN item_category ic ON a.item_category_idx = ic.item_category_idx
-	    <!-- 입찰 정보 가져오기 -->
-	    LEFT JOIN bid b ON a.auction_idx = b.auction_idx
-	    <!-- 실제 제안된 상품의 이미지 가져오기 -->
-	    LEFT JOIN item i ON b.item_idx = i.item_idx
-	    WHERE a.auction_status_idx = 1  <!-- 진행 중인 경매만 -->
-	    GROUP BY 			
-	        a.auction_idx, 
-	        a.auction_title, 
-	        a.auction_target_price, 
-	        a.auction_end_at, 
-	        ic.item_category_name, 
-	        i.item_thumbnail_img  ORDER BY a.auction_regdate DESC <!-- 최신순 정렬 -->
-	</select>
-	
-	<!-- 구매요청 상세보기 조회 -->
-	<select id="auctionDetail" resultMap="AuctionListMap">
-		SELECT 
-	        a.auction_idx, 
-	        a.auction_title, 
-	        a.auction_desc, 
-	        a.auction_target_price, 
-	        a.auction_end_at,
-	        a.auction_decision_deadline,
+	        a.auction_status_idx,
 	        s.auction_status_name,
 	        ic.item_category_name,
 	        i.item_thumbnail_img,
@@ -77,34 +49,112 @@
 	    FROM auction a
 	    JOIN auction_status s ON a.auction_status_idx = s.auction_status_idx
 	    LEFT JOIN item_category ic ON a.item_category_idx = ic.item_category_idx
+	    LEFT JOIN item i ON a.item_idx = i.item_idx
 	    LEFT JOIN bid b ON a.auction_idx = b.auction_idx
-	    LEFT JOIN item i ON b.item_idx = i.item_idx
-	    WHERE a.auction_idx = #{auctionIdx}  
-	    GROUP BY a.auction_idx, 
-	        a.auction_title, 
-	        a.auction_desc, <!-- 상세 설명도 그룹에 포함 -->
-	        a.auction_target_price, 
-	        a.auction_end_at, 
-	        ic.item_category_name, 
-	        i.item_thumbnail_img
+	    WHERE a.auction_is_deleted = 'N'
+	    GROUP BY
+	        a.auction_idx, a.buyer_idx, a.item_category_idx, a.item_idx,
+	        a.auction_title, a.auction_target_price, a.auction_end_at,
+	        a.auction_status_idx, s.auction_status_name,
+	        ic.item_category_name, i.item_thumbnail_img
+	    ORDER BY a.auction_regdate DESC
 	</select>
 	
-	<insert id="insertItem" useGeneratedKeys="true" keyProperty="itemIdx">
-	    INSERT INTO item (item_name, item_category_idx, item_brand, item_condition, item_thumbnail_img, item_regdate)
-	    VALUES (#{auctionTitle}, #{itemCategoryIdx}, #{itemBrand}, 'NEW', #{itemThumbnailImg}, NOW())
-	</insert>
+	<!-- 경매 상세 조회 -->
+	<select id="auctionDetail" resultMap="AuctionListMap">
+	    SELECT
+	        a.auction_idx,
+	        a.buyer_idx,
+	        a.item_category_idx,
+	        a.item_idx,
+	        a.auction_title,
+	        a.auction_desc,
+	        a.auction_target_price,
+	        a.auction_end_at,
+	        a.auction_decision_deadline,
+	        a.auction_status_idx,
+	        s.auction_status_name,
+	        ic.item_category_name,
+	        i.item_thumbnail_img,
+	        COUNT(b.bid_idx) AS b_count,
+	        IFNULL(MIN(b.bid_price), 0) AS min_price
+	    FROM auction a
+	    JOIN auction_status s ON a.auction_status_idx = s.auction_status_idx
+	    LEFT JOIN item_category ic ON a.item_category_idx = ic.item_category_idx
+	    LEFT JOIN item i ON a.item_idx = i.item_idx
+	    LEFT JOIN bid b ON a.auction_idx = b.auction_idx
+	    WHERE a.auction_idx = #{auctionIdx}
+	      AND a.auction_is_deleted = 'N'
+	    GROUP BY
+	        a.auction_idx, a.buyer_idx, a.item_category_idx, a.item_idx,
+	        a.auction_title, a.auction_desc, a.auction_target_price,
+	        a.auction_end_at, a.auction_decision_deadline,
+	        a.auction_status_idx, s.auction_status_name,
+	        ic.item_category_name, i.item_thumbnail_img
+	</select>
 	
-	<insert id="insertAuction">
-	    INSERT INTO auction (
-	        buyer_idx, item_category_idx, auction_title, auction_desc, 
-	        auction_target_price, auction_start_at, auction_end_at, 
-	        auction_decision_deadline, auction_status_idx, auction_regdate
-	    ) VALUES (
-	        #{buyerIdx}, #{itemCategoryIdx}, #{auctionTitle}, #{auctionDesc}, 
-	        #{auctionTargetPrice}, NOW(), #{auctionEndAt}, 
-	        #{auctionDecisionDeadline}, 1, NOW()
-	    )
-	</insert>
+	<!-- 경매 삭제 - 소프트 딜리트 -->
+	<update id="softDeleteAuction">
+	    UPDATE auction
+	    SET auction_is_deleted = 'Y',
+	        auction_status_idx = 4,
+	        auction_deldate = NOW()
+	    WHERE auction_idx = #{auctionIdx}
+	      AND buyer_idx = #{buyerIdx}
+	</update>
+
+    <!-- 마감 처리할 경매 조회 (마감일 지났는데 진행중인 것) -->
+    <select id="findExpiredAuctions" resultMap="AuctionListMap">
+        SELECT
+            a.auction_idx,
+            a.buyer_idx,
+            a.item_category_idx,
+            a.item_idx,
+            a.auction_end_at,
+            a.auction_status_idx
+        FROM auction a
+        WHERE a.auction_status_idx = 1
+          AND a.auction_end_at &lt; NOW()
+    </select>
+
+    <!-- 경매 상태 업데이트 -->
+    <update id="updateAuctionStatus">
+        UPDATE auction
+        SET auction_status_idx = #{statusIdx}
+        WHERE auction_idx = #{auctionIdx}
+    </update>
+
+    <insert id="insertItem" useGeneratedKeys="true" keyProperty="itemIdx">
+        INSERT INTO item (item_name, item_category_idx, item_brand, item_condition, item_thumbnail_img, item_regdate)
+        VALUES (#{auctionTitle}, #{itemCategoryIdx}, #{itemBrand}, 'NEW', #{itemThumbnailImg}, NOW())
+    </insert>
+
+    <insert id="insertAuction">
+        INSERT INTO auction (
+            buyer_idx, item_category_idx, item_idx, auction_title, auction_desc,
+            auction_target_price, auction_start_at, auction_end_at,
+            auction_decision_deadline, auction_status_idx, auction_regdate
+        ) VALUES (
+            #{buyerIdx}, #{itemCategoryIdx}, #{itemIdx}, #{auctionTitle}, #{auctionDesc},
+            #{auctionTargetPrice}, NOW(), #{auctionEndAt},
+            #{auctionDecisionDeadline}, 1, NOW()
+        )
+    </insert>
+	
+	<!-- 경매 수정 -->
+	<update id="updateAuction">
+	    UPDATE auction
+	    SET auction_title = #{auctionTitle},
+	        auction_desc = #{auctionDesc},
+	        auction_target_price = #{auctionTargetPrice},
+	        auction_end_at = #{auctionEndAt},
+	        auction_decision_deadline = #{auctionDecisionDeadline},
+	        auction_moddate = NOW()
+	    WHERE auction_idx = #{auctionIdx}
+	      AND buyer_idx = #{buyerIdx}
+	      AND auction_status_idx = 1
+	      AND auction_is_deleted = 'N'
+	</update>
 	
 </mapper>	
 
