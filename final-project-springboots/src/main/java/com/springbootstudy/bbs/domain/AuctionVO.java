@@ -22,7 +22,4 @@ public class AuctionVO {
   private LocalDateTime auctionDeldate;
   private int bidCount;
 
-  // 조인(Join) 결과를 담기 위한 추가 필드 (HTML에서 사용)
-  private String auctionStatusName; // 예: 진행중, 마감
-  private String auctionStatusCode; // 예: open, closed
 }
