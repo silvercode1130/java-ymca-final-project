@@ -34,7 +34,7 @@
         <input type="hidden" name="sortType" th:value="${sortType}">
         <button type="submit" class="btn btn-ghost btn-sm"
                 th:classappend="${session['boardLike_' + board.boardIdx] != null} ? ' btn-liked' : ''">
-          ❤️ <span th:text="${board.boardLikeCount}">0</span>
+          ❤️ <span th:text="${board.boardLike}">0</span>
         </button>
       </form>
     </div>
@@ -134,7 +134,7 @@
           <input type="hidden" name="replyPage" th:value="${replyPage}">
           <input type="hidden" name="sortType" th:value="${sortType}">
           <button type="submit" class="btn btn-ghost btn-sm">
-            ❤️ <span th:text="${r.replyLikeCount}">0</span>
+            ❤️ <span th:text="${r.replyLike}">0</span>
           </button>
         </form>
         <div th:if="${session.loginUser != null and session.loginUser.memIdx == r.memIdx}"
