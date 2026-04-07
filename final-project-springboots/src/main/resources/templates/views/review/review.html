@@ -8,7 +8,7 @@
 <body>
 	<form class="review" action="">
 	
-	<input type="hidden" name="review_idx" th:value="${reviewIdx}">
+	
 	
 		<div class="reviewTitle">
 			리뷰관리 <br>
@@ -38,7 +38,9 @@
 							<button type="button" th:onclick="|location.href='@{/review/reviewDetail(reviewIdx=${review.reviewIdx})}'|">
 							    상세보기
 							</button>
-                        	<button type="button">삭제</button>
+                        	<button th:if="${session.loginUser.memRoleIdx == 2}">
+                        		삭제
+                        	</button>
 						</td>
 					</tr>
 				</tbody>
