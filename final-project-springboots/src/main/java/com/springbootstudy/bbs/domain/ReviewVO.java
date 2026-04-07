@@ -43,5 +43,6 @@ public class ReviewVO {
 	private String memName;
 	private LocalDateTime bidRegdate;
 	private Integer auctionTargetPrice;
+	private String bidderName; 
 	
 }

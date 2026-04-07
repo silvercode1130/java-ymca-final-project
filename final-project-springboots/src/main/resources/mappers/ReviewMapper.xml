@@ -101,37 +101,24 @@
 	<!-- 리뷰 상세보기 -->
 	<select id="getReviewDetail" parameterType="long" resultType="com.springbootstudy.bbs.domain.ReviewVO">
 		SELECT 
-	    r.review_title AS reviewTitle,
-	    r.review_content AS reviewContent,
-	    r.review_star AS reviewStar,
-	    r.review_regdate AS reviewRegdate,
-	
-	    a.auction_target_price AS auctionTargetPrice,
-	    m.mem_name AS memName,
-	    b.bid_regdate AS bidRegdate
-	
-	FROM review r
-	JOIN bid b ON r.bid_idx = b.bid_idx
-	JOIN auction a ON r.auction_idx = a.auction_idx
-	JOIN member m ON r.bidder_idx = m.mem_idx
-	WHERE r.review_idx = #{reviewIdx}
+		    r.review_title AS reviewTitle,
+		    r.review_content AS reviewContent,
+		    r.review_star AS reviewStar,
+		    r.review_regdate AS reviewRegdate,
+		    a.auction_title AS auctionTitle, 
+		
+		    a.auction_target_price AS auctionTargetPrice,
+		    m.mem_name AS memName,              
+	    	bidder.mem_name AS bidderName,
+		    b.bid_regdate AS bidRegdate
+		
+		FROM review r
+		JOIN bid b ON r.bid_idx = b.bid_idx
+		JOIN auction a ON r.auction_idx = a.auction_idx
+		JOIN member m ON r.buyer_idx = m.mem_idx       
+		JOIN member bidder ON b.bidder_idx = bidder.mem_idx
+		WHERE r.review_idx = #{reviewIdx}
     </select>
-    <!-- SELECT 
-            r.review_idx AS reviewIdx,
-            r.buyer_idx AS buyerIdx,
-            r.bidder_idx AS bidderIdx,
-            r.auction_idx AS auctionIdx,
-            r.bid_idx AS bidIdx,
-            r.review_title AS reviewTitle,
-            r.review_content AS reviewContent,
-            r.review_star AS reviewStar,
-            r.review_regdate AS reviewRegdate,
-            a.auction_title AS auctionTitle,
-            i.item_name AS itemName
-        FROM review r
-        JOIN auction a ON r.auction_idx = a.auction_idx
-        JOIN bid b ON r.bid_idx = b.bid_idx
-        JOIN item i ON b.item_idx = i.item_idx
-        WHERE r.review_idx = #{reviewIdx} -->
+
 
 </mapper>	
