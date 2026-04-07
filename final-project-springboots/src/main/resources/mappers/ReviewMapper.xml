@@ -119,6 +119,12 @@
 		JOIN member bidder ON b.bidder_idx = bidder.mem_idx
 		WHERE r.review_idx = #{reviewIdx}
     </select>
-
+    
+    <!-- 리뷰 삭제하기(관리자만) -->
+	<select id="getAllReviewList" resultType="com.springbootstudy.bbs.domain.ReviewVO">
+	    SELECT *
+	    FROM review
+	    WHERE review_is_delete = 'N'
+	</select>
 
 </mapper>	

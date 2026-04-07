@@ -40,4 +40,9 @@ public class ReviewService {
 	    return reviewMapper.getReviewDetail(reviewIdx);
 	}
 	
+	// 리뷰 삭제하기(관리자만)
+	public List<ReviewVO> getAllReviewList() {
+	    return reviewMapper.getAllReviewList();
+	}
+	
 }

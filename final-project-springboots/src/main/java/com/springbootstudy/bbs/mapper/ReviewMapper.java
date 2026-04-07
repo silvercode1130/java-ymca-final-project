@@ -26,4 +26,7 @@ public interface ReviewMapper {
 	// 리뷰 상세보기
 	ReviewVO getReviewDetail(Long reviewIdx);
 	
+	// 리뷰 삭제하기(관리자만)
+	List<ReviewVO> getAllReviewList();
+	
 }

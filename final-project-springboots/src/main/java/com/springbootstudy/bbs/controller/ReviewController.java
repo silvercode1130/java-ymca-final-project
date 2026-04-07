@@ -114,5 +114,31 @@ public class ReviewController {
 		
 		return "/views/review/reviewDetail";
 	}
+	
+	// 리뷰 삭제하기 -----------------------------------------------------------------
+	
+	@GetMapping("/review")
+	public String review(HttpSession session, Model model) {
+
+	    MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
+
+	    if (loginUser == null) {
+	        return "redirect:/members/login";
+	    }
+
+	    List<ReviewVO> list;
+
+	    // admin이면 전체 조회
+	    if (loginUser.getMemRoleIdx() == 2) {
+	        list = reviewService.getAllReviewList();
+	    } else {
+	        // 일반 유저는 내 것만 조회 가능
+	        list = reviewService.getMyReviewList(loginUser.getMemIdx());
+	    }
+
+	    model.addAttribute("reviewList", list);
+
+	    return "views/review/review";
+	}
 
 }
