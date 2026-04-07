@@ -10,6 +10,9 @@ import com.springbootstudy.bbs.domain.ReviewVO;
 @Mapper
 public interface ReviewMapper {
 	
+	// 리뷰 조회
+	List<ReviewVO> getMyReviewList(@Param("buyerIdx") Long buyerIdx);
+	
 	// 검색 전 기본 목록
 	List<ReviewVO> getWritableReviewList(@Param("buyerIdx") Long buyerIdx); 
 	

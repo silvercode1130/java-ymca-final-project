@@ -31,9 +31,13 @@ public class ReviewVO {
 	private Long auctionIdx;
 	private Long bidderIdx;
 	
+	// 리뷰 남기기용
 	public void setReviewStar(int reviewStar) { this.reviewStar = reviewStar; }  
 	public void setContent(String content) { this.content = content; }
 	public Long getBuyerIdx() { return buyer_idx; }
 	public void setBuyerIdx(Long buyerIdx) { this.buyer_idx = buyerIdx; }  
+	
+	// 리뷰 조회
+	public LocalDateTime getReviewRegdate() { return reviewRegdate; }
 	
 }

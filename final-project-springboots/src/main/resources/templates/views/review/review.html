@@ -27,10 +27,10 @@
 				</thead>
 				<tbody>
 					<tr th:each="review : ${reviewList}">
-						<td>${review.auctionTitle}</td>
-						<td>${review.itemName}</td>
-						<td>${review.reviewStar}</td>
-						<td>${review.reviewRegdate}</td>
+						<td th:text="${review.auctionTitle}"></td>
+						<td th:text="${review.itemName}"></td>
+						<td th:text="${review.reviewStar}"></td>
+						<td th:text="${#temporals.format(review.reviewRegdate, 'yyyy-MM-dd HH:mm')}"></td>
 						<td>
 							<button type="button">조회</button>
                         	<button type="button">삭제</button>

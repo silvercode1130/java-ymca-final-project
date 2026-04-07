@@ -15,6 +15,11 @@ public class ReviewService {
 	@Autowired
     private ReviewMapper reviewMapper;
 	
+	// 리뷰 조회
+	public List<ReviewVO> getMyReviewList(Long buyerIdx) {
+	    return reviewMapper.getMyReviewList(buyerIdx);
+	}
+	
 	// 검색 전 기본 목록
 	public List<ReviewVO> getWritableReviewList(Long buyerIdx) {
 		return reviewMapper.getWritableReviewList(buyerIdx);

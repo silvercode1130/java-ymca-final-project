@@ -25,9 +25,15 @@ public class ReviewController {
 	// 리뷰 조회 창 -----------------------------------------------------------------
 
 	@GetMapping("/review")
-	public String review() {
+	public String review(HttpSession session, Model model) {
 
-		return "views/review/review";
+	    MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
+
+	    List<ReviewVO> list = reviewService.getMyReviewList(loginUser.getMemIdx());
+
+	    model.addAttribute("reviewList", list);
+
+	    return "views/review/review";
 	}
 	
 	// 리뷰 작성창 -----------------------------------------------------------------
@@ -35,7 +41,7 @@ public class ReviewController {
 	
 	// 검색 전에도 기본 리스트가 table에 뜨도록 추가
 	@GetMapping("/review/reviewWrite")
-	public String reviewWrite(HttpSession session, Model model) {
+	public String reviewWrite(HttpSession session, Model model) { 
 		
 		MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
 		if (loginUser == null) {
@@ -70,6 +76,8 @@ public class ReviewController {
 		return "views/review/reviewWrite";  
 	}
 	
+	 
+	// 리뷰 글쓰기 -----------------------------------------------------------------
 	@PostMapping("/review/reviewWrite")
 	public String reviewSubmit(
 	        @RequestParam("buyer_idx") Long buyerIdx,
