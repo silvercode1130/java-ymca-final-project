@@ -5,18 +5,18 @@ import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
-import com.springbootstudy.bbs.domain.BidListDTO;
+import com.springbootstudy.bbs.domain.AuctionListDTO;
 
 @Mapper
 public interface BidMapper {
 	// 특정 경매글에 달린 입찰 리스트 가져오기
-    List<BidListDTO> BidList(Long auctionIdx);
+    List<AuctionListDTO> BidList(Long auctionIdx);
     
     // 아이템 등록 
-    void insertItem(BidListDTO bidDto);
+    void insertItem(AuctionListDTO bidDto);
     
     // 입찰 등록하기
-    int insertBid(BidListDTO bidDto);
+    int insertBid(AuctionListDTO bidDto);
     
     // 입찰 삭제 - 소프트 딜리트
     int softDeleteBid(@Param("bidIdx") Long bidIdx, @Param("bidderIdx") Long bidderIdx);
@@ -30,8 +30,8 @@ public interface BidMapper {
                          @Param("bidIdx") Long bidIdx);
 
     // 입찰 상세 조회 (상세페이지용)
-    BidListDTO findBidById(@Param("bidIdx") Long bidIdx);
+    AuctionListDTO findBidById(@Param("bidIdx") Long bidIdx);
 
     // 입찰 수정
-    int updateBid(BidListDTO bidDto);
+    int updateBid(AuctionListDTO bidDto);
 }

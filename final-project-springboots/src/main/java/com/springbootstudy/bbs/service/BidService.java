@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.springbootstudy.bbs.domain.AuctionListDTO;
-import com.springbootstudy.bbs.domain.BidListDTO;
 import com.springbootstudy.bbs.mapper.AuctionMapper;
 import com.springbootstudy.bbs.mapper.BidMapper;
 
@@ -22,10 +21,10 @@ public class BidService {
 	private AuctionMapper auctionMapper;
 	
 	// 입찰 리스트 조회
-    public List<BidListDTO> BidList(Long auctionIdx) {
-        List<BidListDTO> list = bidMapper.BidList(auctionIdx);
+    public List<AuctionListDTO> BidList(Long auctionIdx) {
+        List<AuctionListDTO> list = bidMapper.BidList(auctionIdx);
         
-        for (BidListDTO dto : list) {
+        for (AuctionListDTO dto : list) {
             String name = dto.getMemName();
             if (name != null && name.length() > 1) {
                 // 판매자 이름 가리기 (신정은 -> 신**)
@@ -37,7 +36,7 @@ public class BidService {
     }
     
     // 입찰 등록
-    public void registerBid(BidListDTO bidDto) {
+    public void registerBid(AuctionListDTO bidDto) {
 
         // 입찰가 검증 - 음수/0 방지
         if (bidDto.getBidPrice() == null || bidDto.getBidPrice() <= 0) {
@@ -78,12 +77,12 @@ public class BidService {
     }
 
     // 입찰 단건 조회
-    public BidListDTO findBidById(Long bidIdx) {
+    public AuctionListDTO findBidById(Long bidIdx) {
         return bidMapper.findBidById(bidIdx);
     }
 
     // 입찰 수정
-    public void updateBid(BidListDTO bidDto) {
+    public void updateBid(AuctionListDTO bidDto) {
         if (bidDto.getBidPrice() == null || bidDto.getBidPrice() <= 0) {
             throw new IllegalArgumentException("제안 가격은 0원보다 커야 합니다.");
         }

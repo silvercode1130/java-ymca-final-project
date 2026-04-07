@@ -15,7 +15,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.springbootstudy.bbs.domain.AuctionListDTO;
-import com.springbootstudy.bbs.domain.BidListDTO;
 import com.springbootstudy.bbs.domain.MemberVO;
 import com.springbootstudy.bbs.service.AuctionService;
 import com.springbootstudy.bbs.service.BidService;
@@ -57,7 +56,7 @@ public class AuctionController {
         AuctionListDTO detail = auctionService.auctionDetail(auctionIdx);
         if (detail == null) return "redirect:/auctions";
 
-        List<BidListDTO> bidList = bidService.BidList(auctionIdx);
+        List<AuctionListDTO> bidList = bidService.BidList(auctionIdx);
         model.addAttribute("detail", detail);
         model.addAttribute("bidList", bidList);
         return "views/auction/auctionDetail";
@@ -177,7 +176,7 @@ public class AuctionController {
         AuctionListDTO detail = auctionService.auctionDetail(auctionIdx);
         if (detail == null) return "redirect:/auctions";
 
-        List<BidListDTO> bidList = bidService.BidList(auctionIdx);
+        List<AuctionListDTO> bidList = bidService.BidList(auctionIdx);
         model.addAttribute("detail", detail);
         model.addAttribute("bidList", bidList);
         return "views/auction/auctionDetail";
@@ -186,7 +185,7 @@ public class AuctionController {
     // ── 입찰 등록 (/auctions/{auctionIdx}/bids POST) ─────
     @PostMapping("/auctions/{auctionIdx}/bids")
     public String registerBid(@PathVariable("auctionIdx") Long auctionIdx,
-                               BidListDTO bidDto,
+    						   AuctionListDTO bidDto,
                                @RequestParam(value = "bidImageFile", required = false) MultipartFile bidImageFile,
                                HttpSession session,
                                RedirectAttributes ra) {
@@ -246,7 +245,7 @@ public class AuctionController {
         MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
         if (loginUser == null) return "redirect:/views/member/login";
 
-        BidListDTO bid = bidService.findBidById(bidIdx);
+        AuctionListDTO bid = bidService.findBidById(bidIdx);
         if (bid == null) return "redirect:/auctions";
 
         AuctionListDTO auction = auctionService.auctionDetail(bid.getAuctionIdx());

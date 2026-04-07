@@ -14,7 +14,7 @@
 <mapper namespace="com.springbootstudy.bbs.mapper.BidMapper">
 	
 	<!-- 입찰 리스트 조회 -->
-	<select id="BidList" resultType="BidListDTO">
+	<select id="BidList" resultType="AuctionListDTO">
 	    SELECT
 	        b.*,
 	        m.mem_name AS realMemName,
@@ -99,7 +99,7 @@
 	</update>
 	
 	<!-- 입찰 단건 조회 (상세페이지, 수정용) -->
-	<select id="findBidById" resultType="BidListDTO">
+	<select id="findBidById" resultType="AuctionListDTO">
 	    SELECT
 	        b.*,
 	        m.mem_name AS realMemName,
