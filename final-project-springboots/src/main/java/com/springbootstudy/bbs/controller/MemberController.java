@@ -99,7 +99,16 @@ public class MemberController {
 
 	// login.html - 창 띄우기
 	@GetMapping("/members/login")
-	public String loginForm(HttpSession session, Model model) {
+	public String loginForm(
+	        @RequestParam(value = "redirect", required = false) String redirect, // 수정되었음
+	        HttpSession session, Model model) {
+	// [변경 필요] 아래와 같이 redirect 파라미터를 받아 모델에 담아야 함:
+	// public String loginForm(
+	//         @RequestParam(value = "redirect", required = false) String redirect,
+	//         HttpSession session, Model model) {
+	// 이유: 게시글 상세에서 로그인 클릭 시 redirect 파라미터로 현재 게시글 URL을 전달하므로,
+	//       이를 받아서 뷰(login.html)로 넘겨줘야 로그인 후 원래 페이지로 돌아올 수 있음.
+	// 추가: if (redirect != null) model.addAttribute("redirect", redirect);
 
 	    String msg = (String) session.getAttribute("loginMsg");
 
@@ -107,6 +116,8 @@ public class MemberController {
 	        model.addAttribute("loginMsg", msg);
 	        session.removeAttribute("loginMsg"); 
 	    }
+
+	    if (redirect != null) model.addAttribute("redirect", redirect); // 수정되었음
 
 	    return "views/member/login";
 	}
@@ -116,6 +127,10 @@ public class MemberController {
 	@PostMapping("/members/login")
 	public String login(@RequestParam("memId") String memId,
 	                    @RequestParam("memPwd") String memPwd,
+	                    @RequestParam(value = "redirect", required = false) String redirect, // 수정되었음
+	                    // [변경 필요] redirect 파라미터 추가:
+	                    // @RequestParam(value = "redirect", required = false) String redirect,
+	                    // 이유: 로그인 성공 후 redirect 값이 있으면 해당 URL로, 없으면 /main 으로 이동해야 함.
 	                    Model model,
 	                    HttpSession session,
 	                    RedirectAttributes ra) throws ServletException, IOException {
@@ -141,7 +156,10 @@ public class MemberController {
 
 	    System.out.println("memberVO.name : " + memberVO.getMemName());
 
-	    return "redirect:/main";
+	    return (redirect != null && !redirect.isBlank()) ? "redirect:" + redirect : "redirect:/main"; // 수정되었음
+	    // [변경 필요] 위 return 을 아래로 교체:
+	    // return (redirect != null && !redirect.isBlank()) ? "redirect:" + redirect : "redirect:/main";
+	    // 이유: redirect 파라미터가 있으면 해당 게시글로, 없으면 기존처럼 /main 으로 이동.
 	}
 
 	// 비번찾기 -----------------------------------------------------------------

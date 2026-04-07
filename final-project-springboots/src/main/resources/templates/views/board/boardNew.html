@@ -4,28 +4,29 @@
 <meta charset="UTF-8">
 <title th:text="${currentType.boardTypeName} + ' 글쓰기 - PickQ'">글쓰기 - PickQ</title>
 <link rel="stylesheet" th:href="@{/bootstrap/bootstrap.min.css}">
-<style>
-
-</style>
+<link rel="stylesheet" th:href="@{/css/board.css}">
 </head>
 <body>
-
-<nav class="navbar navbar-expand-lg">
-  <div class="container">
-    <a class="navbar-brand" href="/">⚡ PickQ</a>
-    <div class="ms-auto d-flex gap-3 align-items-center">
-      <a class="nav-link" href="/boards">커뮤니티</a>
-      <a class="nav-link" href="/auctions">경매</a>
-    </div>
-  </div>
-</nav>
 
 <div class="container py-5">
   <div class="write-card">
     <h4>✏️ 게시글 작성</h4>
-    <div class="board-badge" th:text="${currentType.boardTypeName}">카테고리</div>
 
-    <form th:action="@{/boards/{tc}(tc=${typeCode})}" method="post">
+    <form id="writeForm" th:action="@{/boards/{tc}(tc=${typeCode})}" method="post">
+	<!-- 출처 전달 (전체목록=all, 카테고리=typeCode) -->
+      <input type="hidden" id="fromInput" name="from" th:value="${from}">
+
+      <!-- 카테고리 드롭다운 -->
+      <div class="mb-3">
+        <label>카테고리</label>
+        <select id="categorySelect" class="form-select" onchange="changeCategory(this.value)">
+          <option th:each="bt : ${boardTypes}"
+                  th:value="${bt.boardTypeCode}"
+                  th:text="${bt.boardTypeName}"
+                  th:selected="${bt.boardTypeCode == typeCode}">
+          </option>
+        </select>
+      </div>
 
       <div class="mb-3">
         <label>제목</label>
@@ -41,7 +42,7 @@
 
       <div class="d-flex gap-2">
         <button type="submit" class="btn btn-lime">📝 등록</button>
-        <a th:href="@{/boards/{tc}(tc=${typeCode})}" class="btn btn-ghost">취소</a>
+        <a th:href="${from == 'all'} ? '/boards' : '/boards/' + ${typeCode}" class="btn btn-ghost">취소</a>
       </div>
 
     </form>
@@ -50,5 +51,10 @@
 
 <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
 <script th:src="@{/bootstrap/bootstrap.bundle.min.js}"></script>
+<script>
+	function changeCategory(typeCode) {
+	  document.getElementById('writeForm').action = '/boards/' + typeCode;
+	}
+</script>
 </body>
 </html>
