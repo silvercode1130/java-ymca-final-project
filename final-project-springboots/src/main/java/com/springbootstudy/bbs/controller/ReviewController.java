@@ -78,6 +78,7 @@ public class ReviewController {
 	
 	 
 	// 리뷰 글쓰기 -----------------------------------------------------------------
+	
 	@PostMapping("/review/reviewWrite")
 	public String reviewSubmit(
 	        @RequestParam("buyer_idx") Long buyerIdx,
@@ -99,6 +100,19 @@ public class ReviewController {
 	    reviewService.insertReview(vo);
 
 	    return "redirect:/review";
+	}
+	
+	// 리뷰 상세보기 -----------------------------------------------------------------
+	
+	@GetMapping("/review/reviewDetail")
+	public String reviewDetail(@RequestParam("reviewIdx") Long reviewIdx, Model model) {
+		
+		ReviewVO review = reviewService.getReviewDetail(reviewIdx);
+		
+		// 리뷰 내용 부르기
+		model.addAttribute("review", review);
+		
+		return "/views/review/reviewDetail";
 	}
 
 }

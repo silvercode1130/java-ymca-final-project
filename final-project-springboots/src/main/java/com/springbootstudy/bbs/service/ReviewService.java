@@ -35,4 +35,9 @@ public class ReviewService {
 	    reviewMapper.insertReview(vo);
 	}
 	
+	// 리뷰 상세보기
+	public ReviewVO getReviewDetail(Long reviewIdx) {
+	    return reviewMapper.getReviewDetail(reviewIdx);
+	}
+	
 }

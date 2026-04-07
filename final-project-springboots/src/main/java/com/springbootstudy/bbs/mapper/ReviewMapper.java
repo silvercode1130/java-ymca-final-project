@@ -23,4 +23,7 @@ public interface ReviewMapper {
 	// 리뷰 작성하기
 	void insertReview(ReviewVO vo);
 	
+	// 리뷰 상세보기
+	ReviewVO getReviewDetail(Long reviewIdx);
+	
 }

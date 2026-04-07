@@ -198,11 +198,11 @@ CREATE TABLE item (
    3. 역경매 / 입찰
    ========================================== */
 
--- 3-1) AUCTION (역경매 요청)
+-- 3-1) AUCTION (역경매 요청) 
 CREATE TABLE auction (
     auction_idx               BIGINT        NOT NULL AUTO_INCREMENT COMMENT 'PK',
     buyer_idx                 BIGINT        NOT NULL COMMENT 'FK → member.mem_idx (구매자)',
-    item_category_idx         INT           NOT NULL COMMENT 'FK → item_category',
+    item_category_idx         INT           NOT NULL COMMENT 'FK → item_category', 
     item_idx                  BIGINT        DEFAULT NULL COMMENT 'FK → item (구매자가 올린 상품 정보)',
     auction_title             VARCHAR(200)  NOT NULL COMMENT '경매 제목',
     auction_desc              TEXT          NOT NULL COMMENT '경매 설명',
