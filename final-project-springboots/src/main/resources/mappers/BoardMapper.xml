@@ -89,7 +89,8 @@
                mp.mem_nickname,
                m.mem_id,
                (SELECT COUNT(*) FROM reply r
-                WHERE r.board_idx = b.board_idx AND r.reply_is_deleted = 'N') AS reply_count
+                WHERE r.board_idx = b.board_idx AND r.reply_is_deleted = 'N') AS reply_count,
+               (b.board_content LIKE '%&lt;img%') AS has_image
         FROM board b
         LEFT JOIN board_type bt     ON b.board_type_idx = bt.board_type_idx
         LEFT JOIN member_profile mp ON b.mem_idx = mp.mem_idx
