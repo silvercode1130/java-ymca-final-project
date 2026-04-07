@@ -18,12 +18,12 @@
   <div class="board-card">
     <div class="board-title" th:text="${board.boardTitle}"></div>
     <div class="board-meta">
-      <span>📂 <a th:href="@{/boards/{tc}(tc=${board.boardTypeCode})}"
+      <span><i class="bi bi-collection-fill"></i><a th:href="@{/boards/{tc}(tc=${board.boardTypeCode})}"
                   th:text="${board.boardTypeName}"
                   style="color:#c6f135; text-decoration:none;"></a></span>
-      <span>✍️ <span th:text="${board.memNickname != null} ? ${board.memNickname} : ${board.memId}">작성자</span></span>
-      <span>👁 <span th:text="${board.boardViewCount}">0</span></span>
-      <span>🕐 <span th:text="${#temporals.format(board.boardRegdate, 'yyyy-MM-dd HH:mm')}"></span></span>
+      <span><i class="bi bi-pen-fill"></i><span th:text="${board.memNickname != null} ? ${board.memNickname} : ${board.memId}">작성자</span></span>
+      <span><i class="bi bi-search"></i><span th:text="${board.boardViewCount}">0</span></span>
+      <span><i class="bi bi-clock-history"></i><span th:text="${#temporals.format(board.boardRegdate, 'yyyy-MM-dd HH:mm')}"></span></span>
     </div>
     <hr class="divider">
     <div class="board-content" th:utext="${board.boardContent}"></div>
@@ -107,7 +107,7 @@
             <!-- 로그인 X -->
             <th:block th:if="${session.loginUser == null}">
               <a th:if="${r.replyDepth < 3}"
-                 th:href="@{/members/login(redirect='/boards/' + ${typeCode} + '/' + ${board.boardIdx} + '?replyPage=' + ${replyPage} + '&openReply=' + ${r.replyIdx})}"
+                 th:href="@{/members/login(redirect='/boards/' + ${typeCode} + '/' + ${board.boardIdx} + '?from=' + ${#strings.defaultString(param.from, '')} + '&page=' + ${#strings.defaultString(param.page, '1')} + '&replyPage=' + ${replyPage} + '&openReply=' + ${r.replyIdx})}"
                  class="reply-toggle" style="text-decoration:none;">↩ 답글</a>
               <span th:if="${r.replyDepth >= 3}"
                     class="reply-toggle"
@@ -165,7 +165,7 @@
       </form>
     </div>
     <div th:if="${session.loginUser == null}" class="mt-3" style="color:#666; font-size:.9rem;">
-      댓글을 작성하려면 <a th:href="@{/members/login(redirect='/boards/' + ${typeCode} + '/' + ${board.boardIdx})}" style="color:#c6f135">로그인</a>이 필요합니다. <!-- 수정되었음 -->
+      댓글을 작성하려면 <a th:href="@{/members/login(redirect='/boards/' + ${typeCode} + '/' + ${board.boardIdx} + '?from=' + ${#strings.defaultString(param.from, '')} + '&page=' + ${#strings.defaultString(param.page, '1')})}" style="color:#c6f135">로그인</a>이 필요합니다. <!-- 수정되었음 -->
 
     </div>
 
