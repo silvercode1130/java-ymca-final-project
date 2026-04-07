@@ -95,7 +95,7 @@
 .reply-toggle:hover { color: #c6f135; }
 
 /* ── 글쓰기/수정 폼 ────────────────────────────────────── */
-.write-card { background: #888888; border-radius: 12px; padding: 2rem; max-width: 760px; margin: 0 auto; }
+.write-card { border: 1; border-radius: 12px; padding: 2rem; max-width: 760px; margin: 0 auto; }
 .write-card h4 { color: #c6f135; font-weight: 700; margin-bottom: 1.5rem; }
 .board-badge {
   background: #c6f135; color: #121212; font-size: .8rem; font-weight: 700;

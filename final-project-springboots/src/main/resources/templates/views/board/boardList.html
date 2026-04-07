@@ -117,7 +117,8 @@
 							<a th:href="${typeCode == null} ? @{/boards/{tc}/{id}(tc=${b.boardTypeCode}, id=${b.boardIdx}, from='all', page=${currentPage})} : @{/boards/{tc}/{id}(tc=${b.boardTypeCode}, id=${b.boardIdx}, page=${currentPage})}">
 								<span th:text="${b.boardTitle}"></span>
 							</a>
-							<span th:if="${b.replyCount > 0}" class="reply-count"> 💬
+							<span th:if="${b.hasImage}" style="font-size:.8rem; color:#aaa;"><i class="bi bi-image-fill"></i></span>
+							<span th:if="${b.replyCount > 0}" class="reply-count"><i class="bi bi-chat-dots"></i>
 								<span th:text="${b.replyCount}"></span>
 							</span>
 						</td>
