@@ -9,16 +9,16 @@
 	최근 거래 목록이 뜨면 선택
 	아래에 리뷰창이 뜨고
 	리뷰를 작성 후 버튼을 누르면 전송 됨
-		<input type="hidden" name="buyer_idx" value="${loginUser.mem_idx}">
-		<input type="hidden" name="bidder_idx" value="${bid.bidder_idx}">
-    	<input type="hidden" name="auction_idx" value="${auction.auction_idx}">
-    	<input type="hidden" name="bid_idx" value="${bid.bid_idx}">
+		<input type="hidden" name="buyer_idx" th:value="${session.loginUser.memIdx}">
+		<input type="hidden" name="bidder_idx" th:value="${bidderIdx}">
+		<input type="hidden" name="auction_idx" th:value="${auctionIdx}">
+		<input type="hidden" name="bid_idx" th:value="${bidIdx}">
 	
 		<div>
 			<h2>리뷰 작성하기</h2>
 		</div>
 		
-		<form action="/review/reviewWrite" method="get" class="search-box">
+		<form action="/review/reviewSearch" method="get" class="search-box">
 		    <select name="searchType">
 		    	<option value="">선택하기</option>
 		    	<option value="auctionTitle">경매 제목</option>
@@ -33,6 +33,10 @@
 		
 		<div th:if="${keyword != null and keyword != '' and #lists.isEmpty(reviewList)}">
 		    "<span th:text='${keyword}'></span>"(이)과 관련된 거래가 없습니다
+		</div>
+		
+		<div th:unless="${keyword != null and keyword != '' and #lists.isEmpty(reviewList)}">
+		    "<span th:text='${keyword}'></span>"(이)과 관련된 거래입니다
 		</div>
 		
 		<div>
@@ -74,10 +78,10 @@
         <input type="hidden" name="bidder_idx" id="bidder_idx">
 
 		<div>
-			<input type="text" placeholder="리뷰 제목"> 
+			<input type="text" name="reviewTitle" placeholder="리뷰 제목"> 
 		</div>
 		
-		<div id="stars" style="font-size: 30px; cursor: pointer;">
+		<div id="stars" name="stars" style="font-size: 30px; cursor: pointer;">
 	        <span data-value="1">☆</span>
 	        <span data-value="2">☆</span>
 	        <span data-value="3">☆</span>
@@ -85,10 +89,10 @@
 	        <span data-value="5">☆</span>
 	    </div>
 	    
-	    <input type="hidden" name="rating" id="rating">
+	    <input type="hidden" name="reviewStar" id="reviewStar">
 		
 		<div>
-			<textarea name="content" placeholder="리뷰를 작성해주세요"></textarea>
+			<textarea rows="10" cols="60" name="content" placeholder="리뷰를 작성해주세요"></textarea>
 		</div>
 
         <button type="submit">리뷰 남기기</button>
@@ -122,12 +126,12 @@
         
         	// 별점 부여 기능
 		    const stars = document.querySelectorAll("#stars span");
-		    const ratingInput = document.getElementById("rating");
+		    const reviewStarInput = document.getElementById("reviewStar");
 		
 		    stars.forEach(star => {
 		        star.addEventListener("click", function() {
 		            const value = this.getAttribute("data-value");
-		            ratingInput.value = value;
+		            reviewStarInput.value = value;
 		
 		            stars.forEach((s, index) => {
 		                if (index < value) {

@@ -13,6 +13,25 @@
 -->
 <mapper namespace="com.springbootstudy.bbs.mapper.ReviewMapper" >
 
+	<!-- 검색 전 기본 목록 -->
+	<select id="getWritableReviewList" resultType="com.springbootstudy.bbs.domain.ReviewVO">
+	    SELECT 
+	        a.auction_title AS auctionTitle,
+	        i.item_name AS itemName,
+	        b.bid_idx AS bidIdx,
+	        a.auction_idx AS auctionIdx,
+	        b.bidder_idx AS bidderIdx
+	    FROM bid b
+	    JOIN auction a ON b.auction_idx = a.auction_idx
+	    JOIN item i ON b.item_idx = i.item_idx
+	    JOIN bid_status bs ON b.bid_status_idx = bs.bid_status_idx
+	    LEFT JOIN review r ON b.bid_idx = r.bid_idx
+	     WHERE a.buyer_idx = #{buyerIdx} 
+	      AND bs.bid_status_code = 'won'
+	      AND r.bid_idx IS NULL
+	    ORDER BY b.bid_idx DESC
+	</select>
+
 	<!-- 검색 기능 -->
 	<select id="search" resultType="com.springbootstudy.bbs.domain.ReviewVO">
 	    SELECT 
@@ -24,7 +43,12 @@
 	    FROM bid b
 	    JOIN auction a ON b.auction_idx = a.auction_idx
 	    JOIN item i ON b.item_idx = i.item_idx
-	    WHERE b.bid_status_idx = 1
+	    JOIN bid_status bs ON b.bid_status_idx = bs.bid_status_idx
+	    LEFT JOIN review r ON b.bid_idx = r.bid_idx
+	    WHERE a.buyer_idx = #{buyerIdx}
+	      AND bs.bid_status_code = 'won'
+	      AND r.bid_idx IS NULL
+	
 	    <if test="searchType == 'auctionTitle'">
 	        AND a.auction_title LIKE CONCAT('%', #{keyword}, '%')
 	    </if>
@@ -32,5 +56,32 @@
 	        AND i.item_name LIKE CONCAT('%', #{keyword}, '%')
 	    </if>
 	</select>
+	
+	<!-- 리뷰 작성하기 -->
+	<insert id="insertReview">
+	    INSERT INTO review (
+	        buyer_idx,
+	        bid_idx,
+	        auction_idx,
+	        bidder_idx,
+	        review_title,
+	        review_star,
+	        review_content,
+	        review_regdate
+	    )
+	    SELECT 
+	        a.buyer_idx,    
+	        b.bid_idx,      
+	        a.auction_idx,  
+	        b.bidder_idx,   
+	        #{reviewTitle},  
+	        #{reviewStar},   
+	        #{content},     
+	        NOW()
+	    FROM auction a
+	    JOIN bid b ON a.auction_idx = b.auction_idx
+	    WHERE b.bid_idx = #{bidIdx}  
+	</insert>
+	
 
 </mapper>	

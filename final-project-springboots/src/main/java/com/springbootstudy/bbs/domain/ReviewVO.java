@@ -24,4 +24,16 @@ public class ReviewVO {
 	private String reviewIsDelete;		 // 리뷰 삭제 여부 - default N (N / Y)
 	private LocalDateTime reviewDelete;  // 리뷰 삭제일
 	
+	// 리뷰 게시를 위한 추가 필드
+	private String content;
+	private String auctionTitle;
+	private String itemName;
+	private Long auctionIdx;
+	private Long bidderIdx;
+	
+	public void setReviewStar(int reviewStar) { this.reviewStar = reviewStar; }  
+	public void setContent(String content) { this.content = content; }
+	public Long getBuyerIdx() { return buyer_idx; }
+	public void setBuyerIdx(Long buyerIdx) { this.buyer_idx = buyerIdx; }  
+	
 }
