@@ -38,7 +38,7 @@ public class AuctionController {
     public String auctionList(Model model) { // 쟁반(Model)을 준비
         
 		// 페이지 열릴 때마다 마감된 경매 상태 자동 업데이트
-	    auctionService.updateExpiredAuctions();
+	    auctionService.updateExpiredAuctions(); 
 		
         // 서비스한테서 리스트를 가져옴
         List<AuctionListDTO> list = auctionService.AuctionList();
@@ -86,7 +86,7 @@ public class AuctionController {
 	// 등록 폼으로 이동 (GET)
     @GetMapping("/auction/register")
     public String registerForm(HttpSession session) {
-        // 세션 이름 'loginUser'로 통일! ㅡㅡ^
+        // 세션 이름 'loginUser'로 통일! 
         if (session.getAttribute("loginUser") == null) {
             log.info("로그인 정보 없음 -> 로그인 페이지로 리다이렉트");
             return "redirect:/login"; 

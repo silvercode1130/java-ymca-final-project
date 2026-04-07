@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<form class="review" action="">
+		<div class="reviewTitle">
+			리뷰관리 <br>
+			거래 후 작성한 리뷰 목록
+		</div>
+		
+		<div>
+			<table id="table" name="table" border="1">
+				<thead>
+					<th:if>
+						<tr>
+							<th>거래 제목</th>
+							<th>상품명</th> 
+							<th>별점</th>      
+							<th>리뷰 작성일</th>
+		                    <th>관리</th>
+						</tr>
+					</th:if>
+				</thead>
+				<tbody>
+					<tr th:each="review : ${reviewList}">
+						<td th:text="${review.auctionTitle}"></td>
+						<td th:text="${review.itemName}"></td>
+						<td th:text="${review.reviewStar}"></td>
+						<td th:text="${#temporals.format(review.reviewRegdate, 'yyyy-MM-dd HH:mm')}"></td>
+						<td>
+							<button type="button">조회</button>
+                        	<button type="button">삭제</button>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		
+		<div>
+			<input type="button" value="리뷰 남기기" onclick="location.href='review/reviewWrite'">
+		</div>
+	
+	</form>
+</body>
+</html>

@@ -28,7 +28,7 @@ public class WebConfig implements WebMvcConfigurer {
 						"/views/member/login",
 						"/views/member/signUp",
 						"/views/member/check_id",
-						"/fragments/main");
+						"/fragments/main"); 
 	}
 
 	/*

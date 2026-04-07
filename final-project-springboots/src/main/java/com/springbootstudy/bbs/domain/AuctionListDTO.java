@@ -36,5 +36,8 @@ public class AuctionListDTO {
     // member 관련
     private Long buyerIdx;    // 작성자(구매자) 번호
     
+    // err 땜에 임시로 추가 -> 마이 페이지 클릭 시 에러남
+    private String auctionStatusCode;
+    
     
 }

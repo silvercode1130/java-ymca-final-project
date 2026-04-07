@@ -71,7 +71,6 @@
     
     
     <!-- 탈퇴 -->
-    
     <delete id="deleteMember" parameterType="string">
 	    DELETE FROM member
 	    WHERE mem_id = #{memId}
