@@ -7,23 +7,23 @@ import com.springbootstudy.bbs.domain.MemberVO;
 
 @Mapper
 public interface MemberMapper {
-	
-	// 회원가입 - 회원가입 처리용
-	int insertMember(
+   
+   // 회원가입 - 회원가입 처리용
+   int insertMember(
             @Param("memId") String memId,
             @Param("memPwd") String memPwd,
             @Param("memName") String memName,
             @Param("memTel") String memTel,
             @Param("memEmail") String memEmail,
-	        @Param("memIp") String memIp, 
-	        @Param("memRoleIdx") Long memRoleIdx,
-	        @Param("memGradeIdx") int memGradeIdx
+           @Param("memIp") String memIp, 
+           @Param("memRoleIdx") Long memRoleIdx,
+           @Param("memGradeIdx") int memGradeIdx
     );
-	
-	Long findDefaultRoleIdx(); 
-	
-	// 회원 조회 
-	int countByMemId(@Param("memId") String memId);
+   
+   Long findDefaultRoleIdx(); 
+   
+   // 회원 조회 
+   int countByMemId(@Param("memId") String memId);
 
 
 	// 로그인 =============================================

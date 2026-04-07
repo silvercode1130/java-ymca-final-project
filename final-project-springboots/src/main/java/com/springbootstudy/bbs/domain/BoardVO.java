@@ -25,4 +25,7 @@ public class BoardVO {
  private String         boardTypeName;  // 게시판 타입명 (JOIN)
  private String         boardTypeCode;  // 게시판 타입 코드 (JOIN)
  private String			memNickname;	// 작성자 닉네임 (JOIN)
+ private String			memId;			// 작성자 아이디 (JOIN)
+ private int			replyCount;		// 댓글 수 (서브쿼리)
+ private int            boardLikeCount; // 좋아요 수
 }
