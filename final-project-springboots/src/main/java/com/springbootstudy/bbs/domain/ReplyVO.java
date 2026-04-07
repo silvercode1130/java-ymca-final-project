@@ -21,6 +21,11 @@ public class ReplyVO {
  private Integer 		replyStep;       // 댓글 순서
  private Integer 		replyDepth;      // 댓글 깊이
 
+ // 조회용 추가 필드
+ private String         memNickname;     // 작성자 닉네임 (JOIN)
+ private String         memId;           // 작성자 아이디 (JOIN)
+ private int            replyLikeCount;  // 좋아요 수
+
 }
 
 

@@ -21,9 +21,25 @@ public interface BoardMapper {
     // ── 게시글 ───────────────────────────────────────────────
     // 목록 (typeCode 기반)
     List<BoardVO> findBoards(
-            @Param("typeCode") 	String typeCode,
-            @Param("keyword")  	String keyword,
-            @Param("searchType")String searchType
+            @Param("typeCode")    String typeCode,
+            @Param("keyword")     String keyword,
+            @Param("searchType")  String searchType
+    );
+
+    // 목록 (페이징)
+    List<BoardVO> findBoardsPaged(
+            @Param("typeCode")    String typeCode,
+            @Param("keyword")     String keyword,
+            @Param("searchType")  String searchType,
+            @Param("offset")      int    offset,
+            @Param("limit")       int    limit
+    );
+
+    // 전체 게시글 수
+    int countBoards(
+            @Param("typeCode")    String typeCode,
+            @Param("keyword")     String keyword,
+            @Param("searchType")  String searchType
     );
 
     // 상세
@@ -31,6 +47,10 @@ public interface BoardMapper {
 
     // 조회수 +1
     void increaseViewCount(@Param("boardIdx") Long boardIdx);
+
+    // 좋아요 +1
+    void increaseBoardLike(@Param("boardIdx") Long boardIdx);
+    void increaseReplyLike(@Param("replyIdx") Long replyIdx);
 
     // 등록
     int insertBoard(BoardVO board);
@@ -47,6 +67,18 @@ public interface BoardMapper {
     // ── 댓글 ─────────────────────────────────────────────────
     List<ReplyVO> findRepliesByBoard(@Param("boardIdx") Long boardIdx);
 
+    // 댓글 목록 (페이징)
+    List<ReplyVO> findRepliesByBoardPaged(
+            @Param("boardIdx") Long boardIdx,
+            @Param("offset")   int  offset,
+            @Param("limit")    int  limit,
+            @Param("sortType") String sortType
+    );
+
+    // 원댓글 그룹 수 (페이징 기준)
+    int countRootRepliesByBoard(@Param("boardIdx") Long boardIdx);
+
+
     // 원댓 등록 (ref = 자기 자신 idx, step=0, depth=0)
     int insertReply(ReplyVO reply);
 
@@ -62,6 +94,9 @@ public interface BoardMapper {
 
     // 원댓 ref 업데이트 (insert 후 자기 idx로 세팅)
     void updateReplyRef(ReplyVO reply);
+
+    // 댓글 수정
+    int updateReply(ReplyVO reply);
 
     // 삭제 (soft delete)
     int deleteReply(@Param("replyIdx") Long replyIdx);

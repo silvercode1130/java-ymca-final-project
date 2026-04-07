@@ -1,0 +1,112 @@
+/* ── 게시판 레이아웃 ────────────────────────────────────── */
+.layout { display: flex; min-height: calc(100vh - 60px); }
+
+/* ── 사이드바 ──────────────────────────────────────────── */
+.sidebar {
+  width: 200px; min-width: 200px;
+  border-right: 1px solid #2a2a2a;
+  padding: 1.5rem 0;
+}
+.sidebar-title {
+  color: #0d0d0d; font-weight: 700; font-size: .9rem;
+  padding: .5rem 1.2rem 1rem;
+  border-bottom: 1px solid #2a2a2a;
+  margin-bottom: .5rem;
+}
+.sidebar-item {
+  display: block; padding: .45rem 1.2rem;
+  color: #0d0d0d; text-decoration: none; font-size: .88rem;
+  transition: all .15s;
+}
+.sidebar-item:hover { color: #c6f135; }
+.sidebar-item.active { background: #c6f135; color: #121212; font-weight: 700; }
+
+/* ── 메인 콘텐츠 ───────────────────────────────────────── */
+.main-content { flex: 1; padding: 1.8rem 2rem; }
+
+.page-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 1.2rem;
+}
+.page-title { color: #0d0d0d; font-weight: 700; font-size: 1.4rem; }
+
+.btn-write {
+  background: #c6f135; color: #121212; font-weight: 700; border: none;
+  padding: .4rem 1.2rem; border-radius: 6px; font-size: .88rem; text-decoration: none;
+}
+.btn-write:hover { background: #b0d92e; color: #121212; }
+
+/* ── 검색 바 ───────────────────────────────────────────── */
+.search-bar { display: flex; gap: .5rem; margin-bottom: 1.2rem; align-items: center; }
+.search-bar select {
+  border: 1px solid #333; color: #0d0d0d;
+  border-radius: 6px; padding: .35rem .6rem; font-size: .85rem;
+}
+.search-bar input {
+  flex: 1; border: 1px solid #333; color: #e0e0e0;
+  border-radius: 6px; padding: .35rem .8rem; font-size: .85rem;
+}
+.search-bar input:focus { outline: none; border-color: #c6f135; }
+.btn-search {
+  background: #c6f135; color: #121212; font-weight: 700; border: none;
+  border-radius: 6px; padding: .35rem 1rem; font-size: .85rem; cursor: pointer;
+}
+.btn-search:hover { background: #b0d92e; }
+
+/* ── 게시글 테이블 ─────────────────────────────────────── */
+.board-table { width: 100%; border-collapse: collapse; }
+.board-table thead tr { border-top: 2px solid #c6f135; border-bottom: 1px solid #2a2a2a; }
+.board-table thead th {
+  padding: .65rem .8rem; color: #aaa; font-size: .82rem;
+  font-weight: 600; background: #1a1a1a;
+}
+.board-table tbody tr { border-bottom: 1px solid #222; transition: background .12s; }
+.board-table tbody tr:hover { background: #888888; }
+.board-table td { padding: .65rem .8rem; font-size: .88rem; color: #0d0d0d; vertical-align: middle; }
+.board-table td a { color: #0d0d0d; text-decoration: none; }
+.board-table td a:hover { color: #c6f135; }
+
+.reply-count { color: #c6f135; font-size: .78rem; margin-left: 4px; }
+.writer-dot {
+  display: inline-block; width: 7px; height: 7px; border-radius: 50%;
+  background: #c6f135; margin-right: 5px; vertical-align: middle;
+}
+
+/* ── 게시글 상세 ───────────────────────────────────────── */
+.board-card { background: #fff; border-radius: 12px; padding: 2rem; margin-bottom: 1.5rem; }
+.board-title { font-size: 1.5rem; font-weight: 700; color: #0d0d0d; margin-bottom: .5rem; }
+.board-meta { font-size: .82rem; color: #0d0d0d; margin-bottom: 1.5rem; }
+.board-meta span { margin-right: 1rem; }
+.board-content { line-height: 1.8; color: #0d0d0d; white-space: pre-wrap; }
+
+/* ── 댓글 ──────────────────────────────────────────────── */
+.reply-section { background: #888888; border-radius: 12px; padding: 1.5rem; }
+.reply-section h5 { color: #c6f135; font-weight: 700; margin-bottom: 1rem; }
+.reply-item { border-bottom: 1px solid #2a2a2a; padding: .8rem 0; }
+.reply-item:last-child { border-bottom: none; }
+.reply-content { color: #ccc; font-size: .9rem; }
+.reply-meta { font-size: .78rem; color: #666; margin-top: .2rem; }
+.reply-form textarea {
+  background: #2a2a2a; border: 1px solid #444; color: #e0e0e0;
+  border-radius: 8px; resize: vertical;
+}
+.reply-form textarea:focus { border-color: #c6f135; box-shadow: 0 0 0 2px rgba(198,241,53,.2); outline: none; }
+.reply-toggle { font-size: .8rem; color: #888; cursor: pointer; }
+.reply-toggle:hover { color: #c6f135; }
+
+/* ── 글쓰기/수정 폼 ────────────────────────────────────── */
+.write-card { background: #888888; border-radius: 12px; padding: 2rem; max-width: 760px; margin: 0 auto; }
+.write-card h4 { color: #c6f135; font-weight: 700; margin-bottom: 1.5rem; }
+.board-badge {
+  background: #c6f135; color: #121212; font-size: .8rem; font-weight: 700;
+  border-radius: 20px; padding: 3px 12px; display: inline-block; margin-bottom: 1rem;
+}
+
+/* ── 페이지네이션 ──────────────────────────────────────── */
+.pagination-wrap { display: flex; justify-content: center; gap: .3rem; margin-top: 1.5rem; }
+.page-btn {
+  background: #1e1e1e; border: 1px solid #2a2a2a; color: #aaa;
+  border-radius: 6px; padding: .3rem .7rem; font-size: .85rem;
+  cursor: pointer; text-decoration: none;
+}
+.page-btn:hover, .page-btn.active { background: #c6f135; color: #121212; border-color: #c6f135; font-weight: 700; }
