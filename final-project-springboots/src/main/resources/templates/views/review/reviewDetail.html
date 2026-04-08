@@ -21,7 +21,7 @@
 	            </tr>
 	            <tr>
 	            	<th>최종 입찰가</th>
-	                <td th:text="${review.auctionTargetPrice}"></td>
+	                <td th:text="${#numbers.formatInteger(review.auctionTargetPrice, 0, 'COMMA')}"></td>
 	            </tr>
 	            <tr>
 	                <th>판매자(입찰자)</th>
