@@ -60,21 +60,6 @@ public class BidService {
         // 위에서 생성된 itemIdx를 가지고 입찰(bid) 정보 저장
         bidMapper.insertBid(bidDto);
         
-        // 웹소켓 알림 발행
-        
-        Long auctionIdx = bidDto.getAuctionIdx();
-        Long bidIdx = bidDto.getBidIdx();
-        Long bidderIdx = bidDto.getBidderIdx();
-        
-        BidEventMessage event = new BidEventMessage (
-        		"Bid_CREATED",
-        		auctionIdx,
-        		bidIdx,
-        		bidderIdx,
-        		bidDto.getBidPrice()
-        		);
-        
-        messagingTemplate.convertAndSend("/topic/auction/"+auctionIdx, event);
     }
     
     // 입찰 삭제 - 소프트 딜리트
