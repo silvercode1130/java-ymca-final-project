@@ -356,13 +356,26 @@ VALUES (8, 'accessory',   '액세서리/잡화');
 
 -- 5-4) AUCTION_STATUS 코드
 INSERT INTO auction_status (auction_status_idx, auction_status_code, auction_status_name)
-VALUES (1, 'open',    '진행중');
+VALUES (1, 'open','진행중');
 INSERT INTO auction_status (auction_status_idx, auction_status_code, auction_status_name)
-VALUES (2, 'closed',  '마감');
+VALUES (2, 'decide','결정대기중');
 INSERT INTO auction_status (auction_status_idx, auction_status_code, auction_status_name)
-VALUES (3, 'failed',  '유찰');
+VALUES (3, 'closed','마감');
 INSERT INTO auction_status (auction_status_idx, auction_status_code, auction_status_name)
-VALUES (4, 'canceled','취소');
+VALUES (4, 'failed','유찰');
+INSERT INTO auction_status (auction_status_idx, auction_status_code, auction_status_name)
+VALUES (5, 'canceled','취소');
+INSERT INTO auction_status (auction_status_idx, auction_status_code, auction_status_name)
+VALUES (6, 'deleted','삭제됨');
+INSERT INTO auction_status (auction_status_idx, auction_status_code, auction_status_name)
+VALUES (7, 'paying','결제대기');
+INSERT INTO auction_status (auction_status_idx, auction_status_code, auction_status_name)
+VALUES (8, 'paid','결제완료');
+INSERT INTO auction_status (auction_status_idx, auction_status_code, auction_status_name)
+VALUES (9, 'shipping','배송중');
+INSERT INTO auction_status (auction_status_idx, auction_status_code, auction_status_name)
+VALUES (10, 'delivered','배송완료');
+
 
 -- 5-5) BID_STATUS 코드
 INSERT INTO bid_status (bid_status_idx, bid_status_code, bid_status_name)
@@ -373,6 +386,8 @@ INSERT INTO bid_status (bid_status_idx, bid_status_code, bid_status_name)
 VALUES (3, 'lost',     '실패');
 INSERT INTO bid_status (bid_status_idx, bid_status_code, bid_status_name)
 VALUES (4, 'canceled', '취소');
+INSERT INTO bid_status (bid_status_idx, bid_status_code, bid_status_name)
+VALUES (5, 'deleted', '삭제됨');
 
 -- 5-6) BOARD_TYPE 코드
 INSERT INTO board_type (board_type_idx, board_type_code, board_type_name, board_can_comment, board_min_role)

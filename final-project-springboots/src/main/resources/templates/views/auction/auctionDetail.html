@@ -19,9 +19,11 @@
                 <strong>상태 : </strong>
                 <!-- 상태에 따라 색깔 배지로 표시 -->
                 <span th:if="${detail.auctionStatusIdx == 1}">진행중</span>
-                <span th:if="${detail.auctionStatusIdx == 2}">마감</span>
-                <span th:if="${detail.auctionStatusIdx == 3}">유찰</span>
-                <span th:if="${detail.auctionStatusIdx == 4}">취소</span>
+                <span th:if="${detail.auctionStatusIdx == 2}">결정대기중</span>
+				<span th:if="${detail.auctionStatusIdx == 3}">마감</span>
+				<span th:if="${detail.auctionStatusIdx == 4}">유찰</span>
+				<span th:if="${detail.auctionStatusIdx == 5}">취소</span>
+				<span th:if="${detail.auctionStatusIdx == 6}">삭제됨</span>
             </p>
             <p>
                 <strong>카테고리:</strong> [[${detail.itemCategoryName}]]
@@ -77,13 +79,15 @@
 		</div>
     </div>
 
-    <!-- 4번: 진행중(1)일 때만 입찰 폼 표시, 나머지 상태면 마감 안내 -->
+    <!-- 진행중(1)일 때만 입찰 폼 표시, 나머지 상태면 마감 안내 -->
     <div th:if="${detail.auctionStatusIdx != 1}"
          style="margin:20px; padding:20px; border:2px solid #ccc; border-radius:8px; text-align:center; color:gray;">
         <p style="font-size:1.2rem; font-weight:bold;">
-            <span th:if="${detail.auctionStatusIdx == 2}">⛔ 마감된 경매입니다.</span>
-            <span th:if="${detail.auctionStatusIdx == 3}">😢 유찰된 경매입니다.</span>
-            <span th:if="${detail.auctionStatusIdx == 4}">❌ 취소된 경매입니다.</span>
+            <span th:if="${detail.auctionStatusIdx == 2}">⏳ 결정 대기중인 경매입니다.</span>
+			<span th:if="${detail.auctionStatusIdx == 3}">⛔ 마감된 경매입니다.</span>
+			<span th:if="${detail.auctionStatusIdx == 4}">😢 유찰된 경매입니다.</span>
+			<span th:if="${detail.auctionStatusIdx == 5}">❌ 취소된 경매입니다.</span>
+			<span th:if="${detail.auctionStatusIdx == 6}">❌ 삭제된 경매입니다.</span>
         </p>
         <p style="color:#aaa; font-size:0.9rem;">입찰이 종료되었습니다.</p>
     </div>
@@ -169,10 +173,10 @@
 	            <td>
 	                <span th:if="${session.loginUser != null
 	                              and session.loginUser.memIdx == detail.buyerIdx}"
-	                      th:text="${bid.realMemName}">신정은</span>
+	                      th:text="${bid.memName}">신정은</span>
 	                <span th:if="${session.loginUser == null
 	                              or session.loginUser.memIdx != detail.buyerIdx}"
-	                      th:text="${bid.memName}">신**</span>
+	                      th:text="${bid.bidderName}">신**</span>
 	            </td>
 	
 	            <td th:text="${#numbers.formatInteger(bid.bidPrice, 0, 'COMMA')} + '원'">50,000원</td>
@@ -180,7 +184,7 @@
 	            <td th:text="${bid.bidStatusName}">일반</td>
 	
 	            <td th:if="${session.loginUser != null}">
-	                <!-- 구매자: 낙찰 버튼 (입찰 마감(2) 됐을 때만 활성화!) -->
+	                <!-- 구매자: 낙찰 버튼 (입찰 마감(2) 됐을 때만 활성화) -->
 					<form th:if="${session.loginUser.memIdx == detail.buyerIdx
 					              and bid.bidStatusIdx == 1
 					              and detail.auctionStatusIdx == 2}"
