@@ -135,8 +135,7 @@ public class ReviewController {
 	
 	// 임시 삭제
 	@GetMapping("/reviewDelete")
-	public String reviewDelete(@RequestParam("reviewIdx") Long reviewIdx,
-	                           HttpSession session) {
+	public String reviewDelete(@RequestParam("reviewIdx") Long reviewIdx, HttpSession session) {
 
 	    MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
 
@@ -151,7 +150,7 @@ public class ReviewController {
 	}
 	
 	// 영구 삭제
-	@GetMapping("/hardDelete")
+	@GetMapping("/review/hardDelete")
 	public String hardDelete(@RequestParam("reviewIdx") Long reviewIdx, HttpSession session) {
 
 	    MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
@@ -162,6 +161,23 @@ public class ReviewController {
 
 	    reviewService.hardDeleteReview(reviewIdx);
 	    return "redirect:/reviewAdmin";
+	}
+	
+	// 삭제 취소 -----------------------------------------------------------------
+	
+	@GetMapping("/review/reviewCancel")
+	public String reviewCancel(@RequestParam("reviewIdx") Long reviewIdx, HttpSession session) {
+		
+		MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
+
+	    if (loginUser == null || loginUser.getMemRoleIdx() != 2) {
+	        return "redirect:/main";
+	    }
+	    
+	    // 리뷰 취소 기능
+	    reviewService.cancelDelete(reviewIdx);
+		
+		return "views/review/reviewAdmin";
 	}
 	
 	// 관리자 리뷰 페이지 -----------------------------------------------------------------

@@ -67,5 +67,10 @@ public class ReviewService {
     public void hardDeleteReview(Long reviewIdx) {
         reviewMapper.hardDeleteReview(reviewIdx);
     }
+
+    // 리뷰 삭제 취소
+	public void cancelDelete(Long reviewIdx) {
+		reviewMapper.cancelDelete(reviewIdx);
+	}
 	
 }

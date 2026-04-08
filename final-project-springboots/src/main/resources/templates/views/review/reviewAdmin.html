@@ -90,15 +90,15 @@
 				        </td>
 				        <td th:text="${#temporals.format(review.reviewRegdate, 'yyyy-MM-dd HH:mm')}"></td>
 				        <td>
-				            <button type="button" th:onclick="|location.href='@{/review/reviewDetail(reviewIdx=${review.reviewIdx})}'|">
+				            <button type="button" th:if="${session.loginUser.memRoleIdx == 2}" th:onclick="|location.href='@{/review/reviewDetail(reviewIdx=${review.reviewIdx})}'|">
 				                상세보기
 				            </button>
-				            <button>
+				            <button th:if="${session.loginUser.memRoleIdx == 2}" th:onclick="|location.href='@{/review/reviewCancel(reviewIdx=${review.reviewIdx})}'|">
 				            	삭제 취소
 				            </button>
 				            <button th:if="${session.loginUser.memRoleIdx == 2}" 
 				                    type="button" 
-				                    th:onclick="|if(confirm('⚠️ 정말 영구삭제 하시겠습니까?\n삭제된 리뷰는 되돌릴 수 없습니다')) location.href='@{/hardDelete(reviewIdx=${review.reviewIdx})}'|">
+				                    th:onclick="|if(confirm('⚠️ 정말 영구삭제 하시겠습니까?\n삭제된 리뷰는 되돌릴 수 없습니다')) location.href='@{/review/hardDelete(reviewIdx=${review.reviewIdx})}'|">
 				                영구 삭제
 				            </button>
 				        </td>

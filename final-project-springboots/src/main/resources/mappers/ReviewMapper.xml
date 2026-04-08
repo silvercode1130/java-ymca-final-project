@@ -188,5 +188,12 @@
 	    DELETE FROM review
 	    WHERE review_idx = #{reviewIdx}
 	</delete>
+	
+	<!-- 삭제 취소 -->
+	<update id="cancelDelete">
+	    UPDATE review
+	    SET review_is_deleted = 'N'
+	    WHERE review_idx = #{reviewIdx}
+	</update>
 
 </mapper>	

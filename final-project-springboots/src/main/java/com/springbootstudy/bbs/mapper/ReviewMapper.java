@@ -41,6 +41,9 @@ public interface ReviewMapper {
     
     // 삭제 관련 (띄우기)
     List<ReviewVO> getActiveReviewList();  
-    List<ReviewVO> getDeletedReviewList(); 
+    List<ReviewVO> getDeletedReviewList();
+
+    // 리뷰 삭제 취소
+	void cancelDelete(Long reviewIdx); 
 	
 }
