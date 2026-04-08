@@ -52,6 +52,9 @@
                         	</button>
 						</td>
 					</tr>
+					<tr th:if="${#lists.isEmpty(reviewList)}">
+					    <td colspan="5">작성한 리뷰가 없습니다</td>
+					</tr>
 				</tbody>
 			</table>
 		</div> 
@@ -114,7 +117,9 @@
                         		삭제
                         	</button>
 						</td>
-					</tr>
+						<tr th:if="${#lists.isEmpty(receivedReviewList)}">
+						    <td colspan="5">받은 리뷰가 없습니다</td>
+						</tr>
 				</tbody>
 			</table>
 		</div> 
