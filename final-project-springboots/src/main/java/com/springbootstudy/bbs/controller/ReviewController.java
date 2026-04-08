@@ -100,7 +100,7 @@ public class ReviewController {
 	        @RequestParam("buyer_idx") Long buyerIdx,
 	        @RequestParam("bid_idx") Long bidIdx,
 	        @RequestParam("auction_idx") Long auctionIdx,
-	        @RequestParam("bidder_idx") Long bidderIdx,
+	        @RequestParam("bidder_idx") Long bidderIdx, 
 	        @RequestParam("reviewTitle") String reviewTitle,
 	        @RequestParam("reviewStar") int reviewStar,
 	        @RequestParam("content") String content ) {
@@ -133,6 +133,7 @@ public class ReviewController {
 	
 	// 리뷰 삭제하기(관리자만) -----------------------------------------------------------------
 	
+	// 임시 삭제
 	@GetMapping("/reviewDelete")
 	public String reviewDelete(@RequestParam("reviewIdx") Long reviewIdx,
 	                           HttpSession session) {
@@ -149,8 +150,23 @@ public class ReviewController {
 	    return "redirect:/reviewAdmin";
 	}
 	
+	// 영구 삭제
+	@GetMapping("/hardDelete")
+	public String hardDelete(@RequestParam("reviewIdx") Long reviewIdx, HttpSession session) {
+
+	    MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
+
+	    if (loginUser == null || loginUser.getMemRoleIdx() != 2) {
+	        return "redirect:/main";
+	    }
+
+	    reviewService.hardDeleteReview(reviewIdx);
+	    return "redirect:/reviewAdmin";
+	}
+	
 	// 관리자 리뷰 페이지 -----------------------------------------------------------------
 	
+	// 페이지만 띄움
 	@GetMapping("/reviewAdmin")
 	public String reviewAdmin(HttpSession session, Model model) {
 	    MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");

@@ -142,24 +142,8 @@
 		JOIN member bidder ON b.bidder_idx = bidder.mem_idx
 		WHERE r.review_idx = #{reviewIdx}
     </select>
-    
-    <!-- 리뷰 삭제하기(관리자만) -->
-	<select id="getAllReviewList" resultType="com.springbootstudy.bbs.domain.ReviewVO">
-	    SELECT 
-	        r.review_idx AS reviewIdx,
-	        a.auction_title AS auctionTitle,
-	        i.item_name AS itemName,
-	        r.review_star AS reviewStar,
-	        r.review_regdate AS reviewRegdate,
-	        r.review_is_deleted AS reviewIsDelete
-	    FROM review r
-	    JOIN auction a ON r.auction_idx = a.auction_idx
-	    JOIN bid b ON r.bid_idx = b.bid_idx
-	    LEFT JOIN item i ON b.item_idx = i.item_idx   
-	    WHERE r.review_is_deleted = 'N'
-	    ORDER BY r.review_idx DESC
-	</select>
 	
+	<!-- 임시삭제 -->
 	<update id="deleteReview">
 	    UPDATE review 
 	    SET review_is_deleted = 'Y', 
@@ -198,5 +182,11 @@
 	    WHERE r.review_is_deleted = 'Y'
 	    ORDER BY r.review_idx DESC
 	</select>
+	
+	<!-- 영구 삭제 -->
+	<delete id="hardDeleteReview">
+	    DELETE FROM review
+	    WHERE review_idx = #{reviewIdx}
+	</delete>
 
 </mapper>	

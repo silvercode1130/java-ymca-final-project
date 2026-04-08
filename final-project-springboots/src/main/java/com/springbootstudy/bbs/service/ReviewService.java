@@ -50,11 +50,7 @@ public class ReviewService {
 	    return reviewMapper.getReviewDetail(reviewIdx);
 	}
 	
-	// 리뷰 전체 보기
-	public List<ReviewVO> getAllReviewList() { 
-	    return reviewMapper.getAllReviewList();
-	}
-	// 리뷰 삭제하기
+	// 리뷰 임시삭제하기
     public void deleteReview(Long reviewIdx) {
         reviewMapper.deleteReview(reviewIdx);
     }
@@ -62,9 +58,14 @@ public class ReviewService {
     public List<ReviewVO> getActiveReviewList() {
         return reviewMapper.getActiveReviewList();
     }
-    // 리뷰 영구삭제하기
+    // 리뷰 임시삭제 조회하기
     public List<ReviewVO> getDeletedReviewList() {
         return reviewMapper.getDeletedReviewList();
+    }
+    
+    // 리뷰 영구삭제하기
+    public void hardDeleteReview(Long reviewIdx) {
+        reviewMapper.hardDeleteReview(reviewIdx);
     }
 	
 }

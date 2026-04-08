@@ -33,9 +33,11 @@ public interface ReviewMapper {
 	ReviewVO getReviewDetail(Long reviewIdx);
 	
 	// 리뷰 삭제하기(관리자만)
-	List<ReviewVO> getAllReviewList();    
-    // soft delete 처리
+	//List<ReviewVO> getAllReviewList();    
+    // 임시삭제 처리
     void deleteReview(@Param("reviewIdx") Long reviewIdx);
+    // 영구삭제 처리
+    void hardDeleteReview(@Param("reviewIdx") Long reviewIdx);
     
     // 삭제 관련 (띄우기)
     List<ReviewVO> getActiveReviewList();  

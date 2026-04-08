@@ -52,6 +52,9 @@
 				            </button>
 				        </td>
 				    </tr>
+				    <tr th:if="${#lists.isEmpty(activeList)}">
+					    <td colspan="5">관리할 리뷰가 없습니다</td>
+					</tr>
 				</tbody>
 			</table>
 		</div> 
@@ -90,13 +93,19 @@
 				            <button type="button" th:onclick="|location.href='@{/review/reviewDetail(reviewIdx=${review.reviewIdx})}'|">
 				                상세보기
 				            </button>
+				            <button>
+				            	삭제 취소
+				            </button>
 				            <button th:if="${session.loginUser.memRoleIdx == 2}" 
 				                    type="button" 
-				                    th:onclick="|if(confirm('정말 삭제하시겠습니까?')) location.href='@{/reviewDelete(reviewIdx=${review.reviewIdx})}'|">
+				                    th:onclick="|if(confirm('⚠️ 정말 영구삭제 하시겠습니까?\n삭제된 리뷰는 되돌릴 수 없습니다')) location.href='@{/hardDelete(reviewIdx=${review.reviewIdx})}'|">
 				                영구 삭제
 				            </button>
 				        </td>
 				    </tr>
+				    <tr th:if="${#lists.isEmpty(deletedList)}">
+					    <td colspan="5">임시삭제 된 리뷰가 없습니다</td>
+					</tr>
 				</tbody>
 			</table>
 		</div> 
