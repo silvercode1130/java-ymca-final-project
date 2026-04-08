@@ -54,5 +54,9 @@ public class ReviewService {
 	public List<ReviewVO> getAllReviewList() { 
 	    return reviewMapper.getAllReviewList();
 	}
+	// 리뷰 삭제하기
+    public void deleteReview(Long reviewIdx) {
+        reviewMapper.deleteReview(reviewIdx);
+    }
 	
 }

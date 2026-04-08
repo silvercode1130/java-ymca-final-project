@@ -158,14 +158,22 @@ public class ReviewController {
 	}
 	
 	// 관리자 리뷰 페이지 -----------------------------------------------------------------
-
+	
 	@GetMapping("/reviewAdmin")
 	public String reviewAdmin(HttpSession session, Model model) {
+	    MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
+	    
+	    // 관리자만 들어올 수 있음
+	    if (loginUser == null || loginUser.getMemRoleIdx() != 2) {
+	        return "redirect:/main"; 
+	    }
 
-	  
+	    // 전체 리뷰 가져오기
+	    List<ReviewVO> allList = reviewService.getAllReviewList();
+	    model.addAttribute("reviewList", allList);
 
-	    return "views/review/reviewAdmin";
-	} 
+	    return "views/review/reviewAdmin"; 
+	}
 	
 	
 	
