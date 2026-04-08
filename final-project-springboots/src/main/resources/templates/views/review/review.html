@@ -32,7 +32,16 @@
 					<tr th:each="review : ${reviewList}">
 						<td th:text="${review.auctionTitle}"></td>
 						<td th:text="${review.itemName}"></td>
-						<td th:text="${review.reviewStar}"></td>
+						<td th:with="star=${review.reviewStar}">
+							<!-- 채운 별 -->
+						    <span th:each="i : ${#numbers.sequence(1, star)}">
+						        <i class="bi bi-star-fill" style="color: gold;"></i>
+						    </span>
+						    <!-- 빈 별 -->
+						    <span th:if="${star < 5}" th:each="i : ${#numbers.sequence(1, 5 - star)}">
+						        <i class="bi bi-star"></i> 
+						    </span>
+						</td>
 						<td th:text="${#temporals.format(review.reviewRegdate, 'yyyy-MM-dd HH:mm')}"></td>
 						<td>
 							<button type="button" th:onclick="|location.href='@{/review/reviewDetail(reviewIdx=${review.reviewIdx})}'|">
@@ -87,7 +96,16 @@
 					<tr th:each="review : ${receivedReviewList}">
 						<td th:text="${review.auctionTitle}"></td>
 						<td th:text="${review.itemName}"></td>
-						<td th:text="${review.reviewStar}"><i class="bi bi-star-fill" style="color: gold;"></i></td>
+						<td th:with="star=${review.reviewStar}">
+							<!-- 채운 별 -->
+						    <span th:each="i : ${#numbers.sequence(1, star)}">
+						        <i class="bi bi-star-fill" style="color: gold;"></i>
+						    </span>
+						    <!-- 빈 별 -->
+						    <span th:if="${star < 5}" th:each="i : ${#numbers.sequence(1, 5 - star)}">
+						        <i class="bi bi-star"></i> 
+						    </span>
+						</td>
 						<td th:text="${#temporals.format(review.reviewRegdate, 'yyyy-MM-dd HH:mm')}"></td>
 						<td>
 							<button type="button" th:onclick="|location.href='@{/review/reviewDetail(reviewIdx=${review.reviewIdx})}'|">
