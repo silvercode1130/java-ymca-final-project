@@ -2,6 +2,15 @@
 
 -- 기존 뷰 삭제 후 재생성 (MySQL은 CREATE OR REPLACE VIEW 지원)
 
+
+/* ==========================================
+   6. 뷰 테이블
+   ========================================== */
+   
+   DROP VIEW IF EXISTS auction_list_view;
+   DROP VIEW IF EXISTS auction_detail_view;
+   DROP VIEW IF EXISTS bid_list_view;
+   
 -- AuctionList
 CREATE OR REPLACE VIEW auction_list_view AS
 SELECT
@@ -13,10 +22,12 @@ SELECT
     a.auction_target_price,
     a.auction_end_at,
     a.auction_status_idx,
+    s.auction_status_code,
     s.auction_status_name,
     ic.item_category_name,
-    COUNT(b.bid_idx) AS bidCount,
-    IFNULL(MIN(b.bid_price), 0) AS minBidPrice,
+    ic.item_category_code,
+    COUNT(b.bid_idx) AS bid_count,
+    IFNULL(MIN(b.bid_price), 0) AS min_bid_price ,
     a.auction_regdate,
     a.auction_is_deleted
 FROM auction a
@@ -27,7 +38,7 @@ GROUP BY
     a.auction_idx, a.buyer_idx, a.item_category_idx,
     a.auction_thumbnail_img, a.auction_title, a.auction_target_price,
     a.auction_end_at, a.auction_status_idx, s.auction_status_name,
-    ic.item_category_name, a.auction_regdate, a.auction_is_deleted;
+    ic.item_category_name, ic.item_category_code, a.auction_regdate, a.auction_is_deleted;
 
 
 -- AuctionDetail
@@ -43,10 +54,11 @@ SELECT
     a.auction_end_at,
     a.auction_decision_deadline,
     a.auction_status_idx,
+    s.auction_status_code,
     s.auction_status_name,
     ic.item_category_name,
-    COUNT(b.bid_idx) AS b_count,
-    IFNULL(MIN(b.bid_price), 0) AS min_price,
+    COUNT(b.bid_idx) AS bid_count,
+    IFNULL(MIN(b.bid_price), 0) AS min_bid_price,
     a.auction_is_deleted
 FROM auction a
 JOIN auction_status s ON a.auction_status_idx = s.auction_status_idx
@@ -66,7 +78,7 @@ SELECT
     b.bid_idx,
     b.auction_idx,
     b.bidder_idx,
-    m.mem_name          AS mem_name,        -- 실명 (구매자에게만 노출, 서비스에서 마스킹 처리)
+    m.mem_name AS mem_name,        -- 실명 (구매자에게만 노출, 서비스에서 마스킹 처리)
     b.bid_price,
     b.bid_quantity,
     b.bid_message,
