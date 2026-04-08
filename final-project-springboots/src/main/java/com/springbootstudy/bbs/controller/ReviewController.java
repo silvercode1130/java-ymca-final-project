@@ -29,11 +29,15 @@ public class ReviewController {
 
 	    MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
 
+	    // 내가 쓴 리뷰
 	    List<ReviewVO> list = reviewService.getMyReviewList(loginUser.getMemIdx());
+	    // 내가 받은 리뷰
+	    List<ReviewVO> receivedReviewList = reviewService.getReceivedReviews(loginUser.getMemIdx());
 
 	    model.addAttribute("reviewList", list);
-
-	    return "views/review/review";
+	    model.addAttribute("receivedReviewList", receivedReviewList);
+	    
+	    return "views/review/review"; 
 	}
 	
 	// 리뷰 작성창 -----------------------------------------------------------------
@@ -115,10 +119,10 @@ public class ReviewController {
 		return "/views/review/reviewDetail";
 	}
 	
-	// 리뷰 삭제하기 -----------------------------------------------------------------
+	// 리뷰 삭제하기(관리자만) -----------------------------------------------------------------
 	
-	@GetMapping("/review")
-	public String review(HttpSession session, Model model) {
+	@GetMapping("/reviewDelete")
+	public String reviewDelete(HttpSession session, Model model) {
 
 	    MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
 
@@ -140,5 +144,24 @@ public class ReviewController {
 
 	    return "views/review/review";
 	}
+	
+	// 관리자 리뷰 페이지 -----------------------------------------------------------------
 
+	@GetMapping("/reviewAdmin")
+	public String reviewAdmin(HttpSession session, Model model) {
+
+	  
+
+	    return "views/review/reviewAdmin";
+	} 
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 }

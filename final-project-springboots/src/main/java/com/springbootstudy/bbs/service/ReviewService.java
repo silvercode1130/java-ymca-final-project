@@ -15,9 +15,14 @@ public class ReviewService {
 	@Autowired
     private ReviewMapper reviewMapper;
 	
-	// 리뷰 조회
+	// 내가 쓴 리뷰 조회
 	public List<ReviewVO> getMyReviewList(Long buyerIdx) {
-	    return reviewMapper.getMyReviewList(buyerIdx);
+	    return reviewMapper.getMyReviewList(buyerIdx); 
+	}
+	
+	// 내가 받은 리뷰 조회
+	public List<ReviewVO> getReceivedReviews(Long bidIdx) {
+		return reviewMapper.getReceivedReviews(bidIdx);  
 	}
 	
 	// 검색 전 기본 목록
@@ -41,7 +46,7 @@ public class ReviewService {
 	}
 	
 	// 리뷰 삭제하기(관리자만)
-	public List<ReviewVO> getAllReviewList() {
+	public List<ReviewVO> getAllReviewList() { 
 	    return reviewMapper.getAllReviewList();
 	}
 	

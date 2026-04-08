@@ -6,10 +6,7 @@
 <title>Insert title here</title>
 </head>
 <body>
-	<form class="review" action="">
-	
-	
-	
+	<form class="review">
 		<div class="reviewTitle">
 			리뷰관리 <br>
 			거래 후 작성한 리뷰 목록
@@ -45,11 +42,50 @@
 					</tr>
 				</tbody>
 			</table>
-		</div>
+		</div> 
 		
 		<div>
 			<input type="button" value="리뷰 남기기" onclick="location.href='review/reviewWrite'">
 		</div>
+		
+		<div class="review">
+			<div class="reviewTitle">
+				거래 후 내가 받은 리뷰
+			</div>
+		</div>
+		
+		<div>
+			<!-- ${} 바꿔야 할 것 같음 -->
+			<table id="table" name="table" border="1">
+				<thead>
+					<th:if>
+						<tr>
+							<th>거래 제목</th>
+							<th>상품명</th> 
+							<th>별점</th>      
+							<th>리뷰 작성일</th>
+		                    <th>관리</th>
+						</tr>
+					</th:if>
+				</thead>
+				<tbody>
+					<tr th:each="review : ${receivedReviewList}">
+						<td th:text="${review.auctionTitle}"></td>
+						<td th:text="${review.itemName}"></td>
+						<td th:text="${review.reviewStar}"></td>
+						<td th:text="${#temporals.format(review.reviewRegdate, 'yyyy-MM-dd HH:mm')}"></td>
+						<td>
+							<button type="button" th:onclick="|location.href='@{/review/reviewDetail(reviewIdx=${review.reviewIdx})}'|">
+							    상세보기
+							</button>
+                        	<button th:if="${session.loginUser.memRoleIdx == 2}">
+                        		삭제
+                        	</button>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div> 
 	
 	</form>
 </body>
