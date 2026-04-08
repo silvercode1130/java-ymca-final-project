@@ -21,8 +21,13 @@ public class ReviewService {
 	}
 	
 	// 내가 받은 리뷰 조회
-	public List<ReviewVO> getReceivedReviews(Long bidIdx) {
-		return reviewMapper.getReceivedReviews(bidIdx);  
+	public List<ReviewVO> getReceivedReviews(Long memIdx) {
+		return reviewMapper.getReceivedReviews(memIdx);   
+	}
+	
+	// 내가 받은 리뷰 별점 평균
+	public Double getAvgRating(Long memIdx) {
+	    return reviewMapper.getAvgRating(memIdx);
 	}
 	
 	// 검색 전 기본 목록
@@ -45,9 +50,27 @@ public class ReviewService {
 	    return reviewMapper.getReviewDetail(reviewIdx);
 	}
 	
-	// 리뷰 삭제하기(관리자만)
-	public List<ReviewVO> getAllReviewList() { 
-	    return reviewMapper.getAllReviewList();
+	// 리뷰 임시삭제하기
+    public void deleteReview(Long reviewIdx) {
+        reviewMapper.deleteReview(reviewIdx);
+    }
+    // 리뷰 삭제하기
+    public List<ReviewVO> getActiveReviewList() {
+        return reviewMapper.getActiveReviewList();
+    }
+    // 리뷰 임시삭제 조회하기
+    public List<ReviewVO> getDeletedReviewList() {
+        return reviewMapper.getDeletedReviewList();
+    }
+    
+    // 리뷰 영구삭제하기
+    public void hardDeleteReview(Long reviewIdx) {
+        reviewMapper.hardDeleteReview(reviewIdx);
+    }
+
+    // 리뷰 삭제 취소
+	public void cancelDelete(Long reviewIdx) {
+		reviewMapper.cancelDelete(reviewIdx);
 	}
 	
 }

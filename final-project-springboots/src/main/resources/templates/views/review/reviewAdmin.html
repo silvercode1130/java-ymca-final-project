@@ -4,18 +4,18 @@
 <head>
 <meta charset="UTF-8">
 <title>Insert title here</title>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
 </head>
 <body>
 	<form class="review" action="">
 	
 		<div class="reviewTitle">
-			모든 유저의 리뷰 관리 <br>
-			거래 후 작성한 리뷰 목록
+			모든 유저의 리뷰 관리
 		</div>
-		
-		리뷰
-		
-		<!-- <div>
+
+		<div>
 			<table id="table" name="table" border="1">
 				<thead>
 					<th:if>
@@ -29,24 +29,86 @@
 					</th:if>
 				</thead>
 				<tbody>
-					<tr th:each="review : ${reviewList}">
-						<td th:text="${review.auctionTitle}"></td>
-						<td th:text="${review.itemName}"></td>
-						<td th:text="${review.reviewStar}"></td>
-						<td th:text="${#temporals.format(review.reviewRegdate, 'yyyy-MM-dd HH:mm')}"></td>
-						<td>
-							<button type="button" th:onclick="|location.href='@{/review/reviewDetail(reviewIdx=${review.reviewIdx})}'|">
-							    상세보기
-							</button>
-                        	<button th:if="${session.loginUser.memRoleIdx == 2}">
-                        		삭제
-                        	</button>
-						</td>
+				    <tr th:each="review : ${activeList}">
+				        <td th:text="${review.auctionTitle}"></td>
+				        <td th:text="${review.itemName}"></td>
+				        <td th:with="star=${review.reviewStar}">
+				            <span th:if="${star > 0}" th:each="i : ${#numbers.sequence(1, star)}">
+				                <i class="bi bi-star-fill" style="color: gold;"></i>
+				            </span>
+				            <span th:if="${star < 5}" th:each="i : ${#numbers.sequence(1, 5 - star)}">
+				                <i class="bi bi-star"></i> 
+				            </span>
+				        </td>
+				        <td th:text="${#temporals.format(review.reviewRegdate, 'yyyy-MM-dd HH:mm')}"></td>
+				        <td>
+				            <button type="button" th:onclick="|location.href='@{/review/reviewDetail(reviewIdx=${review.reviewIdx})}'|">
+				                상세보기
+				            </button>
+				            <button th:if="${session.loginUser.memRoleIdx == 2}" 
+				                    type="button" 
+				                    th:onclick="|if(confirm('정말 삭제하시겠습니까?')) location.href='@{/reviewDelete(reviewIdx=${review.reviewIdx})}'|">
+				                임시 삭제
+				            </button>
+				        </td>
+				    </tr>
+				    <tr th:if="${#lists.isEmpty(activeList)}">
+					    <td colspan="5">관리할 리뷰가 없습니다</td>
 					</tr>
 				</tbody>
 			</table>
 		</div> 
- -->
+		
+		<div class="reviewTitle">
+			임시 삭제 처리된 유저의 리뷰 관리
+		</div>
+		
+		<div>
+			<table id="table" name="table" border="1">
+				<thead>
+					<th:if>
+						<tr>
+							<th>거래 제목</th>
+							<th>상품명</th> 
+							<th>별점</th>      
+							<th>리뷰 작성일</th>
+		                    <th>관리</th>
+						</tr>
+					</th:if>
+				</thead>
+				<tbody>
+				    <tr th:each="review : ${deletedList}">
+				        <td th:text="${review.auctionTitle}"></td>
+				        <td th:text="${review.itemName}"></td>
+				        <td th:with="star=${review.reviewStar}">
+				            <span th:if="${star > 0}" th:each="i : ${#numbers.sequence(1, star)}">
+				                <i class="bi bi-star-fill" style="color: gold;"></i>
+				            </span>
+				            <span th:if="${star < 5}" th:each="i : ${#numbers.sequence(1, 5 - star)}">
+				                <i class="bi bi-star"></i> 
+				            </span>
+				        </td>
+				        <td th:text="${#temporals.format(review.reviewRegdate, 'yyyy-MM-dd HH:mm')}"></td>
+				        <td>
+				            <button type="button" th:if="${session.loginUser.memRoleIdx == 2}" th:onclick="|location.href='@{/review/reviewDetail(reviewIdx=${review.reviewIdx})}'|">
+				                상세보기
+				            </button>
+				            <button th:if="${session.loginUser.memRoleIdx == 2}" th:onclick="|location.href='@{/review/reviewCancel(reviewIdx=${review.reviewIdx})}'|">
+				            	삭제 취소
+				            </button>
+				            <button th:if="${session.loginUser.memRoleIdx == 2}" 
+				                    type="button" 
+				                    th:onclick="|if(confirm('⚠️ 정말 영구삭제 하시겠습니까?\n삭제된 리뷰는 되돌릴 수 없습니다')) location.href='@{/review/hardDelete(reviewIdx=${review.reviewIdx})}'|">
+				                영구 삭제
+				            </button>
+				        </td>
+				    </tr>
+				    <tr th:if="${#lists.isEmpty(deletedList)}">
+					    <td colspan="5">임시삭제 된 리뷰가 없습니다</td>
+					</tr>
+				</tbody>
+			</table>
+		</div> 
 	</form>
 </body>
 </html>

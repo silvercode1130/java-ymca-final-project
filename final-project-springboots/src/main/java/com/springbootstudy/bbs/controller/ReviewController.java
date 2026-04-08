@@ -24,21 +24,33 @@ public class ReviewController {
 	
 	// 리뷰 조회 창 -----------------------------------------------------------------
 
-	@GetMapping("/review")
+	@GetMapping("/review") 
 	public String review(HttpSession session, Model model) {
 
 	    MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
+	    
+	    // 로그인 안하면 로그인 부터
+	    if (loginUser == null) {
+	        return "redirect:/members/login";
+	    }
 
 	    // 내가 쓴 리뷰
 	    List<ReviewVO> list = reviewService.getMyReviewList(loginUser.getMemIdx());
 	    // 내가 받은 리뷰
 	    List<ReviewVO> receivedReviewList = reviewService.getReceivedReviews(loginUser.getMemIdx());
+	    // 내가 받은 리뷰 별점 평균 
+	    Double avgRating = reviewService.getAvgRating(loginUser.getMemIdx());
 
 	    model.addAttribute("reviewList", list);
 	    model.addAttribute("receivedReviewList", receivedReviewList);
+	    model.addAttribute("avgRating", avgRating);
 	    
 	    return "views/review/review"; 
 	}
+	
+	
+
+	
 	
 	// 리뷰 작성창 -----------------------------------------------------------------
 	
@@ -88,7 +100,7 @@ public class ReviewController {
 	        @RequestParam("buyer_idx") Long buyerIdx,
 	        @RequestParam("bid_idx") Long bidIdx,
 	        @RequestParam("auction_idx") Long auctionIdx,
-	        @RequestParam("bidder_idx") Long bidderIdx,
+	        @RequestParam("bidder_idx") Long bidderIdx, 
 	        @RequestParam("reviewTitle") String reviewTitle,
 	        @RequestParam("reviewStar") int reviewStar,
 	        @RequestParam("content") String content ) {
@@ -121,47 +133,74 @@ public class ReviewController {
 	
 	// 리뷰 삭제하기(관리자만) -----------------------------------------------------------------
 	
+	// 임시 삭제
 	@GetMapping("/reviewDelete")
-	public String reviewDelete(HttpSession session, Model model) {
+	public String reviewDelete(@RequestParam("reviewIdx") Long reviewIdx, HttpSession session) {
 
 	    MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
 
-	    if (loginUser == null) {
-	        return "redirect:/members/login";
+	    if (loginUser == null || loginUser.getMemRoleIdx() != 2) {
+	        return "redirect:/main";
 	    }
 
-	    List<ReviewVO> list;
+	    // 삭제
+	    reviewService.deleteReview(reviewIdx);
 
-	    // admin이면 전체 조회
-	    if (loginUser.getMemRoleIdx() == 2) {
-	        list = reviewService.getAllReviewList();
-	    } else {
-	        // 일반 유저는 내 것만 조회 가능
-	        list = reviewService.getMyReviewList(loginUser.getMemIdx());
+	    return "redirect:/reviewAdmin";
+	}
+	
+	// 영구 삭제
+	@GetMapping("/review/hardDelete")
+	public String hardDelete(@RequestParam("reviewIdx") Long reviewIdx, HttpSession session) {
+
+	    MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
+
+	    if (loginUser == null || loginUser.getMemRoleIdx() != 2) {
+	        return "redirect:/main";
 	    }
 
-	    model.addAttribute("reviewList", list);
+	    reviewService.hardDeleteReview(reviewIdx);
+	    return "redirect:/reviewAdmin";
+	}
+	
+	// 삭제 취소 -----------------------------------------------------------------
+	
+	@GetMapping("/review/reviewCancel")
+	public String reviewCancel(@RequestParam("reviewIdx") Long reviewIdx, HttpSession session) {
+		
+		MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
 
-	    return "views/review/review";
+	    if (loginUser == null || loginUser.getMemRoleIdx() != 2) {
+	        return "redirect:/main";
+	    }
+	    
+	    // 리뷰 취소 기능
+	    reviewService.cancelDelete(reviewIdx);
+		
+		return "views/review/reviewAdmin";
 	}
 	
 	// 관리자 리뷰 페이지 -----------------------------------------------------------------
-
+	
+	// 페이지만 띄움
 	@GetMapping("/reviewAdmin")
 	public String reviewAdmin(HttpSession session, Model model) {
+	    MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
+	    
+	    // 관리자만 들어올 수 있음
+	    // 로그인 안했거나 관리자 아니면 메인으로 강제 이동
+	    if (loginUser == null || loginUser.getMemRoleIdx() != 2) {
+	        return "redirect:/main"; 
+	    }
 
-	  
+	    // 전체 리뷰 가져오기
+	    List<ReviewVO> activeList = reviewService.getActiveReviewList(); // N
+	    List<ReviewVO> deletedList = reviewService.getDeletedReviewList(); // Y
 
-	    return "views/review/reviewAdmin";
-	} 
-	
-	
-	
-	
-	
-	
-	
-	
-	
+	    model.addAttribute("activeList", activeList);
+	    model.addAttribute("deletedList", deletedList);
+
+	    return "views/review/reviewAdmin"; 
+	}
 	
 }

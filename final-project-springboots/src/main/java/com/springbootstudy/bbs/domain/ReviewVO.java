@@ -21,7 +21,7 @@ public class ReviewVO {
 	private int reviewStar;	  	  // 별점
 	
 	private LocalDateTime reviewRegdate; // 리뷰 작성일
-	private String reviewIsDelete;		 // 리뷰 삭제 여부 - default N (N / Y)
+	private String reviewIsDeleted;		 // 리뷰 삭제 여부 - default N (N / Y)
 	private LocalDateTime reviewDelete;  // 리뷰 삭제일
 	
 	// 리뷰 게시를 위한 추가 필드
