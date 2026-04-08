@@ -188,8 +188,8 @@ CREATE TABLE item (
 CREATE TABLE auction (
     auction_idx               BIGINT        NOT NULL AUTO_INCREMENT COMMENT 'PK',
     buyer_idx                 BIGINT        NOT NULL COMMENT 'FK → member.mem_idx (구매자)',
-    item_category_idx         INT           NOT NULL COMMENT 'FK → item_category', 
-    item_idx                  BIGINT        DEFAULT NULL COMMENT 'FK → item (구매자가 올린 상품 정보)',
+    item_category_idx         INT           NOT NULL COMMENT 'FK → item_category',
+    auction_thumbnail_img     VARCHAR(200)  DEFAULT NULL COMMENT '경매 썸네일',
     auction_title             VARCHAR(200)  NOT NULL COMMENT '경매 제목',
     auction_desc              TEXT          NOT NULL COMMENT '경매 설명',
     auction_target_price      BIGINT        DEFAULT NULL COMMENT '희망 최대가 (nullable)',
@@ -212,9 +212,7 @@ CREATE TABLE auction (
     CONSTRAINT fk_auction_item_category
         FOREIGN KEY (item_category_idx) REFERENCES item_category(item_category_idx),
     CONSTRAINT fk_auction_status
-        FOREIGN KEY (auction_status_idx) REFERENCES auction_status(auction_status_idx),
-    CONSTRAINT fk_auction_item 
-        FOREIGN KEY (item_idx) REFERENCES item(item_idx)
+        FOREIGN KEY (auction_status_idx) REFERENCES auction_status(auction_status_idx)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='역경매 요청 테이블';
 
 -- 3-2) BID (입찰)
@@ -346,14 +344,26 @@ VALUES (8, 'accessory',   '액세서리/잡화');
 
 -- 5-4) AUCTION_STATUS 코드
 INSERT INTO auction_status (auction_status_idx, auction_status_code, auction_status_name)
-VALUES (1, 'open',    '진행중');
+VALUES (1, 'open','진행중');
 INSERT INTO auction_status (auction_status_idx, auction_status_code, auction_status_name)
-VALUES (2, 'closed',  '마감');
--- 결정중, 3
+VALUES (2, 'decide','결정대기중');
 INSERT INTO auction_status (auction_status_idx, auction_status_code, auction_status_name)
-VALUES (3, 'failed',  '유찰');
+VALUES (3, 'closed','마감');
 INSERT INTO auction_status (auction_status_idx, auction_status_code, auction_status_name)
-VALUES (4, 'canceled','취소');
+VALUES (4, 'failed','유찰');
+INSERT INTO auction_status (auction_status_idx, auction_status_code, auction_status_name)
+VALUES (5, 'canceled','취소');
+INSERT INTO auction_status (auction_status_idx, auction_status_code, auction_status_name)
+VALUES (6, 'deleted','삭제됨');
+INSERT INTO auction_status (auction_status_idx, auction_status_code, auction_status_name)
+VALUES (7, 'paying','결제대기');
+INSERT INTO auction_status (auction_status_idx, auction_status_code, auction_status_name)
+VALUES (8, 'paid','결제완료');
+INSERT INTO auction_status (auction_status_idx, auction_status_code, auction_status_name)
+VALUES (9, 'shipping','배송중');
+INSERT INTO auction_status (auction_status_idx, auction_status_code, auction_status_name)
+VALUES (10, 'delivered','배송완료');
+
 
 -- 5-5) BID_STATUS 코드
 INSERT INTO bid_status (bid_status_idx, bid_status_code, bid_status_name)
@@ -364,6 +374,8 @@ INSERT INTO bid_status (bid_status_idx, bid_status_code, bid_status_name)
 VALUES (3, 'lost',     '실패');
 INSERT INTO bid_status (bid_status_idx, bid_status_code, bid_status_name)
 VALUES (4, 'canceled', '취소');
+INSERT INTO bid_status (bid_status_idx, bid_status_code, bid_status_name)
+VALUES (5, 'deleted', '삭제됨');
 
 -- 5-6) BOARD_TYPE 코드
 INSERT INTO board_type (board_type_idx, board_type_code, board_type_name, board_can_comment, board_min_role)

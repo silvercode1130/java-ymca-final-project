@@ -2,213 +2,314 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
-<title>경매 상세</title>
+<title th:text="${detail.auctionTitle} + ' - 경매 상세'">경매 상세</title>
+
 </head>
 <body>
-    <div class="container">
 
-        <!-- 이미지 null 처리 추가 -->
-        <div class="detail-image-box" th:if="${detail.itemThumbnailImg != null and detail.itemThumbnailImg != ''}">
-            <img th:src="${detail.itemThumbnailImg}" alt="경매 이미지">
-        </div>
+<div class="detail-layout">
+  <div class="detail-left">
 
-        <h2 th:text="${detail.auctionTitle}">경매 제목</h2>
-
-        <div class="info-section">
-            <p>
-                <strong>상태 : </strong>
-                <!-- 상태에 따라 색깔 배지로 표시 -->
-                <span th:if="${detail.auctionStatusIdx == 1}">진행중</span>
-                <span th:if="${detail.auctionStatusIdx == 2}">마감</span>
-                <span th:if="${detail.auctionStatusIdx == 3}">유찰</span>
-                <span th:if="${detail.auctionStatusIdx == 4}">취소</span>
-            </p>
-            <p>
-                <strong>카테고리:</strong> [[${detail.itemCategoryName}]]
-            </p>
-            <p>
-                <strong>희망 최대가:</strong> [[${#numbers.formatInteger(detail.auctionTargetPrice, 0, 'COMMA')}]]원
-            </p>
-            <p>
-                <strong>현재 최저가:</strong>
-                <span>
-                    [[${detail.minBidPrice == 0 ? '제안 없음' : #numbers.formatInteger(detail.minBidPrice, 0, 'COMMA') + '원'}]]
-                </span>
-            </p>
-
-            <div class="price-time-grid">
-                <div>
-                    <p class="label">
-                        <strong>입찰 마감 : </strong>[[${#temporals.format(detail.auctionEndAt, 'yyyy-MM-dd HH:mm')}]]
-                    </p>
-                </div>
-                <div>
-                    <p class="label">
-                        <strong>결정 마감 : </strong>[[${#temporals.format(detail.auctionDecisionDeadline, 'yyyy-MM-dd HH:mm')}]]
-                    </p>
-                </div>
-            </div>
-
-            <p>
-                <strong>남은 시간:</strong> <span>[[${detail.timeDisplay}]]</span>
-            </p>
-        </div>
-
-        <div class="desc-section">
-            <h4>상품 상세 설명</h4>
-            <p th:text="${detail.auctionDesc}">여기에 설명이 나옵니다.</p>
-        </div>
-
-        <!-- 목록으로 버튼 옆에 경매 삭제 버튼 추가 -->
-		<div class="btn-group">
-		    <button type="button" th:onclick="@{|location.href='/auctionList'|}">목록으로</button>
-		
-		    <!-- 본인 경매 + 진행중일 때만 삭제 버튼 표시 -->
-		    <th:block th:if="${session.loginUser != null
-		                      and session.loginUser.memIdx == detail.buyerIdx
-		                      and detail.auctionStatusIdx == 1}">
-		        <form th:action="@{/auction/delete/{id}(id=${detail.auctionIdx})}"
-		              method="post"
-		              onsubmit="return confirm('정말 삭제하시겠습니까?')"
-		              style="display:inline;">
-		            <button type="submit">구매요청 삭제</button>
-		        </form>
-		    </th:block>
-		</div>
+    <!-- 썸네일 -->
+    <div class="auction-thumb" th:if="${detail.auctionThumbnailImg != null and detail.auctionThumbnailImg != ''}">
+      <img th:src="${detail.auctionThumbnailImg}" alt="경매 이미지">
     </div>
 
-    <!-- 4번: 진행중(1)일 때만 입찰 폼 표시, 나머지 상태면 마감 안내 -->
+    <h2 th:text="${detail.auctionTitle}" style="margin-top:0;">경매 제목</h2>
+
+    <!-- 상태 배지 -->
+    <div class="info-row">
+      <strong>상태 : </strong>
+      <span th:if="${detail.auctionStatusIdx == 1}" class="status-badge s-open">진행중</span>
+      <span th:if="${detail.auctionStatusIdx == 2}" class="status-badge s-decide">결정대기중</span>
+      <span th:if="${detail.auctionStatusIdx == 3}" class="status-badge s-closed">마감</span>
+      <span th:if="${detail.auctionStatusIdx == 4}" class="status-badge s-failed">유찰</span>
+      <span th:if="${detail.auctionStatusIdx == 5}" class="status-badge s-canceled">취소</span>
+      <span th:if="${detail.auctionStatusIdx == 6}" class="status-badge s-canceled">삭제됨</span>
+    </div>
+
+    <div class="info-row"><strong>카테고리:</strong> [[${detail.itemCategoryName}]]</div>
+    <div class="info-row">
+      <strong>희망 최대가:</strong>
+      [[${#numbers.formatInteger(detail.auctionTargetPrice, 0, 'COMMA')}]]원
+    </div>
+    <div class="info-row">
+      <strong>현재 최저가:</strong>
+      <span th:text="${detail.minBidPrice == 0 ? '제안 없음' : #numbers.formatInteger(detail.minBidPrice, 0, 'COMMA') + '원'}"></span>
+    </div>
+    <div class="info-row">
+      <strong>입찰 마감 : </strong>[[${#temporals.format(detail.auctionEndAt, 'yyyy-MM-dd HH:mm')}]]
+    </div>
+    <div class="info-row">
+      <strong>결정 마감 : </strong>[[${#temporals.format(detail.auctionDecisionDeadline, 'yyyy-MM-dd HH:mm')}]]
+    </div>
+    <div class="info-row">
+      <strong>남은 시간:</strong> [[${detail.timeDisplay}]]
+    </div>
+
+    <div style="margin-top:14px; padding:12px; border:1px solid #eee; border-radius:6px; background:#fafafa;">
+      <h4 style="margin-top:0;">상품 상세 설명</h4>
+      <p th:text="${detail.auctionDesc}" style="margin:0; white-space:pre-line; font-size:14px;">설명</p>
+    </div>
+
+    <!-- 플래시 메시지 -->
+    <div th:if="${bidError}"   class="msg-error"   style="margin-top:12px;" th:text="${bidError}"></div>
+    <div th:if="${successMessage}" class="msg-success" style="margin-top:12px;" th:text="${successMessage}"></div>
+    <div th:if="${errorMessage}"   class="msg-error"   style="margin-top:12px;" th:text="${errorMessage}"></div>
+
+    <!-- 버튼 그룹 -->
+    <div class="btn-group">
+      <button class="btn" th:onclick="@{|location.href='/auctions'|}">목록으로</button>
+
+      <!-- 판매자(비구매자, 로그인) + 진행중 → 입찰하기 버튼 -->
+      <th:block th:if="${detail.auctionStatusIdx == 1
+                         and session.loginUser != null
+                         and session.loginUser.memIdx != detail.buyerIdx}">
+        <button class="btn btn-primary"
+                th:onclick="|location.href='/auctions/${detail.auctionIdx}/bids'|">
+          💰 입찰하기
+        </button>
+      </th:block>
+
+      <!-- 구매자 본인 + 진행중 → 삭제 / 마감 버튼 -->
+      <th:block th:if="${session.loginUser != null
+                         and session.loginUser.memIdx == detail.buyerIdx
+                         and detail.auctionStatusIdx == 1}">
+        <form th:action="@{/auctions/{id}/delete(id=${detail.auctionIdx})}"
+              method="post" style="display:inline;"
+              onsubmit="return confirm('정말 삭제하시겠습니까?')">
+          <button type="submit" class="btn btn-danger">구매요청 삭제</button>
+        </form>
+        <form th:action="@{/auctions/{id}/close(id=${detail.auctionIdx})}"
+              method="post" style="display:inline;"
+              onsubmit="return confirm('경매를 마감하시겠습니까?')">
+          <button type="submit" class="btn">수동 마감</button>
+        </form>
+      </th:block>
+    </div>
+
+    <!-- 진행중 아닐 때 안내 -->
     <div th:if="${detail.auctionStatusIdx != 1}"
-         style="margin:20px; padding:20px; border:2px solid #ccc; border-radius:8px; text-align:center; color:gray;">
-        <p style="font-size:1.2rem; font-weight:bold;">
-            <span th:if="${detail.auctionStatusIdx == 2}">⛔ 마감된 경매입니다.</span>
-            <span th:if="${detail.auctionStatusIdx == 3}">😢 유찰된 경매입니다.</span>
-            <span th:if="${detail.auctionStatusIdx == 4}">❌ 취소된 경매입니다.</span>
-        </p>
-        <p style="color:#aaa; font-size:0.9rem;">입찰이 종료되었습니다.</p>
+         style="margin-top:14px; padding:12px; border:2px solid #eee; border-radius:6px; text-align:center; color:#888;">
+      <span th:if="${detail.auctionStatusIdx == 2}">⏳ 결정 대기중인 경매입니다.</span>
+      <span th:if="${detail.auctionStatusIdx == 3}">⛔ 마감된 경매입니다.</span>
+      <span th:if="${detail.auctionStatusIdx == 4}">😢 유찰된 경매입니다.</span>
+      <span th:if="${detail.auctionStatusIdx == 5}">❌ 취소된 경매입니다.</span>
+      <span th:if="${detail.auctionStatusIdx == 6}">❌ 삭제된 경매입니다.</span>
     </div>
 
-    <!-- 본인 경매 아닐 때 + 진행중(1)일 때만 입찰 폼 표시 -->
-    <div class="bid-form-container"
-         th:if="${detail.auctionStatusIdx == 1
-                 and (session.loginUser == null
-                      or session.loginUser.memIdx != detail.buyerIdx)}">
+  </div>
+  <!-- /detail-left -->
+
+
+  <!-- ═══════════════════════════════════════
+       오른쪽: mode에 따라 패널 전환
+       ─────────────────────────────────────── -->
+  <div class="detail-right">
+
+    <!-- ── mode == list : 입찰 목록 ────────── -->
+    <th:block th:if="${mode == 'list'}">
+      <h3 style="margin-top:0;">📋 입찰 목록 <span style="font-size:14px; color:#888;" th:text="'(' + ${bidList.size()} + '건)'"></span></h3>
+
+      <table class="bid-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>판매자</th>
+            <th>제안가</th>
+            <th>상품명</th>
+            <th>제안일</th>
+            <th>상태</th>
+            <th th:if="${session.loginUser != null}">관리</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr th:each="bid, st : ${bidList}"
+              th:class="${session.loginUser != null and session.loginUser.memIdx == detail.buyerIdx} ? 'bid-row-link' : ''"
+              th:onclick="${session.loginUser != null and session.loginUser.memIdx == detail.buyerIdx}
+                          ? |location.href='/auctions/${detail.auctionIdx}/bids/${bid.bidIdx}'| : ''">
+
+            <td th:text="${st.count}">1</td>
+
+            <!-- 구매자: 실명 / 그 외: 마스킹 -->
+            <td>
+              <span th:if="${session.loginUser != null and session.loginUser.memIdx == detail.buyerIdx}"
+                    th:text="${bid.memName}">실명</span>
+              <span th:unless="${session.loginUser != null and session.loginUser.memIdx == detail.buyerIdx}"
+                    th:text="${bid.bidderName}">마스킹</span>
+            </td>
+
+            <td th:text="${#numbers.formatInteger(bid.bidPrice, 0, 'COMMA') + '원'}">50,000원</td>
+            <td th:text="${bid.itemName != null ? bid.itemName : '-'}">상품명</td>
+            <td th:text="${#temporals.format(bid.bidRegdate, 'yyyy-MM-dd')}">2026-03-30</td>
+            <td th:text="${bid.bidStatusName}">일반</td>
+
+            <td th:if="${session.loginUser != null}" onclick="event.stopPropagation()">
+              <!-- 구매자: 낙찰 버튼 (결정대기중일 때만) -->
+              <form th:if="${session.loginUser.memIdx == detail.buyerIdx
+                             and bid.bidStatusIdx == 1
+                             and detail.auctionStatusIdx == 2}"
+                    th:action="@{/auctions/{aId}/bids/{bId}/win(aId=${detail.auctionIdx},bId=${bid.bidIdx})}"
+                    method="post" style="display:inline;"
+                    onsubmit="return confirm('이 입찰을 낙찰하시겠습니까?')">
+                <button type="submit" class="btn btn-win">낙찰</button>
+              </form>
+
+              <!-- 입찰자(판매자): 취소 버튼 (본인 + 진행중) -->
+              <th:block th:if="${session.loginUser.memIdx == bid.bidderIdx and bid.bidStatusIdx == 1}">
+                <form th:action="@{/bids/{id}/cancel(id=${bid.bidIdx})}"
+                      method="post" style="display:inline;"
+                      onsubmit="return confirm('입찰을 취소하시겠습니까?')">
+                  <input type="hidden" name="auctionIdx" th:value="${detail.auctionIdx}">
+                  <button type="submit" class="btn btn-danger">취소</button>
+                </form>
+              </th:block>
+
+              <!-- 그 외 -->
+              <span th:if="${session.loginUser.memIdx != detail.buyerIdx
+                             and session.loginUser.memIdx != bid.bidderIdx}">-</span>
+            </td>
+          </tr>
+
+          <tr th:if="${#lists.isEmpty(bidList)}">
+            <td colspan="7" style="text-align:center; color:#aaa; padding:20px;">
+              아직 입찰 제안이 없습니다.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </th:block>
+    <!-- /mode == list -->
+
+
+    <!-- ── mode == bidForm : 입찰 등록 폼 ──── -->
+    <th:block th:if="${mode == 'bidForm'}">
+      <div class="bid-form-panel">
         <h3>💰 입찰하기</h3>
 
-        <form id="bidForm" action="/auction/bid" method="post"
+        <form id="bidForm"
+              th:action="@{/auctions/{id}/bids(id=${detail.auctionIdx})}"
+              method="post"
               enctype="multipart/form-data">
-            <input type="hidden" name="auctionIdx" th:value="${detail.auctionIdx}">
 
-            <div class="input-group">
-                <label>제안 이미지 (선택)</label>
-                <input type="file" name="bidImageFile" accept="image/*" id="bidImageFile">
-                <small style="color:gray;">제안할 상품 이미지를 선택해주세요 (선택사항)</small>
-                <div id="bidPreviewBox" style="margin-top:8px; display:none;">
-                    <img id="bidPreviewImg" style="max-width:200px; max-height:150px; border:1px solid #ddd; border-radius:4px;">
-                </div>
-            </div>
+          <input type="hidden" name="itemCategoryIdx" th:value="${detail.itemCategoryIdx}">
 
-            <div class="input-group">
-                <label>제안 가격 (₩)</label>
-                <input type="number" name="bidPrice" id="bidPrice"
-                       min="1000" step="1000"
-                       placeholder="1000원 단위로 입력해주세요" required>
-                <small style="color:gray;">1000원 단위 이상, 음수 불가</small>
+          <div class="input-group">
+            <label>제안 이미지 <span style="color:#888; font-size:12px;">(선택)</span></label>
+            <input type="file" name="bidImageFile" accept="image/*" id="bidImageFile">
+            <div id="bidPreviewBox" style="margin-top:8px; display:none;">
+              <img id="bidPreviewImg" style="max-width:200px; max-height:150px; border:1px solid #ddd; border-radius:4px;">
             </div>
+          </div>
 
-            <div class="input-group">
-                <label>수량</label>
-                <input type="number" name="bidQuantity" value="1" min="1" required>
-            </div>
+          <div class="input-group">
+            <label>상품명 <span style="color:red;">*</span></label>
+            <input type="text" name="itemName" placeholder="제안할 상품명을 입력하세요" required>
+          </div>
 
-            <div class="input-group">
-                <label>제안 메시지</label>
-                <textarea name="bidMessage" placeholder="상품 상태 등을 입력하세요"></textarea>
-            </div>
+          <div class="input-group">
+            <label>브랜드 <span style="color:#888; font-size:12px;">(선택)</span></label>
+            <input type="text" name="itemBrand" placeholder="예: NIKE, ADIDAS">
+          </div>
 
-            <div class="bid-action-area">
-                <p th:if="${session.loginUser == null}"
-                   style="color: red; font-size: 0.9rem; margin-bottom: 8px;">
-                   ※ 로그인 후에 입찰 제출이 가능합니다.
-                </p>
-                <button type="submit" id="submitBtn" class="btn-submit"
-                        th:data-is-login="${session.loginUser != null ? 'true' : 'false'}"
-                        th:disabled="${session.loginUser == null}">
-                    입찰 제출
-                </button>
-            </div>
+          <div class="input-group">
+            <label>제안 가격 (₩) <span style="color:red;">*</span></label>
+            <input type="number" name="bidPrice" id="bidPrice"
+                   min="1000" step="1000"
+                   placeholder="1000원 단위로 입력" required>
+            <small style="color:#888;">희망 최대가
+              [[${#numbers.formatInteger(detail.auctionTargetPrice, 0, 'COMMA')}]]원 이하, 1000원 단위
+            </small>
+          </div>
+
+          <div class="input-group">
+            <label>수량 <span style="color:red;">*</span></label>
+            <input type="number" name="bidQuantity" value="1" min="1" required>
+          </div>
+
+          <div class="input-group">
+            <label>제안 메시지 <span style="color:#888; font-size:12px;">(선택)</span></label>
+            <textarea name="bidMessage" rows="4" placeholder="상품 상태, 배송 조건 등을 입력하세요"></textarea>
+          </div>
+
+          <div style="display:flex; gap:8px;">
+            <button type="button" class="btn-cancel-form"
+                    th:onclick="|location.href='/auctions/${detail.auctionIdx}'|">
+              취소
+            </button>
+            <button type="submit" class="btn-submit">📦 입찰 제출</button>
+          </div>
         </form>
-    </div>
+      </div>
+    </th:block>
+    <!-- /mode == bidForm -->
 
 
-    <table class="bid-table">
-	    <thead>
-	        <tr>
-	            <th>번호</th>
-	            <th>판매자 이름</th>
-	            <th>제안가</th>
-	            <th>제안일</th>
-	            <th>상태</th>
-	            <th th:if="${session.loginUser != null}">관리</th>
-	        </tr>
-	    </thead>
-	    <tbody>
-	        <tr th:each="bid, status : ${bidList}">
-	            <!-- 입찰 번호 클릭하면 상세로 이동 (구매자만) -->
-				<td>
-				    <a th:if="${session.loginUser != null and session.loginUser.memIdx == detail.buyerIdx}"
-				       th:href="@{/auction/bid/detail/{id}(id=${bid.bidIdx})}"
-				       th:text="${status.count}">1</a>
-				    <span th:if="${session.loginUser == null or session.loginUser.memIdx != detail.buyerIdx}"
-				          th:text="${status.count}">1</span>
-				</td>
-	
-	            <!-- 구매자는 실명, 나머지는 마스킹 -->
-	            <td>
-	                <span th:if="${session.loginUser != null
-	                              and session.loginUser.memIdx == detail.buyerIdx}"
-	                      th:text="${bid.realMemName}">신정은</span>
-	                <span th:if="${session.loginUser == null
-	                              or session.loginUser.memIdx != detail.buyerIdx}"
-	                      th:text="${bid.memName}">신**</span>
-	            </td>
-	
-	            <td th:text="${#numbers.formatInteger(bid.bidPrice, 0, 'COMMA')} + '원'">50,000원</td>
-	            <td th:text="${#temporals.format(bid.bidRegdate, 'yyyy-MM-dd')}">2026-03-30</td>
-	            <td th:text="${bid.bidStatusName}">일반</td>
-	
-	            <td th:if="${session.loginUser != null}">
-	                <!-- 구매자: 낙찰 버튼 (입찰 마감(2) 됐을 때만 활성화!) -->
-					<form th:if="${session.loginUser.memIdx == detail.buyerIdx
-					              and bid.bidStatusIdx == 1
-					              and detail.auctionStatusIdx == 2}"
-					      th:action="@{/auction/bid/win/{id}(id=${bid.bidIdx})}"
-					      method="post"
-					      style="display:inline;"
-					      onsubmit="return confirm('이 입찰을 낙찰하시겠습니까?')">
-					    <input type="hidden" name="auctionIdx" th:value="${detail.auctionIdx}">
-					    <button type="submit" style="color:blue;">낙찰</button>
-					</form>
-	
-	                <!-- 판매자: 취소 버튼 (진행중인 입찰에만) -->
-	                <th:block th:if="${session.loginUser.memIdx == bid.bidderIdx
-	                                  and bid.bidStatusIdx == 1}">
-	                    <form th:action="@{/auction/bid/delete/{id}(id=${bid.bidIdx})}"
-	                          method="post"
-	                          style="display:inline;"
-	                          onsubmit="return confirm('입찰을 취소하시겠습니까?')">
-	                        <input type="hidden" name="auctionIdx" th:value="${detail.auctionIdx}">
-	                        <button type="submit" style="color:red;">취소</button>
-	                    </form>
-	                </th:block>
-	
-	                <!-- 그 외 -->
-	                <span th:if="${session.loginUser.memIdx != detail.buyerIdx
-	                              and session.loginUser.memIdx != bid.bidderIdx}">-</span>
-	            </td>
-	        </tr>
-	    </tbody>
-	</table>
+    <!-- ── mode == bidDetail : 입찰 상세 (구매자 전용) ── -->
+    <th:block th:if="${mode == 'bidDetail'}">
+      <div class="bid-detail-panel">
+        <h3>📋 입찰 상세 정보</h3>
+
+        <!-- 상품 이미지 -->
+        <div th:if="${selectedBid.itemThumbnailImg != null and selectedBid.itemThumbnailImg != ''}"
+             style="margin-bottom:14px;">
+          <img th:src="${selectedBid.itemThumbnailImg}"
+               style="max-width:200px; max-height:160px; border:1px solid #ddd; border-radius:6px; object-fit:cover;">
+        </div>
+
+        <div class="info-row"><strong>판매자:</strong> [[${selectedBid.memName}]]</div>
+        <div class="info-row"><strong>상품명:</strong> [[${selectedBid.itemName != null ? selectedBid.itemName : '-'}]]</div>
+        <div class="info-row"><strong>브랜드:</strong> [[${selectedBid.itemBrand != null ? selectedBid.itemBrand : '-'}]]</div>
+        <div class="info-row"><strong>카테고리:</strong> [[${selectedBid.itemCategoryName != null ? selectedBid.itemCategoryName : '-'}]]</div>
+        <div class="info-row">
+          <strong>제안 가격:</strong>
+          [[${#numbers.formatInteger(selectedBid.bidPrice, 0, 'COMMA')}]]원
+        </div>
+        <div class="info-row"><strong>수량:</strong> [[${selectedBid.bidQuantity}]]개</div>
+        <div class="info-row"><strong>상태:</strong> [[${selectedBid.bidStatusName}]]</div>
+        <div class="info-row">
+          <strong>제안일:</strong>
+          [[${#temporals.format(selectedBid.bidRegdate, 'yyyy-MM-dd HH:mm')}]]
+        </div>
+
+        <div th:if="${selectedBid.bidMessage != null and selectedBid.bidMessage != ''}"
+             style="margin-top:10px;">
+          <strong>제안 메시지:</strong>
+          <p th:text="${selectedBid.bidMessage}"
+             style="padding:10px; border:1px solid #ddd; border-radius:4px; background:#fafafa; white-space:pre-line; font-size:14px; margin:6px 0 0 0;">
+          </p>
+        </div>
+
+        <!-- 낙찰 버튼 (결정대기중 + 일반 입찰건) -->
+        <div th:if="${selectedBid.bidStatusIdx == 1 and detail.auctionStatusIdx == 2}"
+             style="margin-top:16px;">
+          <form th:action="@{/auctions/{aId}/bids/{bId}/win(aId=${detail.auctionIdx},bId=${selectedBid.bidIdx})}"
+                method="post"
+                onsubmit="return confirm('이 입찰을 낙찰하시겠습니까?')">
+            <button type="submit" class="btn btn-win" style="font-size:15px; padding:10px 24px;">
+              🏆 이 입찰 낙찰하기
+            </button>
+          </form>
+        </div>
+
+        <div class="btn-group">
+          <!-- 경매 상세 보기 (목록으로 복귀) -->
+          <button class="btn"
+                  th:onclick="|location.href='/auctions/${detail.auctionIdx}'|">
+            ← 경매 상세 보기
+          </button>
+        </div>
+
+      </div>
+    </th:block>
+    <!-- /mode == bidDetail -->
+
+  </div>
+  <!-- /detail-right -->
+
+</div>
+<!-- /detail-layout -->
+
 <script src="/js/auctionDetail.js"></script>
 </body>
 </html>
