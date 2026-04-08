@@ -47,11 +47,16 @@
 	            </tr>
 	            <tr>
 	            	<th>별점</th>
-	                <td>
-	                    <span th:each="i : ${#numbers.sequence(1, review.reviewStar)}">
-	                    	<i class="bi bi-star-fill" style="color: gold;"></i>
-	                    </span>
-	                </td>
+	                	<td th:with="star=${review.reviewStar}">
+							<!-- 채운 별 -->
+						    <span th:each="i : ${#numbers.sequence(1, star)}">
+						        <i class="bi bi-star-fill" style="color: gold;"></i>
+						    </span>
+						    <!-- 빈 별 -->
+						    <span th:if="${star < 5}" th:each="i : ${#numbers.sequence(1, 5 - star)}">
+						        <i class="bi bi-star"></i> 
+						    </span>
+						</td>
 	            </tr>
 	            <tr>
 	                <th>작성 일자</th>

@@ -24,10 +24,15 @@ public class ReviewController {
 	
 	// 리뷰 조회 창 -----------------------------------------------------------------
 
-	@GetMapping("/review")
+	@GetMapping("/review") 
 	public String review(HttpSession session, Model model) {
 
 	    MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
+	    
+	    // 로그인 안하면 로그인 부터
+	    if (loginUser == null) {
+	        return "redirect:/members/login";
+	    }
 
 	    // 내가 쓴 리뷰
 	    List<ReviewVO> list = reviewService.getMyReviewList(loginUser.getMemIdx());

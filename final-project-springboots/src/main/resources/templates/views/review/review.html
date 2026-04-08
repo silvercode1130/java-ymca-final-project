@@ -16,7 +16,7 @@
 		</div>
 		
 		<div>
-			<table id="table" name="table" border="1">
+			<table id="myReviewTable" name="table" border="1">
 				<thead>
 					<th:if>
 						<tr>
@@ -66,21 +66,20 @@
 			</div>
 		</div>
 		
-		<div class="starAverage">
-			별점 평균 
-			<!-- 한개 별 -->
-		    <span th:each="i : ${#numbers.sequence(1, T(java.lang.Math).floor(avgRating))}">
+		<div class="starAverage" th:with="avg=${avgRating != null ? avgRating : 0}">
+		    별점 평균 
+		    <!-- 채운 별 -->
+		    <span th:each="i : ${#numbers.sequence(1, T(java.lang.Math).floor(avg))}">
 		        <i class="bi bi-star-fill" style="color: gold;"></i>
 		    </span>
 		    <!-- 반개 별 -->
-		    <span th:if="${avgRating % 1 >= 0.5}">
+		    <span th:if="${avg % 1 >= 0.5}">
 		        <i class="bi bi-star-half" style="color: gold;"></i>
 		    </span> 
 		</div>
 		
 		<div>
-			<!-- ${} 바꿔야 할 것 같음 -->
-			<table id="table" name="table" border="1">
+			<table id="receivedReviewTable" name="table" border="1">
 				<thead>
 					<th:if>
 						<tr>

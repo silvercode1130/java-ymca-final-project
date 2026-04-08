@@ -147,7 +147,7 @@
 	<select id="getAllReviewList" resultType="com.springbootstudy.bbs.domain.ReviewVO">
 	    SELECT *
 	    FROM review
-	    WHERE review_is_delete = 'N'
+	    WHERE review_is_deleted = 'N'
 	</select> 
 
 </mapper>	
