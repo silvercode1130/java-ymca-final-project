@@ -29,11 +29,15 @@ public class ReviewController {
 
 	    MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
 
+	    // 내가 쓴 리뷰
 	    List<ReviewVO> list = reviewService.getMyReviewList(loginUser.getMemIdx());
+	    // 내가 받은 리뷰
+	    List<ReviewVO> receivedReviewList = reviewService.getReceivedReviews(loginUser.getMemIdx());
 
 	    model.addAttribute("reviewList", list);
-
-	    return "views/review/review";
+	    model.addAttribute("receivedReviewList", receivedReviewList);
+	    
+	    return "views/review/review"; 
 	}
 	
 	// 리뷰 작성창 -----------------------------------------------------------------
@@ -78,6 +82,7 @@ public class ReviewController {
 	
 	 
 	// 리뷰 글쓰기 -----------------------------------------------------------------
+	
 	@PostMapping("/review/reviewWrite")
 	public String reviewSubmit(
 	        @RequestParam("buyer_idx") Long buyerIdx,
@@ -100,5 +105,63 @@ public class ReviewController {
 
 	    return "redirect:/review";
 	}
+	
+	// 리뷰 상세보기 -----------------------------------------------------------------
+	
+	@GetMapping("/review/reviewDetail")
+	public String reviewDetail(@RequestParam("reviewIdx") Long reviewIdx, Model model) {
+		
+		ReviewVO review = reviewService.getReviewDetail(reviewIdx);
+		
+		// 리뷰 내용 부르기
+		model.addAttribute("review", review);
+		
+		return "/views/review/reviewDetail";
+	}
+	
+	// 리뷰 삭제하기(관리자만) -----------------------------------------------------------------
+	
+	@GetMapping("/reviewDelete")
+	public String reviewDelete(HttpSession session, Model model) {
 
+	    MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
+
+	    if (loginUser == null) {
+	        return "redirect:/members/login";
+	    }
+
+	    List<ReviewVO> list;
+
+	    // admin이면 전체 조회
+	    if (loginUser.getMemRoleIdx() == 2) {
+	        list = reviewService.getAllReviewList();
+	    } else {
+	        // 일반 유저는 내 것만 조회 가능
+	        list = reviewService.getMyReviewList(loginUser.getMemIdx());
+	    }
+
+	    model.addAttribute("reviewList", list);
+
+	    return "views/review/review";
+	}
+	
+	// 관리자 리뷰 페이지 -----------------------------------------------------------------
+
+	@GetMapping("/reviewAdmin")
+	public String reviewAdmin(HttpSession session, Model model) {
+
+	  
+
+	    return "views/review/reviewAdmin";
+	} 
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 }

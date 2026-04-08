@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+
+	<input type="hidden" name="review_idx" th:value="${reviewIdx}">
+	
+	<div class="review-container">
+	    <div class="section-title">📦 거래 정보</div>
+	    <table border="1">
+	        <tbody>
+	            <tr>
+	                <th>경매 제목</th>
+	                <td th:text="${review.auctionTitle}"></td>
+	            </tr>
+	            <tr>
+	            	<th>최종 입찰가</th>
+	                <td th:text="${review.auctionTargetPrice}"></td>
+	            </tr>
+	            <tr>
+	                <th>판매자(입찰자)</th>
+	                <td th:text="${review.bidderName}"></td>
+	            </tr>
+	            <tr>
+	            	<th>거래 일자</th>
+	                <td th:text="${#temporals.format(review.bidRegdate, 'yyyy-MM-dd HH:mm')}"></td>
+	            </tr>
+	        </tbody>
+	    </table>
+	    
+	    <div class="section-title">💬 리뷰 상세</div>
+	    <table border="1">
+	        <tbody>
+	            <tr>
+	                <th>제목</th>
+	                <td th:text="${review.reviewTitle}"></td>
+	            </tr>
+	            <tr>
+	                <th>작성자</th>
+	                <td th:text="${review.memName}"></td> 
+	            </tr>
+	            <tr>
+	            	<th>별점</th>
+	                <td>
+	                    <span th:each="i : ${#numbers.sequence(1, review.reviewStar)}">⭐</span>
+	                </td>
+	            </tr>
+	            <tr>
+	                <th>작성 일자</th>
+	                <td th:text="${#temporals.format(review.reviewRegdate, 'yyyy-MM-dd HH:mm')}"></td>
+	            </tr>
+	            <tr>
+	                <th>리뷰 내용</th>
+	                <td th:text="${review.reviewContent}" colspan="3" class="content-box"></td>
+	            </tr>
+	        </tbody>
+	    </table>
+	</div>
+	
+	<div>
+		<input type="button" value="뒤로가기" onclick="history.go(-1)">
+	</div>
+</body>
+</html>

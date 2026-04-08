@@ -15,7 +15,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.springbootstudy.bbs.domain.MemberVO;
 import com.springbootstudy.bbs.mapper.MemberMapper;
-import com.springbootstudy.bbs.service.MemberService;
+import com.springbootstudy.bbs.service.MemberService; 
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

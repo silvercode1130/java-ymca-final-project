@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<form class="review" action="">
+	
+		<div class="reviewTitle">
+			모든 유저의 리뷰 관리 <br>
+			거래 후 작성한 리뷰 목록
+		</div>
+		
+		리뷰
+		
+		<!-- <div>
+			<table id="table" name="table" border="1">
+				<thead>
+					<th:if>
+						<tr>
+							<th>거래 제목</th>
+							<th>상품명</th> 
+							<th>별점</th>      
+							<th>리뷰 작성일</th>
+		                    <th>관리</th>
+						</tr>
+					</th:if>
+				</thead>
+				<tbody>
+					<tr th:each="review : ${reviewList}">
+						<td th:text="${review.auctionTitle}"></td>
+						<td th:text="${review.itemName}"></td>
+						<td th:text="${review.reviewStar}"></td>
+						<td th:text="${#temporals.format(review.reviewRegdate, 'yyyy-MM-dd HH:mm')}"></td>
+						<td>
+							<button type="button" th:onclick="|location.href='@{/review/reviewDetail(reviewIdx=${review.reviewIdx})}'|">
+							    상세보기
+							</button>
+                        	<button th:if="${session.loginUser.memRoleIdx == 2}">
+                        		삭제
+                        	</button>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div> 
+ -->
+	</form>
+</body>
+</html>
