@@ -4,25 +4,25 @@
 
 <mapper namespace="com.springbootstudy.bbs.mapper.AuctionMapper">
 
-    <!-- 경매 리스트 조회 (View 사용) -->
-	<select id="auctionList" resultType="AuctionDTO">
-	    SELECT *
-	    FROM auction_list_view
-	    WHERE auction_is_deleted = 'N'
-	    
-	    <if test="categoryIdx != null">
-	        AND item_category_idx = #{categoryIdx}
-	    </if>
-	
-	    <if test="keyword != null and keyword != ''">
-	        AND (
-	            auction_title LIKE CONCAT('%', #{keyword}, '%')
-	            OR item_category_name LIKE CONCAT('%', #{keyword}, '%')
-	        )
-	    </if>
-	
-	    ORDER BY auction_regdate DESC
-	</select>
+    <!-- 경매 리스트 조회 - 카테고리 코드 + 키워드 모두 지원 (View 사용) -->
+    <select id="auctionList" parameterType="map" resultType="AuctionDTO">
+        SELECT *
+        FROM auction_list_view
+        WHERE auction_is_deleted = 'N'
+
+        <if test="categoryCode != null and categoryCode != ''">
+            AND UPPER(item_category_code) LIKE UPPER(CONCAT('%', #{categoryCode}, '%'))
+        </if>
+
+        <if test="keyword != null and keyword != ''">
+            AND (
+                auction_title LIKE CONCAT('%', #{keyword}, '%')
+                OR item_category_name LIKE CONCAT('%', #{keyword}, '%')
+            )
+        </if>
+
+        ORDER BY auction_regdate DESC
+    </select>
 	
     <!-- 경매 상세 조회 (View 사용) -->
 	<select id="auctionDetail" resultType="AuctionDTO">
@@ -42,7 +42,7 @@
             COUNT(b.bid_idx) AS b_count
         FROM auction a
         LEFT JOIN bid b ON a.auction_idx = b.auction_idx
-            AND b.bid_status_idx != 4
+            AND b.bid_status_idx != 5
         WHERE a.auction_status_idx = 1
           AND a.auction_end_at &lt; NOW()
           AND a.auction_is_deleted = 'N'
@@ -66,7 +66,7 @@
           AND buyer_idx = #{buyerIdx}
     </update>
 
-    <!-- 경매 등록 - item_idx 제거, auction_thumbnail_img 직접 저장 -->
+    <!-- 경매 등록 -->
     <insert id="insertAuction">
         INSERT INTO auction (
             buyer_idx, item_category_idx, auction_thumbnail_img,

@@ -18,8 +18,8 @@ public class AuctionService {
 	private AuctionMapper auctionMapper;
 	
 	// 경매 리스트 조회 (검색 및 카테고리 필터링 포함)
-	public List<AuctionDTO> AuctionList(String keyword, Integer categoryIdx) {
-	    List<AuctionDTO> list = auctionMapper.auctionList(keyword, categoryIdx);
+	public List<AuctionDTO> AuctionList(String categoryCode, String keyword) {
+	    List<AuctionDTO> list = auctionMapper.auctionList(categoryCode, keyword);
 	    for (AuctionDTO dto : list) {
 	        refine(dto);
 	    }
@@ -45,8 +45,8 @@ public class AuctionService {
 	    if (detail.getAuctionStatusIdx() != 1) {
 	        throw new IllegalArgumentException("진행중인 경매만 마감할 수 있습니다.");
 	    }
-	    // 입찰 있으면 마감(2), 없으면 유찰(3)
-	    int statusIdx = (detail.getBidCount() != null && detail.getBidCount() > 0) ? 2 : 3;
+	 // 입찰 있으면 결정대기(2), 없으면 유찰(4)
+	    int statusIdx = (detail.getBidCount() != null && detail.getBidCount() > 0) ? 2 : 4;
 	    auctionMapper.updateAuctionStatus(auctionIdx, statusIdx);
 	}
 
@@ -143,13 +143,8 @@ public class AuctionService {
 	        // bidCount가 null이면 0으로 처리
 	        int bidCount = dto.getBidCount() != null ? dto.getBidCount() : 0;
 
-	        if (bidCount > 0) {
-	            // 입찰 있음 → 마감 (2)
-	            auctionMapper.updateAuctionStatus(dto.getAuctionIdx(), 2);
-	        } else {
-	            // 입찰 없음 → 유찰 (3)
-	            auctionMapper.updateAuctionStatus(dto.getAuctionIdx(), 3);
-	        }
+	        // 입찰 있음 → 결정대기(2), 없음 → 유찰(4)
+	        auctionMapper.updateAuctionStatus(dto.getAuctionIdx(), bidCount > 0 ? 2 : 4);
 	    }
 	}
 	

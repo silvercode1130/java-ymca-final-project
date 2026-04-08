@@ -37,35 +37,51 @@ public class AuctionController {
     @GetMapping("/auctions")
     public String auctionList(
             @RequestParam(value = "keyword", required = false) String keyword,
-            @RequestParam(value = "categoryIdx", required = false) Integer categoryIdx,
             Model model) {
 
         auctionService.updateExpiredAuctions();
+        List<AuctionDTO> list = auctionService.AuctionList(null, keyword);
 
-        List<AuctionDTO> list = auctionService.AuctionList(keyword, categoryIdx);
+        model.addAttribute("auctionList", list);
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("selectedCategory", null);
+        return "views/auction/auctionList";
+    }
+    
+    // 카테고리 필터 (/auctions/category/{categoryCode})
+    @GetMapping("/auctions/category/{categoryCode}")
+    public String auctionListByCategory(
+            @PathVariable("categoryCode") String categoryCode,
+            @RequestParam(value = "keyword", required = false) String keyword,
+            Model model) {
+
+        auctionService.updateExpiredAuctions();
+        List<AuctionDTO> list = auctionService.AuctionList(categoryCode, keyword);
+        
+        System.out.println("전달된 코드: " + categoryCode);
         
         model.addAttribute("auctionList", list);
         model.addAttribute("keyword", keyword);
-        model.addAttribute("categoryIdx", categoryIdx);
-        
+        model.addAttribute("selectedCategory", categoryCode);
         return "views/auction/auctionList";
     }
 
     // 경매 상세 조회 (입찰 리스트 포함) (/auctions/{auctionIdx})
     @GetMapping("/auctions/{auctionIdx}")
-    public String auctionDetail(@PathVariable("auctionIdx") Long auctionIdx, Model model) {
-    	
+    public String auctionDetail(
+            @PathVariable("auctionIdx") Long auctionIdx,
+            Model model) {
+
         auctionService.updateExpiredAuctions();
-        
-        // 경매 상세 정보
+
         AuctionDTO detail = auctionService.auctionDetail(auctionIdx);
         if (detail == null) return "redirect:/auctions";
-        
-        // 해당 경매에 달린 입찰 리스트
+
         List<BidDTO> bidList = bidService.BidList(auctionIdx);
-        
+
         model.addAttribute("detail", detail);
         model.addAttribute("bidList", bidList);
+        model.addAttribute("mode", "list");   // 기본: 입찰 목록 표시
         return "views/auction/auctionDetail";
     }
 
@@ -193,15 +209,36 @@ public class AuctionController {
         return "redirect:/auctions/" + auctionIdx;
     }
 
-    // 특정 경매 입찰 목록 (/auctions/{auctionIdx}/bids GET)
+    // 입찰 폼 페이지 (/auctions/{auctionIdx}/bids GET)
     @GetMapping("/auctions/{auctionIdx}/bids")
-    public String bidList(@PathVariable("auctionIdx") Long auctionIdx, Model model) {
+    public String bidRegisterForm(
+            @PathVariable("auctionIdx") Long auctionIdx,
+            HttpSession session, Model model,
+            RedirectAttributes ra) {
+
+        MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
+        if (loginUser == null) return "redirect:/views/member/login";
+
         AuctionDTO detail = auctionService.auctionDetail(auctionIdx);
         if (detail == null) return "redirect:/auctions";
 
+        // 구매자 본인은 입찰 불가 → 상세로 리다이렉트
+        if (detail.getBuyerIdx().equals(loginUser.getMemIdx())) {
+            ra.addFlashAttribute("bidError", "본인이 등록한 경매에는 입찰할 수 없습니다.");
+            return "redirect:/auctions/" + auctionIdx;
+        }
+
+        // 진행중(1)이 아니면 입찰 불가
+        if (detail.getAuctionStatusIdx() != 1) {
+            ra.addFlashAttribute("bidError", "진행중인 경매에만 입찰할 수 있습니다.");
+            return "redirect:/auctions/" + auctionIdx;
+        }
+
         List<BidDTO> bidList = bidService.BidList(auctionIdx);
+
         model.addAttribute("detail", detail);
         model.addAttribute("bidList", bidList);
+        model.addAttribute("mode", "bidForm");   // 오른쪽 패널: 입찰 폼
         return "views/auction/auctionDetail";
     }
 
@@ -250,6 +287,9 @@ public class AuctionController {
             }
         }
         
+        // itemCategoryIdx는 경매에서 자동 세팅
+        bidDto.setItemCategoryIdx(auction.getItemCategoryIdx());
+        
         // 서비스 호출
         try {
             bidService.registerBid(bidDto);
@@ -263,23 +303,35 @@ public class AuctionController {
     }
 
     // 입찰 상세 (/bids/{bidIdx})
-    @GetMapping("/bids/{bidIdx}")
-    public String bidDetail(@PathVariable("bidIdx") Long bidIdx,
-                             HttpSession session, Model model) {
+    @GetMapping("/auctions/{auctionIdx}/bids/{bidIdx}")
+    public String bidDetailPanel(
+            @PathVariable("auctionIdx") Long auctionIdx,
+            @PathVariable("bidIdx") Long bidIdx,
+            HttpSession session, Model model,
+            RedirectAttributes ra) {
+
         MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
         if (loginUser == null) return "redirect:/views/member/login";
 
-        BidDTO bid = bidService.findBidById(bidIdx);
-        if (bid == null) return "redirect:/auctions";
+        AuctionDTO detail = auctionService.auctionDetail(auctionIdx);
+        if (detail == null) return "redirect:/auctions";
 
-        AuctionDTO auction = auctionService.auctionDetail(bid.getAuctionIdx());
-        if (auction == null || !auction.getBuyerIdx().equals(loginUser.getMemIdx())) {
-            return "redirect:/auctions/" + bid.getAuctionIdx();
+        // 구매자만 입찰 상세 열람 가능
+        if (!detail.getBuyerIdx().equals(loginUser.getMemIdx())) {
+            ra.addFlashAttribute("bidError", "구매자만 입찰 상세를 열람할 수 있습니다.");
+            return "redirect:/auctions/" + auctionIdx;
         }
 
-        model.addAttribute("bid", bid);
-        model.addAttribute("auction", auction);
-        return "views/bid/bidDetail";
+        BidDTO selectedBid = bidService.findBidById(bidIdx);
+        if (selectedBid == null) return "redirect:/auctions/" + auctionIdx;
+
+        List<BidDTO> bidList = bidService.BidList(auctionIdx);
+
+        model.addAttribute("detail", detail);
+        model.addAttribute("bidList", bidList);
+        model.addAttribute("selectedBid", selectedBid);
+        model.addAttribute("mode", "bidDetail");   // 오른쪽 패널: 입찰 상세
+        return "views/auction/auctionDetail";
     }
 
     // 입찰 취소 (/bids/{bidIdx}/cancel)

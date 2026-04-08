@@ -27,10 +27,11 @@ public class BidDTO {
 
     // 아이템 정보 (상세페이지용)
     private Long itemIdx;
+    private Integer itemCategoryIdx;   // insertItem 시 사용
     private String itemName;
     private String itemBrand;
     private String itemThumbnailImg;
-    private String itemCategoryName;
+    private String itemCategoryName;   // bid_list_view에서 JOIN으로 조회
 
     // 시간 정보
     private LocalDateTime bidRegdate; // 입찰 등록일

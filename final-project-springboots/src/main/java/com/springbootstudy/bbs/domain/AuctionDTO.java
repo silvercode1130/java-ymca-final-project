@@ -21,6 +21,7 @@ public class AuctionDTO {
     // 카테고리
     private Integer itemCategoryIdx;
     private String itemCategoryName;
+    private String itemCategoryCode;   // URL용 카테고리 코드 (ball, racket 등)
 
     // 이미지
     private String auctionThumbnailImg;

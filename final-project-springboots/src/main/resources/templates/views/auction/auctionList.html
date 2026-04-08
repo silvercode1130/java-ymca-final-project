@@ -8,43 +8,71 @@
 
 <div class="list-header">
     <h2>전체 경매 리스트</h2>
-    
-    <!-- 검색/카테고리 필터 -->
-	<div style="margin-bottom:16px; display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
-	    <!-- 카테고리 필터 -->
-	    <form th:action="@{/auctions}" method="get" style="display:inline;">
-	        <select name="categoryIdx" onchange="this.form.submit()">
-	            <option value="">전체 카테고리</option>
-	            <option value="1" th:selected="${categoryIdx == 1}">공/볼</option>
-	            <option value="2" th:selected="${categoryIdx == 2}">라켓/배트/클럽</option>
-	            <option value="3" th:selected="${categoryIdx == 3}">보호대/보호장비</option>
-	            <option value="4" th:selected="${categoryIdx == 4}">의류/신발</option>
-	            <option value="5" th:selected="${categoryIdx == 5}">헬스/홈트 용품</option>
-	            <option value="6" th:selected="${categoryIdx == 6}">아웃도어/캠핑 스포츠</option>
-	            <option value="7" th:selected="${categoryIdx == 7}">수영/수상 스포츠 용품</option>
-	            <option value="8" th:selected="${categoryIdx == 8}">액세서리/잡화</option>
-	        </select>
-	    </form>
-	
-	    <!-- 키워드 검색 -->
-	    <form th:action="@{/auctions}" method="get" style="display:flex; gap:6px;">
-	        <input type="text" name="keyword"
-	               th:value="${keyword}"
-	               placeholder="제목 또는 카테고리 검색"
-	               style="padding:6px 10px; border:1px solid #ddd; border-radius:4px;">
-	        <button type="submit" style="padding:6px 12px;">검색</button>
-	    </form>
-	
-	    <!-- 전체 보기 -->
-	    <a th:href="@{/auctions}" style="font-size:13px; color:gray;">전체 보기</a>
-	</div>
-	    
+
+    <div style="margin-bottom:16px; display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+
+        <!-- 카테고리 필터: 클릭하면 /auctions/{code} 로 이동 -->
+        <div style="display:flex; gap:6px; flex-wrap:wrap;">
+            <a th:href="@{/auctions}"
+               th:classappend="${selectedCategory == null} ? ' active-category' : ''">
+               전체
+            </a>
+            <a th:href="@{/auctions/category/ball}"
+               th:classappend="${selectedCategory == 'ball'} ? ' active-category' : ''">
+               공/볼
+            </a>
+            <a th:href="@{/auctions/category/racket}"
+               th:classappend="${selectedCategory == 'racket'} ? ' active-category' : ''">
+               라켓/배트/클럽
+            </a>
+            <a th:href="@{/auctions/category/protective}"
+               th:classappend="${selectedCategory == 'protective'} ? ' active-category' : ''">
+               보호대/보호장비
+            </a>
+            <a th:href="@{/auctions/category/apparel}"
+               th:classappend="${selectedCategory == 'apparel'} ? ' active-category' : ''">
+               의류/신발
+            </a>
+            <a th:href="@{/auctions/category/fitness}"
+               th:classappend="${selectedCategory == 'fitness'} ? ' active-category' : ''">
+               헬스/홈트 용품
+            </a>
+            <a th:href="@{/auctions/category/outdoor}"
+               th:classappend="${selectedCategory == 'outdoor'} ? ' active-category' : ''">
+               아웃도어/캠핑
+            </a>
+            <a th:href="@{/auctions/category/swim}"
+               th:classappend="${selectedCategory == 'swim'} ? ' active-category' : ''">
+               수영/수상 스포츠
+            </a>
+            <a th:href="@{/auctions/category/accessory}"
+               th:classappend="${selectedCategory == 'accessory'} ? ' active-category' : ''">
+               액세서리/잡화
+            </a>
+        </div>
+
+        <!-- 키워드 검색 -->
+        <form th:action="${selectedCategory != null} ? @{/auctions/{cat}(cat=${selectedCategory})} : @{/auctions}"
+              method="get"
+              style="display:flex; gap:6px;">
+            <input type="text" name="keyword"
+                   th:value="${keyword}"
+                   placeholder="제목 검색"
+                   style="padding:6px 10px; border:1px solid #ddd; border-radius:4px;">
+            <button type="submit" style="padding:6px 12px;">검색</button>
+        </form>
+    </div>
+
     <div th:if="${session.loginUser != null}">
         <button th:onclick="|location.href='@{/auctions/new}'|" class="btn-primary">
             🚀 구매 요청하기
         </button>
     </div>
 </div>
+
+<!-- 에러/성공 메시지 -->
+<div th:if="${errorMessage}" style="color:red; margin:8px 0;" th:text="${errorMessage}"></div>
+<div th:if="${successMessage}" style="color:green; margin:8px 0;" th:text="${successMessage}"></div>
 
 <table>
     <thead>
@@ -63,26 +91,27 @@
     <tbody>
         <tr th:each="item : ${auctionList}"
             th:onclick="|location.href='/auctions/${item.auctionIdx}'|"
-            th:style="${item.auctionStatusIdx != 1} ? 'opacity:0.6;' : ''">
+            th:style="${item.auctionStatusIdx != 1} ? 'opacity:0.6; cursor:pointer;' : 'cursor:pointer;'">
 
             <td th:text="${item.auctionIdx}">1</td>
 
-            <!-- 상태 배지 -->
             <td>
                 <span th:if="${item.auctionStatusIdx == 1}">진행중</span>
-                <span th:if="${item.auctionStatusIdx == 2}">마감</span>
-                <span th:if="${item.auctionStatusIdx == 3}">유찰</span>
-                <span th:if="${item.auctionStatusIdx == 4}">취소</span>
+                <span th:if="${item.auctionStatusIdx == 2}">결정대기</span>
+                <span th:if="${item.auctionStatusIdx == 3}">마감</span>
+                <span th:if="${item.auctionStatusIdx == 4}">유찰</span>
+                <span th:if="${item.auctionStatusIdx == 5}">취소</span>
             </td>
 
             <td th:text="${item.itemCategoryName}">헬스/홈트</td>
-			<td>
-				<div style="width: 50px; height: 50px; overflow: hidden; border-radius: 4px;">
-				    <img th:if="${item.auctionThumbnailImg != null and item.auctionThumbnailImg != ''}"
-				         th:src="${item.auctionThumbnailImg}" alt="썸네일" style="width: 100%; height: 100%; object-fit: cover;">
-				    <span th:unless="${item.auctionThumbnailImg != null or item.auctionThumbnailImg == ''}">없음</span>
-				</div>
-			</td>
+            <td>
+                <div style="width:50px; height:50px; overflow:hidden; border-radius:4px;">
+                    <img th:if="${item.auctionThumbnailImg != null and item.auctionThumbnailImg != ''}"
+                         th:src="${item.auctionThumbnailImg}" alt="썸네일"
+                         style="width:100%; height:100%; object-fit:cover;">
+                    <span th:unless="${item.auctionThumbnailImg != null and item.auctionThumbnailImg != ''}">없음</span>
+                </div>
+            </td>
             <td th:text="${item.auctionTitle}">제목</td>
             <td th:text="${#numbers.formatInteger(item.auctionTargetPrice, 0, 'COMMA') + '원'}">50,000원</td>
             <td class="price"
@@ -94,7 +123,7 @@
         </tr>
 
         <tr th:if="${#lists.isEmpty(auctionList)}">
-            <td colspan="10">조회된 경매 데이터가 없습니다.</td>
+            <td colspan="9">조회된 경매 데이터가 없습니다.</td>
         </tr>
     </tbody>
 </table>

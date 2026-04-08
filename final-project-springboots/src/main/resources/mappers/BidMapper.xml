@@ -23,7 +23,7 @@
 	<!-- 입찰 삭제 - 소프트 딜리트 -->
 	<update id="softDeleteBid">
 	    UPDATE bid
-	    SET bid_status_idx = 4,
+	    SET bid_status_idx = 5,
 	        bid_moddate = NOW()
 	    WHERE bid_idx = #{bidIdx}
 	      AND bidder_idx = #{bidderIdx}
@@ -34,15 +34,17 @@
 	    INSERT INTO item (
 	        item_name,
 	        item_category_idx,
+	        item_brand,
 	        item_thumbnail_img,
 	        item_condition,
 	        item_regdate,
 	        item_is_deleted
 	    ) VALUES (
-	        #{itemName},      
+	        #{itemName},
 	        #{itemCategoryIdx},
+	        #{itemBrand},
 	        #{itemThumbnailImg},
-	        'NEW',            
+	        'NEW',
 	        NOW(),
 	        'N'
 	    )
