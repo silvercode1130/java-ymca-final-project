@@ -33,12 +33,19 @@ public class ReviewController {
 	    List<ReviewVO> list = reviewService.getMyReviewList(loginUser.getMemIdx());
 	    // 내가 받은 리뷰
 	    List<ReviewVO> receivedReviewList = reviewService.getReceivedReviews(loginUser.getMemIdx());
+	    // 내가 받은 리뷰 별점 평균 
+	    Double avgRating = reviewService.getAvgRating(loginUser.getMemIdx());
 
 	    model.addAttribute("reviewList", list);
 	    model.addAttribute("receivedReviewList", receivedReviewList);
+	    model.addAttribute("avgRating", avgRating);
 	    
 	    return "views/review/review"; 
 	}
+	
+	
+
+	
 	
 	// 리뷰 작성창 -----------------------------------------------------------------
 	

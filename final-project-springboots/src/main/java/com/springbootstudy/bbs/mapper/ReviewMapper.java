@@ -14,7 +14,10 @@ public interface ReviewMapper {
 	List<ReviewVO> getMyReviewList(@Param("buyerIdx") Long buyerIdx);
 	
 	// 내가 받은 리뷰 조회
-	List<ReviewVO> getReceivedReviews(@Param("bidIdx") Long bidIdx);  
+	List<ReviewVO> getReceivedReviews(@Param("memIdx") Long memIdx);  
+	
+	// 내가 받은 리뷰 별점 평균
+	Double getAvgRating(@Param("memIdx") Long memIdx);
 	
 	// 검색 전 기본 목록
 	List<ReviewVO> getWritableReviewList(@Param("buyerIdx") Long buyerIdx); 
