@@ -50,13 +50,21 @@ public class ReviewService {
 	    return reviewMapper.getReviewDetail(reviewIdx);
 	}
 	
-	// 리뷰 삭제하기(관리자만)
+	// 리뷰 전체 보기
 	public List<ReviewVO> getAllReviewList() { 
 	    return reviewMapper.getAllReviewList();
 	}
 	// 리뷰 삭제하기
     public void deleteReview(Long reviewIdx) {
         reviewMapper.deleteReview(reviewIdx);
+    }
+    // 리뷰 삭제하기
+    public List<ReviewVO> getActiveReviewList() {
+        return reviewMapper.getActiveReviewList();
+    }
+    // 리뷰 영구삭제하기
+    public List<ReviewVO> getDeletedReviewList() {
+        return reviewMapper.getDeletedReviewList();
     }
 	
 }

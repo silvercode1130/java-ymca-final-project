@@ -134,27 +134,19 @@ public class ReviewController {
 	// 리뷰 삭제하기(관리자만) -----------------------------------------------------------------
 	
 	@GetMapping("/reviewDelete")
-	public String reviewDelete(HttpSession session, Model model) {
+	public String reviewDelete(@RequestParam("reviewIdx") Long reviewIdx,
+	                           HttpSession session) {
 
 	    MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
 
-	    if (loginUser == null) {
-	        return "redirect:/members/login";
+	    if (loginUser == null || loginUser.getMemRoleIdx() != 2) {
+	        return "redirect:/main";
 	    }
 
-	    List<ReviewVO> list;
+	    // 삭제
+	    reviewService.deleteReview(reviewIdx);
 
-	    // admin이면 전체 조회
-	    if (loginUser.getMemRoleIdx() == 2) {
-	        list = reviewService.getAllReviewList();
-	    } else {
-	        // 일반 유저는 내 것만 조회 가능
-	        list = reviewService.getMyReviewList(loginUser.getMemIdx());
-	    }
-
-	    model.addAttribute("reviewList", list);
-
-	    return "views/review/review";
+	    return "redirect:/reviewAdmin";
 	}
 	
 	// 관리자 리뷰 페이지 -----------------------------------------------------------------
@@ -164,24 +156,19 @@ public class ReviewController {
 	    MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
 	    
 	    // 관리자만 들어올 수 있음
+	    // 로그인 안했거나 관리자 아니면 메인으로 강제 이동
 	    if (loginUser == null || loginUser.getMemRoleIdx() != 2) {
 	        return "redirect:/main"; 
 	    }
 
 	    // 전체 리뷰 가져오기
-	    List<ReviewVO> allList = reviewService.getAllReviewList();
-	    model.addAttribute("reviewList", allList);
+	    List<ReviewVO> activeList = reviewService.getActiveReviewList(); // N
+	    List<ReviewVO> deletedList = reviewService.getDeletedReviewList(); // Y
+
+	    model.addAttribute("activeList", activeList);
+	    model.addAttribute("deletedList", deletedList);
 
 	    return "views/review/reviewAdmin"; 
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	
 }

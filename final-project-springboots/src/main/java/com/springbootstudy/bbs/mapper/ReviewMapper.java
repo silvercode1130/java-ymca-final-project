@@ -36,5 +36,9 @@ public interface ReviewMapper {
 	List<ReviewVO> getAllReviewList();    
     // soft delete 처리
     void deleteReview(@Param("reviewIdx") Long reviewIdx);
+    
+    // 삭제 관련 (띄우기)
+    List<ReviewVO> getActiveReviewList();  
+    List<ReviewVO> getDeletedReviewList(); 
 	
 }
