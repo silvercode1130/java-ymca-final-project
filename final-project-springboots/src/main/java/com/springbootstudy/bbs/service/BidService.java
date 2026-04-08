@@ -22,19 +22,20 @@ public class BidService {
 	private AuctionMapper auctionMapper;
 	
 	// 특정 경매의 입찰 리스트 조회 (이름 마스킹 포함)
-    public List<BidDTO> BidList(Long auctionIdx) {
-        List<BidDTO> list = bidMapper.BidList(auctionIdx);
-        
-        for (BidDTO dto : list) {
-            String name = dto.getBidderName();
-            if (name != null && name.length() > 1) {
-                // 판매자 이름 가리기 (신정은 -> 신**)
-                String masked = name.substring(0, 1) + "*".repeat(name.length() - 1);
-                dto.setBidderName(masked);
-            }
-        }
-        return list;
-    }
+	public List<BidDTO> BidList(Long auctionIdx) {
+	    List<BidDTO> list = bidMapper.BidList(auctionIdx);
+
+	    for (BidDTO dto : list) {
+	        // memName(실명)을 마스킹해서 bidderName에 세팅
+	        String name = dto.getMemName();
+	        if (name != null && name.length() > 1) {
+	            dto.setBidderName(name.substring(0, 1) + "*".repeat(name.length() - 1));
+	        } else {
+	            dto.setBidderName(name); // 한 글자 이름은 그대로
+	        }
+	    }
+	    return list;
+	}
     
     // 입찰 등록 (아이템 정보 선행 등록 포함)
     public void registerBid(BidDTO bidDto) {
