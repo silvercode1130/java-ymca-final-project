@@ -79,6 +79,14 @@ public class MemberService {
         memberMapper.update(vo);
     }
 
+    
+    // 비밀번호 재발급 -----------------------------------------------------
+    
+    // 비밀번호 재발급 시 아이디 + 전화번호 맞는 지 확인
+	public MemberVO findByIdAndTel(String memId, String memTel) {
+		return memberMapper.findByIdAndTel(memId, memTel);
+	}
+
 	
 
 

@@ -50,4 +50,10 @@ public interface MemberMapper {
  	MemberVO selectOneFromId(String memId); 
  	String selectGradeNameByMemId(String memId);	// grade만 따로 조회
 
+ 	
+ 	// 비밀번호 재발급 =============================================
+ 	
+ 	// 비밀번호 재발급 시 아이디 + 전화번호 맞는 지 확인
+	MemberVO findByIdAndTel(@Param("memId") String memId, @Param("memTel") String memTel);
+
 }
