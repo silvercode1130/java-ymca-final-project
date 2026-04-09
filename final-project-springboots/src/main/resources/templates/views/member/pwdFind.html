@@ -44,44 +44,60 @@
 }
 	
 	// 새 비밀번호 인증
-	$(document).ready(function() {
-	    // 비밀번호 입력창들에서 타이핑 할 때마다 실행
-	    $("#newPwd, #newPwdConfirm").on("keyup", function() {
-	        let pwd1 = $("#newPwd").val();
-	        let pwd2 = $("#newPwdConfirm").val();
-	        let submitBtn = $("#submitBtn");
+	let isSamePwd = false;
+
+	$(document).ready(function() { 
 	
-	        // 두 입력란이 일치하는지 체크
-	        if (pwd1 !== "" && pwd2 !== "") {
-	            if (pwd1 === pwd2) {
-	                $("#pwdMatchMsg").text("비밀번호가 일치합니다").css("color", "gray");
-	                submitBtn.prop("disabled", false); // 버튼 활성화
-	            } else {
-	                $("#pwdMatchMsg").text("비밀번호가 일치하지 않습니다").css("color", "red");
-	                submitBtn.prop("disabled", true); // 버튼 비활성화
-	            }
-	        }
+	    $("#newPwd, #newPwdConfirm").on("keyup", function() {
+	        validatePassword();
 	    });
 	
-	    // 기존 비밀번호와 동일한지 체크 
 	    $("#newPwd").on("blur", function() {
 	        let newPwd = $(this).val();
-	        
+	
 	        $.ajax({
 	            url: "/auth/checkSamePwd",
 	            type: "POST",
 	            data: { "newPwd": newPwd },
 	            success: function(res) {
 	                if (res === "same") {
-	                    $("#pwdCheckMsg").text("이전 비밀번호와 동일합니다").css("color", "red");
-	                    $("#submitBtn").prop("disabled", true);
+	                    isSamePwd = true;
+	                    $("#pwdMatchMsg").text("이전 비밀번호입니다").css("color", "red");
 	                } else {
-	                    $("#pwdCheckMsg").text(""); 
+	                    isSamePwd = false;
 	                }
+	
+	                validatePassword(); 
 	            }
 	        });
 	    });
 	});
+	
+	// 모든 조건을 한 번에 체크
+	function validatePassword() {
+	    let pwd1 = $("#newPwd").val();
+	    let pwd2 = $("#newPwdConfirm").val();
+	    let submitBtn = $("#submitBtn");
+	
+	    // 이전 비밀번호면 무조건 막기
+	    if (isSamePwd) {
+	        submitBtn.prop("disabled", true);
+	        return;
+	    }
+	
+	    // 두 값이 다 있을 때만 비교
+	    if (pwd1 !== "" && pwd2 !== "") {
+	        if (pwd1 === pwd2) {
+	            $("#pwdMatchMsg").text("비밀번호가 일치합니다").css("color", "gray");
+	            submitBtn.prop("disabled", false);
+	        } else {
+	            $("#pwdMatchMsg").text("비밀번호가 일치하지 않습니다").css("color", "red");
+	            submitBtn.prop("disabled", true);
+	        }
+	    } else {
+	        submitBtn.prop("disabled", true);
+	    }
+	}
 	
 	// 비밀번호 체크용 (제약조건)
     function pwdCheck() {

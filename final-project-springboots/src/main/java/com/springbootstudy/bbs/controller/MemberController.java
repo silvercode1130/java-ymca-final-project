@@ -370,14 +370,30 @@ public class MemberController {
       }
       
       // 비밀번호 동일한지 체크
+//      @PostMapping("/auth/checkSamePwd")
+//      @ResponseBody
+//      public String checkSamePwd(@RequestParam("newPwd") String newPwd, HttpSession session) {
+//          MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
+//          
+//          if (loginUser != null && loginUser.getMemPwd().equals(newPwd)) {
+//              return "same"; 
+//          }
+//          return "different";
+//      }
       @PostMapping("/auth/checkSamePwd")
       @ResponseBody
       public String checkSamePwd(@RequestParam("newPwd") String newPwd, HttpSession session) {
-          MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
-          
-          if (loginUser != null && loginUser.getMemPwd().equals(newPwd)) {
-              return "same";
+
+          String memId = (String) session.getAttribute("resetMemId");
+
+          if (memId == null) return "fail";
+
+          MemberVO member = memberMapper.selectOneFromId(memId);
+
+          if (member != null && member.getMemPwd().equals(newPwd)) {
+              return "same"; // 이전 비번
           }
+
           return "different";
       }
 
