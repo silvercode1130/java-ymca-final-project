@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <title>Insert title here</title>
 
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
 <script type="text/javascript">
 	//전화번호 - 010-xxxx-xxxx 형식
 	function formatTel(input) {
@@ -20,19 +22,26 @@
 	  }
 	}
 	
-	/* // 인증문자 발송
-	const { SolapiMessageService } = require('solapi');
-	const messageService = new SolapiMessageService(
-	  "YOUR_API_KEY",
-	  "YOUR_API_SECRET"
-	);
-	
-	messageService.send({
-	  'to': '[[${memTel}]]',
-	  'from': '01024152943',
-	  'text': '[Web발신]\n본인 확인을 위한 인증번호는 [010101]입니다.\n타인에게 노출하지 마세요.'
-	});
-	 */
+	// 인증번호가 맞는지 체크
+	function checkAuthCode() {
+    let userCode = $("#userInputCode").val(); // 사용자가 입력한 인증번호
+    
+    $.ajax({
+        url: "/auth/verifyCode", // 서버 인증번호 검증 주소 
+        type: "POST",
+        data: { "userCode": userCode },
+        success: function(res) {
+            if(res === "success") {
+                $("#authMsg").text("인증 되었습니다").css("color", "gray");
+            } else {
+                $("#authMsg").text("인증번호가 틀렸니다").css("color", "red");
+            }  
+       	},
+        error: function() { 
+        	alert("죄송합니다 \n예기치 못한 오류가 발생하여 잠시 후 다시 시도해 주세요");
+        }
+    });
+}
 </script>
 
 </head>
@@ -62,22 +71,18 @@
 		    <button type="submit">인증번호 받기</button>
 		</div>
 	
-		<!-- 진짜로 전송 되어야 함 -->
-		<div class="msg" th:text="${verifyMsg}">예시 -> ${전화번호}로 전송되었습니다</div>
+		<div class="msg" th:text="${verifyMsg}"></div>
 	</form>
 
 	<hr>
 	
 	<form class="newPwdFind" action="/members/newPwdFind">
 		<div>
-			<!-- 
-				인증번호 다르게 기입하면 틀렸다고 떠야 함(alert 말고) 
-				입력 전 까지는 disabled -> 해야하나??
-			-->
 			<label>인증번호</label> <br>
-		    <input type="text" name="authCode" placeholder="인증번호를 입력하세요"> 
-		    <button>확인</button> <br>
-		    <!-- 두 입력란 다르면 탈락 -->
+		    <input type="text" id="userInputCode" name="authCode" placeholder="인증번호를 입력하세요"> 
+		    <button type="button" onclick="checkAuthCode()">확인</button> <br>
+		    <span id="authMsg"></span> <br>
+		    
 		    <label>새 비밀번호</label> <br> 
 	        <input type="password" name="newPassword" placeholder="새 비밀번호를 입력하세요"> <br>
 	        <input type="password" name="newPassword" placeholder="새 비밀번호 확인">

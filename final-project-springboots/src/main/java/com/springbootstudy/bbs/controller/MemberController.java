@@ -290,6 +290,7 @@ public class MemberController {
               				@RequestParam(value="memTel", required=false) String memTel,
               				RedirectAttributes ra) { 
 
+    	  // 1. 아이디 + 전화번호
           MemberVO member = memberService.findByIdAndTel(memId, memTel);
 
           // 값을 입력하지 않고 버튼을 누른 경우
@@ -305,7 +306,7 @@ public class MemberController {
               ra.addFlashAttribute("verifyMsg", memTel + "로 인증번호가 전송되었습니다");
           }
           
-          // 인증문자 기능
+          // 2. 인증문자 기능
           /* 총 50회 무료 이용 가능! 
            * [인증 문자 안되는 경우 - 필독]
            * 컴퓨터에 환경변수가 등록되어야 실행 가능하고 이클립스 설정 바꿔야 작동하기 때문에
@@ -315,6 +316,11 @@ public class MemberController {
            * Run -> Run Configrations... -> Environment -> add -> 환경변수 + api키 2가지 넣기
            * 필요하신 분들은 카톡으로 연락 주시면 보내드리겠습니다!(외부 유출금지ㅠ -> 금액 폭탄 맞을 수 있어요...)
            * */
+          
+          // 인증번호 6자리 랜덤 전송
+          String code = String.valueOf((int)(Math.random()*900000)+100000);
+          session.setAttribute("authCode", code);
+          
           String apiKey = System.getenv("SOLAPI_KEY"); 
           String apiSecret = System.getenv("SOLAPI_SECRET_KEY"); 
           
@@ -328,7 +334,7 @@ public class MemberController {
 	       Message message = new Message();
 	       message.setFrom("01024152943"); 
 	       message.setTo(memTel.replace("-", "")); 
-	       message.setText("PickQ의 본인 확인을 위한 인증번호는 [010101]입니다."); 
+	       message.setText("PickQ의 본인 확인을 위한 인증번호는 [" + code + "]입니다."); 
 	
 	       try {
 	         // send 메소드로 ArrayList<Message> 객체를 넣어도 동작합니다! 
@@ -340,8 +346,26 @@ public class MemberController {
 	       } catch (Exception exception) {
 	         System.out.println(exception.getMessage());
 	       }
+	       
+	       // 3. 인증번호 확인하기
+	       
+	       // 4. 새 비밀번호 서버에 알리기
 	          
           return "redirect:/members/pwdFind"; 
+      }
+      
+      // 인증번호가 일치하는지 체크
+      @PostMapping("/auth/verifyCode")
+      @ResponseBody
+      public String verifyCode(@RequestParam("userCode") String userCode, HttpSession session) {
+    	  
+          String originalCode = (String) session.getAttribute("authCode"); 
+          
+          if (originalCode != null && originalCode.equals(userCode)) {
+              return "success"; 
+          } else {
+              return "fail"; 
+          }
       }
       
       
