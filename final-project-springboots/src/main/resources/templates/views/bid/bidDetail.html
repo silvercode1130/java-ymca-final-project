@@ -32,7 +32,7 @@
     <!-- 낙찰 버튼 (진행중인 입찰만) -->
     <div th:if="${bid.bidStatusIdx == 1 and auction.auctionStatusIdx == 1}"
          style="margin-top:20px;">
-        <form th:action="@{/auction/bid/win/{id}(id=${bid.bidIdx})}"
+        <form th:action="@{/auctions/{aId}/bids/{bId}/win(aId=${auction.auctionIdx},bId=${bid.bidIdx})}"
               method="post"
               onsubmit="return confirm('이 입찰을 낙찰하시겠습니까?')">
             <input type="hidden" name="auctionIdx" th:value="${auction.auctionIdx}">
@@ -45,7 +45,7 @@
 
     <div class="btn-group" style="margin-top:20px;">
         <button type="button"
-                th:onclick="|location.href='@{/auction/auctionDetail/{id}(id=${auction.auctionIdx})}'|">
+                onclick="history.back()">
             경매로 돌아가기
         </button>
     </div>

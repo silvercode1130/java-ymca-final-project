@@ -8,7 +8,7 @@
 		member_profile p ON m.mem_idx = p.mem_idx JOIN grade g ON m.mem_grade_idx = g.grade_idx WHERE
 		m.mem_idx = #{memIdx} </select>
 
-	<select id="getAuctionList" resultType="AuctionListDTO"> SELECT a.*, s.auction_status_name FROM auction
+	<select id="getAuctionList" resultType="AuctionDTO"> SELECT a.*, s.auction_status_name FROM auction
 		a INNER JOIN auction_status s ON a.auction_status_idx = s.auction_status_idx WHERE a.buyer_idx =
 		#{memIdx} ORDER BY a.auction_regdate DESC </select>
 

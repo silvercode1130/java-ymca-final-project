@@ -5,7 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.springbootstudy.bbs.domain.AuctionListDTO;
+import com.springbootstudy.bbs.domain.AuctionDTO;
 import com.springbootstudy.bbs.domain.AuctionVO;
 import com.springbootstudy.bbs.domain.BidVO;
 import com.springbootstudy.bbs.domain.BoardVO;
@@ -32,7 +32,7 @@ public class MyPageService {
 
   // 2. 내 경매 목록 조회 (입찰 수 포함)
   // 컨트롤러의 getAuctionList와 매퍼의 getAuctionList를 연결합니다.
-  public List<AuctionListDTO> getAuctionList(long memIdx) {
+  public List<AuctionDTO> getAuctionList(long memIdx) {
     log.info("사용자 {}번의 입찰 수 포함 경매 목록을 조회합니다.", memIdx);
     return myPageMapper.getAuctionList(memIdx);
   }

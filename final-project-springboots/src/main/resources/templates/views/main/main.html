@@ -2,194 +2,338 @@
 <html xmlns:th="http://www.thymeleaf.org"
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	layout:decorate="~{layouts/main_layout}">
+<head>
+<meta charset="UTF-8">
+<title>당신의 모든 제안, PickQ</title>
+
+</head>
 <body>
 	<div layout:fragment="content">
 
-		<!-- Hero Slider: 지금은 첫 슬라이드만 정적으로 -->
-		<div class="relative h-[375px] md:h-[450px] overflow-hidden">
-			<div class="relative h-full">
+		<div class="min-h-screen bg-white">
+
+			<!-- Hero Banner -->
+			<div
+				class="relative h-[400px] bg-white overflow-hidden border-b border-gray-100">
 				<div class="absolute inset-0">
+					<!-- 슬라이드 대신 첫 번째 슬라이드 느낌의 고정 배너 -->
 					<img
 						src="https://images.unsplash.com/photo-1461896836934-ffe607ba8211?q=80&w=2000"
-						alt="당신을 위한 모든 제안" class="w-full h-full object-cover">
+						alt="hero" class="w-full h-full object-cover opacity-90">
 					<div
-						class="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent"></div>
+						class="absolute inset-0 bg-gradient-to-r from-black/50 to-transparent"></div>
 				</div>
+
 				<div class="absolute inset-0 flex items-center">
-					<div class="mx-auto max-w-7xl px-4 w-full">
-						<div class="max-w-2xl">
+					<div class="mx-auto max-w-[1200px] px-6 w-full">
+						<div class="max-w-xl">
 							<h1
-								class="text-3xl md:text-4xl font-bold text-white mb-1 leading-tight whitespace-nowrap">
-								당신을 위한 모든 제안</h1>
-							<div
-								class="text-4xl md:text-5xl font-black text-[#AFFF00] mb-4 leading-tight whitespace-nowrap">
-								pickQ</div>
-							<p
-								class="text-base md:text-lg text-gray-200 mb-6 whitespace-nowrap">
-								온라인 발품은 그만! pickQ로 한큐에 해결하세요.</p>
+								class="text-4xl md:text-5xl font-bold text-white mb-4 leading-tight">
+								당신을 위한 모든 제안, <span class="block">PickQ</span>
+							</h1>
+							<p class="text-lg text-white/90 mb-8">온라인 발품은 그만! 픽큐로 한큐에
+								해결하세요.</p>
 							<a th:href="@{/auctions/new}">
 								<button
-									class="inline-flex items-center bg-[#AFFF00] text-black hover:bg-[#AFFF00]/90 font-bold text-base px-6 py-3 rounded">
-									<span class="mr-2">＋</span> 지금 시작하기
-								</button>
+									class="bg-white text-[#222222] hover:bg-gray-100 font-semibold text-base px-8 py-3 rounded-lg">
+									지금 시작하기</button>
 							</a>
 						</div>
 					</div>
 				</div>
 			</div>
-		</div>
 
-		<!-- 카테고리 바: 우선 간단히 버튼만 -->
-		<div class="border-b border-gray-200 bg-white">
-			<div
-				class="mx-auto max-w-7xl px-4 py-3 flex gap-2 overflow-x-auto text-sm">
-				<button
-					class="px-3 py-1.5 rounded-full bg-black text-white whitespace-nowrap">전체</button>
-				<button
-					class="px-3 py-1.5 rounded-full bg-gray-100 text-gray-700 whitespace-nowrap">구기종목</button>
-				<button
-					class="px-3 py-1.5 rounded-full bg-gray-100 text-gray-700 whitespace-nowrap">라켓스포츠</button>
-				<button
-					class="px-3 py-1.5 rounded-full bg-gray-100 text-gray-700 whitespace-nowrap">헬스/홈트</button>
-				<button
-					class="px-3 py-1.5 rounded-full bg-gray-100 text-gray-700 whitespace-nowrap">아웃도어</button>
-				<button
-					class="px-3 py-1.5 rounded-full bg-gray-100 text-gray-700 whitespace-nowrap">수영/수상</button>
-			</div>
-		</div>
+			<!-- Category Grid Section -->
+			<section class="bg-white py-12 border-b border-gray-100">
+				<div class="mx-auto max-w-[1200px] px-6">
+					<h2 class="text-xl font-semibold text-[#222222] mb-8">카테고리별
+						쇼핑하기</h2>
 
-		<!-- 지금 가장 핫한 요청 (mockHotAuctions) -->
-		<div
-			class="bg-gradient-to-b from-gray-50 to-white py-12 border-b border-gray-200">
-			<div class="mx-auto max-w-7xl px-4">
-				<div class="flex items-center justify-between mb-6">
-					<div class="flex items-center gap-3">
-						<span class="text-orange-500 text-2xl">🔥</span>
-						<h2 class="text-2xl font-bold text-gray-900">지금 가장 핫한 요청</h2>
+					<div class="grid grid-cols-2 sm:grid-cols-4 gap-6">
+
+						<!-- 공/볼 -->
+						<a th:href="@{'/auctions/ball'}"
+							class="flex flex-col items-center group cursor-pointer">
+							<div
+								class="w-32 h-32 rounded-full overflow-hidden mb-3 transition-transform group-hover:scale-105">
+								<img
+									src="https://images.unsplash.com/photo-1760177379323-2b22f8d41707?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzb2NjZXIlMjBiYWxsJTIwc3BvcnRzJTIwZXF1aXBtZW50fGVufDF8fHx8MTc3NTYyOTE1OXww&ixlib=rb-4.1.0&q=80&w=400"
+									alt="공/볼" class="w-full h-full object-cover">
+							</div> <span
+							class="text-sm font-medium text-[#222222] text-center group-hover:text-[#7CBD00] transition-colors">
+								공/볼 </span>
+						</a>
+
+						<!-- 라켓/배트/클럽 -->
+						<a th:href="@{'/auctions/racket'}"
+							class="flex flex-col items-center group cursor-pointer">
+							<div
+								class="w-32 h-32 rounded-full overflow-hidden mb-3 transition-transform group-hover:scale-105">
+								<img
+									src="https://images.unsplash.com/photo-1773452549497-05f51a391451?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx0ZW5uaXMlMjByYWNrZXQlMjBzcG9ydHN8ZW58MXx8fHwxNzc1NjI5MTYwfDA&ixlib=rb-4.1.0&q=80&w=400"
+									alt="라켓/배트/클럽" class="w-full h-full object-cover">
+							</div> <span
+							class="text-sm font-medium text-[#222222] text-center group-hover:text-[#7CBD00] transition-colors">
+								라켓/배트/클럽 </span>
+						</a>
+
+						<!-- 보호대/보호장비 -->
+						<a th:href="@{'/auctions/protective'}"
+							class="flex flex-col items-center group cursor-pointer">
+							<div
+								class="w-32 h-32 rounded-full overflow-hidden mb-3 transition-transform group-hover:scale-105">
+								<img
+									src="https://images.unsplash.com/photo-1535031726088-dd46f73b68fa?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxrbmVlJTIwcGFkJTIwcHJvdGVjdGl2ZSUyMGdlYXIlMjBzcG9ydHN8ZW58MXx8fHwxNzc1NjI5MTYwfDA&ixlib=rb-4.1.0&q=80&w=400"
+									alt="보호대/보호장비" class="w-full h-full object-cover">
+							</div> <span
+							class="text-sm font-medium text-[#222222] text-center group-hover:text-[#7CBD00] transition-colors">
+								보호대/보호장비 </span>
+						</a>
+
+						<!-- 의류/신발 -->
+						<a th:href="@{'/auctions/apparel'}"
+							class="flex flex-col items-center group cursor-pointer">
+							<div
+								class="w-32 h-32 rounded-full overflow-hidden mb-3 transition-transform group-hover:scale-105">
+								<img
+									src="https://images.unsplash.com/photo-1739132268718-53d64165d29a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwyfHxydW5uaW5nJTIwc2hvZXMlMjBzbmVha2Vyc3xlbnwxfHx8fDE3NzU2MjkxNjB8MA&ixlib=rb-4.1.0&q=80&w=400"
+									alt="의류/신발" class="w-full h-full object-cover">
+							</div> <span
+							class="text-sm font-medium text-[#222222] text-center group-hover:text-[#7CBD00] transition-colors">
+								의류/신발 </span>
+						</a>
+
+						<!-- 헬스/홈트 용품 -->
+						<a th:href="@{'/auctions/fitness'}"
+							class="flex flex-col items-center group cursor-pointer">
+							<div
+								class="w-32 h-32 rounded-full overflow-hidden mb-3 transition-transform group-hover:scale-105">
+								<img
+									src="https://images.unsplash.com/photo-1576678927484-cc907957088c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxmaXRuZXNzJTIwZHVtYmJlbGxzJTIwZ3ltJTIwZXF1aXBtZW50fGVufDF8fHx8MTc3NTYyOTE2MXww&ixlib=rb-4.1.0&q=80&w=400"
+									alt="헬스/홈트 용품" class="w-full h-full object-cover">
+							</div> <span
+							class="text-sm font-medium text-[#222222] text-center group-hover:text-[#7CBD00] transition-colors">
+								헬스/홈트 용품 </span>
+						</a>
+
+						<!-- 아웃도어/캠핑 스포츠 -->
+						<a th:href="@{'/auctions/outdoor'}"
+							class="flex flex-col items-center group cursor-pointer">
+							<div
+								class="w-32 h-32 rounded-full overflow-hidden mb-3 transition-transform group-hover:scale-105">
+								<img
+									src="https://images.unsplash.com/photo-1771849316197-2b1f3f49b651?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjYW1waW5nJTIwYmFja3BhY2slMjBvdXRkb29yfGVufDF8fHx8MTc3NTYyOTE2MXww&ixlib=rb-4.1.0&q=80&w=400"
+									alt="아웃도어/캠핑 스포츠" class="w-full h-full object-cover">
+							</div> <span
+							class="text-sm font-medium text-[#222222] text-center group-hover:text-[#7CBD00] transition-colors">
+								아웃도어/캠핑 스포츠 </span>
+						</a>
+
+						<!-- 수영/수상 스포츠 용품 -->
+						<a th:href="@{'/auctions/swim'}"
+							class="flex flex-col items-center group cursor-pointer">
+							<div
+								class="w-32 h-32 rounded-full overflow-hidden mb-3 transition-transform group-hover:scale-105">
+								<img
+									src="https://images.unsplash.com/photo-1747494749385-c75103afc37d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzd2ltbWluZyUyMGdvZ2dsZXMlMjBwb29sfGVufDF8fHx8MTc3NTYyOTE2Mnww&ixlib=rb-4.1.0&q=80&w=400"
+									alt="수영/수상 스포츠 용품" class="w-full h-full object-cover">
+							</div> <span
+							class="text-sm font-medium text-[#222222] text-center group-hover:text-[#7CBD00] transition-colors">
+								수영/수상 스포츠 용품 </span>
+						</a>
+
+						<!-- 액세서리/잡화 -->
+						<a th:href="@{'/auctions/accessory'}"
+							class="flex flex-col items-center group cursor-pointer">
+							<div
+								class="w-32 h-32 rounded-full overflow-hidden mb-3 transition-transform group-hover:scale-105">
+								<img
+									src="https://images.unsplash.com/photo-1758348844355-2ef28345979d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzcG9ydHMlMjB3YXRjaCUyMGZpdG5lc3MlMjB0cmFja2VyfGVufDF8fHx8MTc3NTYyOTE2Mnww&ixlib=rb-4.1.0&q=80&w=400"
+									alt="액세서리/잡화" class="w-full h-full object-cover">
+							</div> <span
+							class="text-sm font-medium text-[#222222] text-center group-hover:text-[#7CBD00] transition-colors">
+								액세서리/잡화 </span>
+						</a>
+
 					</div>
-					<a href="#">
-						<button class="text-gray-600 hover:text-[#7CBD00] text-sm">
-							전체보기 →</button>
-					</a>
 				</div>
+			</section>
 
-				<div
-					class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
-					<!-- hot1 -->
-					<a href="#" class="block group">
-						<div class="hover:opacity-90 transition-opacity">
-							<div
-								class="relative aspect-square mb-2 overflow-hidden rounded-lg border border-gray-200 bg-gray-50">
-								<img
-									src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=400"
-									alt="나이키 에어맥스 270 사이즈 270 새상품 삽니다"
-									class="w-full h-full object-cover">
-								<div
-									class="absolute top-2 right-2 bg-orange-500 text-white px-2 py-1 rounded text-xs font-bold">
-									조회 1200+</div>
-							</div>
-							<div>
-								<h3 class="text-sm text-gray-900 truncate mb-1">나이키 에어맥스
-									270 사이즈 270 새상품 삽니다</h3>
-								<div
-									class="flex items-center justify-between text-xs text-gray-500 mb-1">
-									<span>제안 34건</span> <span>1시간 20분</span>
-								</div>
-								<div class="flex items-center justify-between">
-									<span class="text-xs text-gray-500">최저가</span> <span
-										class="text-base font-bold text-[#7CBD00]"> 95,000원 </span>
-								</div>
-							</div>
+			<!-- Hot Requests Section -->
+			<section class="bg-white py-16 border-b border-gray-100">
+				<div class="mx-auto max-w-[1200px] px-6">
+					<div class="flex items-center justify-between mb-8">
+						<div>
+							<h2 class="text-2xl font-bold text-[#222222] mb-1">지금 인기있는
+								요청</h2>
+							<p class="text-sm text-[#767676]">많은 판매자가 제안한 핫한 경매</p>
 						</div>
-					</a>
+						<a th:href="@{/auctions}">
+							<button
+								class="text-[#222222] hover:text-[#7CBD00] font-medium text-sm">
+								더보기</button>
+						</a>
+					</div>
 
-					<!-- hot2 -->
-					<a href="#" class="block group">
-						<div class="hover:opacity-90 transition-opacity">
-							<div
-								class="relative aspect-square mb-2 overflow-hidden rounded-lg border border-gray-200 bg-gray-50">
-								<img
-									src="https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?q=80&w=400"
-									alt="요넥스 배드민턴 라켓 아스트록스99 중고 A급 구함"
-									class="w-full h-full object-cover">
-								<div
-									class="absolute top-2 right-2 bg-orange-500 text-white px-2 py-1 rounded text-xs font-bold">
-									조회 900+</div>
-							</div>
-							<div>
-								<h3 class="text-sm text-gray-900 truncate mb-1">요넥스 배드민턴 라켓
-									아스트록스99 중고 A급 구함</h3>
-								<div
-									class="flex items-center justify-between text-xs text-gray-500 mb-1">
-									<span>제안 28건</span> <span>2시간 15분</span>
+					<div
+						th:if="${auctionList != null and #lists.size(auctionList) > 0}"
+						class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
+						<!-- 상위 4개만 예시로 -->
+						<div th:each="auction, stat : ${auctionList}"
+							th:if="${stat.index < 4}" class="bg-white">
+							<a th:href="@{'/auctions/' + ${auction.auctionIdx}}"
+								class="block group">
+								<div class="relative aspect-square mb-3 overflow-hidden">
+									<img
+										th:src="${auction.auctionThumbnailImg != null ? auction.auctionThumbnailImg : '/img/default_item.png'}"
+										th:alt="${auction.auctionTitle}"
+										class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
 								</div>
-								<div class="flex items-center justify-between">
-									<span class="text-xs text-gray-500">최저가</span> <span
-										class="text-base font-bold text-[#7CBD00]"> 145,000원 </span>
+								<div>
+									<p class="text-xs text-[#767676] mb-1"
+										th:text="${auction.itemCategoryName}">카테고리</p>
+									<h3
+										class="text-sm font-medium text-[#222222] mb-1 line-clamp-2"
+										th:text="${auction.auctionTitle}">경매 제목</h3>
+									<div
+										class="flex items-center gap-2 mb-2 text-xs text-[#767676]">
+										<span th:text="'제안 ' + ${auction.bidCount} + '건'">제안 0건</span>
+										<span>•</span> <span th:text="${auction.timeDisplay}">남은시간</span>
+									</div>
+									<div class="flex items-center justify-between">
+										<span class="text-xs text-[#767676]">최저 제안</span> <span
+											class="text-base font-bold text-[#222222]"
+											th:text="${#numbers.formatInteger(auction.minBidPrice, 0, 'COMMA')} + '원'">
+											0원 </span>
+									</div>
 								</div>
-							</div>
+							</a>
 						</div>
-					</a>
+					</div>
 
-					<!-- hot3 -->
-					<a href="#" class="block group">
-						<div class="hover:opacity-90 transition-opacity">
-							<div
-								class="relative aspect-square mb-2 overflow-hidden rounded-lg border border-gray-200 bg-gray-50">
-								<img
-									src="https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?q=80&w=400"
-									alt="캘러웨이 골프채 풀세트 아이언+우드+퍼터 구합니다"
-									class="w-full h-full object-cover">
-								<div
-									class="absolute top-2 right-2 bg-orange-500 text-white px-2 py-1 rounded text-xs font-bold">
-									조회 800+</div>
-							</div>
-							<div>
-								<h3 class="text-sm text-gray-900 truncate mb-1">캘러웨이 골프채
-									풀세트 아이언+우드+퍼터 구합니다</h3>
-								<div
-									class="flex items-center justify-between text-xs text-gray-500 mb-1">
-									<span>제안 19건</span> <span>3시간</span>
-								</div>
-								<div class="flex items-center justify-between">
-									<span class="text-xs text-gray-500">최저가</span> <span
-										class="text-base font-bold text-[#7CBD00]"> 650,000원 </span>
-								</div>
-							</div>
-						</div>
-					</a>
-
-					<!-- hot4 -->
-					<a href="#" class="block group">
-						<div class="hover:opacity-90 transition-opacity">
-							<div
-								class="relative aspect-square mb-2 overflow-hidden rounded-lg border border-gray-200 bg-gray-50">
-								<img
-									src="https://images.unsplash.com/photo-1546519638-68e109498ffc?q=80&w=400"
-									alt="스팔딩 NBA 공식 농구공 새상품 삽니다" class="w-full h-full object-cover">
-								<div
-									class="absolute top-2 right-2 bg-orange-500 text-white px-2 py-1 rounded text-xs font-bold">
-									조회 1500+</div>
-							</div>
-							<div>
-								<h3 class="text-sm text-gray-900 truncate mb-1">스팔딩 NBA 공식
-									농구공 새상품 삽니다</h3>
-								<div
-									class="flex items-center justify-between text-xs text-gray-500 mb-1">
-									<span>제안 41건</span> <span>45분</span>
-								</div>
-								<div class="flex items-center justify-between">
-									<span class="text-xs text-gray-500">최저가</span> <span
-										class="text-base font-bold text-[#7CBD00]"> 52,000원 </span>
-								</div>
-							</div>
-						</div>
-					</a>
+					<div
+						th:if="${auctionList == null or #lists.size(auctionList) == 0}"
+						class="text-sm text-[#767676]">아직 등록된 경매가 없습니다.</div>
 				</div>
-			</div>
+			</section>
+
+			<!-- Ending Soon Section -->
+			<section class="bg-white py-16 border-b border-gray-100">
+				<div class="mx-auto max-w-[1200px] px-6">
+					<div class="flex items-center justify-between mb-8">
+						<div>
+							<h2 class="text-2xl font-bold text-[#222222] mb-1">마감 임박</h2>
+							<p class="text-sm text-[#767676]">곧 마감되는 경매를 확인하세요</p>
+						</div>
+						<a th:href="@{/auctions}">
+							<button
+								class="text-[#222222] hover:text-[#7CBD00] font-medium text-sm">
+								더보기</button>
+						</a>
+					</div>
+
+					<div
+						th:if="${auctionList != null and #lists.size(auctionList) > 0}"
+						class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5">
+						<!-- 단순히 앞에서 5개만 “마감 임박”이라고 가정 -->
+						<div th:each="auction, stat : ${auctionList}"
+							th:if="${stat.index < 5}"
+							class="border border-gray-200 rounded-lg overflow-hidden bg-white">
+							<a th:href="@{'/auctions/' + ${auction.auctionIdx}}"
+								class="block group h-full">
+								<div class="relative aspect-square overflow-hidden">
+									<img
+										th:src="${auction.auctionThumbnailImg != null ? auction.auctionThumbnailImg : '/img/default_item.png'}"
+										th:alt="${auction.auctionTitle}"
+										class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+								</div>
+								<div class="p-3 flex flex-col gap-1">
+									<p class="text-xs text-[#767676]"
+										th:text="${auction.itemCategoryName}">카테고리</p>
+									<h3 class="text-sm font-medium text-[#222222] line-clamp-2"
+										th:text="${auction.auctionTitle}">제목</h3>
+									<div class="flex items-center justify-between mt-1">
+										<span class="text-xs text-[#767676]">제안</span> <span
+											class="text-xs font-medium text-[#222222]"
+											th:text="${auction.bidCount} + '건'">0건</span>
+									</div>
+									<div class="flex items-center justify-between mt-1">
+										<span class="text-xs text-[#767676]">남은 시간</span> <span
+											class="text-xs font-medium text-red-500"
+											th:text="${auction.timeDisplay}"> 남은시간 </span>
+									</div>
+								</div>
+							</a>
+						</div>
+					</div>
+
+					<div
+						th:if="${auctionList == null or #lists.size(auctionList) == 0}"
+						class="text-sm text-[#767676]">마감 임박 경매가 없습니다.</div>
+				</div>
+			</section>
+
+			<!-- Latest Auctions Section -->
+			<section class="bg-white py-16">
+				<div class="mx-auto max-w-[1200px] px-6">
+					<div class="flex items-center justify-between mb-8">
+						<div>
+							<h2 class="text-2xl font-bold text-[#222222] mb-1">최근 등록된 요청</h2>
+							<p class="text-sm text-[#767676]">새로 올라온 경매에 참여해보세요</p>
+						</div>
+						<a th:href="@{/auctions}">
+							<button
+								class="text-[#222222] hover:text-[#7CBD00] font-medium text-sm">
+								더보기</button>
+						</a>
+					</div>
+
+					<div
+						th:if="${auctionList != null and #lists.size(auctionList) > 0}"
+						class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5">
+						<div th:each="auction, stat : ${auctionList}"
+							th:if="${stat.index < 10}"
+							class="border border-gray-200 rounded-lg overflow-hidden bg-white">
+							<a th:href="@{'/auctions/' + ${auction.auctionIdx}}"
+								class="block group h-full">
+								<div class="relative aspect-square overflow-hidden">
+									<img
+										th:src="${auction.auctionThumbnailImg != null ? auction.auctionThumbnailImg : '/img/default_item.png'}"
+										th:alt="${auction.auctionTitle}"
+										class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+								</div>
+								<div class="p-3 flex flex-col gap-1">
+									<p class="text-xs text-[#767676]"
+										th:text="${auction.itemCategoryName}">카테고리</p>
+									<h3 class="text-sm font-medium text-[#222222] line-clamp-2"
+										th:text="${auction.auctionTitle}">제목</h3>
+									<div class="flex items-center justify-between mt-1">
+										<span class="text-xs text-[#767676]">희망가</span> <span
+											class="text-xs font-medium text-[#222222]"
+											th:text="${#numbers.formatInteger(auction.auctionTargetPrice, 0, 'COMMA')} + '원'">
+											0원 </span>
+									</div>
+									<div class="flex items-center justify-between mt-1">
+										<span class="text-xs text-[#767676]">제안</span> <span
+											class="text-xs font-medium text-[#222222]"
+											th:text="${auction.bidCount} + '건'"> 0건 </span>
+									</div>
+								</div>
+							</a>
+						</div>
+					</div>
+
+					<div
+						th:if="${auctionList == null or #lists.size(auctionList) == 0}"
+						class="text-sm text-[#767676]">최근 등록된 경매가 없습니다.</div>
+				</div>
+			</section>
+
 		</div>
 
-		<!-- 마감 임박 / 신규 요청 섹션도 mockAuctions 중 일부만 골라서 같은 패턴으로 카드 몇 개 하드코딩해두면 됨 -->
+		<script>
+			feather.replace();
+		</script>
 
 	</div>
 </body>

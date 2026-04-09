@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.springbootstudy.bbs.domain.AuctionListDTO;
+import com.springbootstudy.bbs.domain.AuctionDTO;
 import com.springbootstudy.bbs.mapper.AuctionMapper;
 
 @Service
@@ -17,39 +17,49 @@ public class AuctionService {
 	@Autowired
 	private AuctionMapper auctionMapper;
 	
-	// 경매 구매요청 전체 리스트 조회
-	public List<AuctionListDTO> AuctionList() {
-		
-		// DB에서 리스트 가져오기
-        List<AuctionListDTO> list = auctionMapper.auctionList();
-        
-        // 리스트를 하나씩 돌면서 '빈칸' 채우기
-        for (AuctionListDTO dto : list) {
-        	refine(dto);
-        }
-		
-        return list;
-    }
-	
-	// 구매요청 상세보기 조회
-	public AuctionListDTO auctionDetail(Long auctionIdx) {
-		
-		AuctionListDTO detail = auctionMapper.auctionDetail(auctionIdx);
-		
-		if(detail != null) {
-			refine(detail);
-		}
-		
-		return detail;
+	// 경매 리스트 조회 (검색 및 카테고리 필터링 포함)
+	public List<AuctionDTO> AuctionList(String categoryCode, String keyword) {
+	    List<AuctionDTO> list = auctionMapper.auctionList(categoryCode, keyword);
+	    for (AuctionDTO dto : list) {
+	        refine(dto);
+	    }
+	    return list;
 	}
 	
+	// 경매 상세 정보 조회 
+    public AuctionDTO auctionDetail(Long auctionIdx) {
+        AuctionDTO dto = auctionMapper.auctionDetail(auctionIdx);
+        if (dto != null) {
+            refine(dto);
+        }
+        return dto;
+    }
 	
+	// 경매 수동 마감 (구매자가 직접 종료)
+	@Transactional
+	public void closeAuction(Long auctionIdx, Long buyerIdx) {
+	    AuctionDTO detail = auctionMapper.auctionDetail(auctionIdx);
+	    if (detail == null || !detail.getBuyerIdx().equals(buyerIdx)) {
+	        throw new IllegalArgumentException("권한이 없습니다.");
+	    }
+	    if (detail.getAuctionStatusIdx() != 1) {
+	        throw new IllegalArgumentException("진행중인 경매만 마감할 수 있습니다.");
+	    }
+	 // 입찰 있으면 결정대기(2), 없으면 유찰(4)
+	    int statusIdx = (detail.getBidCount() != null && detail.getBidCount() > 0) ? 2 : 4;
+	    auctionMapper.updateAuctionStatus(auctionIdx, statusIdx);
+	}
+
+	// 상태 직접 변경 (유찰 처리 등)
+	public void updateAuctionStatus(Long auctionIdx, int statusIdx) {
+	    auctionMapper.updateAuctionStatus(auctionIdx, statusIdx);
+	}
 	
-	// 절약율 계산과 남은 시간 계산을 도와주는 메서드 
-	private void refine(AuctionListDTO dto) {
+	// 경매 데이터 가공 (남은 시간 계산, 할인율 등)
+	private void refine(AuctionDTO dto) {
 		
 		// 절약율 계산: (희망가 - 최저가) / 희망가 * 100
-        if (dto.getAuctionTargetPrice() > 0 && dto.getMinBidPrice() > 0) {
+        /* if (dto.getAuctionTargetPrice() > 0 && dto.getMinBidPrice() > 0) {
             double target = dto.getAuctionTargetPrice();
             double minPrice = dto.getMinBidPrice();
             
@@ -60,7 +70,7 @@ public class AuctionService {
         else {
             dto.setDiscountRate(0); // 입찰이 없으면 0%
         }
-        
+        */
 
         // 현재 시간 (계산 기준)
         LocalDateTime now = LocalDateTime.now();
@@ -89,8 +99,9 @@ public class AuctionService {
         }
 	}
 	
+	// 경매 등록 (구매 요청)
 	@Transactional
-	public void registerAuction(AuctionListDTO dto) {
+	public void registerAuction(AuctionDTO dto) {
 
 	    // 희망 최대가 검증
 	    if (dto.getAuctionTargetPrice() == null || dto.getAuctionTargetPrice() <= 0) {
@@ -118,34 +129,22 @@ public class AuctionService {
 	        throw new IllegalArgumentException("결정 마감일은 입찰 마감일로부터 3일을 초과할 수 없습니다.");
 	    }
 	    
-	    
-	    
-	    // DB 저장
-	    auctionMapper.insertItem(dto);
 	    auctionMapper.insertAuction(dto);
 	}
 	
-	// =====================================================
-	// 4번: 마감 경매 상태 자동 업데이트
-	// 입찰 마감일 지난 경매:
-	//   - 입찰 있으면 → 2 (마감)
-	//   - 입찰 없으면 → 3 (유찰)
-	// =====================================================
+	// 마감 경매 상태 자동 업데이트
 	@Transactional
 	public void updateExpiredAuctions() {
-	    List<AuctionListDTO> expiredList = auctionMapper.findExpiredAuctions();
-
-	    for (AuctionListDTO dto : expiredList) {
+	    List<AuctionDTO> expiredList = auctionMapper.findExpiredAuctions();
+	    
+	    if (expiredList == null || expiredList.isEmpty()) return;
+	    
+	    for (AuctionDTO dto : expiredList) {
 	        // bidCount가 null이면 0으로 처리
 	        int bidCount = dto.getBidCount() != null ? dto.getBidCount() : 0;
 
-	        if (bidCount > 0) {
-	            // 입찰 있음 → 마감 (2)
-	            auctionMapper.updateAuctionStatus(dto.getAuctionIdx(), 2);
-	        } else {
-	            // 입찰 없음 → 유찰 (3)
-	            auctionMapper.updateAuctionStatus(dto.getAuctionIdx(), 3);
-	        }
+	        // 입찰 있음 → 결정대기(2), 없음 → 유찰(4)
+	        auctionMapper.updateAuctionStatus(dto.getAuctionIdx(), bidCount > 0 ? 2 : 4);
 	    }
 	}
 	
@@ -160,7 +159,7 @@ public class AuctionService {
 	
 	// 경매 수정
 	@Transactional
-	public void updateAuction(AuctionListDTO dto) {
+	public void updateAuction(AuctionDTO dto) {
 	    // 희망 최대가 검증
 	    if (dto.getAuctionTargetPrice() == null || dto.getAuctionTargetPrice() <= 0) {
 	        throw new IllegalArgumentException("희망 최대가는 0원보다 커야 합니다.");
