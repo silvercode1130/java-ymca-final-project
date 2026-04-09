@@ -25,8 +25,11 @@ public interface AuctionMapper {
     // 경매 상태 변경 (진행중 -> 마감/유찰 등)
     int updateAuctionStatus(@Param("auctionIdx") Long auctionIdx, @Param("statusIdx") int statusIdx);
     
-    // 경매 삭제 (소프트 딜리트: 실제 삭제가 아닌 상태값 변경)
+    // 경매 취소 (소프트 딜리트: 구매자 본인)
     int softDeleteAuction(@Param("auctionIdx") Long auctionIdx, @Param("buyerIdx") Long buyerIdx);
+
+    // 경매 삭제 (관리자 전용: buyer_idx 조건 없음)
+    int adminDeleteAuction(@Param("auctionIdx") Long auctionIdx);
     
     // 경매 수정
     int updateAuction(AuctionDTO dto);

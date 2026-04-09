@@ -157,6 +157,15 @@ public class AuctionService {
 	    }
 	}
 	
+	// 관리자 경매 삭제
+	@Transactional
+	public void adminDeleteAuction(Long auctionIdx) {
+	    int result = auctionMapper.adminDeleteAuction(auctionIdx);
+	    if (result == 0) {
+	        throw new IllegalArgumentException("존재하지 않는 경매입니다.");
+	    }
+	}
+	
 	// 경매 수정
 	@Transactional
 	public void updateAuction(AuctionDTO dto) {

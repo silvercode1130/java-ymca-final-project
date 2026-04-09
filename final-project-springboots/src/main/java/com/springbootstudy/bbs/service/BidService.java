@@ -70,6 +70,15 @@ public class BidService {
         }
     }
     
+    // 관리자 입찰 삭제
+    @Transactional
+    public void adminDeleteBid(Long bidIdx) {
+        int result = bidMapper.adminDeleteBid(bidIdx);
+        if (result == 0) {
+            throw new IllegalArgumentException("존재하지 않는 입찰입니다.");
+        }
+    }
+    
     // 낙찰 처리 (경매 상태 변경 및 타 입찰 거절 포함)
     @Transactional
     public void selectWinner(Long bidIdx, Long auctionIdx) {
