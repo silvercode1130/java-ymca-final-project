@@ -307,17 +307,20 @@ public class MemberController {
           
           // 인증문자 기능
           /* 총 50회 무료 이용 가능! 
+           * [인증 문자 안되는 경우 - 필독]
            * 컴퓨터에 환경변수가 등록되어야 실행 가능하고 이클립스 설정 바꿔야 작동하기 때문에
            * 다른 조원들 컴퓨터에서는 작동하지 않을 수 있습니다!
+           * 콘솔로 출력하셔서 등록하셔도 됩니다!
+           * 
            * Run -> Run Configrations... -> Environment -> add -> 환경변수 + api키 2가지 넣기
            * 필요하신 분들은 카톡으로 연락 주시면 보내드리겠습니다!(외부 유출금지ㅠ -> 금액 폭탄 맞을 수 있어요...)
            * */
           String apiKey = System.getenv("SOLAPI_KEY"); 
           String apiSecret = System.getenv("SOLAPI_SECRET_KEY"); 
           
-          // 키가 컨트롤러에 들어오는지 확인!
-          System.out.println("apiKey: " + apiKey); 
-          System.out.println("apiSecret: " + apiSecret); 
+          // 키가 컨트롤러에 들어오는지 확인!(선택사항 - 위의 주석 참고!)
+//          System.out.println("apiKey: " + apiKey); 
+//          System.out.println("apiSecret: " + apiSecret); 
 
           DefaultMessageService messageService = SolapiClient.INSTANCE.createInstance(apiKey, apiSecret); 
           
@@ -325,7 +328,7 @@ public class MemberController {
 	       Message message = new Message();
 	       message.setFrom("01024152943"); 
 	       message.setTo(memTel.replace("-", "")); 
-	       message.setText("[Web발신]\\n본인 확인을 위한 인증번호는 [010101]입니다.\\n타인에게 노출하지 마세요."); 
+	       message.setText("PickQ의 본인 확인을 위한 인증번호는 [010101]입니다."); 
 	
 	       try {
 	         // send 메소드로 ArrayList<Message> 객체를 넣어도 동작합니다! 
