@@ -121,6 +121,8 @@
               <input type="hidden" name="parentReplyIdx" th:value="${r.replyIdx}">
               <input type="hidden" name="replyPage" th:value="${replyPage}">
               <input type="hidden" name="sortType" th:value="${sortType}">
+              <input type="hidden" name="from" th:value="${param.from}">
+              <input type="hidden" name="page" th:value="${param.page}">
               <textarea name="replyContent" rows="2" class="form-control form-control-sm mb-1"
                         placeholder="답글을 입력하세요"></textarea>
               <button type="submit" class="btn btn-lime btn-sm">등록</button>
@@ -159,6 +161,8 @@
             onsubmit="return validateReply(this.querySelector('textarea'))">
         <input type="hidden" name="replyPage" th:value="${replyPage}">
         <input type="hidden" name="sortType" th:value="${sortType}">
+        <input type="hidden" name="from" th:value="${param.from}">
+        <input type="hidden" name="page" th:value="${param.page}">
         <textarea name="replyContent" rows="3" class="form-control mb-2"
                   placeholder="댓글을 입력하세요"></textarea>
         <button type="submit" class="btn btn-lime btn-sm"><i class="bi bi-chat-dots"> 댓글 등록</i></button>
