@@ -271,27 +271,35 @@ public class MemberController {
       
    // 비밀번호 찾기 -----------------------------------------------------------------
       
-      // 비밀번호 재발급 시 아이디 + 전화번호 맞는 지 확인
+      // 창 띄우기
       @GetMapping("/members/pwdFind")
-      public String pwdFind(@RequestParam(value="memId", required=false) String memId, 
-    		  				@RequestParam(value="memTel", required=false) String memTel, 
-    		  				RedirectAttributes ra) { 
-    	  
-    	  // 아이디나 전화번호가 없는 경우
-    	  if(memId == null || memId.trim().isEmpty() ||
-    	     memTel == null || memTel.trim().isEmpty()) {
-    	      // 아이디 존재하지 않는 경우
-    		  ra.addFlashAttribute("idMsg", "아이디 또는 전화번호가 일치하지 않습니다");
-    		  ra.addFlashAttribute("telMsg", "아이디 또는 전화번호가 일치하지 않습니다");
-    	  } else {
-    	      // 아이디 존재함
-    		  ra.addFlashAttribute("idMsg", "아직 안만든 기능 입니당ㅎㅎ");
-    		  ra.addFlashAttribute("telMsg", "아직 안만든 기능 입니당ㅎㅎ");
-    	  }
-    	  
-    	  MemberVO member = memberService.findByIdAndTel(memId, memTel); 
+      public String pwdFind() { 
     	  
     	  return "/views/member/pwdFind"; 
+      }
+      
+      // 그 외 기능들
+      @PostMapping("/members/pwdFind")
+      public String pwdFind(@RequestParam(value="memId", required=false) String memId,
+              				@RequestParam(value="memTel", required=false) String memTel,
+              				RedirectAttributes ra) {
+
+          MemberVO member = memberService.findByIdAndTel(memId, memTel);
+
+          // 값을 입력하지 않고 버튼을 누른 경우
+          if(memId == null || memTel == null) {
+        	    return "redirect:/members/pwdFind";
+    	  }
+          
+          // 일치하지 않는 값을 가진 회원이 없는 경우
+          if(member == null) {
+              ra.addFlashAttribute("idMsg", "아이디 또는 전화번호가 일치하지 않습니다");
+              ra.addFlashAttribute("telMsg", "아이디 또는 전화번호가 일치하지 않습니다");
+          } else {
+              ra.addFlashAttribute("verifyMsg", memTel + "로 인증번호가 전송되었습니다");
+          }
+
+          return "redirect:/members/pwdFind";
       }
 
 
