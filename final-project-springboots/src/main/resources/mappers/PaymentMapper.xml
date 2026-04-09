@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--	
+	마이바티스 참고 사이트
+	  - http://blog.mybatis.org/
+	  - http://www.mybatis.org/mybatis-3/ko/index.html
+	  
+	@Mapper 애노테이션이 적용된 인터페이스와 맵퍼 XML파일은
+	namespace 속성으로 연결되기 때문에 맵퍼 XML의 namespace를
+	지정할 때 @Mapper 애노테이션이 적용된 맵퍼 인터페이스의
+	완전한 클래스 이름(패키지를 포함한 이름)을 지정하면 된다.   
+-->
+<mapper namespace="com.springbootstudy.bbs.mapper.PaymentMapper">
+
+	<insert id="insertPayment" parameterType="com.springbootstudy.bbs.domain.PaymentVO"> INSERT INTO
+		payment ( bid_idx, mem_idx, imp_uid, merchant_uid, pay_method, pay_amount, pay_status,
+		buyer_name, buyer_tel, buyer_addr, buyer_zipcode, escrow_status, pay_regdate ) VALUES (
+		#{bidIdx}, #{memIdx}, #{impUid}, #{merchantUid}, #{payMethod}, #{payAmount}, 'PAID',
+		#{buyerName}, #{buyerTel}, #{buyerAddr}, #{buyerZipcode}, 'READY', NOW() ) </insert>
+
+	<update id="updateAuctionStatus"> UPDATE auction SET auction_status_idx = 8 WHERE auction_idx =
+		#{auctionIdx} </update>
+
+	<update id="updateBidStatus"> UPDATE bid SET bid_status_idx = 2 WHERE bid_idx = #{bidIdx} </update>
+
+</mapper>	
