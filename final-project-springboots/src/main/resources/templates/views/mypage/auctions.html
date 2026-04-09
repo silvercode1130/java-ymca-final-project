@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <meta charset="UTF-8">
+  <title>내 경매 목록</title>
+</head>
+
+<body>
+
+  <h2>내 경매 목록</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>경매 제목</th>
+        <th>카테고리</th>
+        <th>희망 최대가</th>
+        <th>입찰 수</th>
+        <th>최저 입찰가</th>
+        <th>상태</th>
+        <th>마감일</th>
+        <th>등록일</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr th:if="${#lists.isEmpty(auctions)}">
+            <td colspan="8">등록한 경매가 없습니다.</td>
+        </tr>
+        <tr th:each="auction : ${auctions}">
+            <td>
+                <a th:href="@{/auctions/{idx}(idx=${auction.auctionIdx})}"
+                   th:text="${auction.auctionTitle}"></a>
+            </td>
+            <td th:text="${auction.itemCategoryName}"></td>
+            <td th:text="${#numbers.formatInteger(auction.auctionTargetPrice, 0, 'COMMA') + '원'}"></td>
+            <td th:text="${auction.bidCount}"></td>
+            <td th:text="${auction.minBidPrice == 0 ? '입찰 없음' : #numbers.formatInteger(auction.minBidPrice, 0, 'COMMA') + '원'}"></td>
+            <td th:text="${auction.auctionStatusName}"></td>
+            <td th:text="${#temporals.format(auction.auctionEndAt, 'yyyy-MM-dd HH:mm')}"></td>
+            <td th:text="${#temporals.format(auction.auctionRegdate, 'yyyy-MM-dd')}"></td>
+        </tr>
+    </tbody>
+</table>
+
+</body>
+</html>

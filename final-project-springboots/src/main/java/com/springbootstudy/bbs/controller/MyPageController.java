@@ -1,51 +1,72 @@
 package com.springbootstudy.bbs.controller;
 
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.springbootstudy.bbs.domain.AuctionDTO;
+import com.springbootstudy.bbs.domain.BidDTO;
+import com.springbootstudy.bbs.domain.BoardVO;
 import com.springbootstudy.bbs.domain.MemberVO;
 import com.springbootstudy.bbs.service.MyPageService;
 
 import jakarta.servlet.http.HttpSession;
-import lombok.RequiredArgsConstructor;
 
 @Controller
-@RequiredArgsConstructor
+@RequestMapping("/mypage")
 public class MyPageController {
-  private final MyPageService myPageService;
+  @Autowired
+  private MyPageService mypageService;
 
-  private MemberVO getSessionUser(HttpSession session) {
-    return (MemberVO) session.getAttribute("loginUser");
-  }
+  // 내 경매 목록
+  @GetMapping("/auctions")
+  public String myAuctions(HttpSession session, Model model) {
 
-  @GetMapping("/mypage/boards")
-  public String getMyboards(HttpSession session, Model model) {
-    MemberVO member = getSessionUser(session);
-    if (member == null)
+    MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
+    if (loginUser == null) {
       return "redirect:/members/login";
+    }
 
-    model.addAttribute("boards", myPageService.getBoardList(member.getMemIdx()));
-    return "views/mystatus/myboardview";
+    Long memIdx = loginUser.getMemIdx();
+    List<AuctionDTO> auctions = mypageService.getMyAuctions(memIdx);
+    model.addAttribute("auctions", auctions);
+
+    return "views/mypage/auctions";
   }
 
-  @GetMapping("/mypage/auctions")
-  public String getAuctionList(HttpSession session, Model model) {
-    MemberVO member = getSessionUser(session);
-    if (member == null)
-      return "redirect:/members/login"; 
+  // 내 입찰 목록
+  @GetMapping("/bids")
+  public String myBids(HttpSession session, Model model) {
 
-    model.addAttribute("auctions", myPageService.getAuctionList(member.getMemIdx()));
-    return "views/mystatus/auctionview";
-  }
-
-  @GetMapping("/mypage/bids")
-  public String getBidList(HttpSession session, Model model) {
-    MemberVO member = getSessionUser(session);
-    if (member == null)
+    MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
+    if (loginUser == null) {
       return "redirect:/members/login";
+    }
 
-    model.addAttribute("bids", myPageService.getBidList(member.getMemIdx()));
-    return "views/mystatus/bidview";
+    Long memIdx = loginUser.getMemIdx();
+    List<BidDTO> bids = mypageService.getMyBids(memIdx);
+    model.addAttribute("bids", bids);
+
+    return "views/mypage/bids";
+  }
+
+  // 내 게시글 목록
+  @GetMapping("/boards")
+  public String myBoards(HttpSession session, Model model) {
+
+    MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
+    if (loginUser == null) {
+      return "redirect:/members/login";
+    }
+
+    Long memIdx = loginUser.getMemIdx();
+    List<BoardVO> boards = mypageService.getMyBoards(memIdx);
+    model.addAttribute("boards", boards);
+
+    return "views/mypage/boards";
   }
 }
