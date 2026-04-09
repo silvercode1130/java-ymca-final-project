@@ -22,6 +22,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
+// 인증번호
+import com.solapi.sdk.message.model.Message;
+import com.solapi.sdk.message.service.DefaultMessageService;
+import com.solapi.sdk.SolapiClient;
+import com.solapi.sdk.message.exception.SolapiMessageNotReceivedException;
+
 @Controller
 public class MemberController {
 
@@ -282,7 +288,7 @@ public class MemberController {
       @PostMapping("/members/pwdFind")
       public String pwdFind(@RequestParam(value="memId", required=false) String memId,
               				@RequestParam(value="memTel", required=false) String memTel,
-              				RedirectAttributes ra) {
+              				RedirectAttributes ra) { 
 
           MemberVO member = memberService.findByIdAndTel(memId, memTel);
 
@@ -298,9 +304,44 @@ public class MemberController {
           } else {
               ra.addFlashAttribute("verifyMsg", memTel + "로 인증번호가 전송되었습니다");
           }
+          
+          // 인증문자 기능
+          /* 총 50회 무료 이용 가능! 
+           * 컴퓨터에 환경변수가 등록되어야 실행 가능하고 이클립스 설정 바꿔야 작동하기 때문에
+           * 다른 조원들 컴퓨터에서는 작동하지 않을 수 있습니다!
+           * Run -> Run Configrations... -> Environment -> add -> 환경변수 + api키 2가지 넣기
+           * 필요하신 분들은 카톡으로 연락 주시면 보내드리겠습니다!(외부 유출금지ㅠ -> 금액 폭탄 맞을 수 있어요...)
+           * */
+          String apiKey = System.getenv("SOLAPI_KEY"); 
+          String apiSecret = System.getenv("SOLAPI_SECRET_KEY"); 
+          
+          // 키가 컨트롤러에 들어오는지 확인!
+          System.out.println("apiKey: " + apiKey); 
+          System.out.println("apiSecret: " + apiSecret); 
 
-          return "redirect:/members/pwdFind";
+          DefaultMessageService messageService = SolapiClient.INSTANCE.createInstance(apiKey, apiSecret); 
+          
+	       // Message 패키지가 중복될 경우 com.solapi.sdk.message.model.Message로 치환하여 주세요
+	       Message message = new Message();
+	       message.setFrom("01024152943"); 
+	       message.setTo(memTel.replace("-", "")); 
+	       message.setText("[Web발신]\\n본인 확인을 위한 인증번호는 [010101]입니다.\\n타인에게 노출하지 마세요."); 
+	
+	       try {
+	         // send 메소드로 ArrayList<Message> 객체를 넣어도 동작합니다! 
+	    	   messageService.send(message);
+	       } catch (SolapiMessageNotReceivedException exception) {  
+	         // 발송에 실패한 메시지 목록을 확인할 수 있습니다!
+	         System.out.println(exception.getFailedMessageList());
+	         System.out.println(exception.getMessage());
+	       } catch (Exception exception) {
+	         System.out.println(exception.getMessage());
+	       }
+	          
+          return "redirect:/members/pwdFind"; 
       }
-
+      
+      
+     
 
 }
