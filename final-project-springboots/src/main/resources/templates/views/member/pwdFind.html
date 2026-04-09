@@ -32,9 +32,9 @@
         data: { "userCode": userCode },
         success: function(res) {
             if(res === "success") {
-                $("#authMsg").text("인증 되었습니다").css("color", "gray");
+                $("#authMsg").text("인증 되었습니다").css({"color": "gray", "fontSize": "12px"});
             } else {
-                $("#authMsg").text("인증번호가 틀렸니다").css("color", "red");
+                $("#authMsg").text("인증번호가 틀렸습니다").css({"color": "red", "fontSize": "12px"});
             }  
        	},
         error: function() { 
@@ -123,10 +123,10 @@
 	}
 	
 	// 입력할 때마다 실시간으로 체크
-	document.addEventListener("DOMContentLoaded", function() {
+	/* document.addEventListener("DOMContentLoaded", function() {
 	    document.querySelector("#newPwd").addEventListener("keyup", pwdCheck);
 	    document.querySelector("#newPwdConfirm").addEventListener("keyup", pwdCheck);
-	});
+	}); */
 	
 </script>
 

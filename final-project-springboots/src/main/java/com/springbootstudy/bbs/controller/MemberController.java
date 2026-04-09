@@ -304,6 +304,7 @@ public class MemberController {
               ra.addFlashAttribute("telMsg", "아이디 또는 전화번호가 일치하지 않습니다");
           } else {
               ra.addFlashAttribute("verifyMsg", memTel + "로 인증번호가 전송되었습니다");
+              session.setAttribute("resetMemId", member.getMemId());
           }
           
           // 2. 인증문자 기능
@@ -385,7 +386,8 @@ public class MemberController {
       public String updatePassword(@RequestParam("newPassword") String newPassword, 
                                    HttpSession session, RedirectAttributes ra) {
           // 로그인 정보 불러옴
-          String memId = (String) session.getAttribute("loginId"); 
+          //String memId = (String) session.getAttribute("loginId");  
+          String memId = (String) session.getAttribute("resetMemId");
           
           // 비번 바꾸기
           memberService.updatePassword(memId, newPassword);
