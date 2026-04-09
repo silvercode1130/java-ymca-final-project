@@ -47,7 +47,7 @@ public class MemberController {
    // 회원가입 -----------------------------------------------------------------
 
    // signUp.html - 창 띄우기
-   @GetMapping("/members/signUp")
+   @GetMapping("/members/register")
    public String signUp() {
 
       return "/views/member/signUp"; 
@@ -55,7 +55,7 @@ public class MemberController {
 
    // signUp.html - 회원가입 처리 기능
    // 회원가입 처리
-   @PostMapping("/members/signUp")
+   @PostMapping("/members/register")
    public String signUp(
          @RequestParam("memId") String memId,
          @RequestParam("memPwd") String memPwd,
@@ -214,7 +214,7 @@ public class MemberController {
    // 회원정보 수정 -----------------------------------------------------------------
 
       // memberUpdate.html - 창 띄우기
-      @GetMapping("/members/memberUpdate")
+      @GetMapping("/mypage/info")
       public String memberUpdate(HttpSession session, Model model) {
 
          /*
@@ -239,7 +239,7 @@ public class MemberController {
       }
       
       // memberUpdate.html - 수정하기
-      @PostMapping("/members/memberUpdate")
+      @PostMapping("/mypage/info")
       public String memberUpdate(MemberVO vo,
               @RequestParam(value="newPwd", required = false) String newPwd,
               HttpSession session) {

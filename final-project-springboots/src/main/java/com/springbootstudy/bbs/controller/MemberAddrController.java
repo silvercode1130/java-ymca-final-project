@@ -9,12 +9,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.springbootstudy.bbs.domain.MemberAddrVO;
 import com.springbootstudy.bbs.domain.MemberVO;
 import com.springbootstudy.bbs.service.MemberAddrService;
-import com.springbootstudy.bbs.service.MemberService;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -26,7 +24,7 @@ public class MemberAddrController {
 	
 	// 주소등록창 -----------------------------------------------------------------
 	
-	@GetMapping("/members/memberAddrInsert") 
+	@GetMapping("/mypage/addresses/new") 
 	public String memberAddrInsert(HttpSession session, Model model) {
 
 	    MemberVO loginMember = (MemberVO) session.getAttribute("loginUser");
@@ -40,7 +38,7 @@ public class MemberAddrController {
 	    return "/views/member/memberAddrInsert";  
 	}
 	
-	// memberAddrUpdate.html 의 Ajax 저장용
+	// memberAddrInsert.html 의 Ajax 저장용
 	@PostMapping("/member/insertAddrAjax.do")
 	@ResponseBody
 	public int insertAddr(MemberAddrVO vo) {
@@ -49,13 +47,13 @@ public class MemberAddrController {
 	    int result = memberAddrService.registerAddr(vo);
 	    vo.setIsPrimary("N");
 	    
-	    return result;
+	    return result; 
 	}
 
 	// 주소목록창 -----------------------------------------------------------------
 	
 	// 저장된 값 보여주기 
-    @GetMapping("/members/memberAddr") 
+    @GetMapping("/mypage/addresses") 
     public String memberAddr(HttpSession session, Model model) {
 
     	// 로그인 안했으면 쫓아내기
@@ -74,31 +72,30 @@ public class MemberAddrController {
 
     // 주소 삭제 -----------------------------------------------------------------
     
-    @PostMapping("/members/addrDelete")
+    @PostMapping("/mypage/addresses/delete")
     public String deleteAddr(@RequestParam("addrIdx") Long addrIdx) {
 
         memberAddrService.deleteAddr(addrIdx);
 
-        return "redirect:/members/memberAddr"; 
+        return "redirect:/mypage/addresses";
     }
     
     
     // 주소 수정 -----------------------------------------------------------------
     
-    @GetMapping("/members/memberAddrUpdate")
+    @GetMapping("/mypage/addresses/edit") 
     public String updateAddrForm(@RequestParam("addrIdx") Long addrIdx,HttpSession session, Model model) { 
-    	
     	// 로그인 정보 받아오기
         MemberVO loginMember = (MemberVO) session.getAttribute("loginUser");
         
         // 로그인 안했으면 쫓아내기
         if (loginMember == null) {
-            return "redirect:/members/login"; 
+            return "redirect:/members/login";  
         }
         
         // 주소가 없어도 쫓아내기
         if (addrIdx == null) {
-            return "redirect:/members/memberAddr";
+            return "redirect:/mypage/addresses";
         }
         
         MemberAddrVO addr = memberAddrService.selectOne(addrIdx);
