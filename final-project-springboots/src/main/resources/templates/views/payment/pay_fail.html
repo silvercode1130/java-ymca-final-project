@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <title>결제 실패</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      padding-top: 100px;
+    }
+
+    .error-msg {
+      color: #ff4d4f;
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .btn {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 10px 20px;
+      background: #0064ff;
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="error-msg">결제에 실패하였습니다.</div>
+  <p id="fail-reason"></p>
+  <a href="/auctions/my-list" class="btn">목록으로 돌아가기</a>
+
+</body>
+
+</html>

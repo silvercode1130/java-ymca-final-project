@@ -2,34 +2,21 @@ package com.springbootstudy.bbs.mapper;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
-
 import com.springbootstudy.bbs.domain.PaymentVO;
 
 @Mapper
 public interface PaymentMapper {
-  /**
-   * 결제 정보 저장
-   * 
-   * @param payment 결제 상세 정보 (스냅샷 포함)
-   * @return 영향받은 행의 수
-   */
+
+  // 1. 결제 정보 최초 저장 (READY 상태로 저장)
   int insertPayment(PaymentVO payment);
 
-  /**
-   * 경매 상태 업데이트
-   * 
-   * @param auctionIdx 경매 번호
-   * @param statusIdx  상태 코드 (8: 결제완료 등)
-   * @return 영향받은 행의 수
-   */
-  int updateAuctionStatus(@Param("auctionIdx") Long auctionIdx, @Param("statusIdx") int statusIdx);
+  // 2. 결제 최종 승인 시 상태 변경 (READY -> DONE) - 추가됨
+  // orderId를 기준으로 해당 결제 건을 찾아 상태를 변경합니다.
+  int updatePaymentStatus(@Param("orderId") String orderId, @Param("status") String status);
 
-  /**
-   * 입찰 상태 업데이트
-   * 
-   * @param bidIdx    입찰 번호
-   * @param statusIdx 상태 코드 (2: 낙찰/결제완료 등)
-   * @return 영향받은 행의 수
-   */
+  // 3. 경매 상태 업데이트 (예: 8번 - 낙찰/결제완료)
+  int updateAuctionStatus(@Param("bidIdx") Long bidIdx, @Param("statusIdx") int statusIdx);
+
+  // 4. 입찰 상태 업데이트 (예: 2번 - 결제완료)
   int updateBidStatus(@Param("bidIdx") Long bidIdx, @Param("statusIdx") int statusIdx);
 }

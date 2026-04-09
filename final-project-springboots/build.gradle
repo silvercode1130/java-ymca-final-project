@@ -21,7 +21,6 @@ configurations {
 
 repositories {
 	mavenCentral()
-	maven { url 'https://jitpack.io' }
 }
 
 dependencies {
@@ -40,9 +39,6 @@ dependencies {
 	
 	// 웹소켓 이식
 	implementation 'org.springframework.boot:spring-boot-starter-websocket'
-
-	// 포트원(아임포트) 자바 SDK
-  implementation 'com.github.iamport:iamport-rest-client-java:0.2.22'
 }
 
 tasks.named('test') {

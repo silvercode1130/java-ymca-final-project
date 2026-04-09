@@ -1,52 +1,94 @@
 package com.springbootstudy.bbs.service;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+import java.util.Map;
+
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
-import com.siot.IamportRestClient.IamportClient;
-import com.siot.IamportRestClient.response.IamportResponse;
-import com.siot.IamportRestClient.response.Payment;
 import com.springbootstudy.bbs.domain.PaymentVO;
 import com.springbootstudy.bbs.mapper.PaymentMapper;
 
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PaymentServiceImpl implements PaymentService {
+
   private final PaymentMapper paymentMapper;
-  private IamportClient api;
+  private final RestTemplate restTemplate = new RestTemplate();
 
-  // 포트원 관리자 페이지에서 확인한 API 키와 시크릿을 여기에 넣습니다.
-  @PostConstruct
-  public void init() {
-    this.api = new IamportClient("6586607241723066",
-        "kTuccbRmJs5zqZDLJrnej9G3S0aiJwbtKrNuF49creXbBKfW6mTFCShuhN1vUWTpFZFSSL5gO1EwT3kg");
+  // 토스페이먼츠 테스트 시크릿 키 (내 정보에 맞게 수정 가능)
+  private final String SECRET_KEY = "test_sk_LlDJaYngroay02a6RyKG3ezGdRpX" + ":";
+
+  @Override
+  public Map<String, Object> confirmPayment(String paymentKey, String orderId, Long amount) throws Exception {
+    // 1. 토스 API 호출을 위한 헤더 설정 (Basic Auth)
+    String encodedKey = Base64.getEncoder().encodeToString(SECRET_KEY.getBytes(StandardCharsets.UTF_8));
+
+    HttpHeaders headers = new HttpHeaders();
+    headers.set("Authorization", "Basic " + encodedKey);
+    headers.setContentType(MediaType.APPLICATION_JSON);
+
+    // 2. 요청 바디 구성
+    Map<String, Object> params = Map.of(
+        "paymentKey", paymentKey,
+        "orderId", orderId,
+        "amount", amount);
+
+    HttpEntity<Map<String, Object>> entity = new HttpEntity<>(params, headers);
+
+    // 3. 토스 승인 API 호출 (POST)
+    try {
+      // ParameterizedTypeReference를 사용하여 응답 타입을 명확히 규정합니다.
+      return restTemplate.exchange(
+          "https://api.tosspayments.com/v1/payments/confirm",
+          HttpMethod.POST,
+          entity,
+          new ParameterizedTypeReference<Map<String, Object>>() {
+          }).getBody();
+
+    } catch (Exception e) {
+      log.error("토스 승인 API 호출 중 에러 발생", e);
+      throw new Exception("결제 승인에 실패했습니다.");
+    }
   }
 
   @Override
-  public IamportResponse<Payment> verifyPayment(String impUid) throws Exception {
-    // 포트원 서버에 직접 결제 정보를 요청하여 받아옵니다.
-    return api.paymentByImpUid(impUid);
-  }
+  @Transactional(rollbackFor = Exception.class) // 에러 발생 시 전체 롤백
+  public boolean savePaymentAndTrackStatus(PaymentVO paymentVO, Map<String, Object> tossResponse) throws Exception {
+    // 1. 금액 검증 (토스 응답 데이터와 VO 데이터 비교)
+    // 토스는 숫자를 가끔 Integer로 줄 때가 있으므로 숫자로 안전하게 변환
+    Number totalAmountNum = (Number) tossResponse.get("totalAmount");
+    Long totalAmount = totalAmountNum.longValue();
 
-  @Override
-  @Transactional // 하나라도 실패하면 롤백!
-  public boolean savePaymentAndTrackStatus(PaymentVO paymentVO, long actualPaidAmount) throws Exception {
-    // 1. 금액 검증 (낙찰가와 실제 결제금액이 다른지 확인)
-    if (paymentVO.getPayAmount() != actualPaidAmount) {
-      return false; // 금액 위변조 가능성 있음
+    if (!paymentVO.getPayAmount().equals(totalAmount)) {
+      log.error("금액 불일치: 요청({}) vs 실제({})", paymentVO.getPayAmount(), totalAmount);
+      throw new Exception("결제 금액이 일치하지 않습니다."); // return false보다 예외를 던져야 롤백이 확실함
     }
 
-    // 2. 결제 내역 저장 (insert)
-    int result = paymentMapper.insertPayment(paymentVO);
+    // 2. 결제 내역 저장 (READY 상태로 INSERT)
+    int insertResult = paymentMapper.insertPayment(paymentVO);
 
-    if (result > 0) {
-      // 3. 경매 상태 변경 (8: 결제완료)
-      paymentMapper.updateAuctionStatus(paymentVO.getAuctionIdx(), 8);
-      // 4. 입찰 상태 변경 (2: 낙찰/결제성공)
+    if (insertResult > 0) {
+      // 3. 결제 상태 업데이트 (READY -> DONE) ★필수 추가★
+      paymentMapper.updatePaymentStatus(paymentVO.getOrderId(), "DONE");
+
+      // 4. 경매 상태 변경 (8: 결제완료)
+      paymentMapper.updateAuctionStatus(paymentVO.getBidIdx(), 8);
+
+      // 5. 입찰 상태 변경 (2: 낙찰/결제성공)
       paymentMapper.updateBidStatus(paymentVO.getBidIdx(), 2);
+
       return true;
     }
     return false;

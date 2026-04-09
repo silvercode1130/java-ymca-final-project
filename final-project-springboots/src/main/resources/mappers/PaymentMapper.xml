@@ -12,15 +12,58 @@
 -->
 <mapper namespace="com.springbootstudy.bbs.mapper.PaymentMapper">
 
-	<insert id="insertPayment" parameterType="com.springbootstudy.bbs.domain.PaymentVO"> INSERT INTO
-		payment ( bid_idx, mem_idx, imp_uid, merchant_uid, pay_method, pay_amount, pay_status,
-		buyer_name, buyer_tel, buyer_addr, buyer_zipcode, escrow_status, pay_regdate ) VALUES (
-		#{bidIdx}, #{memIdx}, #{impUid}, #{merchantUid}, #{payMethod}, #{payAmount}, 'PAID',
-		#{buyerName}, #{buyerTel}, #{buyerAddr}, #{buyerZipcode}, 'READY', NOW() ) </insert>
+	<insert id="insertPayment" parameterType="com.springbootstudy.bbs.domain.PaymentVO" 
+          useGeneratedKeys="true" keyProperty="payIdx">
+    INSERT INTO payment (
+        bid_idx, 
+        mem_idx, 
+        payment_key, 
+        order_id, 
+        pay_method, 
+        pay_amount, 
+        pay_status,
+        buyer_name, 
+        buyer_tel, 
+        buyer_addr, 
+        buyer_zipcode, 
+        escrow_status, 
+        pay_regdate
+    ) VALUES (
+        #{bidIdx}, 
+        #{memIdx}, 
+        #{paymentKey}, 
+        #{orderId}, 
+        #{payMethod}, 
+        #{payAmount}, 
+        'READY',        #{buyerName}, 
+        #{buyerTel}, 
+        #{buyerAddr}, 
+        #{buyerZipcode}, 
+        'READY', 
+        NOW()
+    )
+  </insert>
 
-	<update id="updateAuctionStatus"> UPDATE auction SET auction_status_idx = 8 WHERE auction_idx =
-		#{auctionIdx} </update>
+  <update id="updatePaymentStatus">
+    UPDATE payment 
+    SET pay_status = 'DONE'
+    WHERE order_id = #{orderId}
+  </update>
 
-	<update id="updateBidStatus"> UPDATE bid SET bid_status_idx = 2 WHERE bid_idx = #{bidIdx} </update>
+  <update id="updateAuctionStatus">
+    UPDATE auction 
+    SET auction_status_idx = 8 
+    WHERE auction_idx = (
+        SELECT auction_idx 
+        FROM bid 
+        WHERE bid_idx = #{bidIdx}
+    )
+  </update>
+
+  <update id="updateBidStatus">
+    UPDATE bid 
+    SET bid_status_idx = 2 
+    WHERE bid_idx = #{bidIdx}
+  </update>
 
 </mapper>	
