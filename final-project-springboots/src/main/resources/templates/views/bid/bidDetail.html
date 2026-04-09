@@ -24,7 +24,7 @@
         <!-- 이미지가 있으면 표시 -->
         <div th:if="${bid.itemThumbnailImg != null and bid.itemThumbnailImg != ''}">
             <p><strong>제안 이미지:</strong></p>
-            <img th:src="${bid.itemThumbnailImg}"
+            <img th:src="@{'/images/' + ${bid.itemThumbnailImg}}"
                  style="max-width:300px; border:1px solid #ddd; border-radius:4px;">
         </div>
     </div>
@@ -38,7 +38,7 @@
             <input type="hidden" name="auctionIdx" th:value="${auction.auctionIdx}">
             <button type="submit"
                     style="background:blue; color:white; padding:10px 20px; border-radius:4px; border:none; cursor:pointer;">
-                이 입찰 낙찰하기
+                낙찰하기
             </button>
         </form>
     </div>

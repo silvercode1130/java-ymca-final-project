@@ -29,6 +29,14 @@
 	      AND bidder_idx = #{bidderIdx}
 	</update>
 	
+	<!-- 입찰 삭제 - 관리자 (bidder_idx 조건 없음) -->
+	<update id="adminDeleteBid">
+	    UPDATE bid
+	    SET bid_status_idx = 5,
+	        bid_moddate = NOW()
+	    WHERE bid_idx = #{bidIdx}
+	</update>
+	
 	<!-- 아이템 등록 -->
 	<insert id="insertItem" useGeneratedKeys="true" keyProperty="itemIdx" keyColumn="item_idx">
 	    INSERT INTO item (

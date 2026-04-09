@@ -149,7 +149,7 @@ public class AuctionController {
         return "redirect:/auctions";
     }
 
-    // 경매 삭제 (/auctions/{auctionIdx}/delete)
+    // 경매 취소 (/auctions/{auctionIdx}/delete)
     @PostMapping("/auctions/{auctionIdx}/delete")
     public String deleteAuction(@PathVariable("auctionIdx") Long auctionIdx,
                                   HttpSession session,
@@ -161,6 +161,29 @@ public class AuctionController {
         	// 작성자 본인 확인은 서비스 계층에서 수행 (안전함)
             auctionService.deleteAuction(auctionIdx, loginUser.getMemIdx());
             ra.addFlashAttribute("successMessage", "구매요청이 삭제되었습니다.");
+        } catch (IllegalArgumentException e) {
+            ra.addFlashAttribute("errorMessage", e.getMessage());
+        }
+        return "redirect:/auctions";
+    }
+    
+    // 관리자 경매 삭제 (/auctions/{auctionIdx}/admin-delete)
+    @PostMapping("/auctions/{auctionIdx}/admin-delete")
+    public String adminDeleteAuction(@PathVariable("auctionIdx") Long auctionIdx,
+                                      HttpSession session,
+                                      RedirectAttributes ra) {
+        MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
+        if (loginUser == null) return "redirect:/views/member/login";
+
+        // 관리자(memRoleIdx == 2)만 접근 가능
+        if (loginUser.getMemRoleIdx() == null || loginUser.getMemRoleIdx() != 2) {
+            ra.addFlashAttribute("errorMessage", "관리자만 사용할 수 있는 기능입니다.");
+            return "redirect:/auctions/" + auctionIdx;
+        }
+
+        try {
+            auctionService.adminDeleteAuction(auctionIdx);
+            ra.addFlashAttribute("successMessage", "관리자 권한으로 경매가 삭제되었습니다.");
         } catch (IllegalArgumentException e) {
             ra.addFlashAttribute("errorMessage", e.getMessage());
         }
@@ -351,7 +374,30 @@ public class AuctionController {
         }
         return "redirect:/auctions/" + auctionIdx;
     }
+    
+    // 관리자 입찰 삭제 (/bids/{bidIdx}/admin-cancel)
+    @PostMapping("/bids/{bidIdx}/admin-cancel")
+    public String adminDeleteBid(@PathVariable("bidIdx") Long bidIdx,
+                                  @RequestParam("auctionIdx") Long auctionIdx,
+                                  HttpSession session,
+                                  RedirectAttributes ra) {
+        MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
+        if (loginUser == null) return "redirect:/views/member/login";
 
+        if (loginUser.getMemRoleIdx() == null || loginUser.getMemRoleIdx() != 2) {
+            ra.addFlashAttribute("errorMessage", "관리자만 사용할 수 있는 기능입니다.");
+            return "redirect:/auctions/" + auctionIdx;
+        }
+
+        try {
+            bidService.adminDeleteBid(bidIdx);
+            ra.addFlashAttribute("successMessage", "관리자 권한으로 입찰이 삭제되었습니다.");
+        } catch (IllegalArgumentException e) {
+            ra.addFlashAttribute("bidError", e.getMessage());
+        }
+        return "redirect:/auctions/" + auctionIdx;
+    }
+    
     // 낙찰 처리 (/auctions/{auctionIdx}/bids/{bidIdx}/win)
     @PostMapping("/auctions/{auctionIdx}/bids/{bidIdx}/win")
     public String selectWinner(@PathVariable("auctionIdx") Long auctionIdx,
