@@ -9,7 +9,7 @@ public class AuctionVO {
  private Long    		auctionIdx;				// PK
  private Long    		buyerIdx;				// FK → member.mem_idx
  private Integer 		itemCategoryIdx;		// FK → item_category
- private Long    		itemIdx;          		// FK → item (실제 제안 상품)
+ private String    		auctionThumbnailImg;    // 경매 이미지
  private String  		auctionTitle;			// 경매 제목
  private String  		auctionDesc;			// 경매 설명
  private Long    		auctionTargetPrice;		// 희망 최대가 (nullable)

@@ -1,42 +1,64 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<!--	
-	마이바티스 참고 사이트
-	  - http://blog.mybatis.org/
-	  - http://www.mybatis.org/mybatis-3/ko/index.html
-	  
-	@Mapper 애노테이션이 적용된 인터페이스와 맵퍼 XML파일은
-	namespace 속성으로 연결되기 때문에 맵퍼 XML의 namespace를
-	지정할 때 @Mapper 애노테이션이 적용된 맵퍼 인터페이스의
-	완전한 클래스 이름(패키지를 포함한 이름)을 지정하면 된다.   
--->
+	
 <mapper namespace="com.springbootstudy.bbs.mapper.BidMapper">
 	
-	<!-- 입찰 리스트 조회 -->
-	<select id="BidList" resultType="BidListDTO">
-	    SELECT
-	        b.*,
-	        m.mem_name AS realMemName,
-	        m.mem_name,
-	        bs.bid_status_name AS bidStatusName
-	    FROM bid b
-	    JOIN member m ON b.bidder_idx = m.mem_idx
-	    JOIN bid_status bs ON b.bid_status_idx = bs.bid_status_idx
-	    WHERE b.auction_idx = #{auctionIdx}
-	      AND b.bid_status_idx != 4
-	    ORDER BY b.bid_regdate DESC
+	<!-- 입찰 리스트 조회 (View 사용) -->
+	<select id="BidList" resultType="BidDTO">
+	    SELECT *
+	    FROM bid_list_view
+	    WHERE auction_idx = #{auctionIdx}
+	      AND bid_status_idx != 5
+	    ORDER BY bid_regdate DESC
 	</select>
 	
+	<!-- 입찰 단건 조회 (상세페이지)(View 사용) -->
+	<select id="findBidById" resultType="BidDTO">
+	    SELECT *
+	    FROM bid_list_view
+	    WHERE bid_idx = #{bidIdx}
+	</select>
+		
 	<!-- 입찰 삭제 - 소프트 딜리트 -->
 	<update id="softDeleteBid">
 	    UPDATE bid
-	    SET bid_status_idx = 4,
+	    SET bid_status_idx = 5,
 	        bid_moddate = NOW()
 	    WHERE bid_idx = #{bidIdx}
 	      AND bidder_idx = #{bidderIdx}
 	</update>
 	
+	<!-- 입찰 삭제 - 관리자 (bidder_idx 조건 없음) -->
+	<update id="adminDeleteBid">
+	    UPDATE bid
+	    SET bid_status_idx = 5,
+	        bid_moddate = NOW()
+	    WHERE bid_idx = #{bidIdx}
+	</update>
+	
+	<!-- 아이템 등록 -->
+	<insert id="insertItem" useGeneratedKeys="true" keyProperty="itemIdx" keyColumn="item_idx">
+	    INSERT INTO item (
+	        item_name,
+	        item_category_idx,
+	        item_brand,
+	        item_thumbnail_img,
+	        item_condition,
+	        item_regdate,
+	        item_is_deleted
+	    ) VALUES (
+	        #{itemName},
+	        #{itemCategoryIdx},
+	        #{itemBrand},
+	        #{itemThumbnailImg},
+	        'NEW',
+	        NOW(),
+	        'N'
+	    )
+	</insert>
+	
+	<!-- 입찰 등록 -->
 	<insert id="insertBid">
 	    INSERT INTO bid (
 	        auction_idx,
@@ -77,18 +99,6 @@
 	      AND bid_idx != #{bidIdx}
 	      AND bid_status_idx = 1
 	</update>
-	
-	<!-- 입찰 단건 조회 (상세페이지, 수정용) -->
-	<select id="findBidById" resultType="BidListDTO">
-	    SELECT
-	        b.*,
-	        m.mem_name AS realMemName,
-	        bs.bid_status_name AS bidStatusName
-	    FROM bid b
-	    JOIN member m ON b.bid_idx = m.mem_idx
-	    JOIN bid_status bs ON b.bid_status_idx = bs.bid_status_idx
-	    WHERE b.bid_idx = #{bidIdx}
-	</select>
 	
 	<!-- 입찰 수정 -->
 	<update id="updateBid">
