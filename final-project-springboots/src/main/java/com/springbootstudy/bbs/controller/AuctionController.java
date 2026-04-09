@@ -111,8 +111,8 @@ public class AuctionController {
         // 파일 업로드 처리 (이미지가 있을 경우에만 실행)
         if (thumbnailFile != null && !thumbnailFile.isEmpty()) {
             try {
-            	// 프로젝트 내부의 static/uploads 폴더 경로 설정 (개발 환경용)
-                String uploadDir = System.getProperty("user.dir") + "/src/main/resources/static/uploads/";
+            	// 프로젝트 내부의 static/images 폴더 경로 설정 (개발 환경용)
+                String uploadDir = System.getProperty("user.dir") + "/src/main/resources/static/images/";
                 File dir = new File(uploadDir);
                 
                 // 폴더가 없으면 생성
@@ -123,7 +123,7 @@ public class AuctionController {
                 thumbnailFile.transferTo(new File(uploadDir + fileName));
                 
                 // DB에는 웹에서 접근 가능한 경로("/uploads/파일명")로 저장
-                dto.setAuctionThumbnailImg("/uploads/" + fileName);
+                dto.setAuctionThumbnailImg("/images/" + fileName);
             } catch (Exception e) {
                 log.error("이미지 업로드 실패", e);
                 dto.setAuctionThumbnailImg(null);  // 실패 시 null 처리 (또는 기본이미지)
@@ -299,12 +299,12 @@ public class AuctionController {
         // 이미지 업로드 처리
         if (bidImageFile != null && !bidImageFile.isEmpty()) {
             try {
-                String uploadDir = System.getProperty("user.dir") + "/src/main/resources/static/uploads/";
+                String uploadDir = System.getProperty("user.dir") + "/src/main/resources/static/images/";
                 File dir = new File(uploadDir);
                 if (!dir.exists()) dir.mkdirs();
                 String fileName = UUID.randomUUID() + "_" + bidImageFile.getOriginalFilename();
                 bidImageFile.transferTo(new File(uploadDir + fileName));
-                bidDto.setItemThumbnailImg("/uploads/" + fileName);
+                bidDto.setItemThumbnailImg("/images/" + fileName);
             } catch (Exception e) {
                 log.error("입찰 이미지 업로드 실패", e);
             }
