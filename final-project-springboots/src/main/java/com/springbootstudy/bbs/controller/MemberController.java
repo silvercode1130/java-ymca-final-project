@@ -368,6 +368,31 @@ public class MemberController {
           }
       }
       
+      // 비밀번호 동일한지 체크
+      @PostMapping("/auth/checkSamePwd")
+      @ResponseBody
+      public String checkSamePwd(@RequestParam("newPwd") String newPwd, HttpSession session) {
+          MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
+          
+          if (loginUser != null && loginUser.getMemPwd().equals(newPwd)) {
+              return "same";
+          }
+          return "different";
+      }
+
+      // 새 비밀번호로 변경
+      @PostMapping("/members/newPwdFind")
+      public String updatePassword(@RequestParam("newPassword") String newPassword, 
+                                   HttpSession session, RedirectAttributes ra) {
+          // 로그인 정보 불러옴
+          String memId = (String) session.getAttribute("loginId"); 
+          
+          // 비번 바꾸기
+          memberService.updatePassword(memId, newPassword);
+          
+          ra.addFlashAttribute("msg", "비밀번호가 변경 되었습니다");
+          return "redirect:/members/login";
+      }
       
      
 

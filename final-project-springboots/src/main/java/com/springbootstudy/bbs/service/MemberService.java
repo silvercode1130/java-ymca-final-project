@@ -87,6 +87,11 @@ public class MemberService {
 		return memberMapper.findByIdAndTel(memId, memTel);
 	}
 
+	// 새 비밀번호로 변경
+	public void updatePassword(String memId, String newPassword) {
+		memberMapper.updatePassword(memId, newPassword);
+	}
+
 	
 
 

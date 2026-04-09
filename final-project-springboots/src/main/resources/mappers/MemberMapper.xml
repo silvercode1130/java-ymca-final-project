@@ -108,6 +108,13 @@
 	    WHERE mem_id = #{memId}
 	    AND mem_tel = #{memTel}
 	</select>
+	
+	<!-- 새 비밀번호 변경 -->
+ 	<update id="updatePassword">
+	    UPDATE member
+	    SET mem_pwd = #{newPassword} 
+	    WHERE mem_id = #{memId}
+	</update>
  
 </mapper>	
 

@@ -48,12 +48,15 @@ public interface MemberMapper {
     // 회원정보 수정
  	void update(MemberVO vo);
  	MemberVO selectOneFromId(String memId); 
- 	String selectGradeNameByMemId(String memId);	// grade만 따로 조회
+ 	String selectGradeNameByMemId(String memId); // grade만 따로 조회
 
  	
  	// 비밀번호 재발급 =============================================
  	
  	// 비밀번호 재발급 시 아이디 + 전화번호 맞는 지 확인
 	MemberVO findByIdAndTel(@Param("memId") String memId, @Param("memTel") String memTel);
+
+	// 새비밀번호로 변경
+	int updatePassword(@Param("memId") String memId, @Param("newPassword") String newPassword);
 
 }

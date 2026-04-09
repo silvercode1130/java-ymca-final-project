@@ -42,6 +42,92 @@
         }
     });
 }
+	
+	// 새 비밀번호 인증
+	$(document).ready(function() {
+	    // 비밀번호 입력창들에서 타이핑 할 때마다 실행
+	    $("#newPwd, #newPwdConfirm").on("keyup", function() {
+	        let pwd1 = $("#newPwd").val();
+	        let pwd2 = $("#newPwdConfirm").val();
+	        let submitBtn = $("#submitBtn");
+	
+	        // 두 입력란이 일치하는지 체크
+	        if (pwd1 !== "" && pwd2 !== "") {
+	            if (pwd1 === pwd2) {
+	                $("#pwdMatchMsg").text("비밀번호가 일치합니다").css("color", "gray");
+	                submitBtn.prop("disabled", false); // 버튼 활성화
+	            } else {
+	                $("#pwdMatchMsg").text("비밀번호가 일치하지 않습니다").css("color", "red");
+	                submitBtn.prop("disabled", true); // 버튼 비활성화
+	            }
+	        }
+	    });
+	
+	    // 기존 비밀번호와 동일한지 체크 
+	    $("#newPwd").on("blur", function() {
+	        let newPwd = $(this).val();
+	        
+	        $.ajax({
+	            url: "/auth/checkSamePwd",
+	            type: "POST",
+	            data: { "newPwd": newPwd },
+	            success: function(res) {
+	                if (res === "same") {
+	                    $("#pwdCheckMsg").text("이전 비밀번호와 동일합니다").css("color", "red");
+	                    $("#submitBtn").prop("disabled", true);
+	                } else {
+	                    $("#pwdCheckMsg").text(""); 
+	                }
+	            }
+	        });
+	    });
+	});
+	
+	// 비밀번호 체크용 (제약조건)
+    function pwdCheck() {
+	    let pwd = document.querySelector("#newPwd").value.trim();
+	    let pwdCheckValue = document.querySelector("#newPwdConfirm").value.trim();
+	    let msg = document.querySelector("#pwdMatchMsg");
+	
+	    // 제약조건
+	    let pwdReg = /^[A-Za-z0-9]{5,}$/;
+	    let submitBtn = document.querySelector("#submitBtn");
+	
+	    // 입력 안하면 return false 처리
+	    if (pwd === "" && pwdCheckValue === "") {
+	        msg.textContent = "";
+	        submitBtn.disabled = true;
+	        return false;
+	    }
+	
+	    // 제약조건 검사
+	    if (!pwdReg.test(pwd)) {
+	        msg.style.color = "red";
+	        msg.textContent = "✘ 영문 + 숫자 5글자 이상으로 입력해주세요.";
+	        submitBtn.disabled = true;
+	        return false;
+	    }
+	
+	    // 두 입력란의 비밀번호가 동일한지 검사
+	    if (pwd === pwdCheckValue) {
+	        msg.style.color = "gray"; 
+	        msg.textContent = "✔ 비밀번호가 일치하며 사용 가능합니다.";
+	        submitBtn.disabled = false; 
+	        return true;
+	    } else {
+	        msg.style.color = "red";
+	        msg.textContent = "✘ 비밀번호가 일치하지 않습니다.";
+	        submitBtn.disabled = true;
+	        return false;
+	    }
+	}
+	
+	// 입력할 때마다 실시간으로 체크
+	document.addEventListener("DOMContentLoaded", function() {
+	    document.querySelector("#newPwd").addEventListener("keyup", pwdCheck);
+	    document.querySelector("#newPwdConfirm").addEventListener("keyup", pwdCheck);
+	});
+	
 </script>
 
 </head>
@@ -76,19 +162,23 @@
 
 	<hr>
 	
-	<form class="newPwdFind" action="/members/newPwdFind">
+	<form class="newPwdFind" action="/members/newPwdFind" method="post">
 		<div>
 			<label>인증번호</label> <br>
 		    <input type="text" id="userInputCode" name="authCode" placeholder="인증번호를 입력하세요"> 
 		    <button type="button" onclick="checkAuthCode()">확인</button> <br>
 		    <span id="authMsg"></span> <br>
 		    
-		    <label>새 비밀번호</label> <br> 
-	        <input type="password" name="newPassword" placeholder="새 비밀번호를 입력하세요"> <br>
-	        <input type="password" name="newPassword" placeholder="새 비밀번호 확인">
-	
-			<!-- 인증 완료 + 비번 입력란 동일해야 disabled 풀림 -->
-	        <button type="submit">변경</button>
+		    <label>비밀번호</label> <br> 
+			<span style="font-size: 11px; color: gray;">✓ 알파벳 + 숫자로만 조합해주세요 (5글자 이상)</span> <br>
+			<input type="password" id="newPwd" name="newPassword" placeholder="새 비밀번호를 입력하세요"> <br>
+			
+			<label style="margin-top: 10px; display: inline-block;">비밀번호 확인</label> <br>
+			<input type="password" id="newPwdConfirm" placeholder="다시 한번 입력하세요"> <br>
+			
+			<span id="pwdMatchMsg" style="font-size: 12px;"></span> <br>
+			
+			<button type="submit" id="submitBtn" disabled>변경</button>
 		</div>
 	</form>
 	
