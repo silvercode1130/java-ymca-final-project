@@ -6,7 +6,6 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import com.springbootstudy.bbs.domain.AuctionDTO;
-import com.springbootstudy.bbs.domain.AuctionVO;
 
 @Mapper
 public interface AuctionMapper {
