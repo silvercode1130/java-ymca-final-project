@@ -1,40 +1,26 @@
 /**
- * 결제 통합 모듈 (payment-master.js)
+ * 결제 통합 모듈 (payment.js)
  */
 
-// 1. 토스페이먼츠 초기화 (키는 본인의 것으로 유지)
 const clientKey = "test_ck_GePWvyJnrKPx4nM5Kogb8gLzN97E";
 const tossPayments = TossPayments(clientKey);
 
 const PaymentModule = {
-  /**
-   * [함수 1] 토스 결제창 호출 (직접 호출용)
-   */
+  // [함수 1] 토스 결제창 호출
   request: function (data) {
-    // 성공 URL에 비즈니스 데이터(bidIdx 등)를 쿼리 스트링으로 포함
-    const url = new URL(data.successUrl);
-    url.searchParams.append("bidIdx", data.bidIdx);
-    url.searchParams.append("memIdx", data.memIdx);
-    url.searchParams.append("buyerName", data.buyerName || "구매자");
-    url.searchParams.append("buyerTel", data.buyerTel || "010-0000-0000");
-    url.searchParams.append("buyerAddr", data.buyerAddr || "주소없음");
-    url.searchParams.append("buyerZipcode", data.buyerZipcode || "00000");
-
     tossPayments
       .requestPayment(data.payMethod || "카드", {
         amount: data.amount,
-        orderId: data.orderId,
+        orderId: data.orderId, // "ORD_bidIdx_timestamp" 형식
         orderName: data.orderName,
         customerName: data.customerName,
-        successUrl: url.toString(),
-        failUrl: data.failUrl,
+        successUrl: window.location.origin + "/payment/success",
+        failUrl: window.location.origin + "/payment/fail",
       })
       .catch((err) => alert("결제 요청 에러: " + err.message));
   },
 
-  /**
-   * [함수 2] 서버 최종 승인 요청 (Fetch API)
-   */
+  // [함수 2] 서버 최종 승인 요청
   confirm: function (requestData) {
     return fetch("/api/payment/confirm", {
       method: "POST",
@@ -49,22 +35,17 @@ const PaymentModule = {
     });
   },
 
-  /**
-   * [함수 3] 페이지 내 결제 버튼(.pay-btn) 자동 연결
-   */
+  // [함수 3] 결제 버튼 자동 연결
   initButtons: function () {
     document.querySelectorAll(".pay-btn").forEach((btn) => {
       btn.addEventListener("click", () => {
+        const bidIdx = btn.getAttribute("data-idx");
         const payData = {
           amount: btn.getAttribute("data-price"),
-          orderId:
-            "ORD_" + btn.getAttribute("data-idx") + "_" + new Date().getTime(),
+          orderId: "ORD_" + bidIdx + "_" + new Date().getTime(), // bidIdx 포함
           orderName: btn.getAttribute("data-title"),
-          customerName: "홍길동", // 실제론 전역변수나 세션에서 주입
-          bidIdx: btn.getAttribute("data-idx"),
-          memIdx: 1, // 실제론 전역변수나 세션에서 주입
-          successUrl: window.location.origin + "/payment/success",
-          failUrl: window.location.origin + "/payment/fail",
+          customerName: loginMemName,
+          payMethod: "카드",
         };
         this.request(payData);
       });
@@ -77,14 +58,27 @@ document.addEventListener("DOMContentLoaded", () =>
   PaymentModule.initButtons(),
 );
 
+// 결제 성공 페이지 처리
 document.addEventListener("DOMContentLoaded", function () {
-  // 현재 페이지 URL이 성공 페이지인지 확인
   if (window.location.pathname.includes("/payment/success")) {
     const urlParams = new URLSearchParams(window.location.search);
-    const params = Object.fromEntries(urlParams.entries());
+    const paymentKey = urlParams.get("paymentKey");
+    const orderId = urlParams.get("orderId");
+    const amount = urlParams.get("amount");
 
-    // 이미 정의된 confirm 함수 호출
-    PaymentModule.confirm(params)
+    // orderId에서 bidIdx 추출 (ORD_bidIdx_timestamp)
+    const bidIdx = orderId.split("_")[1];
+
+    PaymentModule.confirm({
+      paymentKey: paymentKey,
+      orderId: orderId,
+      amount: amount,
+      bidIdx: bidIdx, // orderId에서 추출
+      buyerName: loginMemName, // 세션에서 주입된 값
+      buyerTel: loginMemTel,
+      buyerAddr: loginMemAddr,
+      buyerZipcode: loginMemZipcode,
+    })
       .then((data) => {
         alert("결제가 완료되었습니다!");
         location.href = "/auctions";
@@ -96,12 +90,11 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 });
 
-// payment-master.js 하단에 추가 가능
+// 결제 실패 페이지 처리
 if (window.location.pathname.includes("/payment/fail")) {
   const urlParams = new URLSearchParams(window.location.search);
   const msg = urlParams.get("message");
 
-  // 화면에 'fail-reason'이라는 아이디를 가진 태그가 있다면 메시지 출력
   const failElem = document.getElementById("fail-reason");
   if (failElem) failElem.innerText = "사유: " + (msg || "알 수 없는 오류");
 }
