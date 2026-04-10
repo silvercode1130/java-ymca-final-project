@@ -5,10 +5,6 @@
 <title>Insert title here</title>
 </head>
 <body>
-	거래한 판매자 등등을 검색한 뒤
-	최근 거래 목록이 뜨면 선택
-	아래에 리뷰창이 뜨고
-	리뷰를 작성 후 버튼을 누르면 전송 됨
 		<input type="hidden" name="buyer_idx" th:value="${session.loginUser.memIdx}">
 		<input type="hidden" name="bidder_idx" th:value="${bidderIdx}">
 		<input type="hidden" name="auction_idx" th:value="${auctionIdx}">
@@ -35,7 +31,7 @@
 		    "<span th:text='${keyword}'></span>"(이)과 관련된 거래가 없습니다
 		</div>
 		
-		<div th:unless="${keyword != null and keyword != '' and #lists.isEmpty(reviewList)}">
+		<div th:if="${keyword != null and keyword != '' and !#lists.isEmpty(reviewList)}">
 		    "<span th:text='${keyword}'></span>"(이)과 관련된 거래입니다
 		</div>
 		
@@ -82,11 +78,11 @@
 		</div>
 		
 		<div id="stars" name="stars" style="font-size: 30px; cursor: pointer;">
-	        <span data-value="1">☆</span>
-	        <span data-value="2">☆</span>
-	        <span data-value="3">☆</span>
-	        <span data-value="4">☆</span>
-	        <span data-value="5">☆</span>
+		    <span data-value="1"><i class="bi bi-star"></i></span>
+		    <span data-value="2"><i class="bi bi-star"></i></span>
+		    <span data-value="3"><i class="bi bi-star"></i></span>
+		    <span data-value="4"><i class="bi bi-star"></i></span> 
+		    <span data-value="5"><i class="bi bi-star"></i></span>
 	    </div>
 	    
 	    <input type="hidden" name="reviewStar" id="reviewStar">
@@ -126,24 +122,26 @@
         
         	// 별점 부여 기능
 		    const stars = document.querySelectorAll("#stars span");
-		    const reviewStarInput = document.getElementById("reviewStar");
-		
-		    stars.forEach(star => {
-		        star.addEventListener("click", function() {
-		            const value = this.getAttribute("data-value");
-		            reviewStarInput.value = value;
-		
-		            stars.forEach((s, index) => {
-		                if (index < value) {
-		                    s.textContent = "★";
-		                    s.style.color = "gold";
-		                } else {
-		                    s.textContent = "☆";
-		                    s.style.color = "gray";
-		                }
-		            });
-		        });
-		    });
+			const reviewStarInput = document.getElementById("reviewStar");
+			
+			stars.forEach(star => {
+			    star.addEventListener("click", function() {
+			        const value = this.getAttribute("data-value");
+			        reviewStarInput.value = value;
+			
+			        stars.forEach((s, index) => {
+			            const icon = s.querySelector("i");
+			
+			            if (index < value) {
+			                icon.className = "bi bi-star-fill";
+			                icon.style.color = "gold";
+			            } else {
+			                icon.className = "bi bi-star";
+			                icon.style.color = "gray";
+			            }
+			        });
+			    });
+			});
 		</script>
         
     </form>

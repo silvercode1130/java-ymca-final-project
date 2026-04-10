@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <meta charset="UTF-8">
+  <title>내 게시글 목록</title>
+</head>
+
+<body>
+
+  <h2>내 게시글 목록</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>게시판</th>
+        <th>제목</th>
+        <th>조회수</th>
+        <th>좋아요</th>
+        <th>댓글 수</th>
+        <th>작성일</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr th:if="${#lists.isEmpty(boards)}">
+            <td colspan="6">작성한 게시글이 없습니다.</td>
+        </tr>
+        <tr th:each="board : ${boards}">
+            <td th:text="${board.boardTypeName}"></td>
+            <td>
+                <a th:href="@{/boards/{type}/{idx}(type=${board.boardTypeCode}, idx=${board.boardIdx})}"
+                   th:text="${board.boardTitle}"></a>
+            </td>
+            <td th:text="${board.boardViewCount}"></td>
+            <td th:text="${board.boardLike}"></td>
+            <td th:text="${board.replyCount}"></td>
+            <td th:text="${#temporals.format(board.boardRegdate, 'yyyy-MM-dd HH:mm')}"></td>
+        </tr>
+    </tbody>
+</table>
+
+</body>
+</html>

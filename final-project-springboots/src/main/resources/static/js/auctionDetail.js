@@ -50,3 +50,4 @@ document.getElementById('bidForm').addEventListener('submit', function (e) {
 
     if (hasError) e.preventDefault();
 });
+

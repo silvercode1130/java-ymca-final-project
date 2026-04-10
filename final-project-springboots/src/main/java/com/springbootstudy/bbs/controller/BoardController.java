@@ -31,15 +31,14 @@ public class BoardController {
     // /boards → 전체 목록 (커뮤니티 홈)
     @GetMapping
     public String home(
-            @RequestParam(value = "keyword",    required = false) String keyword,
+            @RequestParam(value = "keyword", required = false) String keyword,
             @RequestParam(value = "searchType", required = false) String searchType,
-            @RequestParam(value = "page", defaultValue = "1")     int    page,
-            Model model
-    ) {
+            @RequestParam(value = "page", defaultValue = "1") int page,
+            Model model) {
         int totalCount = boardService.countBoards(null, keyword, searchType);
         addPagingAttributes(model, null, keyword, searchType, page, totalCount);
-        model.addAttribute("boards",      boardService.getBoardsPaged(null, keyword, searchType, page));
-        model.addAttribute("typeCode",    null);
+        model.addAttribute("boards", boardService.getBoardsPaged(null, keyword, searchType, page));
+        model.addAttribute("typeCode", null);
         model.addAttribute("currentType", null);
         return "views/board/boardList";
     }
@@ -47,70 +46,75 @@ public class BoardController {
     // /boards/{typeCode} → 특정 게시판 목록
     @GetMapping("/{typeCode}")
     public String list(
-            @PathVariable("typeCode")                              String typeCode,
-            @RequestParam(value = "keyword",    required = false)  String keyword,
-            @RequestParam(value = "searchType", required = false)  String searchType,
-            @RequestParam(value = "page", defaultValue = "1")      int    page,
-            Model model
-    ) {
+            @PathVariable("typeCode") String typeCode,
+            @RequestParam(value = "keyword", required = false) String keyword,
+            @RequestParam(value = "searchType", required = false) String searchType,
+            @RequestParam(value = "page", defaultValue = "1") int page,
+            Model model) {
         BoardTypeVO currentType = boardService.getBoardTypeByCode(typeCode);
-        if (currentType == null) return "redirect:/boards";
+        if (currentType == null)
+            return "redirect:/boards";
 
         int totalCount = boardService.countBoards(typeCode, keyword, searchType);
         addPagingAttributes(model, typeCode, keyword, searchType, page, totalCount);
-        model.addAttribute("boards",       boardService.getBoardsPaged(typeCode, keyword, searchType, page));
-        model.addAttribute("typeCode",     typeCode);
-        model.addAttribute("currentType",  currentType);
+        model.addAttribute("boards", boardService.getBoardsPaged(typeCode, keyword, searchType, page));
+        model.addAttribute("typeCode", typeCode);
+        model.addAttribute("currentType", currentType);
         return "views/board/boardList";
     }
-    
+
     // ── 페이징 공통 처리 ──────────────────────────────────────
     private void addPagingAttributes(Model model, String typeCode, String keyword,
-                                     String searchType, int page, int totalCount) {
-        int pageSize  = 10; // 페이지당 게시글 수
+            String searchType, int page, int totalCount) {
+        int pageSize = 10; // 페이지당 게시글 수
         int blockSize = 10; // 페이지 블록 크기
         int totalPages = (int) Math.ceil((double) totalCount / pageSize);
-        if (totalPages == 0) totalPages = 1;
-        if (page < 1) page = 1;
-        if (page > totalPages) page = totalPages;
+        if (totalPages == 0)
+            totalPages = 1;
+        if (page < 1)
+            page = 1;
+        if (page > totalPages)
+            page = totalPages;
 
         int blockStart = ((page - 1) / blockSize) * blockSize + 1;
-        int blockEnd   = Math.min(blockStart + blockSize - 1, totalPages);
+        int blockEnd = Math.min(blockStart + blockSize - 1, totalPages);
 
-        model.addAttribute("boardTypes",  boardService.getBoardTypes());
-        model.addAttribute("keyword",     keyword);
-        model.addAttribute("searchType",  searchType);
+        model.addAttribute("boardTypes", boardService.getBoardTypes());
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("searchType", searchType);
         model.addAttribute("currentPage", page);
-        model.addAttribute("totalPages",  totalPages);
-        model.addAttribute("blockStart",  blockStart);
-        model.addAttribute("blockEnd",    blockEnd);
-        model.addAttribute("totalCount",  totalCount);
+        model.addAttribute("totalPages", totalPages);
+        model.addAttribute("blockStart", blockStart);
+        model.addAttribute("blockEnd", blockEnd);
+        model.addAttribute("totalCount", totalCount);
     }
-    
+
     // ── 게시글 상세 ──────────────────────────────────────────
     @GetMapping("/{typeCode}/{boardIdx}")
     public String detail(
-            @PathVariable("typeCode")  String typeCode,
-            @PathVariable("boardIdx")  Long   boardIdx,
+            @PathVariable("typeCode") String typeCode,
+            @PathVariable("boardIdx") Long boardIdx,
             @RequestParam(value = "from", required = false) String from,
             @RequestParam(value = "page", defaultValue = "1") int page,
             @RequestParam(value = "replyPage", defaultValue = "1") int replyPage,
             @RequestParam(value = "sortType", defaultValue = "oldest") String sortType,
             Model model,
-            HttpSession session
-    ) {
+            HttpSession session) {
         BoardVO board = boardService.getBoardDetail(boardIdx, session);
 
-        int replyPageSize  = 20;
+        int replyPageSize = 20;
         int replyBlockSize = 10;
-        int totalReplies   = boardService.getReplyCount(boardIdx); // 전체 댓글 수 기준
+        int totalReplies = boardService.getReplyCount(boardIdx); // 전체 댓글 수 기준
         int totalReplyPages = (int) Math.ceil((double) totalReplies / replyPageSize);
-        if (totalReplyPages == 0) totalReplyPages = 1;
-        if (replyPage < 1) replyPage = 1;
-        if (replyPage > totalReplyPages) replyPage = totalReplyPages;
+        if (totalReplyPages == 0)
+            totalReplyPages = 1;
+        if (replyPage < 1)
+            replyPage = 1;
+        if (replyPage > totalReplyPages)
+            replyPage = totalReplyPages;
 
         int replyBlockStart = ((replyPage - 1) / replyBlockSize) * replyBlockSize + 1;
-        int replyBlockEnd   = Math.min(replyBlockStart + replyBlockSize - 1, totalReplyPages);
+        int replyBlockEnd = Math.min(replyBlockStart + replyBlockSize - 1, totalReplyPages);
 
         List<ReplyVO> replies = boardService.getRepliesPaged(boardIdx, replyPage, sortType);
 
@@ -118,17 +122,17 @@ public class BoardController {
                 ? "/boards?page=" + page
                 : "/boards/" + typeCode + "?page=" + page;
 
-        model.addAttribute("board",            board);
-        model.addAttribute("replies",          replies);
-        model.addAttribute("typeCode",         typeCode);
-        model.addAttribute("backUrl",          backUrl);
-        model.addAttribute("boardTypes",       boardService.getBoardTypes());
-        model.addAttribute("replyPage",        replyPage);
-        model.addAttribute("totalReplyPages",  totalReplyPages);
-        model.addAttribute("replyBlockStart",  replyBlockStart);
-        model.addAttribute("replyBlockEnd",    replyBlockEnd);
-        model.addAttribute("totalReplies",     totalReplies);
-        model.addAttribute("sortType",         sortType);
+        model.addAttribute("board", board);
+        model.addAttribute("replies", replies);
+        model.addAttribute("typeCode", typeCode);
+        model.addAttribute("backUrl", backUrl);
+        model.addAttribute("boardTypes", boardService.getBoardTypes());
+        model.addAttribute("replyPage", replyPage);
+        model.addAttribute("totalReplyPages", totalReplyPages);
+        model.addAttribute("replyBlockStart", replyBlockStart);
+        model.addAttribute("replyBlockEnd", replyBlockEnd);
+        model.addAttribute("totalReplies", totalReplies);
+        model.addAttribute("sortType", sortType);
         return "views/board/boardDetail";
     }
 
@@ -137,33 +141,34 @@ public class BoardController {
     public String newForm(
             @PathVariable("typeCode") String typeCode,
             @RequestParam(value = "from", required = false) String from,
-            Model model
-    ) {
+            Model model) {
         BoardTypeVO currentType = boardService.getBoardTypeByCode(typeCode);
-        if (currentType == null) return "redirect:/boards";
+        if (currentType == null)
+            return "redirect:/boards";
 
-        model.addAttribute("boardTypes",  boardService.getBoardTypes());
+        model.addAttribute("boardTypes", boardService.getBoardTypes());
         model.addAttribute("currentType", currentType);
-        model.addAttribute("typeCode",    typeCode);
-        model.addAttribute("from",        from);
+        model.addAttribute("typeCode", typeCode);
+        model.addAttribute("from", from);
         return "views/board/boardNew";
     }
 
     // ── 게시글 등록 처리 ─────────────────────────────────────
     @PostMapping("/{typeCode}")
     public String create(
-            @PathVariable("typeCode")     String  typeCode,
-            @RequestParam("boardTitle")   String  boardTitle,
-            @RequestParam("boardContent") String  boardContent,
+            @PathVariable("typeCode") String typeCode,
+            @RequestParam("boardTitle") String boardTitle,
+            @RequestParam("boardContent") String boardContent,
             @RequestParam(value = "from", required = false) String from,
             HttpServletRequest request,
-            HttpSession session
-    ) {
+            HttpSession session) {
         MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
-        if (loginUser == null) return "redirect:/members/login";
+        if (loginUser == null)
+            return "redirect:/members/login";
 
         BoardTypeVO boardType = boardService.getBoardTypeByCode(typeCode);
-        if (boardType == null) return "redirect:/boards";
+        if (boardType == null)
+            return "redirect:/boards";
 
         BoardVO board = new BoardVO();
         board.setMemIdx(loginUser.getMemIdx());
@@ -181,17 +186,17 @@ public class BoardController {
     @GetMapping("/{typeCode}/{boardIdx}/edit")
     public String editForm(
             @PathVariable("typeCode") String typeCode,
-            @PathVariable("boardIdx") Long   boardIdx,
-            Model model, HttpSession session
-    ) {
+            @PathVariable("boardIdx") Long boardIdx,
+            Model model, HttpSession session) {
         MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
-        if (loginUser == null) return "redirect:/members/login";
+        if (loginUser == null)
+            return "redirect:/members/login";
 
         BoardVO board = boardService.getBoardDetail(boardIdx, session);
         if (!board.getMemIdx().equals(loginUser.getMemIdx())) {
             return "redirect:/boards/" + typeCode + "/" + boardIdx;
         }
-        model.addAttribute("board",    board);
+        model.addAttribute("board", board);
         model.addAttribute("typeCode", typeCode);
         return "views/board/boardEdit";
     }
@@ -200,13 +205,13 @@ public class BoardController {
     @PostMapping("/{typeCode}/{boardIdx}/edit")
     public String edit(
             @PathVariable("typeCode") String typeCode,
-            @PathVariable("boardIdx") Long   boardIdx,
-            @RequestParam("boardTitle")   String boardTitle,
+            @PathVariable("boardIdx") Long boardIdx,
+            @RequestParam("boardTitle") String boardTitle,
             @RequestParam("boardContent") String boardContent,
-            HttpSession session
-    ) {
+            HttpSession session) {
         MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
-        if (loginUser == null) return "redirect:/members/login";
+        if (loginUser == null)
+            return "redirect:/members/login";
 
         BoardVO board = new BoardVO();
         board.setBoardIdx(boardIdx);
@@ -220,11 +225,11 @@ public class BoardController {
     @PostMapping("/{typeCode}/{boardIdx}/delete")
     public String delete(
             @PathVariable("typeCode") String typeCode,
-            @PathVariable("boardIdx") Long   boardIdx,
-            HttpSession session
-    ) {
+            @PathVariable("boardIdx") Long boardIdx,
+            HttpSession session) {
         MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
-        if (loginUser == null) return "redirect:/members/login";
+        if (loginUser == null)
+            return "redirect:/members/login";
 
         boardService.removeBoard(boardIdx);
         return "redirect:/boards/" + typeCode;
@@ -234,7 +239,7 @@ public class BoardController {
     @PostMapping("/{typeCode}/{boardIdx}/replies")
     public String createReply(
             @PathVariable("typeCode") String typeCode,
-            @PathVariable("boardIdx") Long   boardIdx,
+            @PathVariable("boardIdx") Long boardIdx,
             @RequestParam("replyContent") String replyContent,
             @RequestParam(value = "parentReplyIdx", required = false) Long parentReplyIdx,
             @RequestParam(value = "replyPage", defaultValue = "1") int replyPage,
@@ -242,10 +247,10 @@ public class BoardController {
             @RequestParam(value = "from", required = false) String from,
             @RequestParam(value = "page", defaultValue = "1") int page,
             HttpServletRequest request,
-            HttpSession session
-    ) {
+            HttpSession session) {
         MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
-        if (loginUser == null) return "redirect:/members/login";
+        if (loginUser == null)
+            return "redirect:/members/login";
 
         ReplyVO reply = new ReplyVO();
         reply.setBoardIdx(boardIdx);
@@ -264,7 +269,8 @@ public class BoardController {
         // 등록 후 자신의 댓글이 있는 페이지 계산
         int totalRootReplies = boardService.getReplyCount(boardIdx); // 전체 댓글 수 기준
         int totalReplyPages = (int) Math.ceil((double) totalRootReplies / 20);
-        if (totalReplyPages == 0) totalReplyPages = 1;
+        if (totalReplyPages == 0)
+            totalReplyPages = 1;
 
         int targetPage;
         if (parentReplyIdx == null) {
@@ -283,11 +289,10 @@ public class BoardController {
     @PostMapping("/{typeCode}/{boardIdx}/like")
     public String likeBoard(
             @PathVariable("typeCode") String typeCode,
-            @PathVariable("boardIdx") Long   boardIdx,
+            @PathVariable("boardIdx") Long boardIdx,
             @RequestParam(value = "replyPage", defaultValue = "1") int replyPage,
             @RequestParam(value = "sortType", defaultValue = "oldest") String sortType,
-            HttpSession session
-    ) {
+            HttpSession session) {
         boardService.likeBoardIfNotYet(boardIdx, session);
         return "redirect:/boards/" + typeCode + "/" + boardIdx + "?replyPage=" + replyPage + "&sortType=" + sortType;
     }
@@ -296,12 +301,11 @@ public class BoardController {
     @PostMapping("/{typeCode}/{boardIdx}/replies/{replyIdx}/like")
     public String likeReply(
             @PathVariable("typeCode") String typeCode,
-            @PathVariable("boardIdx") Long   boardIdx,
-            @PathVariable("replyIdx") Long   replyIdx,
+            @PathVariable("boardIdx") Long boardIdx,
+            @PathVariable("replyIdx") Long replyIdx,
             @RequestParam(value = "replyPage", defaultValue = "1") int replyPage,
             @RequestParam(value = "sortType", defaultValue = "oldest") String sortType,
-            HttpSession session
-    ) {
+            HttpSession session) {
         boardService.likeReplyIfNotYet(replyIdx, session);
         return "redirect:/boards/" + typeCode + "/" + boardIdx + "?replyPage=" + replyPage + "&sortType=" + sortType;
     }
@@ -309,22 +313,23 @@ public class BoardController {
     // ── 댓글 수정 ────────────────────────────────────────────
     @PostMapping("/{typeCode}/{boardIdx}/replies/{replyIdx}/edit")
     public String editReply(
-            @PathVariable("typeCode")  String typeCode,
-            @PathVariable("boardIdx")  Long   boardIdx,
-            @PathVariable("replyIdx")  Long   replyIdx,
+            @PathVariable("typeCode") String typeCode,
+            @PathVariable("boardIdx") Long boardIdx,
+            @PathVariable("replyIdx") Long replyIdx,
             @RequestParam("replyContent") String replyContent,
             @RequestParam(value = "replyPage", defaultValue = "1") int replyPage,
             @RequestParam(value = "sortType", defaultValue = "oldest") String sortType,
-            HttpSession session
-    ) {
+            HttpSession session) {
         MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
-        if (loginUser == null) return "redirect:/members/login";
+        if (loginUser == null)
+            return "redirect:/members/login";
 
         ReplyVO existing = boardService.getReplies(boardIdx).stream()
                 .filter(r -> r.getReplyIdx().equals(replyIdx))
                 .findFirst().orElse(null);
         if (existing == null || !existing.getMemIdx().equals(loginUser.getMemIdx())) {
-            return "redirect:/boards/" + typeCode + "/" + boardIdx + "?replyPage=" + replyPage + "&sortType=" + sortType;
+            return "redirect:/boards/" + typeCode + "/" + boardIdx + "?replyPage=" + replyPage + "&sortType="
+                    + sortType;
         }
 
         if (replyContent != null && replyContent.trim().length() >= 3) {
@@ -336,13 +341,13 @@ public class BoardController {
     // ── 댓글 삭제 ────────────────────────────────────────────
     @PostMapping("/{typeCode}/replies/{replyIdx}/delete")
     public String deleteReply(
-            @PathVariable("typeCode")  String typeCode,
-            @PathVariable("replyIdx")  Long   replyIdx,
-            @RequestParam("boardIdx")  Long   boardIdx,
-            HttpSession session
-    ) {
+            @PathVariable("typeCode") String typeCode,
+            @PathVariable("replyIdx") Long replyIdx,
+            @RequestParam("boardIdx") Long boardIdx,
+            HttpSession session) {
         MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
-        if (loginUser == null) return "redirect:/members/login";
+        if (loginUser == null)
+            return "redirect:/members/login";
 
         boardService.removeReply(replyIdx);
         return "redirect:/boards/" + typeCode + "/" + boardIdx;

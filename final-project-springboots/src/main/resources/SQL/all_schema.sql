@@ -184,12 +184,12 @@ CREATE TABLE item (
    3. 역경매 / 입찰
    ========================================== */
 
--- 3-1) AUCTION (역경매 요청)
+-- 3-1) AUCTION (역경매 요청) 
 CREATE TABLE auction (
     auction_idx               BIGINT        NOT NULL AUTO_INCREMENT COMMENT 'PK',
     buyer_idx                 BIGINT        NOT NULL COMMENT 'FK → member.mem_idx (구매자)',
     item_category_idx         INT           NOT NULL COMMENT 'FK → item_category',
-    item_idx                  BIGINT        DEFAULT NULL COMMENT 'FK → item (구매자가 올린 상품 정보)',
+    auction_thumbnail_img     VARCHAR(200)  DEFAULT NULL COMMENT '경매 썸네일',
     auction_title             VARCHAR(200)  NOT NULL COMMENT '경매 제목',
     auction_desc              TEXT          NOT NULL COMMENT '경매 설명',
     auction_target_price      BIGINT        DEFAULT NULL COMMENT '희망 최대가 (nullable)',
@@ -212,9 +212,7 @@ CREATE TABLE auction (
     CONSTRAINT fk_auction_item_category
         FOREIGN KEY (item_category_idx) REFERENCES item_category(item_category_idx),
     CONSTRAINT fk_auction_status
-        FOREIGN KEY (auction_status_idx) REFERENCES auction_status(auction_status_idx),
-    CONSTRAINT fk_auction_item 
-        FOREIGN KEY (item_idx) REFERENCES item(item_idx)
+        FOREIGN KEY (auction_status_idx) REFERENCES auction_status(auction_status_idx)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='역경매 요청 테이블';
 
 -- 3-2) BID (입찰)
@@ -346,14 +344,26 @@ VALUES (8, 'accessory',   '액세서리/잡화');
 
 -- 5-4) AUCTION_STATUS 코드
 INSERT INTO auction_status (auction_status_idx, auction_status_code, auction_status_name)
-VALUES (1, 'open',    '진행중');
+VALUES (1, 'open','진행중');
 INSERT INTO auction_status (auction_status_idx, auction_status_code, auction_status_name)
-VALUES (2, 'closed',  '마감');
--- 결정중, 3
+VALUES (2, 'decide','결정대기중');
 INSERT INTO auction_status (auction_status_idx, auction_status_code, auction_status_name)
-VALUES (3, 'failed',  '유찰');
+VALUES (3, 'closed','마감');
 INSERT INTO auction_status (auction_status_idx, auction_status_code, auction_status_name)
-VALUES (4, 'canceled','취소');
+VALUES (4, 'failed','유찰');
+INSERT INTO auction_status (auction_status_idx, auction_status_code, auction_status_name)
+VALUES (5, 'canceled','취소');
+INSERT INTO auction_status (auction_status_idx, auction_status_code, auction_status_name)
+VALUES (6, 'deleted','삭제됨');
+INSERT INTO auction_status (auction_status_idx, auction_status_code, auction_status_name)
+VALUES (7, 'paying','결제대기');
+INSERT INTO auction_status (auction_status_idx, auction_status_code, auction_status_name)
+VALUES (8, 'paid','결제완료');
+INSERT INTO auction_status (auction_status_idx, auction_status_code, auction_status_name)
+VALUES (9, 'shipping','배송중');
+INSERT INTO auction_status (auction_status_idx, auction_status_code, auction_status_name)
+VALUES (10, 'delivered','배송완료');
+
 
 -- 5-5) BID_STATUS 코드
 INSERT INTO bid_status (bid_status_idx, bid_status_code, bid_status_name)
@@ -364,6 +374,8 @@ INSERT INTO bid_status (bid_status_idx, bid_status_code, bid_status_name)
 VALUES (3, 'lost',     '실패');
 INSERT INTO bid_status (bid_status_idx, bid_status_code, bid_status_name)
 VALUES (4, 'canceled', '취소');
+INSERT INTO bid_status (bid_status_idx, bid_status_code, bid_status_name)
+VALUES (5, 'deleted', '삭제됨');
 
 -- 5-6) BOARD_TYPE 코드
 INSERT INTO board_type (board_type_idx, board_type_code, board_type_name, board_can_comment, board_min_role)
@@ -410,3 +422,27 @@ VALUES (14, 'aerobics',  '에어로빅', 'Y', 1);
 
 INSERT INTO board_type (board_type_idx, board_type_code, board_type_name, board_can_comment, board_min_role)
 VALUES (15, 'swimming',  '수영',     'Y', 1);
+
+/* ==========================================
+   6. 결제 관련
+   ========================================== */
+
+CREATE TABLE payment (
+    pay_idx          BIGINT        NOT NULL AUTO_INCREMENT COMMENT 'PK',
+    bid_idx          BIGINT        NOT NULL COMMENT 'FK → bid.bid_idx (낙찰된 입찰, 여기서 판매자/경매 정보 조인)',
+    mem_idx          BIGINT        NOT NULL COMMENT 'FK → member.mem_idx (구매자)',
+    imp_uid          VARCHAR(100)  NOT NULL COMMENT '포트원 결제 고유번호',
+    merchant_uid     VARCHAR(100)  NOT NULL COMMENT '우리 시스템 주문번호',
+    pay_method       VARCHAR(50)   NOT NULL COMMENT '결제 수단 (card, trans, vbank 등)',
+    pay_amount       BIGINT        NOT NULL COMMENT '실제 결제 금액',
+    pay_status       VARCHAR(20)   NOT NULL DEFAULT 'PAID'
+                     COMMENT '결제 상태 (PAID, CONFIRMED, SETTLED, CANCELLED)',
+    pay_regdate      DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '결제 일시',
+    confirmed_at     DATETIME      NULL COMMENT '구매자 수령 확인 일시',
+    settled_at       DATETIME      NULL COMMENT '판매자 정산 완료 일시',
+    PRIMARY KEY (pay_idx),
+    UNIQUE KEY ux_payment_imp_uid (imp_uid),
+    UNIQUE KEY ux_payment_merchant_uid (merchant_uid),
+    CONSTRAINT fk_payment_bid    FOREIGN KEY (bid_idx) REFERENCES bid(bid_idx),
+    CONSTRAINT fk_payment_buyer  FOREIGN KEY (mem_idx) REFERENCES member(mem_idx)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='결제 상세 정보 테이블';
