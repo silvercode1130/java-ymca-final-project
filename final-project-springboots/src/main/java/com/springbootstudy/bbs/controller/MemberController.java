@@ -278,7 +278,7 @@ public class MemberController {
       // 회원정보 수정에서 비번 바꾸기
       @PostMapping("/checkOldPwd")
       @ResponseBody
-      public boolean checkOldPwd(@RequestParam String newPwd,
+      public boolean checkOldPwd(@RequestParam("newPwd") String newPwd,
                                 HttpSession session) {
 
           MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");

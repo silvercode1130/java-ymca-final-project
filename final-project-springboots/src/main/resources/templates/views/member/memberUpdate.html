@@ -87,6 +87,7 @@
 			        }
 			        
 			     	// 이전 비밀번호는 disabled 유지 + 이전 비밀번호니 바꾸지 말라 알리기
+			     	// 이 부분 err 이유 못찾음
 			     	if (pwd !== "") {
 					    fetch("/checkOldPwd", {
 					        method: "POST",
@@ -110,10 +111,6 @@
 			    }
 			
 			});
-			
-			
-
-		
 
 		</script>
 		
@@ -159,10 +156,10 @@
 					<!-- ##추가 - 기존 비밀번호와 같다면 disabled도 안풀어주고 글 하나 적어주자!! -->
 					<div id="pwd" name="pwd">
 						<label>새 비밀번호</label>
-						<input type="password" name="newPwd" id="newPwd" placeholder="🔒 변경할 비밀번호를 입력해주세요" oninput="pwdCheck()"> <br>
+						<input type="password" name="newPwd" id="newPwd" placeholder="🔒 변경할 비밀번호를 입력해주세요"> <br>
 						
 						<label>비밀번호 확인</label>
-						<input type="password" id="newPwdConfirm" placeholder="🔒 변경할 비밀번호를 확인해주세요" oninput="pwdCheck()"> <br>
+						<input type="password" id="newPwdConfirm" placeholder="🔒 변경할 비밀번호를 확인해주세요"> <br>
 						<span id="pwdMatchMsg" style="font-size: 12px;"></span> <br>
 						
 					</div>

@@ -56,7 +56,7 @@ public class WebConfig implements WebMvcConfigurer {
 		
 		registry
 			.addResourceHandler("/upload/finalProfile/**")
-			.addResourceLocations("file:///C:/upload/finalProfile/");
+			.addResourceLocations("file:///C:/upload/finalProfile/"); 
 
 		registry
 			.addResourceHandler("/upload/boardImages/**")
