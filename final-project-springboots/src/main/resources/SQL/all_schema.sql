@@ -47,7 +47,7 @@ SET FOREIGN_KEY_CHECKS = 1;
 
 -- 0-1) ROLE (권한 코드: 1 USER, 2 ADMIN)
 CREATE TABLE role (
-    role_idx   BIGINT       NOT NULL AUTO_INCREMENT COMMENT 'PK',
+    role_idx   INT       	NOT NULL AUTO_INCREMENT COMMENT 'PK',
     role_name  VARCHAR(20)  NOT NULL COMMENT '권한 등급 명칭 (USER/ADMIN)',
     PRIMARY KEY (role_idx)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='권한 코드 테이블';
@@ -106,15 +106,17 @@ CREATE TABLE board_type (
 
 -- 1-1) MEMBER (회원 기본 정보)
 CREATE TABLE member (
-    mem_idx         BIGINT       NOT NULL AUTO_INCREMENT COMMENT 'PK',
+    mem_idx        BIGINT        NOT NULL AUTO_INCREMENT COMMENT 'PK',
     mem_id         VARCHAR(50)   NOT NULL COMMENT '로그인 ID',
     mem_pwd        VARCHAR(255)  NOT NULL COMMENT '비밀번호 해시',
     mem_name       VARCHAR(50)   DEFAULT NULL COMMENT '성명', 
     mem_tel        VARCHAR(20)   DEFAULT NULL COMMENT '전화번호',
     mem_email      VARCHAR(100)  DEFAULT NULL COMMENT '이메일',
     mem_ip         VARCHAR(100)  NOT NULL COMMENT 'IP 주소',
-    mem_role_idx   BIGINT        NOT NULL COMMENT 'FK → role.role_idx (권한 등급)',
+    mem_role_idx   INT        	 NOT NULL COMMENT 'FK → role.role_idx (권한 등급)',
     mem_grade_idx  INT           NOT NULL COMMENT 'FK → grade.grade_idx (신용도 등급)',
+	mem_credit 	   INT 			 NOT NULL DEFAULT 50 COMMENT '신용 크레딧 점수',
+	mem_penalty	   INT 			 NOT NULL DEFAULT 0 COMMENT '패널티 점수';
     mem_bday       DATE          DEFAULT NULL COMMENT '생일',
     mem_regdate    DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '가입일',
     mem_is_deleted CHAR(1)       NOT NULL DEFAULT 'N' COMMENT 'Y / N (삭제 여부)',
@@ -244,6 +246,32 @@ CREATE TABLE bid (
 
 
 /* ==========================================
+   MEMBER_PENALTY (회원 패널티 이력)
+   ========================================== */
+
+CREATE TABLE member_penalty (
+    penalty_idx      BIGINT       NOT NULL AUTO_INCREMENT COMMENT 'PK',
+    mem_idx          BIGINT       NOT NULL COMMENT 'FK → member.mem_idx (패널티 받은 회원)',
+    auction_idx      BIGINT       DEFAULT NULL COMMENT '관련 경매 FK → auction.auction_idx',
+    bid_idx          BIGINT       DEFAULT NULL COMMENT '관련 입찰 FK → bid.bid_idx',
+    penalty_code     VARCHAR(50)  NOT NULL COMMENT '패널티 코드 (e.g. NO_PAYMENT, NO_SHIPMENT, LATE_CANCEL)',
+    penalty_reason   VARCHAR(255) DEFAULT NULL COMMENT '추가 설명(운영자 메모 등)',
+    penalty_score    INT          NOT NULL DEFAULT 1 COMMENT '패널티 점수/카운트 (보통 1로 고정 후 누적)',
+    created_at       DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '부과 일시',
+    PRIMARY KEY (penalty_idx),
+    KEY idx_penalty_mem (mem_idx),
+    KEY idx_penalty_auction (auction_idx),
+    KEY idx_penalty_bid (bid_idx),
+    CONSTRAINT fk_penalty_member
+        FOREIGN KEY (mem_idx) REFERENCES member(mem_idx) ON DELETE CASCADE,
+    CONSTRAINT fk_penalty_auction
+        FOREIGN KEY (auction_idx) REFERENCES auction(auction_idx) ON DELETE SET NULL,
+    CONSTRAINT fk_penalty_bid
+        FOREIGN KEY (bid_idx) REFERENCES bid(bid_idx) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='회원 패널티 이력 테이블';
+
+
+/* ==========================================
    4. 커뮤니티 (게시판 / 댓글)
    ========================================== */
 
@@ -311,10 +339,11 @@ INSERT INTO role (role_idx, role_name) VALUES (1, 'USER');
 INSERT INTO role (role_idx, role_name) VALUES (2, 'ADMIN');
 
 -- 5-2) GRADE 코드
-INSERT INTO grade (grade_idx, grade_name, grade_credit) VALUES (1, 'basic',  0.00);
-INSERT INTO grade (grade_idx, grade_name, grade_credit) VALUES (2, 'silver', 3.50);
-INSERT INTO grade (grade_idx, grade_name, grade_credit) VALUES (3, 'gold',   4.00);
-INSERT INTO grade (grade_idx, grade_name, grade_credit) VALUES (4, 'vip',    4.50);
+INSERT INTO grade (grade_idx, grade_name, grade_credit) VALUES (1, 'normal',  0);
+INSERT INTO grade (grade_idx, grade_name, grade_credit) VALUES (2, 'bronze',  500);
+INSERT INTO grade (grade_idx, grade_name, grade_credit) VALUES (3, 'silver', 2000);
+INSERT INTO grade (grade_idx, grade_name, grade_credit) VALUES (4, 'gold',   5000);
+INSERT INTO grade (grade_idx, grade_name, grade_credit) VALUES (5, 'vip',    10000);
 
 -- 5-3) ITEM_CATEGORY 코드
 INSERT INTO item_category (item_category_idx, item_category_code, item_category_name)
