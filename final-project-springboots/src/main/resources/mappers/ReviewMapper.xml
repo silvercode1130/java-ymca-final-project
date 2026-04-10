@@ -46,7 +46,7 @@
 	
 	<!-- 내가 받은 리뷰 별점 평균 -->
 	<select id="getAvgRating" resultType="double">
-	    SELECT AVG(review_star)
+	    SELECT IFNULL(AVG(review_star), 0)
 	    FROM review
 	    WHERE bidder_idx = #{memIdx}
 	</select>

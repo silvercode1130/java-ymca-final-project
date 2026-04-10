@@ -332,6 +332,15 @@ public class MemberController {
            * 
            * Run -> Run Configrations... -> Environment -> add -> 환경변수 + api키 2가지 넣기
            * 필요하신 분들은 카톡으로 연락 주시면 보내드리겠습니다!(외부 유출금지ㅠ -> 금액 폭탄 맞을 수 있어요...)
+           * 
+           * 에러 뜰 경우
+           * build.gradle 확인해주세요 implementation 'com.solapi:sdk:1.0.3' 있어야 해요!
+           * 
+           * 임포트 4개 있어야 해요
+           * import com.solapi.sdk.message.model.Message;
+           * import com.solapi.sdk.message.service.DefaultMessageService;
+           * import com.solapi.sdk.SolapiClient;
+           * import com.solapi.sdk.message.exception.SolapiMessageNotReceivedException;
            * */
           
           // 인증번호 6자리 랜덤 전송
