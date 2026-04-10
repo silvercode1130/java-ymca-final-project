@@ -58,8 +58,15 @@ public class WebConfig implements WebMvcConfigurer {
 			.addResourceHandler("/upload/finalProfile/**")
 			.addResourceLocations("file:///C:/upload/finalProfile/"); 
 
+		// 게시글 이미지 - src/main/resources/static/images/board 실시간 서빙
 		registry
+<<<<<<< feature/member
 			.addResourceHandler("/upload/boardImages/**") 
 			.addResourceLocations("file:///C:/upload/boardImages/");
+=======
+			.addResourceHandler("/images/board/**")
+			.addResourceLocations("file:///" + System.getProperty("user.dir").replace("\\", "/")
+				+ "/src/main/resources/static/images/board/");
+>>>>>>> develop
 	}
 }
