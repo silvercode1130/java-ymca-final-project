@@ -60,6 +60,21 @@
 							</form>
 						</div>
 
+<<<<<<< HEAD
+          <!-- 로그인 X -->
+          <div class="hidden md:flex items-center gap-2"
+               th:if="${loginUser == null}">
+            <a th:href="@{/members/login}"
+               class="px-3 py-1.5 rounded text-sm text-white hover:text-lime-400 hover:bg-white/10">
+              로그인
+            </a>
+            <!-- 회원가입 URL에 맞게 수정 -->
+            <a th:href="@{/members/register}"
+            	class="px-3 py-1.5 rounded text-sm bg-lime-400 text-black font-semibold hover:bg-lime-500">
+              회원가입
+            </a>
+          </div>
+=======
 						<!-- 로그인 X (데스크탑) -->
 						<div class="hidden md:flex items-center gap-2"
 							th:if="${loginUser == null}">
@@ -69,6 +84,7 @@
 								class="px-3 py-1.5 rounded text-sm bg-[#7CBD00] text-white font-semibold hover:bg-[#6BAD00]">
 								회원가입 </a>
 						</div>
+>>>>>>> 2a523c1fb95ecb1a5abd419f8fd752f42faa55d6
 
 						<!-- 모바일: 간단 버전 (풀 메뉴는 나중에 JS로) -->
 						<div class="md:hidden flex items-center gap-2">

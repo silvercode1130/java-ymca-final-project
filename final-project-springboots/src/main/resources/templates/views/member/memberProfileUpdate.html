@@ -6,7 +6,7 @@
 <title>Insert title here</title>
 </head>
 <body>
-	<form class="memberProfileUpdate" action="/members/memberProfileUpdate" method="post" enctype="multipart/form-data">
+	<form class="memberProfileUpdate" action="/mypage/profile" method="post" enctype="multipart/form-data">
 		
 		<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 	
@@ -15,12 +15,12 @@
 
 		    let isNicknameOk = true;
 
-		    // 🔥 기존 이미지 파일명 추출
+		    // 기존 이미지 파일명 추출
 		    let originalImg = $('#preview').attr('src') 
 		        ? $('#preview').attr('src').split('/').pop()
 		        : "";
 
-		    // 🔥 초기 데이터
+		    // 초기 데이터
 		    let originalData = {
 		        nickname: $('#memNickname').val(),
 		        intro: $('#memIntro').val(),
@@ -98,7 +98,7 @@
 		            $('#introMsg').text("");
 		        }
 
-		        // 🔥 이미지 비교 핵심
+		        // 이미지 비교 핵심
 		        let selectedFile = $('#fileInput')[0].files[0];
 		        let isImageChanged = false;
 
@@ -108,7 +108,7 @@
 		            }
 		        }
 
-		        // 🔥 변경 감지
+		        // 변경 감지
 		        if (
 		            originalData.nickname !== nickname ||
 		            originalData.intro !== intro ||

@@ -27,7 +27,7 @@ public class MemberProfileController {
 	// 회원 프로필 띄우기 ---------------------------------------------------------------
 	
 	// 프로필 조회 (페이지 이동)
-	@GetMapping("members/memberProfileUpdate")
+	@GetMapping("/mypage/profile")
 	public String memberProfile(HttpSession session, Model model) {
 
 	    MemberVO loginMember = (MemberVO) session.getAttribute("loginUser");
@@ -52,7 +52,7 @@ public class MemberProfileController {
 
     
     // 프로필 저장 (수정)
-    @PostMapping("members/memberProfileUpdate")
+    @PostMapping("/mypage/profile")
     public String updateProfile(MemberProfileVO vo,
                                 @RequestParam("memImgFile") MultipartFile memImgFile) throws Exception {
 
@@ -88,7 +88,7 @@ public class MemberProfileController {
 
         memberProfileService.updateProfile(vo);
 
-        return "redirect:/members/memberProfileUpdate?memIdx=" + vo.getMemIdx();
+        return "redirect:/mypage/profile?memIdx=" + vo.getMemIdx();
     }
     
     
