@@ -244,6 +244,8 @@ public class BoardController {
             @RequestParam(value = "parentReplyIdx", required = false) Long parentReplyIdx,
             @RequestParam(value = "replyPage", defaultValue = "1") int replyPage,
             @RequestParam(value = "sortType", defaultValue = "oldest") String sortType,
+            @RequestParam(value = "from", required = false) String from,
+            @RequestParam(value = "page", defaultValue = "1") int page,
             HttpServletRequest request,
             HttpSession session) {
         MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
@@ -256,10 +258,12 @@ public class BoardController {
         reply.setReplyContent(replyContent);
         reply.setReplyIp(getClientIp(request));
 
+        String fromParam = (from != null ? "&from=" + from : "") + "&page=" + page;
+
         int result = boardService.writeReply(reply, parentReplyIdx);
         if (result == -1) {
             return "redirect:/boards/" + typeCode + "/" + boardIdx
-                    + "?replyPage=" + replyPage + "&sortType=" + sortType + "&replyLimitExceeded=true";
+                    + "?replyPage=" + replyPage + "&sortType=" + sortType + fromParam + "&replyLimitExceeded=true";
         }
 
         // 등록 후 자신의 댓글이 있는 페이지 계산
@@ -278,7 +282,7 @@ public class BoardController {
         }
 
         return "redirect:/boards/" + typeCode + "/" + boardIdx
-                + "?replyPage=" + targetPage + "&sortType=" + sortType;
+                + "?replyPage=" + targetPage + "&sortType=" + sortType + fromParam;
     }
 
     // ── 게시글 좋아요 ─────────────────────────────────────────
