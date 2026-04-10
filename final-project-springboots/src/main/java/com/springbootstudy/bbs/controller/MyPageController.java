@@ -12,6 +12,7 @@ import com.springbootstudy.bbs.domain.AuctionDTO;
 import com.springbootstudy.bbs.domain.BidDTO;
 import com.springbootstudy.bbs.domain.BoardVO;
 import com.springbootstudy.bbs.domain.MemberVO;
+import com.springbootstudy.bbs.domain.PaymentVO;
 import com.springbootstudy.bbs.service.MyPageService;
 
 import jakarta.servlet.http.HttpSession;
@@ -68,5 +69,17 @@ public class MyPageController {
     model.addAttribute("boards", boards);
 
     return "views/mypage/boards";
+  }
+
+  @GetMapping("/sales")
+  public String mySales(HttpSession session, Model model) {
+    MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
+    if (loginUser == null)
+      return "redirect:/members/login";
+
+    List<PaymentVO> wonBids = mypageService.getMyWonBids(loginUser.getMemIdx());
+    model.addAttribute("wonBids", wonBids);
+
+    return "views/mypage/sales";
   }
 }

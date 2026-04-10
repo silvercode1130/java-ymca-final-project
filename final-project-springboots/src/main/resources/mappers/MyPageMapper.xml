@@ -30,4 +30,15 @@
 		b.mem_idx = mp.mem_idx WHERE b.mem_idx = #{memIdx} AND b.board_is_deleted = 'N' ORDER BY
 		b.board_regdate DESC </select>
 
+	<!-- 판매자 - 낙찰된 입찰 목록 (결제 완료된 것만) -->
+	<select id="getMyWonBids" resultType="com.springbootstudy.bbs.domain.PaymentVO"> SELECT p.*,
+		i.item_name, i.item_brand, i.item_thumbnail_img, a.auction_title, a.auction_status_idx FROM
+		payment p JOIN bid b ON p.bid_idx = b.bid_idx JOIN item i ON b.item_idx = i.item_idx JOIN
+		auction a ON b.auction_idx = a.auction_idx WHERE b.bidder_idx = #{memIdx} AND p.pay_status =
+		'DONE' ORDER BY p.pay_regdate DESC </select>
+
+	<!-- auctionIdx로 낙찰된 bidIdx 조회 -->
+	<select id="getWonBidIdxByAuctionIdx" resultType="long"> SELECT bid_idx FROM bid WHERE auction_idx
+		= #{auctionIdx} AND bid_status_idx = 2 LIMIT 1 </select>
+
 </mapper>	

@@ -19,25 +19,98 @@
         <th>제안 가격</th>
         <th>입찰 상태</th>
         <th>입찰일</th>
+        <th>배송처리</th>
       </tr>
     </thead>
     <tbody>
       <tr th:if="${#lists.isEmpty(bids)}">
-            <td colspan="6">참여한 입찰이 없습니다.</td>
-        </tr>
-        <tr th:each="bid : ${bids}">
-            <td>
-              <a th:href="@{/auctions/{idx}(idx=${bid.auctionIdx})}"
-                 th:text="${bid.itemName}"></a>
-            </td>
-            <td th:text="${bid.itemName}"></td>
-            <td th:text="${bid.itemBrand != null ? bid.itemBrand : '-'}"></td>
-            <td th:text="${#numbers.formatInteger(bid.bidPrice, 0, 'COMMA') + '원'}"></td>
-            <td th:text="${bid.bidStatusName}"></td>
-            <td th:text="${#temporals.format(bid.bidRegdate, 'yyyy-MM-dd HH:mm')}"></td>
-        </tr>
+        <td colspan="7">참여한 입찰이 없습니다.</td>
+      </tr>
+      <tr th:each="bid : ${bids}">
+        <td>
+          <a th:href="@{/auctions/{idx}(idx=${bid.auctionIdx})}"
+             th:text="${bid.itemName}"></a>
+        </td>
+        <td th:text="${bid.itemName}"></td>
+        <td th:text="${bid.itemBrand != null ? bid.itemBrand : '-'}"></td>
+        <td th:text="${#numbers.formatInteger(bid.bidPrice, 0, 'COMMA') + '원'}"></td>
+        <td th:text="${bid.bidStatusName}"></td>
+        <td th:text="${#temporals.format(bid.bidRegdate, 'yyyy-MM-dd HH:mm')}"></td>
+        <td>
+          <!-- 낙찰(2)이고 결제완료(escrow_status=READY)인 경우 운송장 입력 -->
+          <button th:if="${bid.bidStatusIdx == 2}"
+                  th:attr="data-bid-idx=${bid.bidIdx}"
+                  onclick="openShipModal(this)">운송장 입력</button>
+        </td>
+      </tr>
     </tbody>
-</table>
+  </table>
+
+  <!-- 운송장 입력 모달 -->
+  <div id="shipModal" style="display:none;">
+    <div>
+      <h3>운송장 정보 입력</h3>
+      <input type="hidden" id="modalBidIdx"/>
+      <div>
+        <label>택배사</label>
+        <select id="courierCompany">
+          <option value="CJ대한통운">CJ대한통운</option>
+          <option value="한진택배">한진택배</option>
+          <option value="롯데택배">롯데택배</option>
+          <option value="우체국택배">우체국택배</option>
+          <option value="로젠택배">로젠택배</option>
+        </select>
+      </div>
+      <div>
+        <label>운송장번호</label>
+        <input type="text" id="trackingNumber" placeholder="운송장번호 입력"/>
+      </div>
+      <button onclick="submitShipping()">배송 시작</button>
+      <button onclick="closeShipModal()">취소</button>
+    </div>
+  </div>
+
+  <script>
+    function openShipModal(btn) {
+      const bidIdx = btn.getAttribute("data-bid-idx");
+      document.getElementById("modalBidIdx").value = bidIdx;
+      document.getElementById("shipModal").style.display = "block";
+    }
+
+    function closeShipModal() {
+      document.getElementById("shipModal").style.display = "none";
+    }
+
+    function submitShipping() {
+      const bidIdx = document.getElementById("modalBidIdx").value;
+      const courierCompany = document.getElementById("courierCompany").value;
+      const trackingNumber = document.getElementById("trackingNumber").value;
+
+      if (!trackingNumber.trim()) {
+        alert("운송장번호를 입력해주세요.");
+        return;
+      }
+
+      fetch("/api/payment/ship", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          bidIdx: bidIdx,
+          courierCompany: courierCompany,
+          trackingNumber: trackingNumber
+        })
+      })
+        .then(res => res.json())
+        .then(data => {
+          alert("배송 처리가 완료되었습니다!");
+          closeShipModal();
+          location.reload();
+        })
+        .catch(err => {
+          alert("오류가 발생했습니다: " + err.message);
+        });
+    }
+  </script>
 
 </body>
 </html>

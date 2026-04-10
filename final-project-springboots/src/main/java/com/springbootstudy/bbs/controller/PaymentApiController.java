@@ -9,7 +9,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.springbootstudy.bbs.domain.MemberVO;
 import com.springbootstudy.bbs.domain.PaymentVO;
+import com.springbootstudy.bbs.service.MyPageService;
 import com.springbootstudy.bbs.service.PaymentService;
 
 import jakarta.servlet.http.HttpSession;
@@ -23,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 public class PaymentApiController {
 
     private final PaymentService paymentService;
+    private final MyPageService mypageService;
 
     /**
      * 토스페이먼츠 결제 승인 및 최종 처리
@@ -69,6 +72,50 @@ public class PaymentApiController {
 
         } catch (Exception e) {
             log.error("결제 처리 중 에러: ", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    // 판매자 운송장 입력
+    @PostMapping("/ship")
+    public ResponseEntity<?> shipOrder(@RequestBody PaymentVO paymentVO,
+            HttpSession session) {
+        try {
+            MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
+            if (loginUser == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+            }
+            paymentService.shipOrder(paymentVO);
+            return ResponseEntity.ok(Map.of("message", "success"));
+        } catch (Exception e) {
+            log.error("배송 처리 중 에러: ", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    // 구매자 수령 확인
+    @PostMapping("/confirm-receipt")
+    public ResponseEntity<?> confirmReceipt(@RequestBody Map<String, Object> requestData,
+            HttpSession session) {
+        try {
+            MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
+            if (loginUser == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+            }
+
+            Long auctionIdx = Long.valueOf(String.valueOf(requestData.get("auctionIdx")));
+
+            // auctionIdx로 낙찰된 bidIdx 조회
+            Long bidIdx = mypageService.getWonBidIdxByAuctionIdx(auctionIdx);
+            if (bidIdx == null) {
+                return ResponseEntity.badRequest().body("낙찰 정보를 찾을 수 없습니다.");
+            }
+
+            paymentService.confirmReceipt(bidIdx);
+            return ResponseEntity.ok(Map.of("message", "success"));
+
+        } catch (Exception e) {
+            log.error("수령 확인 중 에러: ", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }

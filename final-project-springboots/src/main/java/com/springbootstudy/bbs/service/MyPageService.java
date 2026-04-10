@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.springbootstudy.bbs.domain.AuctionDTO;
 import com.springbootstudy.bbs.domain.BidDTO;
 import com.springbootstudy.bbs.domain.BoardVO;
+import com.springbootstudy.bbs.domain.PaymentVO;
 import com.springbootstudy.bbs.mapper.MyPageMapper;
 
 @Service
@@ -28,5 +29,13 @@ public class MyPageService {
   // 내 게시글 목록
   public List<BoardVO> getMyBoards(Long memIdx) {
     return mypageMapper.getMyBoards(memIdx);
+  }
+
+  public List<PaymentVO> getMyWonBids(Long memIdx) {
+    return mypageMapper.getMyWonBids(memIdx);
+  }
+
+  public Long getWonBidIdxByAuctionIdx(Long auctionIdx) {
+    return mypageMapper.getWonBidIdxByAuctionIdx(auctionIdx);
   }
 }

@@ -439,10 +439,10 @@ CREATE TABLE payment (
     order_id         VARCHAR(255)  NOT NULL COMMENT '우리 시스템 주문번호 (UUID 등)',
     
     -- 결제 금액 및 수단
-    pay_method       VARCHAR(100)   NOT NULL COMMENT '결제 수단 (카드, 가상계좌, 간편결제 등)',
+    pay_method       VARCHAR(100)  NOT NULL COMMENT '결제 수단 (카드, 가상계좌, 간편결제 등)',
     pay_amount       BIGINT        NOT NULL COMMENT '실제 결제 금액',
-    pay_status       VARCHAR(20)   NOT NULL DEFAULT 'READY' 
-                     COMMENT '결제 상태 (READY, DONE, CANCELED, EXPIRED)',
+    pay_status       VARCHAR(20)   NOT NULL DEFAULT 'READY'
+                     COMMENT '결제 상태 (READY, DONE, CONFIRMED, CANCELED, EXPIRED)',
 
     -- 배송지 정보 스냅샷
     buyer_name       VARCHAR(50)   NOT NULL COMMENT '수령인 성함',
@@ -450,18 +450,21 @@ CREATE TABLE payment (
     buyer_addr       VARCHAR(500)  NOT NULL COMMENT '배송지 주소',
     buyer_zipcode    VARCHAR(20)   NOT NULL COMMENT '우편번호',
     
+    -- 배송 정보
+    courier_company  VARCHAR(50)   NULL COMMENT '택배사',
+    tracking_number  VARCHAR(100)  NULL COMMENT '운송장번호',
+    shipped_at       DATETIME      NULL COMMENT '발송일시',
+
     -- 에스크로 및 처리 일시
-    escrow_status    VARCHAR(20)   DEFAULT 'READY' 
+    escrow_status    VARCHAR(20)   DEFAULT 'READY'
                      COMMENT '배송 상태 (READY, SHIPPING, DELIVERED)',
     pay_regdate      DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '결제 완료 일시',
-    confirmed_at     DATETIME      NULL     COMMENT '구매 확정 일시',
-    canceled_at      DATETIME      NULL     COMMENT '결제 취소 일시',
+    confirmed_at     DATETIME      NULL COMMENT '구매 확정 일시',
+    canceled_at      DATETIME      NULL COMMENT '결제 취소 일시',
 
     PRIMARY KEY (pay_idx),
-    -- 고유값 제약조건 (중복 결제 방지)
     UNIQUE KEY ux_payment_key (payment_key),
     UNIQUE KEY ux_order_id (order_id),
-    -- 외래키 설정
     CONSTRAINT fk_payment_bid    FOREIGN KEY (bid_idx) REFERENCES bid(bid_idx),
     CONSTRAINT fk_payment_buyer  FOREIGN KEY (mem_idx) REFERENCES member(mem_idx)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='결제 상세 정보 테이블';

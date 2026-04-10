@@ -2,6 +2,7 @@ package com.springbootstudy.bbs.mapper;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+
 import com.springbootstudy.bbs.domain.PaymentVO;
 
 @Mapper
@@ -19,4 +20,12 @@ public interface PaymentMapper {
 
   // 4. 입찰 상태 업데이트 (예: 2번 - 결제완료)
   int updateBidStatus(@Param("bidIdx") Long bidIdx, @Param("statusIdx") int statusIdx);
+
+  int updateShippingInfo(PaymentVO paymentVO);
+
+  int updateAuctionStatusByBidIdx(@Param("bidIdx") Long bidIdx, @Param("statusIdx") int statusIdx);
+
+  int updateConfirmedAt(@Param("bidIdx") Long bidIdx);
+
+  int updateEscrowStatus(@Param("bidIdx") Long bidIdx, @Param("escrowStatus") String escrowStatus);
 }
