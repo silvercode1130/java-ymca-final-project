@@ -4,9 +4,10 @@
 <meta charset="UTF-8">
 <title>회원가입 - PickQ</title>
 <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
+<script src="https://static.nid.naver.com/js/naveridlogin_js_sdk_2.0.2.js" charset="utf-8"></script>
 </head>
 <body>
-	<th:block layout:fragment="content">
+	<th:block layout:fragment="content"> 
 
 	<script type="text/javascript">
     let isIdDuplicate = true;
@@ -285,8 +286,21 @@
 						</div>
 					</div>
 				</form>
+				<div id="naverIdLogin"></div>
+				
 			</div>
 		</div>
+		
+		<!-- 3. SDK 초기화 및 버튼 생성 -->
+			<script type="text/javascript">
+			    var naverLogin = new naver.LoginWithNaverId({
+			        clientId: "2Rk518jWd9bxOQoKuUnD", // 발급받은 Client ID
+			        callbackUrl: "http://localhost:8080/members/naverCallback", // 등록한 Callback URL
+			        isPopup: false, // 팝업 방식으로 진행할지 여부
+			        loginButton: { color: "green", type: 3, height: 60 } // 버튼 스타일 설정
+			    });
+			    naverLogin.init();
+			</script>
 
 	</th:block>
 </body>

@@ -1,0 +1,27 @@
+<script src="https://static.nid.naver.com/js/naveridlogin_js_sdk_2.0.2.js" charset="utf-8"></script>
+
+<script>
+	//callback.html 또는 콜백 처리 스크립트
+	var naverLogin = new naver.LoginWithNaverId({
+	    clientId: "YOUR_CLIENT_ID",
+	    callbackUrl: "YOUR_CALLBACK_URL",
+	    isPopup: false
+	});
+	
+	naverLogin.init();
+	
+	// 로그인 상태에 따라 사용자 정보를 처리합니다.
+	window.addEventListener('load', function () {
+	    naverLogin.getLoginStatus(function (status) {
+	        if (status) {
+	            var email = naverLogin.user.getEmail();
+	            var name = naverLogin.user.getName();
+	            console.log("로그인 성공! 유저 정보:", email, name);
+	            // 여기서 서버에 정보를 보내거나 메인 페이지로 리다이렉트합니다.
+	        } else {
+	            console.log("AccessToken이 유효하지 않습니다.");
+	        }
+	    });
+	});
+
+</script>
