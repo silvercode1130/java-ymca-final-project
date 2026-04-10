@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.springbootstudy.bbs.domain.MemberAddrVO;
 import com.springbootstudy.bbs.mapper.MemberAddrMapper;
 
+
 @Service
 public class MemberAddrService {
 

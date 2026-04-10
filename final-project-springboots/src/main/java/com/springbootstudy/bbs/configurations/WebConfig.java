@@ -28,7 +28,7 @@ public class WebConfig implements WebMvcConfigurer {
 						"/views/member/login",
 						"/views/member/signUp",
 						"/views/member/check_id",
-						"/fragments/main");
+						"/fragments/main"); 
 	}
 
 	/*
@@ -61,10 +61,16 @@ public class WebConfig implements WebMvcConfigurer {
 		registry
 			.addResourceHandler("/upload/finalProfile/**")
 			.addResourceLocations("file:///C:/upload/finalProfile/");
-		
+					
 	    // 옥션/비드용 이미지 매핑
 	    // 브라우저가 /images/** 라고 요청하면, 프로젝트 루트 안의 external_images 폴더를 봄
 	    registry.addResourceHandler("/images/**")
 	            .addResourceLocations("file:///" + rootPath + "/external_images/");
+
+		// 게시글 이미지 - src/main/resources/static/images/board 실시간 서빙
+		registry
+			.addResourceHandler("/images/board/**")
+			.addResourceLocations("file:///" + System.getProperty("user.dir").replace("\\", "/")
+				+ "/src/main/resources/static/images/board/");
 	}
 }

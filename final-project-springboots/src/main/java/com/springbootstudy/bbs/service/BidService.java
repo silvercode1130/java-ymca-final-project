@@ -6,13 +6,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.springbootstudy.bbs.domain.AuctionDTO;
 import com.springbootstudy.bbs.domain.BidDTO;
 import com.springbootstudy.bbs.mapper.AuctionMapper;
 import com.springbootstudy.bbs.mapper.BidMapper;
 
+import lombok.RequiredArgsConstructor;
+
 
 @Service
+@RequiredArgsConstructor
 public class BidService {
 	
 	@Autowired
@@ -44,7 +46,7 @@ public class BidService {
         if (bidDto.getBidPrice() == null || bidDto.getBidPrice() <= 0) {
             throw new IllegalArgumentException("제안 가격은 0원보다 커야 합니다.");
         }
-        // 100원 단위 검증
+        // 1000원 단위 검증
         if (bidDto.getBidPrice() % 1000 != 0) {
             throw new IllegalArgumentException("제안 가격은 1000원 단위로 입력해야 합니다.");
         }
@@ -55,6 +57,7 @@ public class BidService {
         
         // 위에서 생성된 itemIdx를 가지고 입찰(bid) 정보 저장
         bidMapper.insertBid(bidDto);
+        
     }
     
     // 입찰 삭제 - 소프트 딜리트

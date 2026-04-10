@@ -1,31 +1,32 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/main_layout}">
 <head>
 <meta charset="UTF-8">
 <title th:text="${currentType.boardTypeName} + ' 글쓰기 - PickQ'">글쓰기 - PickQ</title>
-<link rel="stylesheet" th:href="@{/bootstrap/bootstrap.min.css}">
-<style>
-
-</style>
+<link rel="stylesheet" th:href="@{/css/board.css}">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.css">
 </head>
 <body>
-
-<nav class="navbar navbar-expand-lg">
-  <div class="container">
-    <a class="navbar-brand" href="/">⚡ PickQ</a>
-    <div class="ms-auto d-flex gap-3 align-items-center">
-      <a class="nav-link" href="/boards">커뮤니티</a>
-      <a class="nav-link" href="/auctions">경매</a>
-    </div>
-  </div>
-</nav>
-
+<th:block layout:fragment="content">
 <div class="container py-5">
   <div class="write-card">
     <h4>✏️ 게시글 작성</h4>
-    <div class="board-badge" th:text="${currentType.boardTypeName}">카테고리</div>
 
-    <form th:action="@{/boards/{tc}(tc=${typeCode})}" method="post">
+    <form id="writeForm" th:action="@{/boards/{tc}(tc=${typeCode})}" method="post">
+      <input type="hidden" id="fromInput" name="from" th:value="${from}">
+
+      <div class="mb-3">
+        <label>카테고리</label>
+        <select id="categorySelect" class="form-select" onchange="changeCategory(this.value)">
+          <option th:each="bt : ${boardTypes}"
+                  th:value="${bt.boardTypeCode}"
+                  th:text="${bt.boardTypeName}"
+                  th:selected="${bt.boardTypeCode == typeCode}">
+          </option>
+        </select>
+      </div>
 
       <div class="mb-3">
         <label>제목</label>
@@ -35,20 +36,27 @@
 
       <div class="mb-4">
         <label>내용</label>
-        <textarea name="boardContent" class="form-control" rows="12"
-                  placeholder="내용을 입력하세요" required></textarea>
+        <textarea id="boardContent" name="boardContent" class="form-control"></textarea>
       </div>
 
       <div class="d-flex gap-2">
-        <button type="submit" class="btn btn-lime">📝 등록</button>
-        <a th:href="@{/boards/{tc}(tc=${typeCode})}" class="btn btn-ghost">취소</a>
+        <button type="submit" class="btn btn-lime"><i class="bi bi-pencil-square">등록</i></button>
+        <a th:href="${from == 'all'} ? '/boards' : '/boards/' + ${typeCode}" class="btn btn-ghost">취소</a>
       </div>
-
     </form>
   </div>
 </div>
 
-<script th:src="@{/js/jquery-3.7.1.min.js}"></script>
-<script th:src="@{/bootstrap/bootstrap.bundle.min.js}"></script>
+<script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/lang/summernote-ko-KR.min.js"></script>
+<script th:src="@{/js/summernote.js}"></script>
+<script>
+  function changeCategory(typeCode) {
+    document.getElementById('writeForm').action = '/boards/' + typeCode;
+  }
+  initSummernote('boardContent');
+  bindSummernoteSubmit('writeForm', 'boardContent');
+</script>
+</th:block>
 </body>
 </html>

@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<html xmlns:th="http://www.thymeleaf.org">
 
 <th:block layout:fragment="content">
 
@@ -39,12 +38,23 @@
 				<div class="bg-white border border-gray-200 rounded-xl shadow-sm">
 					<div class="border-b border-gray-200 px-6 py-4">
 						<h2 class="text-lg font-semibold text-gray-900">계정 정보 입력</h2>
-						<p class="text-sm text-gray-600 mt-1">아이디와 비밀번호를 입력해주세요</p>
 					</div>
 
 					<div class="px-6 py-6">
 						<form th:action="@{/members/login}" method="post"
 							class="space-y-6">
+							
+							<div style="font-weight: bold;" th:if="${loginMsg}">
+							    <span th:text="${loginMsg}"></span>
+							</div>
+
+							<!--
+							  [변경 필요] 아래 hidden input 추가:
+							  <input type="hidden" name="redirect" th:value="${redirect}">
+							  이유: boardDetail에서 로그인 링크 클릭 시 redirect 파라미터로 게시글 URL이 전달됨.
+							       이를 form에 hidden으로 유지해야 POST 로그인 처리 시 MemberController로 전달됨.
+							-->
+							<input type="hidden" name="redirect" th:value="${redirect}"> <!-- 수정되었음 -->
 
 							<!-- 아이디 -->
 							<div class="space-y-2">
@@ -54,7 +64,7 @@
 										class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs">ID</span>
 									<input
 										class="w-full border border-gray-300 rounded-md px-3 py-2 pl-10 text-sm text-gray-900 placeholder:text-gray-400"
-										id="memId" name="memId" placeholder="your ID"
+										id="memId" name="memId" placeholder="🏷️ your ID"
 										oninput="checkValid()">
 								</div>
 							</div>
@@ -68,7 +78,7 @@
 									<input
 										class="w-full border border-gray-300 rounded-md px-3 py-2 pl-10 text-sm text-gray-900 placeholder:text-gray-400"
 										id="memPwd" name="memPwd" type="password"
-										placeholder="••••••••" oninput="checkValid()">
+										placeholder="🔒 ••••••••" oninput="checkValid()">
 								</div>
 							</div>
 							
@@ -96,11 +106,19 @@
 
 							<!-- 회원가입 링크 -->
 							<div class="text-center text-sm text-gray-600">
-								아직 계정이 없으신가요? <a th:href="@{/members/signUp}"
-									class="text-[#7CBD00] hover:underline font-semibold"> 회원가입
+								아직 계정이 없으신가요? 
+								<a th:href="@{/members/signUp}" class="text-[#7CBD00] hover:underline font-semibold"> 
+									회원가입
 								</a>
 							</div>
-
+							
+							<!-- 비밀번호 링크 -->
+							<div class="text-center text-sm text-gray-600">
+								비밀번호를 잊으셨나요?
+								<a th:href="@{/members/pwdFind}" class="text-[#7CBD00] hover:underline font-semibold"> 
+									비밀번호 찾기
+								</a>
+							</div>
 						</form>
 					</div>
 				</div>

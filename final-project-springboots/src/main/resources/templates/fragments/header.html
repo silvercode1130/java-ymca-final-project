@@ -1,46 +1,41 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
-<th:block th:fragment="header">
+	<th:block th:fragment="header">
 
-  <header class="sticky top-0 z-50 bg-black shadow-sm">
-    <div class="mx-auto max-w-6xl px-4">
-      <div class="grid grid-cols-12 h-16 items-center gap-4">
+		<!-- 전체 폭(풀 브리드), 안쪽 컨테이너만 max-w-7xl -->
+		<header class="sticky top-0 z-50 bg-white border-b border-gray-200">
+			<div class="max-w-7xl mx-auto px-4">
+				<div class="grid grid-cols-12 h-16 items-center gap-4">
 
-        <!-- Logo -->
-        <div class="col-span-6 md:col-span-3">
-          <a th:href="@{/}" class="flex items-center gap-3">
-            <!-- 로고 이미지 있으면 여기에 -->
-            <span class="text-xl font-bold text-white">⚡ PickQ</span>
-          </a>
-        </div>
+					<!-- Logo : 좌측 -->
+					<div class="col-span-6 md:col-span-3">
+						<a th:href="@{/}" class="flex items-center gap-3"> <!-- 나중에 실제 로고 이미지로 교체 -->
+							<span class="text-xl font-bold text-[#222222] tracking-tight">PickQ</span>
+						</a>
+					</div>
 
-        <!-- GNB: 데스크탑 -->
-        <nav class="hidden md:flex col-span-6 items-center justify-center gap-4">
-          <a th:href="@{/auctions}"
-             class="px-6 py-2 text-sm font-medium text-white hover:text-lime-400 hover:bg-white/5 rounded transition-colors">
-            경매
-          </a>
-          <a th:href="@{/boards}"
-             class="px-6 py-2 text-sm font-medium text-white hover:text-lime-400 hover:bg-white/5 rounded transition-colors">
-            커뮤니티
-          </a>
-          <a th:href="@{/mypage/auctions}"
-             class="px-6 py-2 text-sm font-medium text-white hover:text-lime-400 hover:bg-white/5 rounded transition-colors">
-            마이페이지
-          </a>
-          <a th:href="@{/#}"
-             class="px-6 py-2 text-sm font-medium text-white hover:text-lime-400 hover:bg-white/5 rounded transition-colors">
-            고객지원
-          </a>
-        </nav>
+					<!-- GNB (데스크탑, 중앙 정렬) -->
+					<nav
+						class="hidden md:flex col-span-6 items-center justify-center gap-2">
+						<a th:href="@{/auctions}"
+							class="px-4 py-2 text-sm font-medium text-[#222222] hover:text-[#7CBD00] rounded transition-colors">
+							경매 </a> <a th:href="@{/boards}"
+							class="px-4 py-2 text-sm font-medium text-[#222222] hover:text-[#7CBD00] rounded transition-colors">
+							커뮤니티 </a> <a th:href="@{/mypage/auctions}"
+							class="px-4 py-2 text-sm font-medium text-[#222222] hover:text-[#7CBD00] rounded transition-colors">
+							마이페이지 </a> <a th:href="@{/#}"
+							class="px-4 py-2 text-sm font-medium text-[#222222] hover:text-[#7CBD00] rounded transition-colors">
+							고객지원 </a>
+					</nav>
 
-        <!-- 오른쪽: 로그인 상태에 따라 분기 -->
-        <div class="col-span-6 md:col-span-3 flex items-center justify-end gap-3">
+					<!-- 오른쪽: 로그인 상태에 따라 분기 -->
+					<div
+						class="col-span-6 md:col-span-3 flex items-center justify-end gap-3">
 
           <!-- 로그인 O -->
           <div class="hidden md:flex items-center gap-3"
-               th:if="${loginUser != null}">
+               th:if="${session.loginUser != null}">
             <!-- 알림 버튼 (임시로 링크만) -->
             <a th:href="@{/#}"
                class="relative w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 transition-colors flex items-center justify-center">
@@ -49,30 +44,31 @@
               <span class="absolute top-1 right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-black"></span>
             </a>
 
-            <!-- 내 정보 버튼 -->
-            <a th:href="@{/mypage/boards}"
-               class="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 transition-colors flex items-center justify-center">
-              <span class="text-white text-sm">👤</span>
-            </a>
+							<!-- 내 정보 버튼 -->
+							<a th:href="@{/mypage/boards}"
+								class="w-9 h-9 rounded-full hover:bg-gray-100 transition-colors flex items-center justify-center">
+								<i data-feather="user" class="w-4 h-4 text-[#222222]"></i>
+							</a>
 
-            <!-- 로그아웃 -->
-            <form th:action="@{/members/logout}" method="post" class="m-0">
-              <button type="submit"
-                      class="inline-flex items-center px-3 py-1.5 rounded text-sm bg-lime-400 text-black font-semibold hover:bg-lime-500 border-0">
-                로그아웃
-              </button>
-            </form>
-          </div>
+							<!-- 로그아웃 버튼 -->
+							<form th:action="@{/members/logout}" method="post" class="m-0">
+								<button type="submit"
+									class="inline-flex items-center px-3 py-1.5 rounded text-sm
+                             bg-[#222222] text-white font-semibold hover:bg-[#6BAD00] border-0">
+									<i data-feather="log-out" class="w-4 h-4 mr-1.5"></i> 로그아웃
+								</button>
+							</form>
+						</div>
 
           <!-- 로그인 X -->
           <div class="hidden md:flex items-center gap-2"
-               th:if="${loginUser == null}">
+               th:if="${session.loginUser == null}">
             <a th:href="@{/members/login}"
                class="px-3 py-1.5 rounded text-sm text-white hover:text-lime-400 hover:bg-white/10">
               로그인
             </a>
             <!-- 회원가입 URL에 맞게 수정 -->
-            <a th:href="@{/members/signUp}"
+            <a th:href="@{/members/register}"
             	class="px-3 py-1.5 rounded text-sm bg-lime-400 text-black font-semibold hover:bg-lime-500">
               회원가입
             </a>
@@ -80,24 +76,29 @@
 
           <!-- 모바일: 간단하게 링크만 -->
           <div class="md:hidden flex items-center gap-2">
-            <a th:if="${loginUser != null}"
+            <a th:if="${session.loginUser != null}"
                th:href="@{/mypage/boards}"
                class="px-2 py-1 rounded text-xs bg-white/10 text-white">
-              <span th:text="${loginUser.memName}">내정보</span>
+              <span th:text="${session.loginUser.memName}">내정보</span>
             </a>
-            <a th:if="${loginUser == null}"
+            <a th:if="${session.loginUser == null}"
                th:href="@{/members/login}"
                class="px-2 py-1 rounded text-xs bg-lime-400 text-black">
               로그인
             </a>
           </div>
 
-        </div>
+					</div>
+				</div>
+			</div>
+		</header>
 
-      </div>
-    </div>
-  </header>
+		<script>
+			if (window.feather) {
+				feather.replace();
+			}
+		</script>
 
-</th:block>
+	</th:block>
 </body>
 </html>

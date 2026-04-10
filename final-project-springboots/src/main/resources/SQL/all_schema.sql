@@ -1,18 +1,4 @@
--- 1. 'final'이라는 이름의 계정을 만들고 비밀번호 설정하기
--- (localhost는 쩡이 컴퓨터에서만 접속 가능하다는 뜻)
-CREATE USER 'final'@'localhost' IDENTIFIED BY 'final';
 
--- 2. 이 계정에게 모든 데이터베이스를 관리할 수 있는 '왕' 권한 주기
-GRANT ALL PRIVILEGES ON *.* TO 'final'@'localhost' WITH GRANT OPTION;
-
--- 3. 설정한 권한을 지금 바로 적용하기 (새로고침 느낌)
-FLUSH PRIVILEGES;
-
--- 4. 방 만들기 (이름은 마음대로 보통 프로젝트명으로)
-CREATE DATABASE final_project; 
-
--- 5. 방 안으로 들어가기 (이걸 해야 에러가 안 남)
-USE final_project;
 
 /* ==========================================
    DATABASE 생성 및 선택
@@ -120,7 +106,7 @@ CREATE TABLE board_type (
 
 -- 1-1) MEMBER (회원 기본 정보)
 CREATE TABLE member (
-    mem_idx		   BIGINT		 NOT NULL AUTO_INCREMENT COMMENT 'PK',
+    mem_idx         BIGINT       NOT NULL AUTO_INCREMENT COMMENT 'PK',
     mem_id         VARCHAR(50)   NOT NULL COMMENT '로그인 ID',
     mem_pwd        VARCHAR(255)  NOT NULL COMMENT '비밀번호 해시',
     mem_name       VARCHAR(50)   DEFAULT NULL COMMENT '성명', 
@@ -198,7 +184,7 @@ CREATE TABLE item (
    3. 역경매 / 입찰
    ========================================== */
 
--- 3-1) AUCTION (역경매 요청)
+-- 3-1) AUCTION (역경매 요청) 
 CREATE TABLE auction (
     auction_idx               BIGINT        NOT NULL AUTO_INCREMENT COMMENT 'PK',
     buyer_idx                 BIGINT        NOT NULL COMMENT 'FK → member.mem_idx (구매자)',
@@ -254,7 +240,7 @@ CREATE TABLE bid (
         FOREIGN KEY (item_idx) REFERENCES item(item_idx),
     CONSTRAINT fk_bid_status
         FOREIGN KEY (bid_status_idx) REFERENCES bid_status(bid_status_idx)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='입찰 테이블';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='입찰 테이블'; 
 
 
 /* ==========================================
@@ -270,6 +256,7 @@ CREATE TABLE board (
     board_ip         VARCHAR(40)   NOT NULL COMMENT 'IP',
     board_thumbnail  VARCHAR(200)  DEFAULT NULL COMMENT '썸네일',
     board_view_count BIGINT        NOT NULL DEFAULT 0 COMMENT '조회수',
+    board_like       INT         NOT NULL DEFAULT 0 COMMENT '좋아요',
     board_type_idx   INT           NOT NULL COMMENT 'FK → board_type.board_type_idx',
     board_regdate    DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '등록일',
     board_moddate    DATETIME      DEFAULT NULL COMMENT '수정일',
@@ -293,6 +280,7 @@ CREATE TABLE reply (
     mem_idx          BIGINT         NOT NULL COMMENT 'FK → member.mem_idx',
     reply_content    VARCHAR(1000)  DEFAULT NULL COMMENT '댓글 내용',
     reply_ip         VARCHAR(40)    DEFAULT NULL COMMENT 'IP',
+    reply_like       INT            NOT NULL DEFAULT 0 COMMENT '좋아요',
     reply_regdate    DATETIME       NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '등록일',
     reply_moddate    DATETIME       DEFAULT NULL COMMENT '수정일',
     reply_is_deleted CHAR(1)        NOT NULL DEFAULT 'N' COMMENT 'Y / N',
@@ -434,3 +422,27 @@ VALUES (14, 'aerobics',  '에어로빅', 'Y', 1);
 
 INSERT INTO board_type (board_type_idx, board_type_code, board_type_name, board_can_comment, board_min_role)
 VALUES (15, 'swimming',  '수영',     'Y', 1);
+
+/* ==========================================
+   6. 결제 관련
+   ========================================== */
+
+CREATE TABLE payment (
+    pay_idx          BIGINT        NOT NULL AUTO_INCREMENT COMMENT 'PK',
+    bid_idx          BIGINT        NOT NULL COMMENT 'FK → bid.bid_idx (낙찰된 입찰, 여기서 판매자/경매 정보 조인)',
+    mem_idx          BIGINT        NOT NULL COMMENT 'FK → member.mem_idx (구매자)',
+    imp_uid          VARCHAR(100)  NOT NULL COMMENT '포트원 결제 고유번호',
+    merchant_uid     VARCHAR(100)  NOT NULL COMMENT '우리 시스템 주문번호',
+    pay_method       VARCHAR(50)   NOT NULL COMMENT '결제 수단 (card, trans, vbank 등)',
+    pay_amount       BIGINT        NOT NULL COMMENT '실제 결제 금액',
+    pay_status       VARCHAR(20)   NOT NULL DEFAULT 'PAID'
+                     COMMENT '결제 상태 (PAID, CONFIRMED, SETTLED, CANCELLED)',
+    pay_regdate      DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '결제 일시',
+    confirmed_at     DATETIME      NULL COMMENT '구매자 수령 확인 일시',
+    settled_at       DATETIME      NULL COMMENT '판매자 정산 완료 일시',
+    PRIMARY KEY (pay_idx),
+    UNIQUE KEY ux_payment_imp_uid (imp_uid),
+    UNIQUE KEY ux_payment_merchant_uid (merchant_uid),
+    CONSTRAINT fk_payment_bid    FOREIGN KEY (bid_idx) REFERENCES bid(bid_idx),
+    CONSTRAINT fk_payment_buyer  FOREIGN KEY (mem_idx) REFERENCES member(mem_idx)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='결제 상세 정보 테이블';

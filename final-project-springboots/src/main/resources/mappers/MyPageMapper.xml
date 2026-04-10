@@ -1,35 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-
+<!--	
+	마이바티스 참고 사이트
+	  - http://blog.mybatis.org/
+	  - http://www.mybatis.org/mybatis-3/ko/index.html
+	  
+	@Mapper 애노테이션이 적용된 인터페이스와 맵퍼 XML파일은
+	namespace 속성으로 연결되기 때문에 맵퍼 XML의 namespace를
+	지정할 때 @Mapper 애노테이션이 적용된 맵퍼 인터페이스의
+	완전한 클래스 이름(패키지를 포함한 이름)을 지정하면 된다.   
+-->
 <mapper namespace="com.springbootstudy.bbs.mapper.MyPageMapper">
 
-	<select id="getMember" parameterType="long" resultType="MemberVO"> SELECT m.mem_idx, m.mem_id,
-		m.mem_name, m.mem_email, p.mem_nickname, p.mem_img, g.grade_name FROM member m LEFT JOIN
-		member_profile p ON m.mem_idx = p.mem_idx JOIN grade g ON m.mem_grade_idx = g.grade_idx WHERE
-		m.mem_idx = #{memIdx} </select>
+	<!-- 내 경매 목록 -->
+	<select id="getMyAuctions" parameterType="long"
+		resultType="AuctionDTO"> SELECT * FROM auction_list_view WHERE buyer_idx = #{memIdx} AND
+		auction_is_deleted = 'N' ORDER BY auction_regdate DESC </select>
 
-	<select id="getAuctionList" resultType="AuctionVO"> SELECT a.*, s.auction_status_name FROM auction
-		a INNER JOIN auction_status s ON a.auction_status_idx = s.auction_status_idx WHERE a.buyer_idx =
-		#{memIdx} ORDER BY a.auction_regdate DESC </select>
+	<!-- 내 입찰 목록 -->
+	<select id="getMyBids" parameterType="long" resultType="BidDTO"> SELECT * FROM bid_list_view WHERE
+		bidder_idx = #{memIdx} ORDER BY bid_regdate DESC </select>
 
-	<select id="getBoardListByMemIdx" parameterType="long"
-		resultType="BoardVO"> SELECT b.board_idx AS boardIdx, b.board_title AS boardTitle,
-		b.board_regdate AS boardRegdate, b.board_view_count AS boardViewCount, b.mem_idx AS memIdx,
-		t.board_type_name AS boardTypeName, t.board_type_code AS boardTypeCode FROM board b JOIN
-		board_type t ON b.board_type_idx = t.board_type_idx WHERE b.mem_idx = #{memIdx} AND
-		b.board_is_deleted = 'N' ORDER BY b.board_regdate DESC </select>
+	<!-- 내 게시글 목록 -->
+	<select id="getMyBoards" parameterType="long"
+		resultType="BoardVO"> SELECT b.board_idx, b.board_title, b.board_view_count, b.board_like,
+		b.board_regdate, bt.board_type_name, bt.board_type_code, mp.mem_nickname, (SELECT COUNT(*) FROM
+		reply r WHERE r.board_idx = b.board_idx AND r.reply_is_deleted = 'N') AS reply_count FROM board
+		b LEFT JOIN board_type bt ON b.board_type_idx = bt.board_type_idx LEFT JOIN member_profile mp ON
+		b.mem_idx = mp.mem_idx WHERE b.mem_idx = #{memIdx} AND b.board_is_deleted = 'N' ORDER BY
+		b.board_regdate DESC </select>
 
-	<select id="findBoardById" resultType="BoardVO"> SELECT b.board_idx AS boardIdx, b.mem_idx AS
-		memIdx, b.board_title AS boardTitle, b.board_content AS boardContent, b.board_regdate AS
-		boardRegdate, b.board_view_count AS boardViewCount, m.mem_name AS memName, t.board_type_code AS
-		boardTypeCode FROM board b JOIN member m ON b.mem_idx = m.mem_idx JOIN board_type t ON
-		b.board_type_idx = t.board_type_idx WHERE b.board_idx = #{boardIdx} AND b.board_is_deleted = 'N' </select>
-
-	<select id="getBidListByMemIdx" parameterType="long" resultType="BidVO"> SELECT b.bid_idx AS
-		bidIdx, b.auction_idx AS auctionIdx, b.bid_price AS bidPrice, b.bid_regdate AS bidRegdate,
-		s.bid_status_name AS bidStatusName, a.auction_title AS auctionTitle, i.item_name AS itemName
-		FROM bid b JOIN auction a ON b.auction_idx = a.auction_idx JOIN bid_status s ON b.bid_status_idx
-		= s.bid_status_idx JOIN item i ON b.item_idx = i.item_idx WHERE b.bidder_idx = #{memIdx} ORDER
-		BY b.bid_regdate DESC </select>
-
-</mapper>
+</mapper>	

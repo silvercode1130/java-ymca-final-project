@@ -1,7 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	layout:decorate="~{layouts/main_layout}">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
 <title>회원가입 - PickQ</title>
@@ -179,7 +177,7 @@
 					</div>
 				</div>
 
-				<form class="signUp" th:action="@{/members/signUp}" method="post"
+				<form class="signUp" th:action="@{/members/register}" method="post"
 					id="signUpForm">
 
 					<!-- 임시 지정 -->
@@ -243,13 +241,12 @@
 
 					<div class="row my-3">
 						<div class="col-8 offset-2">
-							<label for="memPwd" class="form-label">비밀번호</label> <input
-								type="password" class="form-control" name="memPwd" id="memPwd"
-								placeholder="🔒 ••••••••" oninput="pwdCheck()"> <span
-								id="memPwdMsg"
-								style="font-size: 12px; color: gray; margin-top: 4px;"></span><br>
+							<label for="memPwd" class="form-label">비밀번호</label> 
+							<input type="password" class="form-control" name="memPwd" id="memPwd" placeholder="🔒 ••••••••" oninput="pwdCheck()"> 
+							<span id="memPwdMsg" style="font-size: 12px; color: gray; margin-top: 4px;"></span> <br>
 							<span style="font-size: 12px; color: gray; margin-top: 4px;">
-								✓ 알파벳 + 숫자로만 조합해주세요 (5글자 이상) </span>
+								✓ 알파벳 + 숫자로만 조합해주세요 (5글자 이상) 
+							</span>
 						</div>
 					</div>
 
@@ -263,21 +260,22 @@
 
 					<div class="row my-3">
 						<div class="col-8 offset-2">
-							<label style="cursor: pointer;"> <input type="checkbox"
-								name="agree" onchange="checkValid()"> 이용약관 및 개인정보 처리 방침에
+							<label style="cursor: pointer;"> 
+							<input type="checkbox" name="agree" onchange="checkValid()"> 
+								이용약관 및 개인정보 처리 방침에
 								동의 합니다
 							</label>
 							<div>
-								<span style="font-size: 12px; color: gray;"> 회원가입을 위해서는
-									약관 동의가 필수입니다 </span>
+								<span style="font-size: 12px; color: gray;"> 
+									회원가입을 위해서는 약관 동의가 필수입니다
+								</span>
 							</div>
 						</div>
 					</div>
 
 					<div class="row mb-3 mt-5">
 						<div class="col-8 offset-2">
-							<input type="submit" name="signUpBtn" value="✔️ 회원가입 완료"
-								class="btn btn-primary" disabled>
+							<input type="submit" name="signUpBtn" value="✔️ 회원가입 완료" class="btn btn-primary" disabled>
 						</div>
 					</div>
 

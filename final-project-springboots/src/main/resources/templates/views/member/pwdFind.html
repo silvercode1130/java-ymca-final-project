@@ -1,10 +1,202 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
 <title>Insert title here</title>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+<script type="text/javascript">
+	//전화번호 - 010-xxxx-xxxx 형식
+	function formatTel(input) {
+	  let value = input.value.replace(/[^0-9]/g, "");
+	
+	  if (value.length <= 3) {
+	    input.value = value;
+	  } else if (value.length <= 7) {
+	    input.value = value.substring(0, 3) + "-" + value.substring(3);
+	  } else {
+	    input.value = value.substring(0, 3) + "-" +
+	                  value.substring(3, 7) + "-" +
+	                  value.substring(7, 11);
+	  }
+	}
+	
+	// 인증번호가 맞는지 체크
+	function checkAuthCode() {
+    let userCode = $("#userInputCode").val(); // 사용자가 입력한 인증번호
+    
+    $.ajax({
+        url: "/auth/verifyCode", // 서버 인증번호 검증 주소 
+        type: "POST",
+        data: { "userCode": userCode },
+        success: function(res) {
+            if(res === "success") {
+                $("#authMsg").text("인증 되었습니다").css({"color": "gray", "fontSize": "12px"});
+            } else {
+                $("#authMsg").text("인증번호가 틀렸습니다").css({"color": "red", "fontSize": "12px"});
+            }  
+       	},
+        error: function() { 
+        	alert("죄송합니다 \n예기치 못한 오류가 발생하여 잠시 후 다시 시도해 주세요");
+        }
+    });
+}
+	
+	// 새 비밀번호 인증
+	let isSamePwd = false;
+
+	$(document).ready(function() { 
+	
+	    $("#newPwd, #newPwdConfirm").on("keyup", function() {
+	        validatePassword();
+	    });
+	
+	    $("#newPwd").on("blur", function() {
+	        let newPwd = $(this).val();
+	
+	        $.ajax({
+	            url: "/auth/checkSamePwd",
+	            type: "POST",
+	            data: { "newPwd": newPwd },
+	            success: function(res) {
+	                if (res === "same") {
+	                    isSamePwd = true;
+	                    $("#pwdMatchMsg").text("이전 비밀번호입니다").css("color", "red");
+	                } else {
+	                    isSamePwd = false;
+	                }
+	
+	                validatePassword(); 
+	            }
+	        });
+	    });
+	});
+	
+	// 모든 조건을 한 번에 체크
+	function validatePassword() {
+	    let pwd1 = $("#newPwd").val();
+	    let pwd2 = $("#newPwdConfirm").val();
+	    let submitBtn = $("#submitBtn");
+	
+	    // 이전 비밀번호면 무조건 막기
+	    if (isSamePwd) {
+	        submitBtn.prop("disabled", true);
+	        return;
+	    }
+	
+	    // 두 값이 다 있을 때만 비교
+	    if (pwd1 !== "" && pwd2 !== "") {
+	        if (pwd1 === pwd2) {
+	            $("#pwdMatchMsg").text("비밀번호가 일치합니다").css("color", "gray");
+	            submitBtn.prop("disabled", false);
+	        } else {
+	            $("#pwdMatchMsg").text("비밀번호가 일치하지 않습니다").css("color", "red");
+	            submitBtn.prop("disabled", true);
+	        }
+	    } else {
+	        submitBtn.prop("disabled", true);
+	    }
+	}
+	
+	// 비밀번호 체크용 (제약조건)
+    function pwdCheck() {
+	    let pwd = document.querySelector("#newPwd").value.trim();
+	    let pwdCheckValue = document.querySelector("#newPwdConfirm").value.trim();
+	    let msg = document.querySelector("#pwdMatchMsg");
+	
+	    // 제약조건
+	    let pwdReg = /^[A-Za-z0-9]{5,}$/;
+	    let submitBtn = document.querySelector("#submitBtn");
+	
+	    // 입력 안하면 return false 처리
+	    if (pwd === "" && pwdCheckValue === "") {
+	        msg.textContent = "";
+	        submitBtn.disabled = true;
+	        return false;
+	    }
+	
+	    // 제약조건 검사
+	    if (!pwdReg.test(pwd)) {
+	        msg.style.color = "red";
+	        msg.textContent = "✘ 영문 + 숫자 5글자 이상으로 입력해주세요.";
+	        submitBtn.disabled = true;
+	        return false;
+	    }
+	
+	    // 두 입력란의 비밀번호가 동일한지 검사
+	    if (pwd === pwdCheckValue) {
+	        msg.style.color = "gray"; 
+	        msg.textContent = "✔ 비밀번호가 일치하며 사용 가능합니다.";
+	        submitBtn.disabled = false; 
+	        return true;
+	    } else {
+	        msg.style.color = "red";
+	        msg.textContent = "✘ 비밀번호가 일치하지 않습니다.";
+	        submitBtn.disabled = true;
+	        return false;
+	    }
+	}
+	
+	// 입력할 때마다 실시간으로 체크
+	/* document.addEventListener("DOMContentLoaded", function() {
+	    document.querySelector("#newPwd").addEventListener("keyup", pwdCheck);
+	    document.querySelector("#newPwdConfirm").addEventListener("keyup", pwdCheck);
+	}); */
+	
+</script>
+
 </head>
-<body>
-	비번 찾기 (기능 아직 안만들었음! - 추후 만들 예정!)
+<body> 
+	<div class="title">
+		비밀번호 찾기
+	</div>
+	
+	<!-- 
+		비밀번호를 찾기 위해 아이디와 전화번호를 입력하면 
+		인증번호가 전송되고(해당 연락처에 전송) 인증번호를 확인
+		-> 아이디나 전화번호 틀리면 인증번호 안보냄
+		
+		비밀번호를 바꾸면 끝
+		-> 단 이전 비밀번호와 동일하거나 비밀번호를 다르게 처리하면 안됨
+ 	-->
+ 	
+	<form class="pwdFind" action="/members/pwdFind" method="post">
+		<div>
+			<label>아이디</label> <br>
+		    ID <input type="text" name="memId" placeholder="your ID" required> <br>
+		    <div class="msg" th:text="${idMsg}" style="color: gray; font-size: 12px;"></div>
+		    <label>전화번호</label> <br>
+		    TEL <input type="text" name="memTel" placeholder="010-1234-5678" maxlength="13"
+								oninput="formatTel(this)" required> <br>
+			<div class="msg" th:text="${telMsg}" style="color: gray; font-size: 12px;"></div>
+		    <button type="submit">인증번호 받기</button>
+		</div>
+	
+		<div class="msg" th:text="${verifyMsg}"></div>
+	</form>
+
+	<hr>
+	
+	<form class="newPwdFind" action="/members/newPwdFind" method="post">
+		<div>
+			<label>인증번호</label> <br>
+		    <input type="text" id="userInputCode" name="authCode" placeholder="인증번호를 입력하세요"> 
+		    <button type="button" onclick="checkAuthCode()">확인</button> <br>
+		    <span id="authMsg"></span> <br>
+		    
+		    <label>비밀번호</label> <br> 
+			<span style="font-size: 11px; color: gray;">✓ 알파벳 + 숫자로만 조합해주세요 (5글자 이상)</span> <br>
+			<input type="password" id="newPwd" name="newPassword" placeholder="새 비밀번호를 입력하세요"> <br>
+			
+			<label style="margin-top: 10px; display: inline-block;">비밀번호 확인</label> <br>
+			<input type="password" id="newPwdConfirm" placeholder="다시 한번 입력하세요"> <br>
+			
+			<span id="pwdMatchMsg" style="font-size: 12px;"></span> <br>
+			
+			<button type="submit" id="submitBtn" disabled>변경</button>
+		</div>
+	</form>
+	
 </body>
 </html>

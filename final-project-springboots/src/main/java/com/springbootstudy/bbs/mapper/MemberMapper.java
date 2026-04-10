@@ -7,23 +7,23 @@ import com.springbootstudy.bbs.domain.MemberVO;
 
 @Mapper
 public interface MemberMapper {
-	
-	// 회원가입 - 회원가입 처리용
-	int insertMember(
+   
+   // 회원가입 - 회원가입 처리용
+   int insertMember(
             @Param("memId") String memId,
             @Param("memPwd") String memPwd,
             @Param("memName") String memName,
             @Param("memTel") String memTel,
             @Param("memEmail") String memEmail,
-	        @Param("memIp") String memIp, 
-	        @Param("memRoleIdx") Long memRoleIdx,
-	        @Param("memGradeIdx") int memGradeIdx
+           @Param("memIp") String memIp, 
+           @Param("memRoleIdx") Long memRoleIdx,
+           @Param("memGradeIdx") int memGradeIdx
     );
-	
-	Long findDefaultRoleIdx(); 
-	
-	// 회원 조회 
-	int countByMemId(@Param("memId") String memId);
+   
+   Long findDefaultRoleIdx(); 
+   
+   // 회원 조회 
+   int countByMemId(@Param("memId") String memId);
 
 
 	// 로그인 =============================================
@@ -48,6 +48,15 @@ public interface MemberMapper {
     // 회원정보 수정
  	void update(MemberVO vo);
  	MemberVO selectOneFromId(String memId); 
- 	String selectGradeNameByMemId(String memId);	// grade만 따로 조회
+ 	String selectGradeNameByMemId(String memId); // grade만 따로 조회
+
+ 	
+ 	// 비밀번호 재발급 =============================================
+ 	
+ 	// 비밀번호 재발급 시 아이디 + 전화번호 맞는 지 확인
+	MemberVO findByIdAndTel(@Param("memId") String memId, @Param("memTel") String memTel);
+
+	// 새비밀번호로 변경
+	int updatePassword(@Param("memId") String memId, @Param("newPassword") String newPassword);
 
 }
