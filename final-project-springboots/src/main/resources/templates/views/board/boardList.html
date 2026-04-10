@@ -7,271 +7,254 @@
 <title
 	th:text="${currentType != null} ? ${currentType.boardTypeName} + ' - PickQ' : '커뮤니티 - PickQ'">
 	커뮤니티 - PickQ</title>
-<!-- 공통 CSS/JS는 main_layout에서 처리, 여기선 페이지 전용 CSS만 -->
 </head>
 <body>
 	<th:block layout:fragment="content">
 
-		<!-- React Community 컴포넌트 느낌 살린 레이아웃 -->
-		<div class="min-h-screen bg-gray-50">
-			<!-- 메인 컨테이너: 헤더 컨테이너(max-w-6xl)에 맞춰 약간 좁게 -->
-			<div class="mx-auto max-w-6xl px-4 py-8">
-				<div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+		<div class="min-h-screen bg-white">
+			<div class="mx-auto max-w-[1200px] px-4 sm:px-6 py-8">
+				<div class="grid grid-cols-1 lg:grid-cols-4 gap-6 lg:gap-8">
 
-					<!-- Left Sidebar - Board List -->
+					<!-- Left Sidebar -->
 					<aside class="lg:col-span-1">
 						<div
-							class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
-							<h3
-								class="font-semibold text-gray-900 mb-4 pb-3 border-b border-gray-100">
-								종목별 게시판</h3>
+							class="bg-white border border-gray-100 rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.03)] sticky top-24">
+							<div class="px-4 py-3 border-b border-gray-100">
+								<h3 class="text-sm font-semibold text-[#222222]">종목별 게시판</h3>
+							</div>
 
-							<!-- 전체 게시판 버튼 (React의 ghost Button 느낌) -->
-							<a th:href="@{/boards}"
-								class="w-full inline-flex items-center px-3 py-2 rounded-lg text-sm font-medium
-                                  transition-colors border border-transparent"
-								th:classappend="${typeCode == null} ?
-                                            ' bg-[#7CBD00] text-white shadow-sm hover:bg-[#6BAD00]' :
-                                            ' text-gray-800 hover:bg-gray-50'">
-								전체 게시판 </a>
+							<div class="px-2 py-2">
+								<!-- 전체 게시판 -->
+								<a th:href="@{/boards}"
+									class="w-full inline-flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-colors"
+									th:classappend="${typeCode == null} ?
+                    ' bg-gray-100 text-[#222222]' :
+                    ' text-[#767676] hover:bg-gray-50 hover:text-[#222222]'">
+									전체 게시판 </a>
 
-							<!-- 각 종목 게시판 리스트 -->
-							<div class="mt-2 space-y-1">
-								<a th:each="bt : ${boardTypes}"
-									th:href="@{/boards/{tc}(tc=${bt.boardTypeCode})}"
-									class="w-full inline-flex items-center px-3 py-2 rounded-lg text-sm font-medium
-                                      transition-colors border border-transparent"
-									th:classappend="${typeCode != null and typeCode == bt.boardTypeCode} ?
-                                               ' bg-[#7CBD00] text-white shadow-sm hover:bg-[#6BAD00]' :
-                                               ' text-gray-800 hover:bg-gray-50'">
-									<span th:text="${bt.boardTypeName}">축구</span>
-								</a>
+								<!-- 개별 게시판 -->
+								<div class="mt-1 space-y-1">
+									<a th:each="bt : ${boardTypes}"
+										th:href="@{/boards/{tc}(tc=${bt.boardTypeCode})}"
+										class="w-full inline-flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-colors"
+										th:classappend="${typeCode != null and typeCode == bt.boardTypeCode} ?
+                      ' bg-gray-100 text-[#222222]' :
+                      ' text-[#767676] hover:bg-gray-50 hover:text-[#222222]'">
+										<span th:text="${bt.boardTypeName}">축구</span>
+									</a>
+								</div>
 							</div>
 						</div>
 					</aside>
 
-					<!-- Right Content - Posts List -->
+					<!-- Right: List -->
 					<div class="lg:col-span-3">
 						<div
-							class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-							<!-- Header 영역 -->
-							<div class="p-6 border-b border-gray-100">
+							class="bg-white border border-gray-100 rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.03)] overflow-hidden">
+
+							<!-- Header -->
+							<div class="px-6 py-5 border-b border-gray-100">
 								<div
 									class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4">
-									<!-- 페이지 타이틀 -->
-									<h1 class="text-2xl font-bold text-gray-900"
+									<h1 class="text-xl sm:text-2xl font-bold text-[#222222]"
 										th:text="${currentType != null} ? ${currentType.boardTypeName} : '전체 게시판'">
 										전체 게시판</h1>
 
-									<!-- 오른쪽 글쓰기 버튼들: React의 Plus + Button 느낌 -->
-									<!-- 로그인 O -->
-									<div th:if="${session.loginUser != null}"
-										class="flex items-center justify-end">
-										<!-- 특정 카테고리 안 -->
-										<a th:if="${typeCode != null}"
-											th:href="@{/boards/{tc}/new(tc=${typeCode})}"
-											class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold
-                                              bg-[#7CBD00] text-white shadow-sm hover:bg-[#6BAD00] transition-colors">
-											<i class="bi bi-plus-lg" style="font-size: 0.85rem;"></i> <span>글쓰기</span>
-										</a>
-										<!-- 전체 게시판: 카테고리 선택 모달 -->
-										<button th:if="${typeCode == null}" type="button"
-											class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold
-                                                   bg-[#7CBD00] text-white shadow-sm hover:bg-[#6BAD00] transition-colors"
-											onclick="document.getElementById('categoryModal').style.display='flex'">
-											<i class="bi bi-plus-lg" style="font-size: 0.85rem;"></i> <span>글쓰기</span>
-										</button>
-									</div>
+									<!-- 글쓰기: 로그인 여부에 따라 -->
+									<div class="flex items-center justify-end">
+										<!-- 로그인 O -->
+										<th:block th:if="${session.loginUser != null}">
+											<!-- 특정 카테고리 안 -->
+											<a th:if="${typeCode != null}"
+												th:href="@{/boards/{tc}/new(tc=${typeCode})}"
+												class="inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-xs sm:text-sm font-semibold bg-[#222222] text-white hover:bg-[#444444] transition-colors">
+												<i class="bi bi-plus-lg text-[0.8rem]"></i> <span>글쓰기</span>
+											</a>
+											<!-- 전체 게시판: 모달 -->
+											<button th:if="${typeCode == null}" type="button"
+												class="inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-xs sm:text-sm font-semibold bg-[#222222] text-white hover:bg-[#444444] transition-colors"
+												onclick="document.getElementById('categoryModal').style.display='flex'">
+												<i class="bi bi-plus-lg text-[0.8rem]"></i> <span>글쓰기</span>
+											</button>
+										</th:block>
 
-									<!-- 로그인 X -->
-									<div th:if="${session.loginUser == null}"
-										class="flex items-center justify-end">
-										<a th:if="${typeCode != null}"
-											th:href="@{/members/login(redirect='/boards/' + ${typeCode} + '/new')}"
-											class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold
-                                              bg-[#7CBD00] text-white shadow-sm hover:bg-[#6BAD00] transition-colors">
-											<i class="bi bi-plus-lg" style="font-size: 0.85rem;"></i> <span>글쓰기</span>
-										</a> <a th:if="${typeCode == null}"
-											th:href="@{/members/login(redirect='/boards?page=' + ${currentPage})}"
-											class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold
-                                              bg-[#7CBD00] text-white shadow-sm hover:bg-[#6BAD00] transition-colors">
-											<i class="bi bi-plus-lg" style="font-size: 0.85rem;"></i> <span>글쓰기</span>
-										</a>
+										<!-- 로그인 X -->
+										<th:block th:if="${session.loginUser == null}">
+											<a th:if="${typeCode != null}"
+												th:href="@{/members/login(redirect='/boards/' + ${typeCode} + '/new')}"
+												class="inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-xs sm:text-sm font-semibold bg-[#222222] text-white hover:bg-[#444444] transition-colors">
+												<i class="bi bi-plus-lg text-[0.8rem]"></i> <span>글쓰기</span>
+											</a>
+											<a th:if="${typeCode == null}"
+												th:href="@{/members/login(redirect='/boards?page=' + ${currentPage})}"
+												class="inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-xs sm:text-sm font-semibold bg-[#222222] text-white hover:bg-[#444444] transition-colors">
+												<i class="bi bi-plus-lg text-[0.8rem]"></i> <span>글쓰기</span>
+											</a>
+										</th:block>
 									</div>
 								</div>
 
-								<!-- 카테고리 선택 모달 (React의 모달 느낌 유지) -->
+								<!-- 글쓰기용 카테고리 모달 -->
 								<div id="categoryModal"
-									style="display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, .6); z-index: 9999; align-items: center; justify-content: center;"
+									class="hidden fixed inset-0 z-[9999] items-center justify-center bg-black/60"
 									onclick="if(event.target===this) this.style.display='none'">
 									<div
-										style="background: #1e1e1e; border: 1px solid #333; border-radius: 12px; padding: 1.5rem; min-width: 280px; max-width: 360px; width: 90%;">
-										<div
-											style="color: #c6f135; font-weight: 700; font-size: 1rem; margin-bottom: 1rem;">
-											게시판 선택</div>
-										<div
-											style="display: flex; flex-direction: column; gap: .4rem;">
+										class="w-[90%] max-w-sm rounded-2xl border border-[#333] bg-[#1e1e1e] px-5 py-4">
+										<div class="mb-3 text-sm font-bold text-[#c6f135]">게시판
+											선택</div>
+										<div class="flex flex-col gap-1">
 											<a th:each="bt : ${boardTypes}"
 												th:href="@{/boards/{tc}/new(tc=${bt.boardTypeCode}, from='all')}"
 												th:text="${bt.boardTypeName}"
-												style="display: block; padding: .5rem .8rem; background: #2a2a2a; border-radius: 8px; color: #e0e0e0; text-decoration: none; font-size: .9rem;"
+												class="block rounded-lg bg-[#2a2a2a] px-3 py-2 text-xs text-[#e0e0e0] no-underline"
 												onmouseover="this.style.background='#c6f135'; this.style.color='#121212';"
 												onmouseout="this.style.background='#2a2a2a'; this.style.color='#e0e0e0';">
 											</a>
 										</div>
 										<button type="button"
-											onclick="document.getElementById('categoryModal').style.display='none'"
-											style="margin-top: 1rem; width: 100%; background: transparent; border: 1px solid #444; color: #aaa; border-radius: 8px; padding: .4rem; cursor: pointer;">
+											class="mt-3 w-full rounded-lg border border-[#444] px-3 py-1.5 text-xs text-[#aaaaaa]"
+											onclick="document.getElementById('categoryModal').style.display='none'">
 											취소</button>
 									</div>
 								</div>
 
-								<!-- Search 영역: Select + Input + 버튼 (React 구조 반영) -->
+								<!-- Search -->
 								<form
 									th:action="${typeCode != null} ? '/boards/' + ${typeCode} : '/boards'"
 									method="get"
-									class="mt-4 flex flex-col gap-2 sm:flex-row sm:items-center">
-									<!-- 좌측 Select -->
+									class="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center">
+									<!-- Select -->
 									<select name="searchType"
-										class="form-select text-sm w-full sm:w-40 bg-white border border-gray-300 rounded-md">
+										class="w-full sm:w-40 rounded-md border border-gray-300 bg-white px-2 py-2 text-xs sm:text-sm">
 										<option value="all"
-											th:selected="${searchType == null or searchType == 'all'}">제목</option>
+											th:selected="${searchType == null or searchType == 'all'}">
+											제목</option>
 										<option value="title" th:selected="${searchType == 'title'}">제목</option>
 										<option value="content"
 											th:selected="${searchType == 'content'}">내용</option>
 										<option value="writer" th:selected="${searchType == 'writer'}">작성자</option>
 									</select>
 
-									<!-- 중앙 Input + 아이콘 -->
+									<!-- Input -->
 									<div class="relative flex-1">
-										<i class="bi bi-search"
-											style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-size: 0.9rem; color: #9ca3af;"></i>
+										<i
+											class="bi bi-search text-gray-400 text-xs sm:text-sm absolute left-2.5 top-1/2 -translate-y-1/2"></i>
 										<input type="text" name="keyword" placeholder="검색어를 입력하세요"
 											th:value="${keyword}"
-											class="w-full pl-8 pr-3 py-2 text-sm border border-gray-300 rounded-md
-                                                  bg-white focus:outline-none focus:ring-1 focus:ring-[#7CBD00]">
+											class="w-full rounded-md border border-gray-300 bg-white pl-7 pr-3 py-2 text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-gray-800" />
 									</div>
 
-									<!-- 우측 검색 버튼 -->
+									<!-- Button -->
 									<button type="submit"
-										class="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-md text-sm font-semibold
-                                               bg-[#7CBD00] text-white hover:bg-[#6BAD00] transition-colors">
-										<i class="bi bi-search" style="font-size: 0.9rem;"></i> <span>검색</span>
+										class="inline-flex items-center justify-center gap-1.5 rounded-md bg-gray-900 px-4 py-2 text-xs sm:text-sm font-semibold text-white hover:bg-gray-700">
+										<i class="bi bi-search text-[0.8rem]"></i> <span>검색</span>
 									</button>
 								</form>
 							</div>
 
-							<!-- Posts Table 영역 -->
-							<div class="divide-y divide-gray-100">
+							<!-- List Header -->
+							<div
+								class="grid grid-cols-12 gap-1 px-6 py-3 bg-gray-50 text-[11px] sm:text-xs font-semibold text-[#222222]">
+								<div class="col-span-1 text-center">종목</div>
+								<div class="col-span-6 text-center">제목</div>
+								<div class="col-span-2 text-center">작성자</div>
+								<div class="col-span-1 text-center">조회</div>
+								<div class="col-span-1 text-center">추천</div>
+								<div class="col-span-1 text-center">작성일</div>
+							</div>
 
-								<!-- Header Row -->
-								<div
-									class="grid grid-cols-12 gap-4 px-6 py-3 bg-gray-50 text-xs sm:text-sm font-semibold text-gray-700">
-									<!-- React에는 종목/제목/작성자/조회/추천/작성일 -->
-									<div class="col-span-1 text-center">종목</div>
-									<div class="col-span-5 text-center">제목</div>
-									<div class="col-span-2 text-center">작성자</div>
-									<div class="col-span-1 text-center">조회</div>
-									<div class="col-span-1 text-center">추천</div>
-									<div class="col-span-2 text-center">작성일</div>
-								</div>
+							<!-- Empty -->
+							<div th:if="${#lists.isEmpty(boards)}"
+								class="px-6 py-8 text-center text-sm text-gray-500">게시글이
+								없습니다.</div>
 
-								<!-- 게시글 없을 때 -->
-								<div th:if="${#lists.isEmpty(boards)}"
-									class="px-6 py-8 text-center text-sm text-gray-500">게시글이
-									없습니다.</div>
-
-								<!-- 게시글 목록: React의 map(filteredPosts.map) 구조를 Thymeleaf로 -->
+							<!-- Rows -->
+							<div class="divide-y divide-gray-100"
+								th:if="${!#lists.isEmpty(boards)}">
 								<div th:each="b, stat : ${boards}"
-									class="grid grid-cols-12 gap-4 px-6 py-4 hover:bg-gray-50 transition-colors text-xs sm:text-sm">
+									class="grid grid-cols-12 gap-1 px-6 py-3 text-[11px] sm:text-sm hover:bg-gray-50 transition-colors">
 
-									<!-- 종목 Badge -->
+									<!-- 종목 -->
 									<div class="col-span-1 flex items-center justify-center">
 										<a th:href="@{/boards/{tc}(tc=${b.boardTypeCode})}"
-											class="inline-flex items-center px-2 py-1 rounded-full text-[10px] sm:text-xs
-                                              bg-gray-100 text-gray-800">
+											class="inline-flex items-center rounded-full bg-gray-100 px-2 py-1 text-[10px] sm:text-xs text-[#767676]">
 											<span th:text="${b.boardTypeName}">축구</span>
 										</a>
 									</div>
 
-									<!-- 제목 + 이미지/댓글 아이콘 -->
-									<div class="col-span-5">
+									<!-- 제목 -->
+									<div class="col-span-6">
 										<div class="flex items-center gap-2 overflow-hidden">
-											<!-- 제목 링크 -->
 											<a
 												th:href="${typeCode == null} 
-                                                     ? @{/boards/{tc}/{id}(tc=${b.boardTypeCode}, id=${b.boardIdx}, from='all', page=${currentPage})} 
-                                                     : @{/boards/{tc}/{id}(tc=${b.boardTypeCode}, id=${b.boardIdx}, page=${currentPage})}"
-												class="text-gray-900 font-medium hover:text-[#7CBD00] truncate">
+                                   ? @{/boards/{tc}/{id}(tc=${b.boardTypeCode}, id=${b.boardIdx}, from='all', page=${currentPage})} 
+                                   : @{/boards/{tc}/{id}(tc=${b.boardTypeCode}, id=${b.boardIdx}, page=${currentPage})}"
+												class="truncate text-[#222222] font-medium hover:text-[#7CBD00]">
 												<span th:text="${b.boardTitle}">게시글 제목</span>
 											</a>
 
-											<!-- 이미지 여부 (React의 Image 아이콘 대체) -->
+											<!-- 이미지 여부 -->
 											<i
-												class="bi bi-image-fill text-gray-400 text-[10px] sm:text-xs flex-shrink-0"
+												class="bi bi-image-fill text-[10px] sm:text-xs text-[#999999] flex-shrink-0"
 												th:if="${b.hasImage}"></i>
 
-											<!-- 댓글 수 (React의 MessageCircle 아이콘 대체) -->
+											<!-- 댓글 수 -->
 											<span th:if="${b.replyCount > 0}"
-												class="flex items-center gap-1 text-[#7CBD00] text-[10px] sm:text-xs flex-shrink-0">
-												<i class="bi bi-chat-dots"></i> <span
+												class="flex items-center gap-1 text-xs text-[#999999] flex-shrink-0">
+												<i class="bi bi-chat-dots text-[11px]"></i> <span
 												th:text="${b.replyCount}">3</span>
 											</span>
 										</div>
 									</div>
 
-									<!-- 작성자 (닉네임 or 아이디) -->
+									<!-- 작성자 -->
 									<div class="col-span-2 flex items-center justify-center">
-										<span class="text-gray-700 text-[10px] sm:text-xs truncate"
+										<span class="truncate text-[10px] sm:text-xs text-[#767676]"
 											th:text="${b.memNickname != null} ? ${b.memNickname} : ${b.memId}">
 											닉네임 </span>
 									</div>
 
-									<!-- 조회수 -->
-									<div class="col-span-1 text-center text-gray-500">
+									<!-- 조회 -->
+									<div class="col-span-1 text-center text-[#767676]">
 										<span th:text="${b.boardViewCount}">123</span>
 									</div>
 
-									<!-- 추천수: DB에 likes 없으면 일단 비워두고, 나중에 필드 추가하면 교체 -->
-									<div class="col-span-1 text-center text-gray-500">
-										<!-- 예시: 추천 컬럼이 생기면 th:text에 매핑 -->
+									<!-- 추천 (현재 필드 없음: 비워둠) -->
+									<div class="col-span-1 text-center text-[#767676]">
 										<!-- <span th:text="${b.boardLikeCount}"></span> -->
 									</div>
 
-									<!-- 작성일 (yyyy-MM-dd) -->
+									<!-- 작성일 -->
 									<div
-										class="col-span-2 text-center text-gray-500 text-[10px] sm:text-xs"
+										class="col-span-1 text-center text-[10px] sm:text-xs text-[#767676]"
 										th:text="${#temporals.format(b.boardRegdate, 'yyyy-MM-dd')}">
 										2026-03-24</div>
 								</div>
 							</div>
 
-							<!-- Pagination: React의 Button들 느낌으로 -->
+							<!-- Pagination -->
 							<div
-								class="p-4 sm:p-6 border-t border-gray-100 flex items-center justify-center gap-1.5 sm:gap-2">
-								<!-- 이전 블록 -->
+								class="border-t border-gray-100 px-4 sm:px-6 py-4 flex items-center justify-center gap-1.5 sm:gap-2">
+								<!-- 이전 -->
 								<a th:if="${blockStart > 1}"
 									th:href="@{${typeCode != null ? '/boards/' + typeCode : '/boards'}(page=${blockStart - 1}, keyword=${keyword}, searchType=${searchType})}"
-									class="px-3 py-1.5 rounded-md border border-gray-300 text-xs sm:text-sm text-gray-700
-                                      bg-white hover:bg-gray-50">
+									class="rounded-md border border-gray-300 bg-white px-3 py-1.5 text-xs sm:text-sm text-[#767676] hover:bg-gray-50">
 									이전 </a>
 
 								<!-- 페이지 번호 -->
 								<a th:each="p : ${#numbers.sequence(blockStart, blockEnd)}"
 									th:href="@{${typeCode != null ? '/boards/' + typeCode : '/boards'}(page=${p}, keyword=${keyword}, searchType=${searchType})}"
 									th:text="${p}"
-									class="px-3 py-1.5 rounded-md border text-xs sm:text-sm
-                                      hover:bg-gray-50"
-									th:classappend="${p == currentPage} ?
-                                               ' bg-[#7CBD00] border-[#7CBD00] text-white' :
-                                               ' border-gray-300 text-gray-700'">
+									class="rounded-md border px-3 py-1.5 text-xs sm:text-sm hover:bg-gray-50"
+									th:classappend="${p == currentPage}
+                                  ? ' bg-[#222222] border-[#222222] text-white'
+                                  : ' border-gray-300 text-[#767676]'">
 								</a>
 
-								<!-- 다음 블록 -->
+								<!-- 다음 -->
 								<a th:if="${blockEnd < totalPages}"
 									th:href="@{${typeCode != null ? '/boards/' + typeCode : '/boards'}(page=${blockEnd + 1}, keyword=${keyword}, searchType=${searchType})}"
-									class="px-3 py-1.5 rounded-md border border-gray-300 text-xs sm:text-sm text-gray-700
-                                      bg-white hover:bg-gray-50">
+									class="rounded-md border border-gray-300 bg-white px-3 py-1.5 text-xs sm:text-sm text-[#767676] hover:bg-gray-50">
 									다음 </a>
 							</div>
 						</div>
@@ -283,4 +266,4 @@
 
 	</th:block>
 </body>
-</html>ㄴ
+</html>

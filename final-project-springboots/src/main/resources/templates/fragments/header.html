@@ -35,7 +35,7 @@
 
 						<!-- 로그인 O (데스크탑) -->
 						<div class="hidden md:flex items-center gap-3"
-							th:if="${loginUser != null}">
+							th:if="${session.loginUser != null}">
 							<!-- 알림 버튼 -->
 							<a th:href="@{/#}"
 								class="relative w-9 h-9 rounded-full hover:bg-gray-100 transition-colors flex items-center justify-center">
@@ -62,7 +62,7 @@
 
 						<!-- 로그인 X (데스크탑) -->
 						<div class="hidden md:flex items-center gap-2"
-							th:if="${loginUser == null}">
+							th:if="${session.loginUser == null}">
 							<a th:href="@{/members/login}"
 								class="px-3 py-1.5 rounded text-sm text-[#222222] hover:text-[#7CBD00]">
 								로그인 </a> <a th:href="@{/members/signUp}"
@@ -72,10 +72,10 @@
 
 						<!-- 모바일: 간단 버전 (풀 메뉴는 나중에 JS로) -->
 						<div class="md:hidden flex items-center gap-2">
-							<a th:if="${loginUser != null}" th:href="@{/mypage/boards}"
+							<a th:if="${session.loginUser != null}" th:href="@{/mypage/boards}"
 								class="px-2 py-1 rounded text-xs bg-gray-100 text-[#222222]">
-								<span th:text="${loginUser.memName}">내정보</span>
-							</a> <a th:if="${loginUser == null}" th:href="@{/members/login}"
+								<span th:text="${session.loginUser.memName}">내정보</span>
+							</a> <a th:if="${session.loginUser == null}" th:href="@{/members/login}"
 								class="px-2 py-1 rounded text-xs bg-[#7CBD00] text-white">
 								로그인 </a>
 						</div>
