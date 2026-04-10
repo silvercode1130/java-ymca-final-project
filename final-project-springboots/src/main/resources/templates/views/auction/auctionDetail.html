@@ -44,8 +44,14 @@
       <strong>결정 마감 : </strong>[[${#temporals.format(detail.auctionDecisionDeadline, 'yyyy-MM-dd HH:mm')}]]
     </div>
     <div class="info-row">
-      <strong>남은 시간:</strong> [[${detail.timeDisplay}]]
-    </div>
+	  <strong>남은 시간 : </strong>
+	  	<span id="realtime-timer" class="status-badge"
+		      th:data-status="${detail.auctionStatusIdx}"
+		      th:data-end="${detail.auctionEndAt}"
+		      th:data-deadline="${detail.auctionDecisionDeadline}">
+		    [[${detail.timeDisplay}]]
+		</span>
+	</div>
 
     <div style="margin-top:14px; padding:12px; border:1px solid #eee; border-radius:6px; background:#fafafa;">
       <h4 style="margin-top:0;">상품 상세 설명</h4>
@@ -77,8 +83,8 @@
                          and detail.auctionStatusIdx == 1}">
         <form th:action="@{/auctions/{id}/delete(id=${detail.auctionIdx})}"
               method="post" style="display:inline;"
-              onsubmit="return confirm('정말 삭제하시겠습니까?')">
-          <button type="submit" class="btn btn-danger">구매요청 삭제</button>
+              onsubmit="return confirm('정말 취소하시겠습니까?')">
+          <button type="submit" class="btn btn-danger">구매요청 취소</button>
         </form>
         
         <form th:action="@{/auctions/{id}/close(id=${detail.auctionIdx})}"
@@ -151,7 +157,7 @@
 
             <td th:text="${#numbers.formatInteger(bid.bidPrice, 0, 'COMMA') + '원'}">50,000원</td>
             <td th:text="${bid.itemName != null ? bid.itemName : '-'}">상품명</td>
-            <td th:text="${#temporals.format(bid.bidRegdate, 'yyyy-MM-dd')}">2026-03-30</td>
+            <td th:text="${#temporals.format(bid.bidRegdate, 'yyyy-MM-dd HH:mm')}">2026-03-30</td>
             <td th:text="${bid.bidStatusName}">일반</td>
 
             <td th:if="${session.loginUser != null}" onclick="event.stopPropagation()">
@@ -237,12 +243,14 @@
 
           <div class="input-group">
             <label>제안 가격 (₩) <span style="color:red;">*</span></label>
-            <input type="number" name="bidPrice" id="bidPrice"
-                   min="1000" step="1000"
-                   placeholder="1000원 단위로 입력" required>
-            <small style="color:#888;">희망 최대가
-              [[${#numbers.formatInteger(detail.auctionTargetPrice, 0, 'COMMA')}]]원 이하, 1000원 단위
-            </small>
+           <!-- type="number" → type="text" 로 변경 -->
+			<input type="text" name="bidPrice" id="bidPrice"
+			       placeholder="예: 50,000" required
+			       inputmode="numeric"
+			       th:data-max-price="${detail.auctionTargetPrice}">
+			<small style="color:#888;">희망 최대가
+			  [[${#numbers.formatInteger(detail.auctionTargetPrice, 0, 'COMMA')}]]원 이하, 1000원 단위
+			</small>
           </div>
 
           <div class="input-group">

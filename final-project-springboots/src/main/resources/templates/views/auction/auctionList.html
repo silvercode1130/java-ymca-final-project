@@ -61,6 +61,30 @@
                    style="padding:6px 10px; border:1px solid #ddd; border-radius:4px;">
             <button type="submit" style="padding:6px 12px;">검색</button>
         </form>
+        
+        <!-- 정렬 버튼 -->
+		<div style="display:flex; gap:6px; margin-bottom:10px;">
+		    <a th:href="${selectedCategory != null}
+		                ? @{/auctions/category/{cat}(cat=${selectedCategory}, sortBy='latest', keyword=${keyword})}
+		                : @{/auctions(sortBy='latest', keyword=${keyword})}"
+		       th:classappend="${sortBy == 'latest' or sortBy == null} ? ' active-sort' : ''">
+		        📅 최신순
+		    </a>
+		
+		    <a th:href="${selectedCategory != null}
+		                ? @{/auctions/category/{cat}(cat=${selectedCategory}, sortBy='views', keyword=${keyword})}
+		                : @{/auctions(sortBy='views', keyword=${keyword})}"
+		       th:classappend="${sortBy == 'views'} ? ' active-sort' : ''">
+		        👀 조회수순
+		    </a>
+		
+		    <a th:href="${selectedCategory != null}
+		                ? @{/auctions/category/{cat}(cat=${selectedCategory}, sortBy='deadline', keyword=${keyword})}
+		                : @{/auctions(sortBy='deadline', keyword=${keyword})}"
+		       th:classappend="${sortBy == 'deadline'} ? ' active-sort' : ''">
+		        ⏰ 마감임박순
+		    </a>
+		</div>
     </div>
 
     <div th:if="${session.loginUser != null}">
@@ -119,7 +143,12 @@
                 42,000원
             </td>
             <td th:text="${item.bidCount + '건'}">2건</td>
-            <td th:text="${item.timeDisplay}">3일 남음</td>
+            <td class="timer-display"
+			    th:data-status="${item.auctionStatusIdx}"
+			    th:data-end="${item.auctionEndAt}"
+			    th:data-deadline="${item.auctionDecisionDeadline}">
+			    [[${item.timeDisplay}]]
+			</td>
         </tr>
 
         <tr th:if="${#lists.isEmpty(auctionList)}">
@@ -127,5 +156,6 @@
         </tr>
     </tbody>
 </table>
+<script src="/js/auctionList.js"></script>
 </body>
 </html>

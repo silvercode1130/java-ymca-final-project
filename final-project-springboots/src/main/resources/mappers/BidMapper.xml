@@ -100,15 +100,12 @@
 	      AND bid_status_idx = 1
 	</update>
 	
-	<!-- 입찰 수정 -->
-	<update id="updateBid">
+	<!-- 경매 취소 시 해당 경매의 진행중(1) 입찰 전부 취소(4) 처리 -->
+	<update id="cancelBidsByAuction">
 	    UPDATE bid
-	    SET bid_price = #{bidPrice},
-	        bid_quantity = #{bidQuantity},
-	        bid_message = #{bidMessage},
+	    SET bid_status_idx = 4,
 	        bid_moddate = NOW()
-	    WHERE bid_idx = #{bidIdx}
-	      AND bidder_idx = #{bidderIdx}
+	    WHERE auction_idx = #{auctionIdx}
 	      AND bid_status_idx = 1
 	</update>
 	

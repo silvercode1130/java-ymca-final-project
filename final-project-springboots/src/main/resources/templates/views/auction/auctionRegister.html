@@ -44,10 +44,11 @@
 
         <div class="input-group">
             <label>희망 최대가 (₩) *</label>
-            <input type="number" name="auctionTargetPrice"
-                   min="1000" step="1000"
-                   placeholder="1000원 단위로 입력해주세요" required>
-            <small style="color:gray;">1000원 단위 이상, 음수 불가</small>
+            <!-- type="number" → type="text" 로 변경 -->
+			<input type="text" name="auctionTargetPrice" id="auctionTargetPrice"
+			       placeholder="예: 50,000" required
+			       inputmode="numeric">
+			<small style="color:gray;">1000원 단위 이상, 음수 불가</small>
         </div>
 
         <!-- URL 방식 → 파일 업로드 방식으로 변경 -->

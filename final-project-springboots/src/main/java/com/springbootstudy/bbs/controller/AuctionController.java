@@ -36,15 +36,17 @@ public class AuctionController {
     // 경매 목록 (/auctions)
     @GetMapping("/auctions")
     public String auctionList(
-            @RequestParam(value = "keyword", required = false) String keyword,
+            @RequestParam(value = "keyword",  required = false) String keyword,
+            @RequestParam(value = "sortBy",   required = false, defaultValue = "latest") String sortBy,
             Model model) {
 
         auctionService.updateExpiredAuctions();
-        List<AuctionDTO> list = auctionService.AuctionList(null, keyword);
+        List<AuctionDTO> list = auctionService.AuctionList(null, keyword, sortBy);
 
         model.addAttribute("auctionList", list);
         model.addAttribute("keyword", keyword);
         model.addAttribute("selectedCategory", null);
+        model.addAttribute("sortBy", sortBy);
         return "views/auction/auctionList";
     }
     
@@ -53,16 +55,16 @@ public class AuctionController {
     public String auctionListByCategory(
             @PathVariable("categoryCode") String categoryCode,
             @RequestParam(value = "keyword", required = false) String keyword,
+            @RequestParam(value = "sortBy",  required = false, defaultValue = "latest") String sortBy,
             Model model) {
 
         auctionService.updateExpiredAuctions();
-        List<AuctionDTO> list = auctionService.AuctionList(categoryCode, keyword);
-        
-        System.out.println("전달된 코드: " + categoryCode);
-        
+        List<AuctionDTO> list = auctionService.AuctionList(categoryCode, keyword, sortBy);
+
         model.addAttribute("auctionList", list);
         model.addAttribute("keyword", keyword);
         model.addAttribute("selectedCategory", categoryCode);
+        model.addAttribute("sortBy", sortBy);
         return "views/auction/auctionList";
     }
 
@@ -108,11 +110,13 @@ public class AuctionController {
         // DTO에 로그인한 사용자의 고유 번호(buyerIdx) 세팅
         dto.setBuyerIdx(loginUser.getMemIdx());
         
-        // 파일 업로드 처리 (이미지가 있을 경우에만 실행)
+     // 파일 업로드 처리 (이미지가 있을 경우에만 실행)
         if (thumbnailFile != null && !thumbnailFile.isEmpty()) {
             try {
-            	// 프로젝트 내부의 static/images 폴더 경로 설정 (개발 환경용)
-                String uploadDir = System.getProperty("user.dir") + "/src/main/resources/static/images/";
+                // 상대 경로 기준 외부 폴더 설정
+                String rootPath = System.getProperty("user.dir");
+                String uploadDir = rootPath + File.separator + "external_images" + File.separator;
+                
                 File dir = new File(uploadDir);
                 
                 // 폴더가 없으면 생성
@@ -122,14 +126,14 @@ public class AuctionController {
                 String fileName = UUID.randomUUID() + "_" + thumbnailFile.getOriginalFilename();
                 thumbnailFile.transferTo(new File(uploadDir + fileName));
                 
-                // DB에는 웹에서 접근 가능한 경로("/uploads/파일명")로 저장
+                // DB에는 웹에서 접근 가능한 경로("/images/파일명")로 저장
                 dto.setAuctionThumbnailImg("/images/" + fileName);
             } catch (Exception e) {
                 log.error("이미지 업로드 실패", e);
-                dto.setAuctionThumbnailImg(null);  // 실패 시 null 처리 (또는 기본이미지)
+                dto.setAuctionThumbnailImg(null); 
             }
         } else {
-            dto.setAuctionThumbnailImg(null);  // 첨부 파일이 없는 경우
+            dto.setAuctionThumbnailImg(null); 
         }
         
         // 서비스 호출 및 예외 처리
@@ -296,14 +300,20 @@ public class AuctionController {
             return "redirect:/auctions/" + auctionIdx;
         }
         
-        // 이미지 업로드 처리
+        /// 이미지 업로드 처리
         if (bidImageFile != null && !bidImageFile.isEmpty()) {
             try {
-                String uploadDir = System.getProperty("user.dir") + "/src/main/resources/static/images/";
+                // static 내부가 아니라 루트의 external_images 폴더를 타겟으로 잡음
+                String rootPath = System.getProperty("user.dir");
+                String uploadDir = rootPath + File.separator + "external_images" + File.separator;
+                
                 File dir = new File(uploadDir);
                 if (!dir.exists()) dir.mkdirs();
+                
                 String fileName = UUID.randomUUID() + "_" + bidImageFile.getOriginalFilename();
                 bidImageFile.transferTo(new File(uploadDir + fileName));
+                
+                // DB에는 WebConfig에서 설정한 주소인 /images/파일명 으로 저장
                 bidDto.setItemThumbnailImg("/images/" + fileName);
             } catch (Exception e) {
                 log.error("입찰 이미지 업로드 실패", e);

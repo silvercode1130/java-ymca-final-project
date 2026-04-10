@@ -24,7 +24,7 @@
         <!-- 이미지가 있으면 표시 -->
         <div th:if="${bid.itemThumbnailImg != null and bid.itemThumbnailImg != ''}">
             <p><strong>제안 이미지:</strong></p>
-            <img th:src="@{'/images/' + ${bid.itemThumbnailImg}}"
+            <img th:src="@{${bid.itemThumbnailImg}}"
                  style="max-width:300px; border:1px solid #ddd; border-radius:4px;">
         </div>
     </div>

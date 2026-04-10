@@ -47,9 +47,13 @@ public class WebConfig implements WebMvcConfigurer {
 		registry.addViewController("/writeBoard").setViewName("views/writeForm");
 	}
 	
-	// 프로필 이미지 업로드 기능
+	// 이미지 업로드 기능
 	@Override
 	public void addResourceHandlers(ResourceHandlerRegistry registry) {
+		
+		// 현재 프로젝트의 실제 위치(루트 경로)를 가져와서 문자열로 저장
+	    String rootPath = System.getProperty("user.dir");
+		
 		registry
 			.addResourceHandler("/upload/**")
 			.addResourceLocations("file:///C:/upload/");
@@ -57,5 +61,10 @@ public class WebConfig implements WebMvcConfigurer {
 		registry
 			.addResourceHandler("/upload/finalProfile/**")
 			.addResourceLocations("file:///C:/upload/finalProfile/");
+		
+	    // 옥션/비드용 이미지 매핑
+	    // 브라우저가 /images/** 라고 요청하면, 프로젝트 루트 안의 external_images 폴더를 봄
+	    registry.addResourceHandler("/images/**")
+	            .addResourceLocations("file:///" + rootPath + "/external_images/");
 	}
 }
