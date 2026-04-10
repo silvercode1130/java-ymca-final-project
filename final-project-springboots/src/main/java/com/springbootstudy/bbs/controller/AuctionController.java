@@ -25,8 +25,14 @@ import lombok.extern.slf4j.Slf4j;
 
 @Controller
 @Slf4j
-public class AuctionController {
 
+public class AuctionController {
+	
+	// 이미지 저장 경로 & 기본 이미지 경로 상수
+	private static final String AUCTION_UPLOAD_SUBDIR = "/src/main/resources/static/images/auction/";
+	private static final String AUCTION_DEFAULT_IMG   = "/images/auction/default_auction.png";
+	private static final String BID_DEFAULT_IMG       = null; // 입찰 기본이미지 없음 (선택사항)
+	
     @Autowired
     private AuctionService auctionService;
 
@@ -83,7 +89,7 @@ public class AuctionController {
 
         model.addAttribute("detail", detail);
         model.addAttribute("bidList", bidList);
-        model.addAttribute("mode", "list");   // 기본: 입찰 목록 표시
+        model.addAttribute("mode", "list");   // 입찰 목록 표시
         return "views/auction/auctionDetail";
     }
 
@@ -110,30 +116,23 @@ public class AuctionController {
         // DTO에 로그인한 사용자의 고유 번호(buyerIdx) 세팅
         dto.setBuyerIdx(loginUser.getMemIdx());
         
-     // 파일 업로드 처리 (이미지가 있을 경우에만 실행)
+        // 파일 업로드 처리
         if (thumbnailFile != null && !thumbnailFile.isEmpty()) {
             try {
-                // 상대 경로 기준 외부 폴더 설정
-                String rootPath = System.getProperty("user.dir");
-                String uploadDir = rootPath + File.separator + "external_images" + File.separator;
-                
+                String uploadDir = System.getProperty("user.dir") + AUCTION_UPLOAD_SUBDIR;
                 File dir = new File(uploadDir);
-                
-                // 폴더가 없으면 생성
-                if (!dir.exists()) dir.mkdirs();
-                
-                // 파일명 중복 방지를 위해 UUID 사용
+                if (!dir.exists()) dir.mkdirs(); // 폴더 없으면 자동 생성
+
                 String fileName = UUID.randomUUID() + "_" + thumbnailFile.getOriginalFilename();
                 thumbnailFile.transferTo(new File(uploadDir + fileName));
-                
-                // DB에는 웹에서 접근 가능한 경로("/images/파일명")로 저장
-                dto.setAuctionThumbnailImg("/images/" + fileName);
+
+                dto.setAuctionThumbnailImg("/images/auction/" + fileName);
             } catch (Exception e) {
-                log.error("이미지 업로드 실패", e);
-                dto.setAuctionThumbnailImg(null); 
+                log.error("경매 이미지 업로드 실패", e);
+                dto.setAuctionThumbnailImg(AUCTION_DEFAULT_IMG); // 실패 시 기본 이미지
             }
         } else {
-            dto.setAuctionThumbnailImg(null); 
+            dto.setAuctionThumbnailImg(AUCTION_DEFAULT_IMG); // 미첨부 시 기본 이미지
         }
         
         // 서비스 호출 및 예외 처리
@@ -300,24 +299,23 @@ public class AuctionController {
             return "redirect:/auctions/" + auctionIdx;
         }
         
-        /// 이미지 업로드 처리
+        // 입찰 이미지 업로드 처리
         if (bidImageFile != null && !bidImageFile.isEmpty()) {
             try {
-                // static 내부가 아니라 루트의 external_images 폴더를 타겟으로 잡음
-                String rootPath = System.getProperty("user.dir");
-                String uploadDir = rootPath + File.separator + "external_images" + File.separator;
-                
+                String uploadDir = System.getProperty("user.dir") + AUCTION_UPLOAD_SUBDIR;
                 File dir = new File(uploadDir);
                 if (!dir.exists()) dir.mkdirs();
-                
+
                 String fileName = UUID.randomUUID() + "_" + bidImageFile.getOriginalFilename();
                 bidImageFile.transferTo(new File(uploadDir + fileName));
-                
-                // DB에는 WebConfig에서 설정한 주소인 /images/파일명 으로 저장
-                bidDto.setItemThumbnailImg("/images/" + fileName);
+
+                bidDto.setItemThumbnailImg("/images/auction/" + fileName);
             } catch (Exception e) {
                 log.error("입찰 이미지 업로드 실패", e);
+                bidDto.setItemThumbnailImg(BID_DEFAULT_IMG);
             }
+        } else {
+            bidDto.setItemThumbnailImg(BID_DEFAULT_IMG); // 입찰은 선택이라 null
         }
         
         // itemCategoryIdx는 경매에서 자동 세팅
@@ -335,7 +333,7 @@ public class AuctionController {
         return "redirect:/auctions/" + auctionIdx;
     }
 
-    // 입찰 상세 (/bids/{bidIdx})
+    // 입찰 상세 (/auctions/{auctionIdx}/bids/{bidIdx})
     @GetMapping("/auctions/{auctionIdx}/bids/{bidIdx}")
     public String bidDetailPanel(
             @PathVariable("auctionIdx") Long auctionIdx,
@@ -343,17 +341,8 @@ public class AuctionController {
             HttpSession session, Model model,
             RedirectAttributes ra) {
 
-        MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
-        if (loginUser == null) return "redirect:/views/member/login";
-
         AuctionDTO detail = auctionService.auctionDetail(auctionIdx);
         if (detail == null) return "redirect:/auctions";
-
-        // 구매자만 입찰 상세 열람 가능
-        if (!detail.getBuyerIdx().equals(loginUser.getMemIdx())) {
-            ra.addFlashAttribute("bidError", "구매자만 입찰 상세를 열람할 수 있습니다.");
-            return "redirect:/auctions/" + auctionIdx;
-        }
 
         BidDTO selectedBid = bidService.findBidById(bidIdx);
         if (selectedBid == null) return "redirect:/auctions/" + auctionIdx;
@@ -363,7 +352,7 @@ public class AuctionController {
         model.addAttribute("detail", detail);
         model.addAttribute("bidList", bidList);
         model.addAttribute("selectedBid", selectedBid);
-        model.addAttribute("mode", "bidDetail");   // 오른쪽 패널: 입찰 상세
+        model.addAttribute("mode", "bidDetail");
         return "views/auction/auctionDetail";
     }
 

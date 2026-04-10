@@ -28,7 +28,12 @@ public class WebConfig implements WebMvcConfigurer {
 						"/views/member/login",
 						"/views/member/signUp",
 						"/views/member/check_id",
-						"/fragments/main"); 
+						"/fragments/main",
+						// 경매 조회는 비회원 허용
+		                "/auctions",
+		                "/auctions/category/**",
+		                "/auctions/*",
+		                "/auctions/*/bids/*"); 
 	}
 
 	/*
@@ -51,21 +56,14 @@ public class WebConfig implements WebMvcConfigurer {
 	@Override
 	public void addResourceHandlers(ResourceHandlerRegistry registry) {
 		
-		// 현재 프로젝트의 실제 위치(루트 경로)를 가져와서 문자열로 저장
-	    String rootPath = System.getProperty("user.dir");
-		
-		registry
-			.addResourceHandler("/upload/**")
-			.addResourceLocations("file:///C:/upload/");
-		
 		registry
 			.addResourceHandler("/upload/finalProfile/**")
 			.addResourceLocations("file:///C:/upload/finalProfile/");
 					
-	    // 옥션/비드용 이미지 매핑
-	    // 브라우저가 /images/** 라고 요청하면, 프로젝트 루트 안의 external_images 폴더를 봄
-	    registry.addResourceHandler("/images/**")
-	            .addResourceLocations("file:///" + rootPath + "/external_images/");
+		// 경매/입찰 이미지 - static/images/auction 으로 변경
+	    String staticPath = System.getProperty("user.dir") + "/src/main/resources/static/images/auction/";
+	    registry.addResourceHandler("/images/auction/**")
+	            .addResourceLocations("file:///" + staticPath);
 
 		// 게시글 이미지 - src/main/resources/static/images/board 실시간 서빙
 		registry

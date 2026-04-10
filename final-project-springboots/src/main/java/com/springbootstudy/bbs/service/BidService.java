@@ -94,7 +94,16 @@ public class BidService {
 
     // 입찰 단건 상세 조회
     public BidDTO findBidById(Long bidIdx) {
-        return bidMapper.findBidById(bidIdx);
+        BidDTO dto = bidMapper.findBidById(bidIdx);
+        if (dto != null) {
+            String name = dto.getMemName();
+            if (name != null && name.length() > 1) {
+                dto.setBidderName(name.substring(0, 1) + "*".repeat(name.length() - 1));
+            } else {
+                dto.setBidderName(name);
+            }
+        }
+        return dto;
     }
 
 }
