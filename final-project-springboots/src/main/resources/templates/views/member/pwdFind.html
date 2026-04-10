@@ -137,13 +137,6 @@
 	        return false;
 	    }
 	}
-	
-	// 입력할 때마다 실시간으로 체크
-	/* document.addEventListener("DOMContentLoaded", function() {
-	    document.querySelector("#newPwd").addEventListener("keyup", pwdCheck);
-	    document.querySelector("#newPwdConfirm").addEventListener("keyup", pwdCheck);
-	}); */
-	
 </script>
 
 </head>
@@ -151,15 +144,6 @@
 	<div class="title">
 		비밀번호 찾기
 	</div>
-	
-	<!-- 
-		비밀번호를 찾기 위해 아이디와 전화번호를 입력하면 
-		인증번호가 전송되고(해당 연락처에 전송) 인증번호를 확인
-		-> 아이디나 전화번호 틀리면 인증번호 안보냄
-		
-		비밀번호를 바꾸면 끝
-		-> 단 이전 비밀번호와 동일하거나 비밀번호를 다르게 처리하면 안됨
- 	-->
  	
 	<form class="pwdFind" action="/members/pwdFind" method="post">
 		<div>

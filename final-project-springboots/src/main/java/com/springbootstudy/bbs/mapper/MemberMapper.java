@@ -49,6 +49,9 @@ public interface MemberMapper {
  	void update(MemberVO vo);
  	MemberVO selectOneFromId(String memId); 
  	String selectGradeNameByMemId(String memId); // grade만 따로 조회
+ 	
+ 	// 비밀번호
+ 	public String selectPwdById(String memId);
 
  	
  	// 비밀번호 재발급 =============================================

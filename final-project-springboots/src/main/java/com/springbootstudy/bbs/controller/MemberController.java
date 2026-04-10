@@ -275,6 +275,22 @@ public class MemberController {
           return "redirect:/main"; 
       } 
       
+      // 회원정보 수정에서 비번 바꾸기
+      @PostMapping("/checkOldPwd")
+      @ResponseBody
+      public boolean checkOldPwd(@RequestParam String newPwd,
+                                HttpSession session) {
+
+          MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
+
+          // 최신 정보 가져오기
+          String dbPwd = memberService.selectPwdById(loginUser.getMemId());
+          
+          // 기존 비밀번호랑 비교
+          return newPwd.equals(loginUser.getMemPwd());
+      }
+      
+      
    // 비밀번호 찾기 -----------------------------------------------------------------
       
       // 창 띄우기

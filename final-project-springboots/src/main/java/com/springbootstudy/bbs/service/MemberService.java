@@ -78,10 +78,16 @@ public class MemberService {
     public void updateMember(MemberVO vo) {
         memberMapper.update(vo);
     }
+    
+    // 회원정보 수정창에서 비밀번호 재발급
+    public String selectPwdById(String memId) {
+        return memberMapper.selectPwdById(memId);
+    }
 
     
     // 비밀번호 재발급 -----------------------------------------------------
     
+    // 비밀번호 잃어버렸을 때 재발급! (위쪽 비번이랑 전혀 다른 아이!!)
     // 비밀번호 재발급 시 아이디 + 전화번호 맞는 지 확인
 	public MemberVO findByIdAndTel(String memId, String memTel) {
 		return memberMapper.findByIdAndTel(memId, memTel);
