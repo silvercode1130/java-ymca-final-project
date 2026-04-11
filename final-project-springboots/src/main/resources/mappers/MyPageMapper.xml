@@ -42,14 +42,14 @@
 		= #{auctionIdx} AND bid_status_idx = 2 LIMIT 1 </select>
 
 	<!-- 내 결제 내역 (구매자) -->
-	<select id="getMyPayments" resultType="com.springbootstudy.bbs.domain.PaymentVO"> SELECT p.*,
-		i.item_name, i.item_thumbnail_img, d.courier_company, d.tracking_number, d.delivery_status,
+	<select id="getMyPayments" resultType="com.springbootstudy.bbs.domain.MyPagePaymentVO"> SELECT
+		p.*, i.item_name, i.item_thumbnail_img, d.courier_company, d.tracking_number, d.delivery_status,
 		d.shipped_at, d.delivered_at FROM payment p JOIN bid b ON p.bid_idx = b.bid_idx JOIN item i ON
 		b.item_idx = i.item_idx LEFT JOIN delivery d ON p.bid_idx = d.bid_idx WHERE p.mem_idx =
 		#{memIdx} AND p.pay_status IN ('DONE', 'CONFIRMED') ORDER BY p.pay_regdate DESC </select>
 
 	<!-- 내 판매 내역 (판매자) -->
-	<select id="getMySales" resultType="com.springbootstudy.bbs.domain.PaymentVO"> SELECT p.*,
+	<select id="getMySales" resultType="com.springbootstudy.bbs.domain.MyPagePaymentVO"> SELECT p.*,
 		i.item_name, i.item_thumbnail_img, d.courier_company, d.tracking_number, d.delivery_status,
 		d.shipped_at, d.delivered_at FROM payment p JOIN bid b ON p.bid_idx = b.bid_idx JOIN item i ON
 		b.item_idx = i.item_idx LEFT JOIN delivery d ON p.bid_idx = d.bid_idx WHERE b.bidder_idx =

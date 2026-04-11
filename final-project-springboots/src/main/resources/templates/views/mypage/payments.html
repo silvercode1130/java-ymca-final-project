@@ -38,13 +38,15 @@
                 <td th:text="${payment.trackingNumber != null ? payment.trackingNumber : '-'}"></td>
                 <td th:text="${#temporals.format(payment.payRegdate, 'yyyy-MM-dd HH:mm')}"></td>
                 <td>
-                    <!-- 배송완료(DELIVERED)이고 아직 수령확인 안한 경우 -->
-                    <button th:if="${payment.deliveryStatus == 'DELIVERED' and payment.payStatus == 'DONE'}"
-                            th:attr="data-bid-idx=${payment.bidIdx}"
-                            onclick="confirmReceipt(this)">수령확인</button>
-                    <!-- 이미 수령확인 완료 -->
-                    <span th:if="${payment.payStatus == 'CONFIRMED'}">수령완료</span>
-                </td>
+                  <!-- 배송중(SHIPPING)일 때 수령확인 버튼 -->
+                <button th:if="${payment.deliveryStatus == 'SHIPPING' and payment.payStatus == 'DONE'}"
+                        th:attr="data-bid-idx=${payment.bidIdx}"
+                        onclick="confirmReceipt(this)">수령확인</button>
+                <!-- 이미 수령확인 완료 -->
+                  <span th:if="${payment.payStatus == 'CONFIRMED'}">수령완료</span>
+                  <!-- 배송준비중 -->
+                  <span th:if="${payment.deliveryStatus == null}">배송준비중</span>
+              </td>
             </tr>
         </tbody>
     </table>

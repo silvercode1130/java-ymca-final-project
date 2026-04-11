@@ -46,40 +46,14 @@
              th:href="@{/mypage/payment/pay(auctionIdx=${auction.auctionIdx})}"
              class="btn-pay">결제하기</a>
 
-          <!-- 배송중(9) -->
+          <!-- 배송중(9): 배송중 표시만 -->
           <span th:if="${auction.auctionStatusIdx == 9}">배송중</span>
 
-          <!-- 배송완료(10): 수령확인 -->
-          <button th:if="${auction.auctionStatusIdx == 10}"
-                  th:attr="data-auction-idx=${auction.auctionIdx}"
-                  class="btn-confirm"
-                  onclick="confirmReceipt(this)">수령확인</button>
+          <!-- 배송완료(10): 수령완료 표시 -->
+          <span th:if="${auction.auctionStatusIdx == 10}">수령완료</span>
         </td>
       </tr>
     </tbody>
   </table>
-
-<script>
-  function confirmReceipt(btn) {
-    if (!confirm("수령 확인하시겠습니까? 확인 후 판매자에게 대금이 지급됩니다.")) return;
-
-    const auctionIdx = btn.getAttribute("data-auction-idx");
-
-    fetch("/api/payment/confirm-receipt", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ auctionIdx: auctionIdx })
-    })
-      .then(res => res.json())
-      .then(data => {
-        alert("수령 확인이 완료되었습니다!");
-        location.reload();
-      })
-      .catch(err => {
-        alert("오류가 발생했습니다: " + err.message);
-      });
-  }
-</script>
-
 </body>
 </html>
