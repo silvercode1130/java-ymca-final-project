@@ -12,7 +12,7 @@ import com.springbootstudy.bbs.domain.AuctionDTO;
 import com.springbootstudy.bbs.domain.BidDTO;
 import com.springbootstudy.bbs.domain.BoardVO;
 import com.springbootstudy.bbs.domain.MemberVO;
-import com.springbootstudy.bbs.domain.PaymentVO;
+import com.springbootstudy.bbs.domain.MyPagePaymentVO;
 import com.springbootstudy.bbs.service.MyPageService;
 
 import jakarta.servlet.http.HttpSession;
@@ -71,15 +71,30 @@ public class MyPageController {
     return "views/mypage/boards";
   }
 
+  // 구매자 결제 내역
+  @GetMapping("/payments")
+  public String myPayments(HttpSession session, Model model) {
+    MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
+    if (loginUser == null)
+      return "redirect:/members/login";
+
+    List<MyPagePaymentVO> payments = mypageService.getMyPayments(loginUser.getMemIdx());
+    model.addAttribute("payments", payments);
+
+    return "views/mypage/payments";
+  }
+
+  // 판매자 판매 내역
   @GetMapping("/sales")
   public String mySales(HttpSession session, Model model) {
     MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
     if (loginUser == null)
       return "redirect:/members/login";
 
-    List<PaymentVO> wonBids = mypageService.getMyWonBids(loginUser.getMemIdx());
-    model.addAttribute("wonBids", wonBids);
+      var sales = mypageService.getMySales(loginUser.getMemIdx());
+    model.addAttribute("sales", sales);
 
     return "views/mypage/sales";
   }
+
 }

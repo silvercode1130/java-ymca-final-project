@@ -28,4 +28,7 @@ public interface PaymentMapper {
   int updateConfirmedAt(@Param("bidIdx") Long bidIdx);
 
   int updateEscrowStatus(@Param("bidIdx") Long bidIdx, @Param("escrowStatus") String escrowStatus);
+
+  // 중복 결제 체크 및 결제 정보 조회
+  PaymentVO findPaymentByBidIdx(@Param("bidIdx") Long bidIdx);
 }

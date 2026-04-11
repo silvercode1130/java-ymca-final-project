@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <meta charset="UTF-8">
+  <title>내 결제 내역</title>
+</head>
+
+<body>
+
+  <h2>내 결제 내역</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>상품명</th>
+        <th>결제 금액</th>
+        <th>결제 수단</th>
+        <th>결제 상태</th>
+        <th>배송 상태</th>
+        <th>택배사</th>
+        <th>운송장번호</th>
+        <th>결제일</th>
+        <th>수령확인</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr th:if="${#lists.isEmpty(payments)}">
+                <td colspan="9">결제 내역이 없습니다.</td>
+            </tr>
+            <tr th:each="payment : ${payments}">
+                <td th:text="${payment.itemName}"></td>
+                <td th:text="${#numbers.formatInteger(payment.payAmount, 0, 'COMMA') + '원'}"></td>
+                <td th:text="${payment.payMethod}"></td>
+                <td th:text="${payment.payStatus}"></td>
+                <td th:text="${payment.deliveryStatus != null ? payment.deliveryStatus : '배송준비중'}"></td>
+                <td th:text="${payment.courierCompany != null ? payment.courierCompany : '-'}"></td>
+                <td th:text="${payment.trackingNumber != null ? payment.trackingNumber : '-'}"></td>
+                <td th:text="${#temporals.format(payment.payRegdate, 'yyyy-MM-dd HH:mm')}"></td>
+                <td>
+                    <!-- 배송완료(DELIVERED)이고 아직 수령확인 안한 경우 -->
+                    <button th:if="${payment.deliveryStatus == 'DELIVERED' and payment.payStatus == 'DONE'}"
+                            th:attr="data-bid-idx=${payment.bidIdx}"
+                            onclick="confirmReceipt(this)">수령확인</button>
+                    <!-- 이미 수령확인 완료 -->
+                    <span th:if="${payment.payStatus == 'CONFIRMED'}">수령완료</span>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <script>
+      function confirmReceipt(btn) {
+        if (!confirm("수령 확인하시겠습니까? 확인 후 판매자에게 대금이 지급됩니다.")) return;
+
+        const bidIdx = btn.getAttribute("data-bid-idx");
+
+        fetch("/api/payment/confirm-receipt", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ bidIdx: bidIdx })
+        })
+          .then(res => res.json())
+          .then(data => {
+            alert("수령 확인이 완료되었습니다!");
+            location.reload();
+          })
+          .catch(err => {
+            alert("오류가 발생했습니다: " + err.message);
+          });
+      }
+    </script>
+
+</body>
+</html>

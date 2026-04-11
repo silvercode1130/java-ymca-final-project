@@ -449,15 +449,6 @@ CREATE TABLE payment (
     buyer_tel        VARCHAR(20)   NOT NULL COMMENT '수령인 연락처',
     buyer_addr       VARCHAR(500)  NOT NULL COMMENT '배송지 주소',
     buyer_zipcode    VARCHAR(20)   NOT NULL COMMENT '우편번호',
-    
-    -- 배송 정보
-    courier_company  VARCHAR(50)   NULL COMMENT '택배사',
-    tracking_number  VARCHAR(100)  NULL COMMENT '운송장번호',
-    shipped_at       DATETIME      NULL COMMENT '발송일시',
-
-    -- 에스크로 및 처리 일시
-    escrow_status    VARCHAR(20)   DEFAULT 'READY'
-                     COMMENT '배송 상태 (READY, SHIPPING, DELIVERED)',
     pay_regdate      DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '결제 완료 일시',
     confirmed_at     DATETIME      NULL COMMENT '구매 확정 일시',
     canceled_at      DATETIME      NULL COMMENT '결제 취소 일시',
@@ -468,3 +459,19 @@ CREATE TABLE payment (
     CONSTRAINT fk_payment_bid    FOREIGN KEY (bid_idx) REFERENCES bid(bid_idx),
     CONSTRAINT fk_payment_buyer  FOREIGN KEY (mem_idx) REFERENCES member(mem_idx)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='결제 상세 정보 테이블';
+
+-- delivery 테이블 새로 생성
+CREATE TABLE delivery (
+    delivery_idx     BIGINT        NOT NULL AUTO_INCREMENT COMMENT 'PK',
+    pay_idx          BIGINT        NOT NULL COMMENT 'FK → payment.pay_idx',
+    bid_idx          BIGINT        NOT NULL COMMENT 'FK → bid.bid_idx',
+    courier_company  VARCHAR(50)   NULL COMMENT '택배사',
+    tracking_number  VARCHAR(100)  NULL COMMENT '운송장번호',
+    shipped_at       DATETIME      NULL COMMENT '발송일시',
+    delivered_at     DATETIME      NULL COMMENT '배송완료일시',
+    delivery_status  VARCHAR(20)   NOT NULL DEFAULT 'READY'
+                     COMMENT '배송 상태 (READY, SHIPPING, DELIVERED)',
+    PRIMARY KEY (delivery_idx),
+    CONSTRAINT fk_delivery_payment FOREIGN KEY (pay_idx) REFERENCES payment(pay_idx),
+    CONSTRAINT fk_delivery_bid     FOREIGN KEY (bid_idx) REFERENCES bid(bid_idx)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='배송 정보 테이블';

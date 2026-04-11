@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.springbootstudy.bbs.domain.AuctionDTO;
 import com.springbootstudy.bbs.domain.BidDTO;
 import com.springbootstudy.bbs.domain.BoardVO;
+import com.springbootstudy.bbs.domain.MyPagePaymentVO;
 import com.springbootstudy.bbs.domain.PaymentVO;
 import com.springbootstudy.bbs.mapper.MyPageMapper;
 
@@ -37,5 +38,13 @@ public class MyPageService {
 
   public Long getWonBidIdxByAuctionIdx(Long auctionIdx) {
     return mypageMapper.getWonBidIdxByAuctionIdx(auctionIdx);
+  }
+
+  public List<MyPagePaymentVO> getMyPayments(Long memIdx) {
+    return mypageMapper.getMyPayments(memIdx);
+  }
+
+  public List<MyPagePaymentVO> getMySales(Long memIdx) {
+    return mypageMapper.getMySales(memIdx);
   }
 }

@@ -28,8 +28,4 @@ public class PaymentVO {
   private LocalDateTime confirmedAt; // 구매 확정 일시
   private LocalDateTime canceledAt; // 결제 취소 일시
 
-  // 배송 정보
-  private String courierCompany; // 택배사
-  private String trackingNumber; // 운송장번호
-  private LocalDateTime shippedAt; // 발송일시
 }
