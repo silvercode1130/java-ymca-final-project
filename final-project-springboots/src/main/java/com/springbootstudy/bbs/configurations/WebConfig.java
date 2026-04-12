@@ -22,44 +22,33 @@ public class WebConfig implements WebMvcConfigurer {
 	// 인터셉터
 	@Override
 	public void addInterceptors(InterceptorRegistry registry) {
-		registry.addInterceptor(new LoginCheckInterceptor())
-				.addPathPatterns("/**")
-				.excludePathPatterns(
-						"/views/member/login",
-						"/views/member/signUp",
-						"/views/member/check_id",
-						"/fragments/main"); 
+		registry.addInterceptor(new LoginCheckInterceptor()).addPathPatterns("/**").excludePathPatterns(
+				"/views/member/login", "/views/member/signUp", "/views/member/check_id", "/fragments/main");
 	}
 
 	/*
-	 * 어떤 요청에 대해서 요청을 처리한 결과 데이터인 모델은 필요 없고 화면만
-	 * 보여주는 경우 아래와 같이 addViewControllers() 메서드를 오버라이드하여
-	 * 뷰 전용 컨트롤러를 설정할 수 있다.
+	 * 어떤 요청에 대해서 요청을 처리한 결과 데이터인 모델은 필요 없고 화면만 보여주는 경우 아래와 같이 addViewControllers()
+	 * 메서드를 오버라이드하여 뷰 전용 컨트롤러를 설정할 수 있다.
 	 **/
 	@Override
 	public void addViewControllers(ViewControllerRegistry registry) {
 		/*
-		 * 아래는 /writeForm과 /writeBoard 요청에 대한 뷰를 지정한 것이다.
-		 * 여기서 지정한 뷰의 이름과 prefix, suffix를 조합하여 실제 뷰의
-		 * 물리적인 이름이 결정된다.
+		 * 아래는 /writeForm과 /writeBoard 요청에 대한 뷰를 지정한 것이다. 여기서 지정한 뷰의 이름과 prefix, suffix를
+		 * 조합하여 실제 뷰의 물리적인 이름이 결정된다.
 		 **/
 		registry.addViewController("/writeForm").setViewName("views/writeForm");
 		registry.addViewController("/writeBoard").setViewName("views/writeForm");
 	}
-	
+
 	// 프로필 이미지 업로드 기능
 	@Override
 	public void addResourceHandlers(ResourceHandlerRegistry registry) {
-		registry
-			.addResourceHandler("/upload/**")
-			.addResourceLocations("file:///C:/upload/");
-		
-		registry
-			.addResourceHandler("/upload/finalProfile/**")
-			.addResourceLocations("file:///C:/upload/finalProfile/");
+		registry.addResourceHandler("/upload/**").addResourceLocations("file:///C:/upload/");
 
-		registry
-			.addResourceHandler("/upload/boardImages/**")
-			.addResourceLocations("file:///C:/upload/boardImages/");
+		registry.addResourceHandler("/upload/finalProfile/**").addResourceLocations("file:///C:/upload/finalProfile/");
+
+		// 게시글 이미지 - src/main/resources/static/images/board 실시간 서빙
+		registry.addResourceHandler("/images/board/**").addResourceLocations("file:///"
+				+ System.getProperty("user.dir").replace("\\", "/") + "/src/main/resources/static/images/board/");
 	}
 }

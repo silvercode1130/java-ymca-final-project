@@ -172,10 +172,11 @@
 											th:if="${item.auctionThumbnailImg != null and item.auctionThumbnailImg != ''}"
 											th:src="${item.auctionThumbnailImg}" alt="썸네일"
 											class="h-full w-full object-cover transition-transform group-hover:scale-[1.03]" />
-										<div
+										<img
 											th:unless="${item.auctionThumbnailImg != null and item.auctionThumbnailImg != ''}"
-											class="flex h-full w-full items-center justify-center text-xs text-[#999999]">
-											이미지 없음</div>
+											th:src="${pageContext.request.contextPath}/images/common/default_image}" alt="썸네일없음"
+											class="h-full w-full object-cover transition-transform group-hover:scale-[1.03]" />
+											</div>
 
 										<!-- 상태 배지 -->
 										<div class="absolute left-2 top-2">
