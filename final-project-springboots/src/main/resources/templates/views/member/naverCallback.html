@@ -3,8 +3,8 @@
 <script>
 	//callback.html 또는 콜백 처리 스크립트
 	var naverLogin = new naver.LoginWithNaverId({
-	    clientId: "YOUR_CLIENT_ID",
-	    callbackUrl: "YOUR_CALLBACK_URL",
+	    clientId: "2Rk518jWd9bxOQoKuUnD",
+	    callbackUrl: "http://localhost:8080/members/naverCallback",
 	    isPopup: false
 	});
 	
@@ -17,6 +17,19 @@
 	            var email = naverLogin.user.getEmail();
 	            var name = naverLogin.user.getName();
 	            console.log("로그인 성공! 유저 정보:", email, name);
+	            
+	            fetch("/members/naverCallback", {
+	                method: "POST",
+	                headers: {
+	                    "Content-Type": "application/x-www-form-urlencoded"
+	                },
+	                body:
+	                    "memName=" + encodeURIComponent(name) +
+	                    "&memEmail=" + encodeURIComponent(email) +
+	                    "&memTel=010-0000-0000" +
+	                    "&memBday=2000-01-01"
+	            });
+	            
 	            // 여기서 서버에 정보를 보내거나 메인 페이지로 리다이렉트합니다.
 	        } else {
 	            console.log("AccessToken이 유효하지 않습니다.");
