@@ -64,40 +64,14 @@ public class ApiController {
 	        user = apiService.findByEmail(memEmail);  
 	    }
 
-	    session.setAttribute("loginUser", user);
+	    session.setAttribute("isLogin", true);
+	    session.setAttribute("loginId", memId);
+	    session.setAttribute("loginUser", user); 
 	    
 	    System.out.println("내가 그래도 컨트롤러는 접근 했어!!!" + memEmail);
+	    System.out.println("user: " + user);
 
 	    return "redirect:/main";
 	}
-//	@PostMapping("/members/naverCallback")
-//	public String naverCallback( 
-//	    @RequestParam("memName") String memName,   // 네이버에서 받은 이름
-//	    @RequestParam("memEmail") String memEmail,  // 네이버에서 받은 이메일
-//	    @RequestParam("memTel") String memTel,    // (입력받거나 네이버에서 가져온 번호)
-//	    @RequestParam("memBday") String memBday,    // (네이버에서 가져온 생일) 
-//	    HttpSession session
-//	) {
-//	    
-//	    // 네이버 이메일을 아이디로
-//	    String memId = memEmail; 
-//	    
-//	    String tempPwd = "TMP_" + UUID.randomUUID().toString().substring(0, 8);
-//	    
-//	    // not null 값 채우기
-//	    String memIp = "127.0.0.1";
-//	    long memRoleIdx = 1;  // 일반유저 권한
-//	    int memGradeIdx = 1;  // 일반 등급
-//	    
-//	    session.setAttribute("isTempPwd", true); 
-//	    
-//	    memberService.register(memId, tempPwd, memName, memTel, memEmail, memIp, memRoleIdx, memGradeIdx, memBday);
-//
-//	    session.setAttribute("loginUser", memName);
-//	    session.setAttribute("isTemp", "Y"); 
-//	    
-//	    return "redirect:/main"; // 메인으로 이동!
-//	} 
-	
 	
 }
