@@ -19,13 +19,13 @@ import jakarta.servlet.http.HttpSession;
 @Controller
 public class MemberAddrController {
 
-    @Autowired
-    private MemberAddrService memberAddrService;
-
-    // 주소등록창 -----------------------------------------------------------------
-
-    @GetMapping("/members/memberAddrInsert")
-    public String memberAddrInsert(HttpSession session, Model model) {
+	@Autowired
+	private MemberAddrService memberAddrService;
+	
+	// 주소등록창 -----------------------------------------------------------------
+	
+	@GetMapping("/mypage/addresses/new") 
+	public String memberAddrInsert(HttpSession session, Model model) {
 
         MemberVO loginMember = (MemberVO) session.getAttribute("loginUser");
 
@@ -35,25 +35,25 @@ public class MemberAddrController {
 
         model.addAttribute("member", loginMember);
 
-        return "/views/member/memberAddrInsert";
-    }
+	    return "/views/member/memberAddrInsert";  
+	}
+	
+	// memberAddrInsert.html 의 Ajax 저장용
+	@PostMapping("/member/insertAddrAjax.do")
+	@ResponseBody
+	public int insertAddr(MemberAddrVO vo) {
 
-    // memberAddrUpdate.html 의 Ajax 저장용
-    @PostMapping("/member/insertAddrAjax.do")
-    @ResponseBody
-    public int insertAddr(MemberAddrVO vo) {
+		// 두개 확인 필요
+	    int result = memberAddrService.registerAddr(vo);
+	    vo.setIsPrimary("N");
+	    
+	    return result; 
+	}
 
-        // 두개 확인 필요
-        int result = memberAddrService.registerAddr(vo);
-        vo.setIsPrimary("N");
-
-        return result;
-    }
-
-    // 주소목록창 -----------------------------------------------------------------
-
-    // 저장된 값 보여주기
-    @GetMapping("/members/addresses")
+	// 주소목록창 -----------------------------------------------------------------
+	
+	// 저장된 값 보여주기 
+    @GetMapping("/mypage/addresses") 
     public String memberAddr(HttpSession session, Model model) {
 
         // 로그인 안했으면 쫓아내기
@@ -70,31 +70,30 @@ public class MemberAddrController {
     }
 
     // 주소 삭제 -----------------------------------------------------------------
-
-    @PostMapping("/members/addrDelete")
+    
+    @PostMapping("/mypage/addresses/delete")
     public String deleteAddr(@RequestParam("addrIdx") Long addrIdx) {
 
         memberAddrService.deleteAddr(addrIdx);
 
-        return "redirect:/members/memberAddr";
+        return "redirect:/mypage/addresses";
     }
 
     // 주소 수정 -----------------------------------------------------------------
-
-    @GetMapping("/members/memberAddrUpdate")
-    public String updateAddrForm(@RequestParam("addrIdx") Long addrIdx, HttpSession session, Model model) {
-
-        // 로그인 정보 받아오기
+    
+    @GetMapping("/mypage/addresses/edit") 
+    public String updateAddrForm(@RequestParam("addrIdx") Long addrIdx,HttpSession session, Model model) { 
+    	// 로그인 정보 받아오기
         MemberVO loginMember = (MemberVO) session.getAttribute("loginUser");
 
         // 로그인 안했으면 쫓아내기
         if (loginMember == null) {
-            return "redirect:/members/login";
+            return "redirect:/members/login";  
         }
 
         // 주소가 없어도 쫓아내기
         if (addrIdx == null) {
-            return "redirect:/members/memberAddr";
+            return "redirect:/mypage/addresses";
         }
 
         MemberAddrVO addr = memberAddrService.selectOne(addrIdx);
