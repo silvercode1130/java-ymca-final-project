@@ -9,11 +9,10 @@
 <div class="register-container">
     <h2>📣 역경매 구매 요청하기</h2>
 
-    <div th:if="${errorMessage}" style="color:red; margin-bottom:10px;">
-        ⚠️ [[${errorMessage}]]
-    </div>
+    <span th:if="${errorMessage}" id="toast-error" th:data-msg="${errorMessage}" style="display:none;"></span>
+	<span th:if="${successMessage}" id="toast-success" th:data-msg="${successMessage}" style="display:none;"></span>
 
-    <!-- enctype 반드시 필요! 없으면 파일 전송 안 됨 -->
+    <!-- enctype 반드시 필요 없으면 파일 전송 안 됨 -->
     <form action="/auctions" method="post" id="registerForm"
           enctype="multipart/form-data">
 
@@ -92,5 +91,6 @@
 </div>
 
 <script src="/js/auctionRegister.js"></script>
+<script src="/js/toast.js"></script>
 </body>
 </html>

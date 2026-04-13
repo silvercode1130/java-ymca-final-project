@@ -2,7 +2,6 @@
 
 -- 기존 뷰 삭제 후 재생성 (MySQL은 CREATE OR REPLACE VIEW 지원)
 
-
 /* ==========================================
    6. 뷰 테이블
    ========================================== */
@@ -33,9 +32,10 @@ SELECT
     a.auction_regdate,
     a.auction_is_deleted
 FROM auction a
-JOIN auction_status s   ON a.auction_status_idx  = s.auction_status_idx
-LEFT JOIN item_category ic ON a.item_category_idx = ic.item_category_idx
-LEFT JOIN bid b         ON a.auction_idx          = b.auction_idx
+JOIN auction_status s      ON a.auction_status_idx  = s.auction_status_idx
+LEFT JOIN item_category ic ON a.item_category_idx   = ic.item_category_idx
+LEFT JOIN bid b            ON a.auction_idx          = b.auction_idx
+                          AND b.bid_status_idx NOT IN (4, 5)  -- ← 취소/삭제 제외
 GROUP BY
     a.auction_idx, a.buyer_idx, a.item_category_idx,
     a.auction_thumbnail_img, a.auction_title, a.auction_target_price,
@@ -43,7 +43,6 @@ GROUP BY
     a.auction_status_idx, s.auction_status_name, s.auction_status_code,
     ic.item_category_name, ic.item_category_code,
     a.auction_regdate, a.auction_is_deleted;
-
 
 
 -- AuctionDetail
@@ -59,21 +58,23 @@ SELECT
     a.auction_end_at,
     a.auction_decision_deadline,
     a.auction_status_idx,
+    s.auction_status_code,
     s.auction_status_name,
     ic.item_category_name,
-    COUNT(b.bid_idx) AS bid_count,
+    COUNT(b.bid_idx)            AS bid_count,
     IFNULL(MIN(b.bid_price), 0) AS min_bid_price,
     a.auction_is_deleted
 FROM auction a
-JOIN auction_status s ON a.auction_status_idx = s.auction_status_idx
-LEFT JOIN item_category ic ON a.item_category_idx = ic.item_category_idx
-LEFT JOIN bid b ON a.auction_idx = b.auction_idx
+JOIN auction_status s      ON a.auction_status_idx  = s.auction_status_idx
+LEFT JOIN item_category ic ON a.item_category_idx   = ic.item_category_idx
+LEFT JOIN bid b            ON a.auction_idx          = b.auction_idx
+                          AND b.bid_status_idx NOT IN (4, 5)  -- ← 취소/삭제 제외
 GROUP BY
     a.auction_idx, a.buyer_idx, a.item_category_idx,
     a.auction_thumbnail_img, a.auction_title, a.auction_desc,
     a.auction_target_price, a.auction_end_at, a.auction_decision_deadline,
-    a.auction_status_idx, s.auction_status_name, ic.item_category_name,
-    a.auction_is_deleted;
+    a.auction_status_idx, s.auction_status_name, s.auction_status_code,
+    ic.item_category_name, a.auction_is_deleted;
 
 
 -- BidList (item_category JOIN 추가)

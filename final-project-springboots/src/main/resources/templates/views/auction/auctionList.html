@@ -117,9 +117,11 @@
     </div>
 </div>
 
-<!-- 에러/성공 메시지 -->
-<div th:if="${errorMessage}" style="color:red; margin:8px 0;" th:text="${errorMessage}"></div>
-<div th:if="${successMessage}" style="color:green; margin:8px 0;" th:text="${successMessage}"></div>
+<!-- 에러/성공 메시지 - 보이지 않는 hidden 요소로 메시지 전달 -->
+<span th:if="${successMessage}" id="toast-success"
+      th:data-msg="${successMessage}" style="display:none;"></span>
+<span th:if="${errorMessage}"   id="toast-error"
+      th:data-msg="${errorMessage}"   style="display:none;"></span>
 
 <table>
     <thead>
@@ -181,5 +183,6 @@
     </tbody>
 </table>
 <script src="/js/auctionList.js"></script>
+<script src="/js/toast.js"></script>
 </body>
 </html>

@@ -69,9 +69,12 @@
 		</div>
 		
 		<!-- 플래시 메시지 -->
-		<div th:if="${bidError}"   class="msg-error"   style="margin-top:12px;" th:text="${bidError}"></div>
-		<div th:if="${successMessage}" class="msg-success" style="margin-top:12px;" th:text="${successMessage}"></div>
-		<div th:if="${errorMessage}"   class="msg-error"   style="margin-top:12px;" th:text="${errorMessage}"></div>
+		<span th:if="${successMessage}" id="toast-success"
+		      th:data-msg="${successMessage}" style="display:none;"></span>
+		<span th:if="${errorMessage}"   id="toast-error"
+		      th:data-msg="${errorMessage}"   style="display:none;"></span>
+		<span th:if="${bidError}"       id="toast-bid-error"
+		      th:data-msg="${bidError}"       style="display:none;"></span>
 		
 		<!-- 버튼 그룹 -->
 		<div class="btn-group">
@@ -88,10 +91,12 @@
 				</th:block>
 				
 				<!-- 비회원 → 로그인 안내 버튼 -->
-				<th:block th:if="${session.loginUser == null}">
-					<button class="btn btn-primary" onclick="location.href='/members/login'">
-						🔒 로그인 후 입찰하기
-					</button>
+				<th:block th:if="${session.loginUser == null and detail.auctionStatusIdx == 1}">
+				    <form th:action="@{/auctions/{id}/bids(id=${detail.auctionIdx})}" method="get" style="display:inline;">
+				        <button type="submit" class="btn btn-primary">
+				            🔒 로그인 후 입찰하기
+				        </button>
+				    </form>
 				</th:block>
 			</th:block>
 			
@@ -373,7 +378,7 @@
 				
 				<div th:if="${selectedBid.bidMessage != null and selectedBid.bidMessage != ''}">
 					<strong>제안 메시지:</strong>
-					<p th:text="${selectedBid.bidMessage}"></p>
+					<p th:text="${selectedBid.bidMessage}" style="white-space:pre-line;"></p>
 				</div>
 				
 				<!-- 낙찰 버튼: 진행중+입찰있음 또는 결정대기중 -->
@@ -400,5 +405,6 @@
 </div>
 <!-- /detail-layout -->
 <script src="/js/auctionDetail.js"></script>
+<script src="/js/toast.js"></script>
 </body>
 </html>

@@ -99,10 +99,11 @@ public class AuctionController {
 
     // 경매 등록 폼 이동 (/auctions/new)
     @GetMapping("/auctions/new")
-    public String registerForm(HttpSession session) {
+    public String registerForm(HttpSession session, RedirectAttributes ra) {
     	
         if (session.getAttribute("loginUser") == null) {
-            return "redirect:/views/member/login";
+        	session.setAttribute("loginRedirectUrl", "/auctions/new");
+            return "redirect:/members/login";
         }
         
         return "views/auction/auctionRegister";
@@ -153,6 +154,9 @@ public class AuctionController {
             ra.addFlashAttribute("errorMessage", "등록 중 오류가 발생했습니다.");
             return "redirect:/auctions/new";
         }
+
+        ra.addFlashAttribute("successMessage", "구매요청이 등록되었습니다! 🎉");
+        
         return "redirect:/auctions";
     }
 
@@ -162,7 +166,7 @@ public class AuctionController {
                                   HttpSession session,
                                   RedirectAttributes ra) {
         MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
-        if (loginUser == null) return "redirect:/views/member/login";
+        if (loginUser == null) return "redirect:/members/login";
 
         try {
         	// 작성자 본인 확인은 서비스 계층에서 수행 (안전함)
@@ -226,7 +230,7 @@ public class AuctionController {
                                HttpSession session,
                                RedirectAttributes ra) {
         MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
-        if (loginUser == null) return "redirect:/views/member/login";
+        if (loginUser == null) return "redirect:/members/login";
 
         AuctionDTO detail = auctionService.auctionDetail(auctionIdx);
         if (detail == null || !detail.getBuyerIdx().equals(loginUser.getMemIdx())) {
@@ -247,7 +251,12 @@ public class AuctionController {
             RedirectAttributes ra) {
 
         MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
-        if (loginUser == null) return "redirect:/views/member/login";
+        if (loginUser == null) {
+        	
+        	session.setAttribute("loginRedirectUrl", "/auctions/" + auctionIdx + "/bids");
+        	
+        	return "redirect:/members/login";
+        } 
 
         AuctionDTO detail = auctionService.auctionDetail(auctionIdx);
         if (detail == null) return "redirect:/auctions";
@@ -280,7 +289,10 @@ public class AuctionController {
                                HttpSession session,
                                RedirectAttributes ra) {
         MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
-        if (loginUser == null) return "redirect:/views/member/login";
+        if (loginUser == null) {
+        	session.setAttribute("loginRedirectUrl", "/auctions/" + auctionIdx);
+        	return "redirect:/members/login";
+        } 
         
         // 기본 데이터 세팅
         bidDto.setAuctionIdx(auctionIdx);
@@ -371,7 +383,10 @@ public class AuctionController {
                              HttpSession session,
                              RedirectAttributes ra) {
         MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
-        if (loginUser == null) return "redirect:/views/member/login";
+        if (loginUser == null) {
+        	session.setAttribute("loginRedirectUrl", "/auctions/" + auctionIdx);
+        	return "redirect:/members/login";
+        }
 
         try {
             bidService.deleteBid(bidIdx, loginUser.getMemIdx());
@@ -389,7 +404,7 @@ public class AuctionController {
                                   HttpSession session,
                                   RedirectAttributes ra) {
         MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
-        if (loginUser == null) return "redirect:/views/member/login";
+        if (loginUser == null) return "redirect:/members/login";
 
         if (loginUser.getMemRoleIdx() == null || loginUser.getMemRoleIdx() != 2) {
             ra.addFlashAttribute("errorMessage", "관리자만 사용할 수 있는 기능입니다.");
@@ -412,7 +427,10 @@ public class AuctionController {
                                  HttpSession session,
                                  RedirectAttributes ra) {
         MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
-        if (loginUser == null) return "redirect:/views/member/login";
+        if (loginUser == null) {
+        	session.setAttribute("loginRedirectUrl", "/auctions/" + auctionIdx);
+        	return "redirect:/members/login";
+        }
 
         AuctionDTO auction = auctionService.auctionDetail(auctionIdx);
         if (auction == null || !auction.getBuyerIdx().equals(loginUser.getMemIdx())) {
@@ -422,7 +440,7 @@ public class AuctionController {
 
         try {
             bidService.selectWinner(bidIdx, auctionIdx);
-            ra.addFlashAttribute("successMessage", "낙찰 처리가 완료되었습니다!");
+            ra.addFlashAttribute("successMessage", "낙찰 처리가 완료되었습니다");
         } catch (IllegalArgumentException e) {
             ra.addFlashAttribute("bidError", e.getMessage());
         }
