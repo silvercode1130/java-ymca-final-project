@@ -66,8 +66,14 @@
         SELECT *
         FROM member
         WHERE mem_id = #{memId}
-    </select>    
+    </select>   
     
+    <!-- 회원정보 수정창에서 비밀번호 재발급 --> 
+    <select id="selectPwdById" resultType="String">
+	    SELECT mem_pwd
+	    FROM member
+	    WHERE mem_id = #{memId}
+	</select>
     
     <!-- 탈퇴 -->
     <delete id="deleteMember" parameterType="string">
@@ -76,7 +82,7 @@
 	</delete>
 	
 	
-		 <update id="update">
+	<update id="update">
         UPDATE member
         SET mem_name = #{memName},
             mem_email = #{memEmail},
