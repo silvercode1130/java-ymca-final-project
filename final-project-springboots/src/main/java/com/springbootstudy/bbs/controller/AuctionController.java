@@ -30,8 +30,8 @@ public class AuctionController {
 	
 	// 이미지 저장 경로 & 기본 이미지 경로 상수
 	private static final String AUCTION_UPLOAD_SUBDIR = "/src/main/resources/static/images/auction/";
-	private static final String AUCTION_DEFAULT_IMG   = "/images/auction/default_auction.png";
-	private static final String BID_DEFAULT_IMG       = null; // 입찰 기본이미지 없음 (선택사항)
+	private static final String BID_UPLOAD_SUBDIR     = "/src/main/resources/static/images/bid/";
+	private static final String AUCTION_DEFAULT_IMG   = "/images/auction/auction_default.png"; 
 	
     @Autowired
     private AuctionService auctionService;
@@ -44,15 +44,17 @@ public class AuctionController {
     public String auctionList(
             @RequestParam(value = "keyword",  required = false) String keyword,
             @RequestParam(value = "sortBy",   required = false, defaultValue = "latest") String sortBy,
+            @RequestParam(value = "statusFilter", required = false, defaultValue = "open") String statusFilter,
             Model model) {
 
         auctionService.updateExpiredAuctions();
-        List<AuctionDTO> list = auctionService.AuctionList(null, keyword, sortBy);
+        List<AuctionDTO> list = auctionService.AuctionList(null, keyword, sortBy, statusFilter);
 
         model.addAttribute("auctionList", list);
         model.addAttribute("keyword", keyword);
         model.addAttribute("selectedCategory", null);
         model.addAttribute("sortBy", sortBy);
+        model.addAttribute("statusFilter", statusFilter);
         return "views/auction/auctionList";
     }
     
@@ -62,15 +64,17 @@ public class AuctionController {
             @PathVariable("categoryCode") String categoryCode,
             @RequestParam(value = "keyword", required = false) String keyword,
             @RequestParam(value = "sortBy",  required = false, defaultValue = "latest") String sortBy,
+            @RequestParam(value = "statusFilter", required = false, defaultValue = "open") String statusFilter,
             Model model) {
 
         auctionService.updateExpiredAuctions();
-        List<AuctionDTO> list = auctionService.AuctionList(categoryCode, keyword, sortBy);
+        List<AuctionDTO> list = auctionService.AuctionList(categoryCode, keyword, sortBy, statusFilter);
 
         model.addAttribute("auctionList", list);
         model.addAttribute("keyword", keyword);
         model.addAttribute("selectedCategory", categoryCode);
         model.addAttribute("sortBy", sortBy);
+        model.addAttribute("statusFilter", statusFilter);
         return "views/auction/auctionList";
     }
 
@@ -302,20 +306,24 @@ public class AuctionController {
         // 입찰 이미지 업로드 처리
         if (bidImageFile != null && !bidImageFile.isEmpty()) {
             try {
-                String uploadDir = System.getProperty("user.dir") + AUCTION_UPLOAD_SUBDIR;
+                String uploadDir = System.getProperty("user.dir") + BID_UPLOAD_SUBDIR;
                 File dir = new File(uploadDir);
                 if (!dir.exists()) dir.mkdirs();
 
                 String fileName = UUID.randomUUID() + "_" + bidImageFile.getOriginalFilename();
                 bidImageFile.transferTo(new File(uploadDir + fileName));
 
-                bidDto.setItemThumbnailImg("/images/auction/" + fileName);
+                bidDto.setItemThumbnailImg("/images/bid/" + fileName);
             } catch (Exception e) {
                 log.error("입찰 이미지 업로드 실패", e);
-                bidDto.setItemThumbnailImg(BID_DEFAULT_IMG);
+                // 업로드 실패 시 에러 반환 (기본이미지 없음)
+                ra.addFlashAttribute("bidError", "이미지 업로드에 실패했습니다. 다시 시도해주세요.");
+                return "redirect:/auctions/" + auctionIdx;
             }
         } else {
-            bidDto.setItemThumbnailImg(BID_DEFAULT_IMG); // 입찰은 선택이라 null
+            // JS에서 막지만 혹시 모를 직접 요청 방어
+            ra.addFlashAttribute("bidError", "제안 상품 이미지는 필수입니다.");
+            return "redirect:/auctions/" + auctionIdx + "/bids";
         }
         
         // itemCategoryIdx는 경매에서 자동 세팅

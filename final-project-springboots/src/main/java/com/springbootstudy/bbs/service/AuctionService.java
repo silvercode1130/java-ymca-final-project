@@ -22,8 +22,8 @@ public class AuctionService {
 	private BidMapper bidMapper;
 	
 	// 경매 리스트 조회 (검색 및 카테고리 필터링 포함)
-	public List<AuctionDTO> AuctionList(String categoryCode, String keyword, String sortBy) {
-	    List<AuctionDTO> list = auctionMapper.auctionList(categoryCode, keyword, sortBy);
+	public List<AuctionDTO> AuctionList(String categoryCode, String keyword, String sortBy, String statusFilter) {
+	    List<AuctionDTO> list = auctionMapper.auctionList(categoryCode, keyword, sortBy, statusFilter);
 	    for (AuctionDTO dto : list) {
 	        refine(dto);
 	    }

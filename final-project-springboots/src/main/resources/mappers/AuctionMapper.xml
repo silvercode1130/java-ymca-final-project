@@ -10,6 +10,17 @@
 	    FROM auction_list_view
 	    WHERE auction_is_deleted = 'N'
 	
+	    <choose>
+		    <when test="statusFilter == 'closed'">
+		        <!-- 마감된 경매: 결정대기(2), 마감(3), 유찰(4), 취소(5) 한번에 -->
+		        AND auction_status_idx IN (2, 3, 4, 5)
+		    </when>
+		    <otherwise>
+		        <!-- 기본(진행중): 1번만 -->
+		        AND auction_status_idx = 1
+		    </otherwise>
+		</choose>
+	
 	    <if test="categoryCode != null and categoryCode != ''">
 	        AND UPPER(item_category_code) LIKE UPPER(CONCAT('%', #{categoryCode}, '%'))
 	    </if>

@@ -60,10 +60,15 @@ public class WebConfig implements WebMvcConfigurer {
 			.addResourceHandler("/upload/finalProfile/**")
 			.addResourceLocations("file:///C:/upload/finalProfile/");
 					
-		// 경매/입찰 이미지 - static/images/auction 으로 변경
-	    String staticPath = System.getProperty("user.dir") + "/src/main/resources/static/images/auction/";
+		// 경매 이미지 
 	    registry.addResourceHandler("/images/auction/**")
-	            .addResourceLocations("file:///" + staticPath);
+	            .addResourceLocations("file:///" + System.getProperty("user.dir").replace("\\", "/")
+	    				+ "/src/main/resources/static/images/auction/");
+	    
+	    // 입찰 이미지 
+	    registry.addResourceHandler("/images/bid/**")
+	            .addResourceLocations("file:///" + System.getProperty("user.dir").replace("\\", "/")
+	    				+ "/src/main/resources/static/images/bid/");
 
 		// 게시글 이미지 - src/main/resources/static/images/board 실시간 서빙
 		registry

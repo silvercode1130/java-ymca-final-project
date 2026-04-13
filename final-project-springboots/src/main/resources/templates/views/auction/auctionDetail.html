@@ -9,8 +9,11 @@
 	<div class="detail-left">
 		
 		<!-- 썸네일 -->
-		<div class="auction-thumb" th:if="${detail.auctionThumbnailImg != null and detail.auctionThumbnailImg != ''}">
-			<img th:src="@{${detail.auctionThumbnailImg}}" alt="경매 이미지">
+		<div class="auction-thumb">
+		    <img th:src="${detail.auctionThumbnailImg != null and detail.auctionThumbnailImg != ''
+		                   ? detail.auctionThumbnailImg
+		                   : '/images/auction/auction_default.png'}"
+		         alt="경매 이미지">
 		</div>
 		
 		<h2 th:text="${detail.auctionTitle}" style="margin-top:0;">경매 제목</h2>
@@ -151,8 +154,8 @@
 				
 				<tbody>
 					<!-- 클릭 → 모든 유저가 상세 이동 가능 -->
-					<tr th:each="bid, st : ${bidList}" th:class="${session.loginUser != null} ? 'bid-row-link' : ''"
-						th:onclick="${session.loginUser != null} ? |location.href='/auctions/${detail.auctionIdx}/bids/${bid.bidIdx}'| : ''">
+					<tr th:each="bid, st : ${bidList}" class="'bid-row-link' : ''"
+						th:onclick="|location.href='/auctions/${detail.auctionIdx}/bids/${bid.bidIdx}'|">
 						<td th:text="${st.count}">1</td>
 						
 						<!-- 구매자: 실명 / 그 외: 마스킹 -->
@@ -243,11 +246,12 @@
 					<input type="hidden" name="itemCategoryIdx" th:value="${detail.itemCategoryIdx}">
 					
 					<div class="input-group">
-						<label>제안 이미지 <span style="color:#888; font-size:12px;">(선택)</span></label>
-						<input type="file" name="bidImageFile" accept="image/*" id="bidImageFile">
-						<div id="bidPreviewBox" style="margin-top:8px; display:none;">
-							<img id="bidPreviewImg" style="max-width:200px; max-height:150px; border:1px solid #ddd; border-radius:4px;">
-						</div>
+					    <label>제안 이미지 <span style="color:red;">*</span></label>
+					    <input type="file" name="bidImageFile" accept="image/*" id="bidImageFile">
+					    <small style="color:#888;">제안할 상품 이미지를 첨부해주세요 (필수)</small>
+					    <div id="bidPreviewBox" style="margin-top:8px; display:none;">
+					        <img id="bidPreviewImg" style="max-width:200px; max-height:150px; border:1px solid #ddd; border-radius:4px;">
+					    </div>
 					</div>
 					
 					<div class="input-group">

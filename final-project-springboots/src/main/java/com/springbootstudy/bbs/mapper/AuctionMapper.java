@@ -12,7 +12,7 @@ public interface AuctionMapper {
 	
 	// 경매 구매요청 전체 리스트 조회 (카테고리 코드 + 키워드 검색)
     List<AuctionDTO> auctionList(@Param("categoryCode") String categoryCode, 
-    		@Param("keyword") String keyword,@Param("sortBy") String sortBy);
+    		@Param("keyword") String keyword,@Param("sortBy") String sortBy, @Param("statusFilter") String statusFilter);
 
     // 구매요청 상세보기 조회
     AuctionDTO auctionDetail(Long auctionIdx);

@@ -66,6 +66,17 @@ if (bidPriceInput) {
 const bidForm = document.getElementById('bidForm');
 if (bidForm) {
     bidForm.addEventListener('submit', function (e) {
+		
+		// 이미지 필수 체크
+        const imgInput = document.getElementById('bidImageFile');
+        if (imgInput && (!imgInput.files || imgInput.files.length === 0)) {
+            alert('제안 상품 이미지를 첨부해주세요 📸');
+            imgInput.focus();
+            e.preventDefault();
+            return;
+        }
+		
+		// 가격 검증
         const inp = document.getElementById('bidPrice');
         if (!inp) return;
         const raw = inp.value.replace(/,/g, '');
@@ -85,6 +96,8 @@ if (bidForm) {
             // 쉼표 제거 후 전송
             inp.value = raw;
         }
+		
+		
     });
 }
 /* ── 실시간 타이머 (상세 페이지) ── */
