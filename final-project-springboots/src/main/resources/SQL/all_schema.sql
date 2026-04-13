@@ -424,6 +424,51 @@ CREATE TABLE payment (
     CONSTRAINT fk_payment_buyer  FOREIGN KEY (mem_idx) REFERENCES member(mem_idx)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='결제 상세 정보 테이블';
 
+
+/* ==========================================
+   채팅 관련 (추가기능)
+   ========================================== */
+   
+   CREATE TABLE chatroom (
+    chatroom_idx   BIGINT      NOT NULL AUTO_INCREMENT COMMENT 'PK',
+    auction_idx    BIGINT      NOT NULL COMMENT 'FK auction.auctionidx',
+    buyer_idx      BIGINT      NOT NULL COMMENT 'FK member.memidx (구매자)',
+    bidder_idx     BIGINT      NOT NULL COMMENT 'FK member.memidx (입찰자)',
+    created_at     DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '방 생성 시각',
+    PRIMARY KEY (chatroom_idx),
+    UNIQUE KEY ux_chatroom_unique (auction_idx, buyer_idx, bidder_idx),
+    KEY idx_chatroom_auction (auction_idx),
+    KEY idx_chatroom_buyer (buyer_idx),
+    KEY idx_chatroom_bidder (bidder_idx),
+    CONSTRAINT fk_chatroom_auction
+        FOREIGN KEY (auction_idx) REFERENCES auction(auction_idx)
+        ON DELETE CASCADE,
+    CONSTRAINT fk_chatroom_buyer
+        FOREIGN KEY (buyer_idx) REFERENCES member(mem_idx)
+        ON DELETE CASCADE,
+    CONSTRAINT fk_chatroom_bidder
+        FOREIGN KEY (bidder_idx) REFERENCES member(mem_idx)
+        ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='경매별 1:1 채팅방';
+
+CREATE TABLE chatmessage (
+    message_idx    BIGINT      NOT NULL AUTO_INCREMENT COMMENT 'PK',
+    chatroom_idx   BIGINT      NOT NULL COMMENT 'FK chatroom.chatroom_idx',
+    sender_idx     BIGINT      NOT NULL COMMENT 'FK member.memidx',
+    message_content VARCHAR(1000) NOT NULL COMMENT '메시지 내용',
+    sent_at        DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '보낸 시각',
+    PRIMARY KEY (message_idx),
+    KEY idx_chatmessage_room (chatroom_idx),
+    KEY idx_chatmessage_sender (sender_idx),
+    CONSTRAINT fk_chatmessage_room
+        FOREIGN KEY (chatroom_idx) REFERENCES chatroom(chatroom_idx)
+        ON DELETE CASCADE,
+    CONSTRAINT fk_chatmessage_sender
+        FOREIGN KEY (sender_idx) REFERENCES member(mem_idx)
+        ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='채팅 메시지';
+
+
 /* ==========================================
    7. 코드 테이블 기본 데이터
    ========================================== */
