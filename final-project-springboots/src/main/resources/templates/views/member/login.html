@@ -3,6 +3,8 @@
 
 <th:block layout:fragment="content">
 
+<script src="https://static.nid.naver.com/js/naveridlogin_js_sdk_2.0.2.js" charset="utf-8"></script>
+
 	<script type="text/javascript">
 		//필수 항목 체크 안되면 못 넘어가게 하는 기능
 		function checkValid() {
@@ -120,10 +122,26 @@
 								</a>
 							</div>
 						</form>
+						
+						<hr>
+						
+						<div id="naverIdLogin"></div> 
+						
 					</div>
 				</div>
 			</div> 
 		</div>
+		
+			<!-- 3. SDK 초기화 및 버튼 생성 -->
+			<script type="text/javascript">
+			    var naverLogin = new naver.LoginWithNaverId({
+			        clientId: "2Rk518jWd9bxOQoKuUnD", // 발급받은 Client ID
+			        callbackUrl: "http://localhost:8080/members/naverCallback", // 등록한 Callback URL
+			        isPopup: false, // 팝업 방식으로 진행할지 여부
+			        loginButton: { color: "green", type: 3, height: 60 } // 버튼 스타일 설정
+			    });
+			    naverLogin.init();
+			</script>
 
 	</th:block>
 </body>
