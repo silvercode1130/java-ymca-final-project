@@ -28,7 +28,12 @@ public class WebConfig implements WebMvcConfigurer {
 						"/views/member/login",
 						"/views/member/signUp",
 						"/views/member/check_id",
-						"/fragments/main"); 
+						"/fragments/main",
+						// 경매 조회는 비회원 허용
+		                "/auctions",
+		                "/auctions/category/**",
+		                "/auctions/*",
+		                "/auctions/*/bids/*"); 
 	}
 
 	/*
@@ -47,16 +52,23 @@ public class WebConfig implements WebMvcConfigurer {
 		registry.addViewController("/writeBoard").setViewName("views/writeForm");
 	}
 	
-	// 프로필 이미지 업로드 기능
+	// 이미지 업로드 기능
 	@Override
 	public void addResourceHandlers(ResourceHandlerRegistry registry) {
-		registry
-			.addResourceHandler("/upload/**")
-			.addResourceLocations("file:///C:/upload/");
 		
 		registry
 			.addResourceHandler("/upload/finalProfile/**")
 			.addResourceLocations("file:///C:/upload/finalProfile/");
+					
+		// 경매 이미지 
+	    registry.addResourceHandler("/images/auction/**")
+	            .addResourceLocations("file:///" + System.getProperty("user.dir").replace("\\", "/")
+	    				+ "/src/main/resources/static/images/auction/");
+	    
+	    // 입찰 이미지 
+	    registry.addResourceHandler("/images/bid/**")
+	            .addResourceLocations("file:///" + System.getProperty("user.dir").replace("\\", "/")
+	    				+ "/src/main/resources/static/images/bid/");
 
 		// 게시글 이미지 - src/main/resources/static/images/board 실시간 서빙
 		registry

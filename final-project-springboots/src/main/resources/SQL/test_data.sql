@@ -219,7 +219,7 @@ INSERT INTO item (
 ('리조트 숙박권 1박',                      8, 'ResortX','NEW',   NULL, NULL, 'N'),
 
 -- 20: 콘서트 티켓 (accessory = 8)
-('콘서트 티켓 2장',                        8, 'Ticket','NEW',   NULL, NULL, 'N');
+('콘서트 티켓 2장',                        8, 'Ticket','NEW',   NULL, NULL, 'N'),
  
  -- 공/볼 (카테고리 : 1번)
 ('프리미어리그 공인구 - 미개봉 새제품', 1, 'NIKE', 'NEW', '/images/ball_01.jpg', NULL, 'N'),
@@ -360,7 +360,7 @@ INSERT INTO auction (
  NOW() - INTERVAL 12 DAY,
  6,
  NOW() - INTERVAL 18 DAY, NOW() - INTERVAL 12 DAY,
- 'Y', NOW() - INTERVAL 11 DAY);
+ 'Y', NOW() - INTERVAL 11 DAY),
  
  -- 11. 공/볼 (1번) 관련 경매
 (3, 1, 
@@ -462,7 +462,7 @@ INSERT INTO bid (
 
 -- Auction 10 (관리자 삭제된 콘서트 티켓 케이스)
 (10,6,  20,350000, 2, '콘서트 티켓 2장 양도합니다.', 5,
- NOW() - INTERVAL 17 DAY, NOW() - INTERVAL 11 DAY);
+ NOW() - INTERVAL 17 DAY, NOW() - INTERVAL 11 DAY),
 
 -- Auction 11
 (11, 7, 21, 110000, 1, '미개봉 나이키 공인구입니다. 박스 풀셋이에요.', 1, NOW() - INTERVAL 5 HOUR, NULL),
