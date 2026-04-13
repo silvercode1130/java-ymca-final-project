@@ -16,6 +16,11 @@
 	        if (status) {
 	            var email = naverLogin.user.getEmail();
 	            var name = naverLogin.user.getName();
+	            var tel = naverLogin.user.getMobile();
+	            var birthyear = naverLogin.user.getBirthyear();
+	            var birthday = naverLogin.user.getBirthday();
+	            var memBday = birthyear + "-" + birthday;
+	            
 	            console.log("로그인 성공! 유저 정보:", email, name);
 	            
 	            fetch("/members/naverCallback", {
@@ -26,8 +31,11 @@
 	                body:
 	                    "memName=" + encodeURIComponent(name) +
 	                    "&memEmail=" + encodeURIComponent(email) +
-	                    "&memTel=010-0000-0000" +
-	                    "&memBday=2000-01-01"
+	                    "&memTel=" + encodeURIComponent(tel) +
+	                    "&memBday=" + encodeURIComponent(memBday)
+	            })
+		            .then(() => {
+		                window.location.href = "/main"; 
 	            });
 	            
 	            // 여기서 서버에 정보를 보내거나 메인 페이지로 리다이렉트합니다.
