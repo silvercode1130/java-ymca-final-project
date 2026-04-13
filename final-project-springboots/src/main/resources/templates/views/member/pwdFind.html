@@ -32,7 +32,7 @@
 	}
 	
 	// 인증번호가 맞는지 체크
-	function checkAuthCode() {
+	function checkAuthCode() { 
     let userCode = $("#userInputCode").val(); // 사용자가 입력한 인증번호
     
     $.ajax({
@@ -41,8 +41,11 @@
         data: { "userCode": userCode },
         success: function(res) {
             if(res === "success") {
+            	isAuthOk = true;        
+                //checkAll(); // 비번 검증도 못하는데 왜 필요함? -> 인증번호 다음에 해야 함(코드 상으로도 아래에 있어서 안됨)         
                 $("#authMsg").text("인증 되었습니다").css({"color": "gray", "fontSize": "12px"});
             } else {
+            	isAuthOk = false;  
                 $("#authMsg").text("인증번호가 틀렸습니다").css({"color": "red", "fontSize": "12px"});
             }  
        	},
@@ -54,18 +57,18 @@
 	
 	// 새 비밀번호 인증
 	let isSamePwd = false;
+	//let isAuthOk = false;  // 지역변수고 뭐고 간에 false면 인증코드 틀림 처리
 
 	$(document).ready(function() { 
 	
 	    $("#newPwd, #newPwdConfirm").on("keyup", function() {
-	    	pwdCheck();
-	    	validatePassword();
+	    	checkAll();
 	    });
 	
 	    $("#newPwd").on("blur", function() {
 	        let newPwd = $(this).val();
 	
-	        $.ajax({
+	        $.ajax({ 
 	            url: "/auth/checkSamePwd",
 	            type: "POST",
 	            data: { "newPwd": newPwd },
@@ -76,76 +79,49 @@
 	                } else {
 	                    isSamePwd = false;
 	                }
-	
-	                validatePassword(); 
+	                checkAll();
 	            }
 	        });
 	    });
 	});
 	
 	// 모든 조건을 한 번에 체크
-	function validatePassword() {
+	function checkAll() {
 	    let pwd1 = $("#newPwd").val();
 	    let pwd2 = $("#newPwdConfirm").val();
 	    let submitBtn = $("#submitBtn");
 	
-	    // 이전 비밀번호면 무조건 막기
-	    if (isSamePwd) {
-	        submitBtn.prop("disabled", true);
-	        return;
-	    }
-	
-	    // 두 값이 다 있을 때만 비교
-	    if (pwd1 !== "") {
-		    if (pwd2 === "") {
-		        $("#pwdMatchMsg").text("비밀번호를 한번 더 입력해주세요").css("color", "gray");
-		        submitBtn.prop("disabled", true);
-		    } else if (pwd1 === pwd2) {
-		        $("#pwdMatchMsg").text("비밀번호가 일치합니다").css("color", "gray");
-		        submitBtn.prop("disabled", false);
-		    } else {
-		        $("#pwdMatchMsg").text("비밀번호가 일치하지 않습니다").css("color", "red");
-		        submitBtn.prop("disabled", true);
-		    }
-		}
-	}
-	
-	// 비밀번호 체크용 (제약조건)
-    function pwdCheck() {
-	    let pwd = document.querySelector("#newPwd").value.trim();
-	    let pwdCheckValue = document.querySelector("#newPwdConfirm").value.trim();
-	    let msg = document.querySelector("#pwdMatchMsg");
-	
-	    // 제약조건
 	    let pwdReg = /^[A-Za-z0-9]{5,}$/;
-	    let submitBtn = document.querySelector("#submitBtn");
 	
-	    // 입력 안하면 return false 처리
-	    if (pwd === "" && pwdCheckValue === "") {
-	        msg.textContent = "";
-	        submitBtn.disabled = true;
-	        return false;
-	    }
+	    let isPwdValid = false;
+	    let isMatch = false;
 	
-	    // 제약조건 검사
-	    if (!pwdReg.test(pwd)) {
-	        msg.style.color = "red";
-	        msg.textContent = "✘ 영문 + 숫자 5글자 이상으로 입력해주세요.";
-	        submitBtn.disabled = true;
-	        return false;
-	    }
-	
-	    // 두 입력란의 비밀번호가 동일한지 검사
-	    if (pwd === pwdCheckValue) {
-	        msg.style.color = "gray"; 
-	        msg.textContent = "✔ 비밀번호가 일치하며 사용 가능합니다.";
-	        submitBtn.disabled = false; 
-	        return true;
+	    // 비밀번호 조건
+	    if (!pwdReg.test(pwd1)) {
+	        $("#pwdMsg").text("✘ 영문 + 숫자 5글자 이상").css("color", "red");
+	        isPwdValid = false;
 	    } else {
-	        msg.style.color = "red";
-	        msg.textContent = "✘ 비밀번호가 일치하지 않습니다.";
-	        submitBtn.disabled = true;
-	        return false;
+	        $("#pwdMsg").text("✔ 사용 가능한 비밀번호").css("color", "gray");
+	        isPwdValid = true;
+	    }
+	
+	    // 비밀번호 확인
+	    if (pwd2 === "") {
+	        $("#pwdConfirmMsg").text("").css("color", "gray");
+	        isMatch = false;
+	    } else if (pwd1 === pwd2) {
+	        $("#pwdConfirmMsg").text("✔ 비밀번호 일치").css("color", "gray");
+	        isMatch = true;
+	    } else {
+	        $("#pwdConfirmMsg").text("✘ 비밀번호 불일치").css("color", "red");
+	        isMatch = false;
+	    }
+	
+	    // 버튼 제어 
+	    if (isPwdValid && isMatch && isAuthOk) {
+	        submitBtn.prop("disabled", false);
+	    } else {
+	        submitBtn.prop("disabled", true);
 	    }
 	}
 </script>
@@ -186,7 +162,7 @@
 			<span id="togglePwd">
 				<i class="bi bi-eye"></i>
 			</span> <br>
-			<span id="pwdMatchMsg" style="font-size: 12px;"></span> <br>
+			<span id="pwdMsg" style="font-size: 12px;"></span> <br>
 			
 			<label style="margin-top: 10px; display: inline-block;">비밀번호 확인</label> <br>
 			<input type="password" id="newPwdConfirm" placeholder="다시 한번 입력하세요"> <br>

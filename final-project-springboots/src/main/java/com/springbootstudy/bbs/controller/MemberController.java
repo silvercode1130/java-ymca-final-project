@@ -358,7 +358,7 @@ public class MemberController {
           
 	       // Message 패키지가 중복될 경우 com.solapi.sdk.message.model.Message로 치환하여 주세요
 	       Message message = new Message();
-	       message.setFrom("01024152943"); 
+	       message.setFrom("01024152943"); // 보내는 사람 번호
 	       message.setTo(memTel.replace("-", "")); 
 	       message.setText("PickQ의 본인 확인을 위한 인증번호는 [" + code + "]입니다."); 
 	
@@ -372,10 +372,6 @@ public class MemberController {
 	       } catch (Exception exception) {
 	         System.out.println(exception.getMessage());
 	       }
-	       
-	       // 3. 인증번호 확인하기
-	       
-	       // 4. 새 비밀번호 서버에 알리기
 	          
           return "redirect:/members/pwdFind"; 
       }
@@ -394,17 +390,6 @@ public class MemberController {
           }
       }
       
-      // 비밀번호 동일한지 체크
-//      @PostMapping("/auth/checkSamePwd")
-//      @ResponseBody
-//      public String checkSamePwd(@RequestParam("newPwd") String newPwd, HttpSession session) {
-//          MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
-//          
-//          if (loginUser != null && loginUser.getMemPwd().equals(newPwd)) {
-//              return "same"; 
-//          }
-//          return "different";
-//      }
       @PostMapping("/auth/checkSamePwd")
       @ResponseBody
       public String checkSamePwd(@RequestParam("newPwd") String newPwd, HttpSession session) {
