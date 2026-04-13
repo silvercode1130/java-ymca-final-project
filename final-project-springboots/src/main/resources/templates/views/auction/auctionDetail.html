@@ -42,8 +42,12 @@
 
 										<!-- 썸네일 -->
 										<div style="width: 180px;" class="d-flex flex-column gap-2">
-											<img th:src="${detail.auctionThumbnailImg}"
-												class="img-fluid rounded" style="cursor: pointer;">
+											<img
+												th:src="${detail.auctionThumbnailImg != null and detail.auctionThumbnailImg != ''
+                   ? detail.auctionThumbnailImg
+                   : '/images/common/default_image.png'}"
+												class="img-fluid rounded" alt="경매 이미지"
+												style="cursor: pointer;">
 
 											<!-- 채팅 버튼: 썸네일과 동일 너비 180px -->
 											<button type="button" class="btn btn-dark w-100"
@@ -92,7 +96,6 @@
 										<p th:text="${detail.auctionDesc}"
 											style="white-space: pre-line;"></p>
 									</div>
-
 								</th:block>
 
 
@@ -114,8 +117,7 @@
 										<div class="col text-end">
 											<small class="text-muted">제안 금액</small>
 											<div class="fw-bold text-primary fs-5">
-												[[${#numbers.formatInteger(selectedBid.bidPrice,0,'COMMA')}]]원
-											</div>
+												[[${#numbers.formatInteger(selectedBid.bidPrice,0,'COMMA')}]]원</div>
 										</div>
 									</div>
 
@@ -191,8 +193,7 @@
 
 										<div class="d-flex justify-content-between mb-1">
 
-											<div class="fw-semibold text-sm">[[${bid.bidderName}]]
-											</div>
+											<div class="fw-semibold text-sm">[[${bid.bidderName}]]</div>
 
 											<div class="fw-bold">
 												[[${#numbers.formatInteger(bid.bidPrice,0,'COMMA')}]]원</div>
@@ -203,7 +204,6 @@
 
 										<div class="d-flex justify-content-between">
 											<span class="text-muted small"> [[${bid.itemBrand}]] </span>
-
 											<span class="badge bg-secondary"
 												th:text="${bid.bidStatusName}"></span>
 										</div>
@@ -223,6 +223,6 @@
 				</div>
 			</div>
 	</th:block>
-	
+
 </body>
 </html>
