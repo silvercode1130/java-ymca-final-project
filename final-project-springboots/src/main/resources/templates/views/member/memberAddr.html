@@ -13,12 +13,13 @@
 		<script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 		
 		<script>
+			// 주소 삭제
 			function deleteAddr(addrIdx) {
 			    if(confirm("주소를 삭제하시겠습니까?")) {
 			        document.getElementById("deleteAddrIdx").value = addrIdx;
 			        
 			        let form = document.getElementById("memberAddr");
-			        form.action = "/members/addrDelete";
+			        form.action = "/mypage/addresses/delete"; 
 			        form.method = "post";
 			        
 			        form.submit();
@@ -30,7 +31,7 @@
 			</div>
 			
 			<div>
-				<form action="/members/memberAddrUpdate" id="memberAddr" name="memberAddrForm">		
+				<form action="/mypage/addresses/edit" id="memberAddr" name="memberAddrForm">		
 				
 				<input type="hidden" name="addrIdx" id="deleteAddrIdx">
 							
@@ -49,7 +50,7 @@
 								<td th:text="${addr.memAddr}"></td>
 								<td th:text="${member.memTel}"></td>
 								<td>
-									<button type="button" class="btn-update" th:onclick="|location.href='@{/members/memberAddrUpdate(addrIdx=${addr.addrIdx})}'|">수정</button>
+									<button type="button" class="btn-update" th:onclick="|location.href='@{/mypage/addresses/edit(addrIdx=${addr.addrIdx})}'|">수정</button>
             						<button type="button" class="btn-delete" th:onclick="|deleteAddr(${addr.addrIdx})|">삭제</button>
 								</td>
 							</tr> 
@@ -62,12 +63,11 @@
 						</tbody>
 					</table> 
 					
-					<button type="button" onclick="location.href='/members/memberAddrInsert'">
+					<button type="button" onclick="location.href='/mypage/addresses/new'">
 					    주소 추가
 					</button>
 				</form> 
 			</div>
-		</div>
 
 	</th:block>
 </body>

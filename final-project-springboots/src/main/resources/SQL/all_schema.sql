@@ -36,6 +36,7 @@ DROP TABLE IF EXISTS member;
 
 DROP TABLE IF EXISTS grade;
 DROP TABLE IF EXISTS role;
+DROP TABLE IF EXISTS payment;
 
 SET FOREIGN_KEY_CHECKS = 1;
 
@@ -224,7 +225,7 @@ CREATE TABLE bid (
     item_idx          BIGINT        NOT NULL COMMENT 'FK → item (실제 제안 상품)',
     bid_price         BIGINT        NOT NULL COMMENT '제안 가격',
     bid_quantity      INT           NOT NULL DEFAULT 1 COMMENT '수량',
-    bid_message       VARCHAR(500)  DEFAULT NULL COMMENT '제안 조건/설명',
+    bid_message       LONGTEXT		DEFAULT NULL COMMENT '제안 조건/설명',
     bid_status_idx    INT           NOT NULL COMMENT 'FK → bid_status',
     bid_regdate       DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '등록일',
     bid_moddate       DATETIME      DEFAULT NULL COMMENT '수정/취소일',
@@ -523,15 +524,6 @@ INSERT INTO auction_status (auction_status_idx, auction_status_code, auction_sta
 VALUES (5, 'canceled','취소');
 INSERT INTO auction_status (auction_status_idx, auction_status_code, auction_status_name)
 VALUES (6, 'deleted','삭제됨');
-INSERT INTO auction_status (auction_status_idx, auction_status_code, auction_status_name)
-VALUES (7, 'paying','결제대기');
-INSERT INTO auction_status (auction_status_idx, auction_status_code, auction_status_name)
-VALUES (8, 'paid','결제완료');
-INSERT INTO auction_status (auction_status_idx, auction_status_code, auction_status_name)
-VALUES (9, 'shipping','배송중');
-INSERT INTO auction_status (auction_status_idx, auction_status_code, auction_status_name)
-VALUES (10, 'delivered','배송완료');
-
 
 -- 7-5) BID_STATUS 코드
 INSERT INTO bid_status (bid_status_idx, bid_status_code, bid_status_name)
@@ -576,3 +568,27 @@ INSERT INTO board_type (board_type_idx, board_type_code, board_type_name, board_
 VALUES (14, 'aerobics',  '에어로빅', 'Y', 1);
 INSERT INTO board_type (board_type_idx, board_type_code, board_type_name, board_can_comment, board_min_role)
 VALUES (15, 'swimming',  '수영',     'Y', 1);
+
+/* ==========================================
+   6. 결제 관련
+   ========================================== */
+
+CREATE TABLE payment (
+    pay_idx          BIGINT        NOT NULL AUTO_INCREMENT COMMENT 'PK',
+    bid_idx          BIGINT        NOT NULL COMMENT 'FK → bid.bid_idx (낙찰된 입찰, 여기서 판매자/경매 정보 조인)',
+    mem_idx          BIGINT        NOT NULL COMMENT 'FK → member.mem_idx (구매자)',
+    imp_uid          VARCHAR(100)  NOT NULL COMMENT '포트원 결제 고유번호',
+    merchant_uid     VARCHAR(100)  NOT NULL COMMENT '우리 시스템 주문번호',
+    pay_method       VARCHAR(50)   NOT NULL COMMENT '결제 수단 (card, trans, vbank 등)',
+    pay_amount       BIGINT        NOT NULL COMMENT '실제 결제 금액',
+    pay_status       VARCHAR(20)   NOT NULL DEFAULT 'PAID'
+                     COMMENT '결제 상태 (PAID, CONFIRMED, SETTLED, CANCELLED)',
+    pay_regdate      DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '결제 일시',
+    confirmed_at     DATETIME      NULL COMMENT '구매자 수령 확인 일시',
+    settled_at       DATETIME      NULL COMMENT '판매자 정산 완료 일시',
+    PRIMARY KEY (pay_idx),
+    UNIQUE KEY ux_payment_imp_uid (imp_uid),
+    UNIQUE KEY ux_payment_merchant_uid (merchant_uid),
+    CONSTRAINT fk_payment_bid    FOREIGN KEY (bid_idx) REFERENCES bid(bid_idx),
+    CONSTRAINT fk_payment_buyer  FOREIGN KEY (mem_idx) REFERENCES member(mem_idx)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='결제 상세 정보 테이블';

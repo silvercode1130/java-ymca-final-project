@@ -3,12 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <title>Insert title here</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
 <body>
-	거래한 판매자 등등을 검색한 뒤
-	최근 거래 목록이 뜨면 선택
-	아래에 리뷰창이 뜨고
-	리뷰를 작성 후 버튼을 누르면 전송 됨
+
 		<input type="hidden" name="buyer_idx" th:value="${session.loginUser.memIdx}">
 		<input type="hidden" name="bidder_idx" th:value="${bidderIdx}">
 		<input type="hidden" name="auction_idx" th:value="${auctionIdx}">
@@ -35,7 +33,7 @@
 		    "<span th:text='${keyword}'></span>"(이)과 관련된 거래가 없습니다
 		</div>
 		
-		<div th:unless="${keyword != null and keyword != '' and #lists.isEmpty(reviewList)}">
+		<div th:if="${keyword != null and keyword != '' and !#lists.isEmpty(reviewList)}">
 		    "<span th:text='${keyword}'></span>"(이)과 관련된 거래입니다
 		</div>
 		
@@ -78,30 +76,32 @@
         <input type="hidden" name="bidder_idx" id="bidder_idx">
 
 		<div>
-			<input type="text" name="reviewTitle" placeholder="리뷰 제목"> 
+			<input type="text" id="reviewTitle" name="reviewTitle" placeholder="리뷰 제목(5글자 이상)"> 
+			
 		</div>
 		
 		<div id="stars" name="stars" style="font-size: 30px; cursor: pointer;">
-	        <span data-value="1">☆</span>
-	        <span data-value="2">☆</span>
-	        <span data-value="3">☆</span>
-	        <span data-value="4">☆</span>
-	        <span data-value="5">☆</span>
+		    <span data-value="1"><i class="bi bi-star"></i></span>
+		    <span data-value="2"><i class="bi bi-star"></i></span>
+		    <span data-value="3"><i class="bi bi-star"></i></span>
+		    <span data-value="4"><i class="bi bi-star"></i></span> 
+		    <span data-value="5"><i class="bi bi-star"></i></span>
 	    </div>
 	    
 	    <input type="hidden" name="reviewStar" id="reviewStar">
 		
 		<div>
-			<textarea rows="10" cols="60" name="content" placeholder="리뷰를 작성해주세요"></textarea>
+			<textarea id="reviewContent" rows="10" cols="60" name="content" placeholder="리뷰를 작성해주세요(10글자 이상)"></textarea>
+			<div id="contentCount" style="font-size:12px; color:gray;">0 / 300자</div>
 		</div>
 
-        <button type="submit">리뷰 남기기</button>
+        <button type="submit" id="reviewSubmitBtn" disabled>리뷰 남기기</button>
         
         <script>
         	// 검색 기능 disabled 
         	const keywordInput = document.querySelector('input[name="keyword"]');
 		    const searchBtn = document.getElementById('searchBtn');
-		
+		    
 		    keywordInput.addEventListener("input", function() {
 		        if (this.value.trim() === "") {
 		            searchBtn.disabled = true;
@@ -126,24 +126,62 @@
         
         	// 별점 부여 기능
 		    const stars = document.querySelectorAll("#stars span");
-		    const reviewStarInput = document.getElementById("reviewStar");
-		
-		    stars.forEach(star => {
-		        star.addEventListener("click", function() {
-		            const value = this.getAttribute("data-value");
-		            reviewStarInput.value = value;
-		
-		            stars.forEach((s, index) => {
-		                if (index < value) {
-		                    s.textContent = "★";
-		                    s.style.color = "gold";
-		                } else {
-		                    s.textContent = "☆";
-		                    s.style.color = "gray";
-		                }
-		            });
-		        });
-		    });
+			const reviewStarInput = document.getElementById("reviewStar");
+			
+			stars.forEach(star => {
+			    star.addEventListener("click", function() {
+			        const value = this.getAttribute("data-value");
+			        reviewStarInput.value = value;
+			
+			        stars.forEach((s, index) => {
+			            const icon = s.querySelector("i");
+			
+			            if (index < value) {
+			                icon.className = "bi bi-star-fill";
+			                icon.style.color = "gold";
+			            } else {
+			                icon.className = "bi bi-star";
+			                icon.style.color = "gray";
+			            }
+			        });
+			    });
+			});
+			
+			// 리뷰 제약조건 걸기
+			const titleInput = document.getElementById("reviewTitle");
+			const contentInput = document.getElementById("reviewContent");
+			const reviewBtn = document.getElementById("reviewSubmitBtn");
+			
+			function checkReviewValid() {
+			    const title = titleInput.value.trim();
+			    const content = contentInput.value.trim();
+			    const contentCount = document.getElementById("contentCount");
+
+			    contentInput.addEventListener("input", function() {
+			        const length = this.value.length;
+
+			        contentCount.textContent = length + " / 300자";
+
+			        if (length > 300) {
+			            contentCount.style.color = "red";
+			        } else {
+			            contentCount.style.color = "gray";
+			        }
+			    });
+			
+			    const isTitleValid = title.length >= 5;
+			    const isContentValid = content.length >= 10 && content.length <= 300;
+			
+			    if (isTitleValid && isContentValid) {
+			        reviewBtn.disabled = false;
+			    } else {
+			        reviewBtn.disabled = true;
+			    }
+			}
+			
+			// 실시간 체크
+			titleInput.addEventListener("input", checkReviewValid);
+			contentInput.addEventListener("input", checkReviewValid);
 		</script>
         
     </form>

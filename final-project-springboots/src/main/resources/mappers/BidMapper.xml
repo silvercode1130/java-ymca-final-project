@@ -7,26 +7,34 @@
 	<!-- 입찰 리스트 조회 (View 사용) -->
 	<select id="BidList" resultType="BidDTO">
 	    SELECT *
-	    FROM bid_list_view
-	    WHERE auction_idx = #{auctionIdx}
-	      AND bid_status_idx != 5
-	    ORDER BY bid_regdate DESC
+		    FROM bid_list_view
+		    WHERE auction_idx = #{auctionIdx}
+		      AND bid_status_idx != 5
+		    ORDER BY bid_price ASC
 	</select>
 	
 	<!-- 입찰 단건 조회 (상세페이지)(View 사용) -->
 	<select id="findBidById" resultType="BidDTO">
 	    SELECT *
-	    FROM bid_list_view
-	    WHERE bid_idx = #{bidIdx}
+		    FROM bid_list_view
+		    WHERE bid_idx = #{bidIdx}
 	</select>
 		
 	<!-- 입찰 삭제 - 소프트 딜리트 -->
 	<update id="softDeleteBid">
 	    UPDATE bid
-	    SET bid_status_idx = 5,
-	        bid_moddate = NOW()
-	    WHERE bid_idx = #{bidIdx}
-	      AND bidder_idx = #{bidderIdx}
+		    SET bid_status_idx = 5,
+		        bid_moddate = NOW()
+		    WHERE bid_idx = #{bidIdx}
+		      AND bidder_idx = #{bidderIdx}
+	</update>
+	
+	<!-- 입찰 삭제 - 관리자 (bidder_idx 조건 없음) -->
+	<update id="adminDeleteBid">
+	    UPDATE bid
+		    SET bid_status_idx = 5,
+		        bid_moddate = NOW()
+		    WHERE bid_idx = #{bidIdx}
 	</update>
 	
 	<!-- 아이템 등록 -->
@@ -76,32 +84,29 @@
 	<!-- 특정 입찰 낙찰 처리 -->
 	<update id="selectWinnerBid">
 	    UPDATE bid
-	    SET bid_status_idx = 2,
-	        bid_moddate = NOW()
-	    WHERE bid_idx = #{bidIdx}
-	      AND auction_idx = #{auctionIdx}
+		    SET bid_status_idx = 2,
+		        bid_moddate = NOW()
+		    WHERE bid_idx = #{bidIdx}
+		      AND auction_idx = #{auctionIdx}
 	</update>
 	
 	<!-- 해당 경매의 나머지 입찰 실패 처리 -->
 	<update id="rejectOtherBids">
 	    UPDATE bid
-	    SET bid_status_idx = 3,
-	        bid_moddate = NOW()
-	    WHERE auction_idx = #{auctionIdx}
-	      AND bid_idx != #{bidIdx}
-	      AND bid_status_idx = 1
+		    SET bid_status_idx = 3,
+		        bid_moddate = NOW()
+		    WHERE auction_idx = #{auctionIdx}
+		      AND bid_idx != #{bidIdx}
+		      AND bid_status_idx = 1
 	</update>
 	
-	<!-- 입찰 수정 -->
-	<update id="updateBid">
+	<!-- 경매 취소 시 해당 경매의 진행중(1) 입찰 전부 취소(4) 처리 -->
+	<update id="cancelBidsByAuction">
 	    UPDATE bid
-	    SET bid_price = #{bidPrice},
-	        bid_quantity = #{bidQuantity},
-	        bid_message = #{bidMessage},
-	        bid_moddate = NOW()
-	    WHERE bid_idx = #{bidIdx}
-	      AND bidder_idx = #{bidderIdx}
-	      AND bid_status_idx = 1
+		    SET bid_status_idx = 4,
+		        bid_moddate = NOW()
+		    WHERE auction_idx = #{auctionIdx}
+		      AND bid_status_idx = 1
 	</update>
 	
 </mapper>	

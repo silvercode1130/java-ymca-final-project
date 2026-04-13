@@ -173,139 +173,6 @@ INSERT INTO reply (
  '127.0.0.1', 'N', NULL, 2, 0);
  
  /* ==========================================
-   AUCTION 더미 데이터 (10건)
-   ========================================== */
-
-INSERT INTO auction (
-    buyer_idx, item_category_idx,
-    auction_title, auction_desc,
-    auction_target_price, auction_view_count,
-    auction_start_at, auction_end_at, auction_decision_deadline,
-    auction_status_idx,
-    auction_regdate, auction_moddate,
-    auction_is_deleted, auction_deldate
-) VALUES
--- 1. 진행중 경매 (open) - 러닝화
-(1, 5,
- '10km 대회용 러닝화 추천받습니다',
- '10km 대회 출전 예정이라, 초보 러너에게 맞는 쿠션 좋은 러닝화 추천받고 싶습니다.',
- 150000, 35,
- NOW() - INTERVAL 1 DAY,
- NOW() + INTERVAL 3 DAY,
- NOW() + INTERVAL 5 DAY,
- 1,
- NOW() - INTERVAL 1 DAY, NULL,
- 'N', NULL),
-
--- 2. 진행중 경매 (open) - 골프 아이언
-(2, 2,
- '골프 아이언 세트 역경매 (중급자용)',
- '현재 핸디 90대 초반, 중급자용 아이언 세트 제안 부탁드립니다. 중고/새 제품 모두 가능.',
- 800000, 42,
- NOW() - INTERVAL 2 DAY,
- NOW() + INTERVAL 5 DAY,
- NOW() + INTERVAL 7 DAY,
- 1,
- NOW() - INTERVAL 2 DAY, NULL,
- 'N', NULL),
-
--- 3. 진행중 경매 (open) - 자전거 헬멧
-(9, 8,
- '로드용 헬멧, 가벼운 모델 찾습니다',
- '자출+주말 라이딩용으로 쓸 헬멧 찾고 있습니다. M 사이즈, 통풍 잘 되는 모델로 제안 부탁드려요.',
- 200000, 18,
- NOW() - INTERVAL 3 DAY,
- NOW() + INTERVAL 2 DAY,
- NOW() + INTERVAL 4 DAY,
- 1,
- NOW() - INTERVAL 3 DAY, NULL,
- 'N', NULL),
-
--- 4. 정상 낙찰된 경매 (closed) - 헬스 홈트 세트
-(10, 5,
- '홈트용 아령 + 매트 세트 구합니다',
- '1~10kg 조절 가능한 아령과 두꺼운 요가매트 세트로 제안 부탁드려요.',
- 250000, 57,
- NOW() - INTERVAL 10 DAY,
- NOW() - INTERVAL 5 DAY,
- NOW() - INTERVAL 3 DAY,
- 2,
- NOW() - INTERVAL 10 DAY, NOW() - INTERVAL 3 DAY,
- 'N', NULL),
-
--- 5. 정상 낙찰된 경매 (closed) - 수영 용품 세트
-(8, 7,
- '수영 입문용 세트 (수경+수모+수영복)',
- '성인 남성 수영 입문용 세트 제안 부탁드립니다. 브랜드는 크게 상관 없고 내구성 좋은 제품이면 좋겠습니다.',
- 200000, 44,
- NOW() - INTERVAL 12 DAY,
- NOW() - INTERVAL 7 DAY,
- NOW() - INTERVAL 5 DAY,
- 2,
- NOW() - INTERVAL 12 DAY, NOW() - INTERVAL 5 DAY,
- 'N', NULL),
-
--- 6. 마감 후 결정 진행중 느낌 (closed, 낙찰자 아직 확정 X) - 축구 스파이크
-(3, 1,
- '인조잔디용 축구 스파이크 요청',
- '발볼 넓은 편이라, 발 편한 인조잔디용 스파이크 찾고 있습니다. 270mm 기준 제안 부탁드려요.',
- 180000, 29,
- NOW() - INTERVAL 6 DAY,
- NOW() - INTERVAL 1 DAY,
- NOW() + INTERVAL 1 DAY,
- 2,
- NOW() - INTERVAL 6 DAY, NULL,
- 'N', NULL),
-
--- 7. 유찰된 경매 (failed) - 스키 장비
-(4, 6,
- '스키 풀세트(중고) 구합니다',
- '스키/부츠/폴/헬멧 풀세트로 중고 매물을 찾고 있습니다. 175cm, 70kg 기준 맞는 장비면 좋겠습니다.',
- 500000, 12,
- NOW() - INTERVAL 15 DAY,
- NOW() - INTERVAL 10 DAY,
- NOW() - INTERVAL 8 DAY,
- 3,
- NOW() - INTERVAL 15 DAY, NOW() - INTERVAL 8 DAY,
- 'N', NULL),
-
--- 8. 취소된 경매 (canceled) - 요가 매트 (구매자 취소)
-(7, 8,
- '두꺼운 요가 매트 구합니다 (취소됨)',
- '무릎이 안 좋아서 두꺼운 요가 매트 찾아요. 집에서 사용하는 용도입니다.',
- 80000, 9,
- NOW() - INTERVAL 7 DAY,
- NOW() - INTERVAL 4 DAY,
- NOW() - INTERVAL 3 DAY,
- 4,
- NOW() - INTERVAL 7 DAY, NOW() - INTERVAL 3 DAY,
- 'N', NULL),
-
--- 9. 관리자 삭제된 경매 (is_deleted = Y) - 리조트 이용권 (법적 이슈 케이스)
-(5, 8,
- '리조트 숙박권 양도 요청 (관리자 삭제)',
- '리조트 숙박권 양도 받으려고 합니다. 날짜는 협의 가능해요.',
- 600000, 5,
- NOW() - INTERVAL 20 DAY,
- NOW() - INTERVAL 15 DAY,
- NOW() - INTERVAL 14 DAY,
- 4,
- NOW() - INTERVAL 20 DAY, NOW() - INTERVAL 14 DAY,
- 'Y', NOW() - INTERVAL 13 DAY),
-
--- 10. 관리자 삭제된 경매 (is_deleted = Y) - 콘서트 티켓 (정책 위반)
-(6, 8,
- '콘서트 티켓 양도 요청 (정책 위반)',
- '콘서트 티켓 구해봅니다. 연석이면 좋겠습니다.',
- 400000, 7,
- NOW() - INTERVAL 18 DAY,
- NOW() - INTERVAL 13 DAY,
- NOW() - INTERVAL 12 DAY,
- 3,
- NOW() - INTERVAL 18 DAY, NOW() - INTERVAL 12 DAY,
- 'Y', NOW() - INTERVAL 11 DAY);
- 
- /* ==========================================
    ITEM 더미 데이터 (AUCTION/BID에서 참조하는 1~20번)
    ========================================== */
 
@@ -352,7 +219,180 @@ INSERT INTO item (
 ('리조트 숙박권 1박',                      8, 'ResortX','NEW',   NULL, NULL, 'N'),
 
 -- 20: 콘서트 티켓 (accessory = 8)
-('콘서트 티켓 2장',                        8, 'Ticket','NEW',   NULL, NULL, 'N');
+('콘서트 티켓 2장',                        8, 'Ticket','NEW',   NULL, NULL, 'N'),
+ 
+ -- 공/볼 (카테고리 : 1번)
+('프리미어리그 공인구 - 미개봉 새제품', 1, 'NIKE', 'NEW', '/images/ball_01.jpg', NULL, 'N'),
+('KBL 공식 시합용 농구공', 1, 'Wilson', 'USED_A', '/images/ball_02.jpg', NULL, 'N'),
+
+-- 액세서리/잡화 (카테고리 : 8번)
+('대용량 스포츠 백팩 (신발주머니 포함)', 8, 'UnderArmour', 'USED_A', '/images/bag_01.jpg', NULL, 'N'),
+('겨울철 야외 러닝용 스마트폰 터치 장갑', 8, 'Adidas', 'NEW', '/images/gloves_01.jpg', NULL, 'N');
+ 
+ /* ==========================================
+   AUCTION 더미 데이터 (10건)
+   ========================================== */
+
+INSERT INTO auction (
+    buyer_idx, item_category_idx,
+    auction_title, auction_desc,
+    auction_target_price, auction_view_count,
+    auction_start_at, auction_end_at, auction_decision_deadline,
+    auction_status_idx,
+    auction_regdate, auction_moddate,
+    auction_is_deleted, auction_deldate
+) VALUES
+-- 1. 진행중 경매 (open) - 러닝화
+(1, 4,
+ '10km 대회용 러닝화 추천받습니다',
+ '10km 대회 출전 예정이라, 초보 러너에게 맞는 쿠션 좋은 러닝화 추천받고 싶습니다.',
+ 150000, 35,
+ NOW() - INTERVAL 1 DAY,
+ NOW() + INTERVAL 3 DAY,
+ NOW() + INTERVAL 5 DAY,
+ 1,
+ NOW() - INTERVAL 1 DAY, NULL,
+ 'N', NULL),
+
+-- 2. 진행중 경매 (open) - 골프 아이언
+(2, 2,
+ '골프 아이언 세트 역경매 (중급자용)',
+ '현재 핸디 90대 초반, 중급자용 아이언 세트 제안 부탁드립니다. 중고/새 제품 모두 가능.',
+ 800000, 42,
+ NOW() - INTERVAL 2 DAY,
+ NOW() + INTERVAL 5 DAY,
+ NOW() + INTERVAL 7 DAY,
+ 1,
+ NOW() - INTERVAL 2 DAY, NULL,
+ 'N', NULL),
+
+-- 3. 진행중 경매 (open) - 자전거 헬멧
+(9, 3,
+ '로드용 헬멧, 가벼운 모델 찾습니다',
+ '자출+주말 라이딩용으로 쓸 헬멧 찾고 있습니다. M 사이즈, 통풍 잘 되는 모델로 제안 부탁드려요.',
+ 200000, 18,
+ NOW() - INTERVAL 3 DAY,
+ NOW() + INTERVAL 2 DAY,
+ NOW() + INTERVAL 4 DAY,
+ 1,
+ NOW() - INTERVAL 3 DAY, NULL,
+ 'N', NULL),
+
+-- 4. 정상 낙찰된 경매 (closed) - 헬스 홈트 세트
+(10, 5,
+ '홈트용 아령 + 매트 세트 구합니다',
+ '1~10kg 조절 가능한 아령과 두꺼운 요가매트 세트로 제안 부탁드려요.',
+ 250000, 57,
+ NOW() - INTERVAL 10 DAY,
+ NOW() - INTERVAL 5 DAY,
+ NOW() - INTERVAL 3 DAY,
+ 3,
+ NOW() - INTERVAL 10 DAY, NOW() - INTERVAL 3 DAY,
+ 'N', NULL),
+
+-- 5. 정상 낙찰된 경매 (closed) - 수영 용품 세트
+(8, 7,
+ '수영 입문용 세트 (수경+수모+수영복)',
+ '성인 남성 수영 입문용 세트 제안 부탁드립니다. 브랜드는 크게 상관 없고 내구성 좋은 제품이면 좋겠습니다.',
+ 200000, 44,
+ NOW() - INTERVAL 12 DAY,
+ NOW() - INTERVAL 7 DAY,
+ NOW() - INTERVAL 5 DAY,
+ 3,
+ NOW() - INTERVAL 12 DAY, NOW() - INTERVAL 5 DAY,
+ 'N', NULL),
+
+-- 6. 마감 후 결정 진행중 느낌 (closed, 낙찰자 아직 확정 X) - 축구 스파이크
+(3, 4,
+ '인조잔디용 축구 스파이크 요청',
+ '발볼 넓은 편이라, 발 편한 인조잔디용 스파이크 찾고 있습니다. 270mm 기준 제안 부탁드려요.',
+ 180000, 29,
+ NOW() - INTERVAL 6 DAY,
+ NOW() - INTERVAL 1 DAY,
+ NOW() + INTERVAL 1 DAY,
+ 2,
+ NOW() - INTERVAL 6 DAY, NULL,
+ 'N', NULL),
+
+-- 7. 유찰된 경매 (failed) - 스키 장비
+(4, 6,
+ '스키 풀세트(중고) 구합니다',
+ '스키/부츠/폴/헬멧 풀세트로 중고 매물을 찾고 있습니다. 175cm, 70kg 기준 맞는 장비면 좋겠습니다.',
+ 500000, 12,
+ NOW() - INTERVAL 15 DAY,
+ NOW() - INTERVAL 10 DAY,
+ NOW() - INTERVAL 8 DAY,
+ 4,
+ NOW() - INTERVAL 15 DAY, NOW() - INTERVAL 8 DAY,
+ 'N', NULL),
+
+-- 8. 취소된 경매 (canceled) - 요가 매트 (구매자 취소)
+(7, 5,
+ '두꺼운 요가 매트 구합니다 (취소됨)',
+ '무릎이 안 좋아서 두꺼운 요가 매트 찾아요. 집에서 사용하는 용도입니다.',
+ 80000, 9,
+ NOW() - INTERVAL 7 DAY,
+ NOW() - INTERVAL 4 DAY,
+ NOW() - INTERVAL 3 DAY,
+ 5,
+ NOW() - INTERVAL 7 DAY, NOW() - INTERVAL 3 DAY,
+ 'N', NULL),
+
+-- 9. 관리자 삭제된 경매 (is_deleted = Y) - 리조트 이용권 (법적 이슈 케이스)
+(5, 8,
+ '리조트 숙박권 양도 요청 (관리자 삭제)',
+ '리조트 숙박권 양도 받으려고 합니다. 날짜는 협의 가능해요.',
+ 600000, 5,
+ NOW() - INTERVAL 20 DAY,
+ NOW() - INTERVAL 15 DAY,
+ NOW() - INTERVAL 14 DAY,
+ 6,
+ NOW() - INTERVAL 20 DAY, NOW() - INTERVAL 14 DAY,
+ 'Y', NOW() - INTERVAL 13 DAY),
+
+-- 10. 관리자 삭제된 경매 (is_deleted = Y) - 콘서트 티켓 (정책 위반)
+(6, 8,
+ '콘서트 티켓 양도 요청 (정책 위반)',
+ '콘서트 티켓 구해봅니다. 연석이면 좋겠습니다.',
+ 400000, 7,
+ NOW() - INTERVAL 18 DAY,
+ NOW() - INTERVAL 13 DAY,
+ NOW() - INTERVAL 12 DAY,
+ 6,
+ NOW() - INTERVAL 18 DAY, NOW() - INTERVAL 12 DAY,
+ 'Y', NOW() - INTERVAL 11 DAY),
+ 
+ -- 11. 공/볼 (1번) 관련 경매
+(3, 1, 
+ '축구 소모임에서 쓸 공인구 여러 개 구해요', 
+ '상태 좋은 프리미어리그나 챔스 공인구 찾습니다. 낱개도 좋으니 제안 주세요.', 
+ 120000, 15, 
+ NOW() - INTERVAL 1 DAY, NOW() + INTERVAL 4 DAY, NOW() + INTERVAL 6 DAY, 
+ 1, NOW() - INTERVAL 1 DAY, NULL, 'N', NULL),
+
+-- 12. 공/볼 (1번) 관련 경매
+(4, 1, 
+ '야외 우레탄 코트용 농구공 추천 바랍니다', 
+ '내구성 좋은 농구공 찾고 있습니다. 7호 사이즈 위주로 제안 부탁드려요.', 
+ 60000, 22, 
+ NOW() - INTERVAL 2 DAY, NOW() + INTERVAL 3 DAY, NOW() + INTERVAL 5 DAY, 
+ 1, NOW() - INTERVAL 2 DAY, NULL, 'N', NULL),
+
+-- 13. 액세서리/잡화 (8번) 관련 경매
+(5, 8, 
+ '헬스장 갈 때 들기 좋은 큰 가방 구합니다', 
+ '신발이랑 옷이 다 들어가는 넉넉한 사이즈의 백팩이나 더플백 찾고 있어요.', 
+ 100000, 10, 
+ NOW() - INTERVAL 1 DAY, NOW() + INTERVAL 5 DAY, NOW() + INTERVAL 7 DAY, 
+ 1, NOW() - INTERVAL 1 DAY, NULL, 'N', NULL),
+
+-- 14. 액세서리/잡화 (8번) 관련 경매
+(6, 8, 
+ '야간 라이딩용 반사 장갑이나 양말 세트', 
+ '밤에 자전거 탈 때 안전을 위해 눈에 잘 띄는 잡화 세트 제안 부탁드립니다.', 
+ 40000, 5, 
+ NOW() - INTERVAL 12 HOUR, NOW() + INTERVAL 2 DAY, NOW() + INTERVAL 4 DAY, 
+ 1, NOW() - INTERVAL 12 HOUR, NULL, 'N', NULL);
  
  /* ==========================================
    BID 더미 데이터 (각 상태별)
@@ -409,7 +449,7 @@ INSERT INTO bid (
  NOW() - INTERVAL 4 DAY, NULL),
 
 -- Auction 7 (failed, 유찰: 입찰이 거의 없거나 너무 낮음)
-(7, 6,  17,200000, 1, '스키 세트지만 연식이 좀 있습니다.', 1,
+(7, 6,  17,200000, 1, '스키 세트지만 연식이 좀 있습니다.', 3,
  NOW() - INTERVAL 14 DAY, NULL),
 
 -- Auction 8 (canceled, 취소된 경매: 입찰은 있었지만 상태 canceled)
@@ -417,18 +457,25 @@ INSERT INTO bid (
  NOW() - INTERVAL 6 DAY, NOW() - INTERVAL 4 DAY),
 
 -- Auction 9 (관리자 삭제된 경매: 입찰도 모두 취소 처리)
-(9, 5,  19,550000, 1, '리조트 숙박권 주중 1박 양도 제안드립니다.', 4,
+(9, 5,  19,550000, 1, '리조트 숙박권 주중 1박 양도 제안드립니다.', 5,
  NOW() - INTERVAL 19 DAY, NOW() - INTERVAL 13 DAY),
 
 -- Auction 10 (관리자 삭제된 콘서트 티켓 케이스)
-(10,6,  20,350000, 2, '콘서트 티켓 2장 양도합니다.', 4,
- NOW() - INTERVAL 17 DAY, NOW() - INTERVAL 11 DAY);
- 
-  /* ==========================================
-   REVIEW 더미 데이터
+(10,6,  20,350000, 2, '콘서트 티켓 2장 양도합니다.', 5,
+ NOW() - INTERVAL 17 DAY, NOW() - INTERVAL 11 DAY),
+
+-- Auction 11
+(11, 7, 21, 110000, 1, '미개봉 나이키 공인구입니다. 박스 풀셋이에요.', 1, NOW() - INTERVAL 5 HOUR, NULL),
+
+-- Auction 13
+(13, 1, 23, 85000, 1, '언더아머 백팩인데 수납공간 정말 많고 깨끗합니다.', 1, NOW() - INTERVAL 2 HOUR, NULL);
+
+
+ /* ==========================================
+   리뷰 더미 데이터 (각 상태별)
    ========================================== */
    
- INSERT INTO review (
+INSERT INTO review (
     buyer_idx, bidder_idx, auction_idx, bid_idx,
     review_title, review_content, review_star
 ) VALUES

@@ -24,6 +24,7 @@ public class MemberVO {
  private LocalDateTime 	memRegdate;  	// 가입일
  private String  		memIsDeleted;   // 'Y' / 'N' (삭제 여부)
  private LocalDateTime 	memDeldate;  	// 탈퇴일 
+ private String 		memLoginType;   // 로그인 타입(로그인 API용)
 
 }
 

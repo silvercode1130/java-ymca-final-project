@@ -40,8 +40,15 @@
 		JOIN auction a ON r.auction_idx = a.auction_idx
 		JOIN bid b ON r.bid_idx = b.bid_idx
 		LEFT JOIN item i ON b.item_idx = i.item_idx   
-		WHERE r.bid_idx = #{bidIdx}
+		WHERE r.bidder_idx = #{memIdx}
 		ORDER BY r.review_idx DESC
+	</select>
+	
+	<!-- 내가 받은 리뷰 별점 평균 -->
+	<select id="getAvgRating" resultType="double">
+	    SELECT IFNULL(AVG(review_star), 0)
+	    FROM review
+	    WHERE bidder_idx = #{memIdx}
 	</select>
 
 	<!-- 검색 전 기본 목록 -->
@@ -135,12 +142,58 @@
 		JOIN member bidder ON b.bidder_idx = bidder.mem_idx
 		WHERE r.review_idx = #{reviewIdx}
     </select>
-    
-    <!-- 리뷰 삭제하기(관리자만) -->
-	<select id="getAllReviewList" resultType="com.springbootstudy.bbs.domain.ReviewVO">
-	    SELECT *
-	    FROM review
-	    WHERE review_is_delete = 'N'
-	</select> 
+	
+	<!-- 임시삭제 -->
+	<update id="deleteReview">
+	    UPDATE review 
+	    SET review_is_deleted = 'Y', 
+	        review_deldate = NOW() 
+	    WHERE review_idx = #{reviewIdx}
+	</update> 
+	
+	<!-- 리뷰 띄우기 -->
+	<select id="getActiveReviewList" resultType="com.springbootstudy.bbs.domain.ReviewVO">
+	    SELECT 
+	        r.review_idx AS reviewIdx,
+	        a.auction_title AS auctionTitle,
+	        i.item_name AS itemName,
+	        r.review_star AS reviewStar,
+	        r.review_regdate AS reviewRegdate
+	    FROM review r
+	    JOIN auction a ON r.auction_idx = a.auction_idx
+	    JOIN bid b ON r.bid_idx = b.bid_idx
+	    LEFT JOIN item i ON b.item_idx = i.item_idx   
+	    WHERE r.review_is_deleted = 'N'
+	    ORDER BY r.review_idx DESC
+	</select>
+	
+	<!-- 삭제된 리뷰 조회 -->
+	<select id="getDeletedReviewList" resultType="com.springbootstudy.bbs.domain.ReviewVO">
+	    SELECT 
+	        r.review_idx AS reviewIdx,
+	        a.auction_title AS auctionTitle,
+	        i.item_name AS itemName,
+	        r.review_star AS reviewStar,
+	        r.review_regdate AS reviewRegdate
+	    FROM review r
+	    JOIN auction a ON r.auction_idx = a.auction_idx
+	    JOIN bid b ON r.bid_idx = b.bid_idx
+	    LEFT JOIN item i ON b.item_idx = i.item_idx   
+	    WHERE r.review_is_deleted = 'Y'
+	    ORDER BY r.review_idx DESC
+	</select>
+	
+	<!-- 영구 삭제 -->
+	<delete id="hardDeleteReview">
+	    DELETE FROM review
+	    WHERE review_idx = #{reviewIdx}
+	</delete>
+	
+	<!-- 삭제 취소 -->
+	<update id="cancelDelete">
+	    UPDATE review
+	    SET review_is_deleted = 'N'
+	    WHERE review_idx = #{reviewIdx}
+	</update>
 
 </mapper>	

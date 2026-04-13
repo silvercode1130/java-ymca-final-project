@@ -26,8 +26,14 @@ import lombok.extern.slf4j.Slf4j;
 
 @Controller
 @Slf4j
-public class AuctionController {
 
+public class AuctionController {
+	
+	// 이미지 저장 경로 & 기본 이미지 경로 상수
+	private static final String AUCTION_UPLOAD_SUBDIR = "/src/main/resources/static/images/auction/";
+	private static final String BID_UPLOAD_SUBDIR     = "/src/main/resources/static/images/bid/";
+	private static final String AUCTION_DEFAULT_IMG   = "/images/auction/auction_default.png"; 
+	
     @Autowired
     private AuctionService auctionService;
 
@@ -40,15 +46,19 @@ public class AuctionController {
     // 경매 목록 (/auctions)
     @GetMapping("/auctions")
     public String auctionList(
-            @RequestParam(value = "keyword", required = false) String keyword,
+            @RequestParam(value = "keyword",  required = false) String keyword,
+            @RequestParam(value = "sortBy",   required = false, defaultValue = "latest") String sortBy,
+            @RequestParam(value = "statusFilter", required = false, defaultValue = "open") String statusFilter,
             Model model) {
 
         auctionService.updateExpiredAuctions();
-        List<AuctionDTO> list = auctionService.AuctionList(null, keyword);
+        List<AuctionDTO> list = auctionService.AuctionList(null, keyword, sortBy, statusFilter);
 
         model.addAttribute("auctionList", list);
         model.addAttribute("keyword", keyword);
         model.addAttribute("selectedCategory", null);
+        model.addAttribute("sortBy", sortBy);
+        model.addAttribute("statusFilter", statusFilter);
         return "views/auction/auctionList";
     }
     
@@ -57,16 +67,18 @@ public class AuctionController {
     public String auctionListByCategory(
             @PathVariable("categoryCode") String categoryCode,
             @RequestParam(value = "keyword", required = false) String keyword,
+            @RequestParam(value = "sortBy",  required = false, defaultValue = "latest") String sortBy,
+            @RequestParam(value = "statusFilter", required = false, defaultValue = "open") String statusFilter,
             Model model) {
 
         auctionService.updateExpiredAuctions();
-        List<AuctionDTO> list = auctionService.AuctionList(categoryCode, keyword);
-        
-        System.out.println("전달된 코드: " + categoryCode);
-        
+        List<AuctionDTO> list = auctionService.AuctionList(categoryCode, keyword, sortBy, statusFilter);
+
         model.addAttribute("auctionList", list);
         model.addAttribute("keyword", keyword);
         model.addAttribute("selectedCategory", categoryCode);
+        model.addAttribute("sortBy", sortBy);
+        model.addAttribute("statusFilter", statusFilter);
         return "views/auction/auctionList";
     }
 
@@ -99,10 +111,11 @@ public class AuctionController {
 
     // 경매 등록 폼 이동 (/auctions/new)
     @GetMapping("/auctions/new")
-    public String registerForm(HttpSession session) {
+    public String registerForm(HttpSession session, RedirectAttributes ra) {
     	
         if (session.getAttribute("loginUser") == null) {
-            return "redirect:/views/member/login";
+        	session.setAttribute("loginRedirectUrl", "/auctions/new");
+            return "redirect:/members/login";
         }
         
         return "views/auction/auctionRegister";
@@ -120,28 +133,23 @@ public class AuctionController {
         // DTO에 로그인한 사용자의 고유 번호(buyerIdx) 세팅
         dto.setBuyerIdx(loginUser.getMemIdx());
         
-        // 파일 업로드 처리 (이미지가 있을 경우에만 실행)
+        // 파일 업로드 처리
         if (thumbnailFile != null && !thumbnailFile.isEmpty()) {
             try {
-            	// 프로젝트 내부의 static/uploads 폴더 경로 설정 (개발 환경용)
-                String uploadDir = System.getProperty("user.dir") + "/src/main/resources/static/uploads/";
+                String uploadDir = System.getProperty("user.dir") + AUCTION_UPLOAD_SUBDIR;
                 File dir = new File(uploadDir);
-                
-                // 폴더가 없으면 생성
-                if (!dir.exists()) dir.mkdirs();
-                
-                // 파일명 중복 방지를 위해 UUID 사용
+                if (!dir.exists()) dir.mkdirs(); // 폴더 없으면 자동 생성
+
                 String fileName = UUID.randomUUID() + "_" + thumbnailFile.getOriginalFilename();
                 thumbnailFile.transferTo(new File(uploadDir + fileName));
-                
-                // DB에는 웹에서 접근 가능한 경로("/uploads/파일명")로 저장
-                dto.setAuctionThumbnailImg("/uploads/" + fileName);
+
+                dto.setAuctionThumbnailImg("/images/auction/" + fileName);
             } catch (Exception e) {
-                log.error("이미지 업로드 실패", e);
-                dto.setAuctionThumbnailImg(null);  // 실패 시 null 처리 (또는 기본이미지)
+                log.error("경매 이미지 업로드 실패", e);
+                dto.setAuctionThumbnailImg(AUCTION_DEFAULT_IMG); // 실패 시 기본 이미지
             }
         } else {
-            dto.setAuctionThumbnailImg(null);  // 첨부 파일이 없는 경우
+            dto.setAuctionThumbnailImg(AUCTION_DEFAULT_IMG); // 미첨부 시 기본 이미지
         }
         
         // 서비스 호출 및 예외 처리
@@ -158,21 +166,47 @@ public class AuctionController {
             ra.addFlashAttribute("errorMessage", "등록 중 오류가 발생했습니다.");
             return "redirect:/auctions/new";
         }
+
+        ra.addFlashAttribute("successMessage", "구매요청이 등록되었습니다! 🎉");
+        
         return "redirect:/auctions";
     }
 
-    // 경매 삭제 (/auctions/{auctionIdx}/delete)
+    // 경매 취소 (/auctions/{auctionIdx}/delete)
     @PostMapping("/auctions/{auctionIdx}/delete")
     public String deleteAuction(@PathVariable("auctionIdx") Long auctionIdx,
                                   HttpSession session,
                                   RedirectAttributes ra) {
         MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
-        if (loginUser == null) return "redirect:/views/member/login";
+        if (loginUser == null) return "redirect:/members/login";
 
         try {
         	// 작성자 본인 확인은 서비스 계층에서 수행 (안전함)
             auctionService.deleteAuction(auctionIdx, loginUser.getMemIdx());
             ra.addFlashAttribute("successMessage", "구매요청이 삭제되었습니다.");
+        } catch (IllegalArgumentException e) {
+            ra.addFlashAttribute("errorMessage", e.getMessage());
+        }
+        return "redirect:/auctions";
+    }
+    
+    // 관리자 경매 삭제 (/auctions/{auctionIdx}/admin-delete)
+    @PostMapping("/auctions/{auctionIdx}/admin-delete")
+    public String adminDeleteAuction(@PathVariable("auctionIdx") Long auctionIdx,
+                                      HttpSession session,
+                                      RedirectAttributes ra) {
+        MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
+        if (loginUser == null) return "redirect:/views/member/login";
+
+        // 관리자(memRoleIdx == 2)만 접근 가능
+        if (loginUser.getMemRoleIdx() == null || loginUser.getMemRoleIdx() != 2) {
+            ra.addFlashAttribute("errorMessage", "관리자만 사용할 수 있는 기능입니다.");
+            return "redirect:/auctions/" + auctionIdx;
+        }
+
+        try {
+            auctionService.adminDeleteAuction(auctionIdx);
+            ra.addFlashAttribute("successMessage", "관리자 권한으로 경매가 삭제되었습니다.");
         } catch (IllegalArgumentException e) {
             ra.addFlashAttribute("errorMessage", e.getMessage());
         }
@@ -208,7 +242,7 @@ public class AuctionController {
                                HttpSession session,
                                RedirectAttributes ra) {
         MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
-        if (loginUser == null) return "redirect:/views/member/login";
+        if (loginUser == null) return "redirect:/members/login";
 
         AuctionDTO detail = auctionService.auctionDetail(auctionIdx);
         if (detail == null || !detail.getBuyerIdx().equals(loginUser.getMemIdx())) {
@@ -229,7 +263,12 @@ public class AuctionController {
             RedirectAttributes ra) {
 
         MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
-        if (loginUser == null) return "redirect:/views/member/login";
+        if (loginUser == null) {
+        	
+        	session.setAttribute("loginRedirectUrl", "/auctions/" + auctionIdx + "/bids");
+        	
+        	return "redirect:/members/login";
+        } 
 
         AuctionDTO detail = auctionService.auctionDetail(auctionIdx);
         if (detail == null) return "redirect:/auctions";
@@ -262,7 +301,10 @@ public class AuctionController {
                                HttpSession session,
                                RedirectAttributes ra) {
         MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
-        if (loginUser == null) return "redirect:/views/member/login";
+        if (loginUser == null) {
+        	session.setAttribute("loginRedirectUrl", "/auctions/" + auctionIdx);
+        	return "redirect:/members/login";
+        } 
         
         // 기본 데이터 세팅
         bidDto.setAuctionIdx(auctionIdx);
@@ -285,18 +327,27 @@ public class AuctionController {
             return "redirect:/auctions/" + auctionIdx;
         }
         
-        // 이미지 업로드 처리
+        // 입찰 이미지 업로드 처리
         if (bidImageFile != null && !bidImageFile.isEmpty()) {
             try {
-                String uploadDir = System.getProperty("user.dir") + "/src/main/resources/static/uploads/";
+                String uploadDir = System.getProperty("user.dir") + BID_UPLOAD_SUBDIR;
                 File dir = new File(uploadDir);
                 if (!dir.exists()) dir.mkdirs();
+
                 String fileName = UUID.randomUUID() + "_" + bidImageFile.getOriginalFilename();
                 bidImageFile.transferTo(new File(uploadDir + fileName));
-                bidDto.setItemThumbnailImg("/uploads/" + fileName);
+
+                bidDto.setItemThumbnailImg("/images/bid/" + fileName);
             } catch (Exception e) {
                 log.error("입찰 이미지 업로드 실패", e);
+                // 업로드 실패 시 에러 반환 (기본이미지 없음)
+                ra.addFlashAttribute("bidError", "이미지 업로드에 실패했습니다. 다시 시도해주세요.");
+                return "redirect:/auctions/" + auctionIdx;
             }
+        } else {
+            // JS에서 막지만 혹시 모를 직접 요청 방어
+            ra.addFlashAttribute("bidError", "제안 상품 이미지는 필수입니다.");
+            return "redirect:/auctions/" + auctionIdx + "/bids";
         }
         
         // itemCategoryIdx는 경매에서 자동 세팅
@@ -314,7 +365,7 @@ public class AuctionController {
         return "redirect:/auctions/" + auctionIdx;
     }
 
-    // 입찰 상세 (/bids/{bidIdx})
+    // 입찰 상세 (/auctions/{auctionIdx}/bids/{bidIdx})
     @GetMapping("/auctions/{auctionIdx}/bids/{bidIdx}")
     public String bidDetailPanel(
             @PathVariable("auctionIdx") Long auctionIdx,
@@ -322,17 +373,8 @@ public class AuctionController {
             HttpSession session, Model model,
             RedirectAttributes ra) {
 
-        MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
-        if (loginUser == null) return "redirect:/views/member/login";
-
         AuctionDTO detail = auctionService.auctionDetail(auctionIdx);
         if (detail == null) return "redirect:/auctions";
-
-        // 구매자만 입찰 상세 열람 가능
-        if (!detail.getBuyerIdx().equals(loginUser.getMemIdx())) {
-            ra.addFlashAttribute("bidError", "구매자만 입찰 상세를 열람할 수 있습니다.");
-            return "redirect:/auctions/" + auctionIdx;
-        }
 
         BidDTO selectedBid = bidService.findBidById(bidIdx);
         if (selectedBid == null) return "redirect:/auctions/" + auctionIdx;
@@ -342,7 +384,7 @@ public class AuctionController {
         model.addAttribute("detail", detail);
         model.addAttribute("bidList", bidList);
         model.addAttribute("selectedBid", selectedBid);
-        model.addAttribute("mode", "bidDetail");   // 오른쪽 패널: 입찰 상세
+        model.addAttribute("mode", "bidDetail");
         return "views/auction/auctionDetail";
     }
 
@@ -353,7 +395,10 @@ public class AuctionController {
                              HttpSession session,
                              RedirectAttributes ra) {
         MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
-        if (loginUser == null) return "redirect:/views/member/login";
+        if (loginUser == null) {
+        	session.setAttribute("loginRedirectUrl", "/auctions/" + auctionIdx);
+        	return "redirect:/members/login";
+        }
 
         try {
             bidService.deleteBid(bidIdx, loginUser.getMemIdx());
@@ -363,7 +408,30 @@ public class AuctionController {
         }
         return "redirect:/auctions/" + auctionIdx;
     }
+    
+    // 관리자 입찰 삭제 (/bids/{bidIdx}/admin-cancel)
+    @PostMapping("/bids/{bidIdx}/admin-cancel")
+    public String adminDeleteBid(@PathVariable("bidIdx") Long bidIdx,
+                                  @RequestParam("auctionIdx") Long auctionIdx,
+                                  HttpSession session,
+                                  RedirectAttributes ra) {
+        MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
+        if (loginUser == null) return "redirect:/members/login";
 
+        if (loginUser.getMemRoleIdx() == null || loginUser.getMemRoleIdx() != 2) {
+            ra.addFlashAttribute("errorMessage", "관리자만 사용할 수 있는 기능입니다.");
+            return "redirect:/auctions/" + auctionIdx;
+        }
+
+        try {
+            bidService.adminDeleteBid(bidIdx);
+            ra.addFlashAttribute("successMessage", "관리자 권한으로 입찰이 삭제되었습니다.");
+        } catch (IllegalArgumentException e) {
+            ra.addFlashAttribute("bidError", e.getMessage());
+        }
+        return "redirect:/auctions/" + auctionIdx;
+    }
+    
     // 낙찰 처리 (/auctions/{auctionIdx}/bids/{bidIdx}/win)
     @PostMapping("/auctions/{auctionIdx}/bids/{bidIdx}/win")
     public String selectWinner(@PathVariable("auctionIdx") Long auctionIdx,
@@ -371,7 +439,10 @@ public class AuctionController {
                                  HttpSession session,
                                  RedirectAttributes ra) {
         MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
-        if (loginUser == null) return "redirect:/views/member/login";
+        if (loginUser == null) {
+        	session.setAttribute("loginRedirectUrl", "/auctions/" + auctionIdx);
+        	return "redirect:/members/login";
+        }
 
         AuctionDTO auction = auctionService.auctionDetail(auctionIdx);
         if (auction == null || !auction.getBuyerIdx().equals(loginUser.getMemIdx())) {
@@ -381,7 +452,7 @@ public class AuctionController {
 
         try {
             bidService.selectWinner(bidIdx, auctionIdx);
-            ra.addFlashAttribute("successMessage", "낙찰 처리가 완료되었습니다!");
+            ra.addFlashAttribute("successMessage", "낙찰 처리가 완료되었습니다");
         } catch (IllegalArgumentException e) {
             ra.addFlashAttribute("bidError", e.getMessage());
         }

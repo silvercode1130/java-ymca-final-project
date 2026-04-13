@@ -27,7 +27,7 @@ public class MemberProfileController {
 	// 회원 프로필 띄우기 ---------------------------------------------------------------
 	
 	// 프로필 조회 (페이지 이동)
-	@GetMapping("members/memberProfileUpdate")
+	@GetMapping("/mypage/profile")
 	public String memberProfile(HttpSession session, Model model) {
 
 	    MemberVO loginMember = (MemberVO) session.getAttribute("loginUser");
@@ -52,13 +52,14 @@ public class MemberProfileController {
 
     
     // 프로필 저장 (수정)
-    @PostMapping("members/memberProfileUpdate")
+    @PostMapping("/mypage/profile")
     public String updateProfile(MemberProfileVO vo,
                                 @RequestParam("memImgFile") MultipartFile memImgFile) throws Exception {
 
     	if (!memImgFile.isEmpty()) {
 
-    	    String uploadDir = "C:/upload/finalProfile/";
+    	    String uploadDir = System.getProperty("user.dir")
+    	            + "/src/main/resources/static/images/profileUpload/";
 
     	    File dir = new File(uploadDir);
     	    if (!dir.exists()) {
@@ -68,6 +69,11 @@ public class MemberProfileController {
     	    String fileName = memImgFile.getOriginalFilename();
     	    File dest = new File(uploadDir + fileName);
     	    memImgFile.transferTo(dest);
+    	    
+            // 확인용
+	        System.out.println("파일 저장 경로: " + uploadDir);
+	        System.out.println("파일 존재 여부: " + new File(uploadDir).exists());
+	        System.out.println("실제 저장 파일 경로: " + dest.getAbsolutePath());
 
     	    vo.setMemImg(fileName);
 
@@ -88,7 +94,7 @@ public class MemberProfileController {
 
         memberProfileService.updateProfile(vo);
 
-        return "redirect:/members/memberProfileUpdate?memIdx=" + vo.getMemIdx();
+        return "redirect:/mypage/profile?memIdx=" + vo.getMemIdx();
     }
     
     

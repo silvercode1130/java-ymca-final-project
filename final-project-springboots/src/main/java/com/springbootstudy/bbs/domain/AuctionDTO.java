@@ -16,7 +16,6 @@ public class AuctionDTO {
     private LocalDateTime auctionRegdate; // 리스트 정렬 및 날짜 표시용
 
     private Integer auctionStatusIdx;
-    private String  auctionStatusCode;
     private String auctionStatusName;
 
     // 카테고리
@@ -38,4 +37,5 @@ public class AuctionDTO {
     // private int discountRate;
     private String timeDisplay;
     private String statusBadge;
+    private Long auctionViewCount;   // ← 추가
 }
