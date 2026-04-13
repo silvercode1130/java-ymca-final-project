@@ -4,9 +4,18 @@
 <meta charset="UTF-8">
 <title>Insert title here</title>
 
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
 <script type="text/javascript">
+
+/* 
+ 1. 뭘 입력하든 비밀번호를 한번 더 입력해주세요 가 뜸 
+ -> 한글로 적었으면 ✘ 영문 + 숫자 5글자 이상으로 입력해주세요.가 떠야 함 
+ 비밀번호를 한번 더 입력해주세요는 없는게 나은듯 
+ 2. 인증번호 체크도 안했는데 비번란과 비번확인란 조건만 충족하면 disabled가 풀림 
+*/
+
 	//전화번호 - 010-xxxx-xxxx 형식
 	function formatTel(input) {
 	  let value = input.value.replace(/[^0-9]/g, "");
@@ -49,7 +58,8 @@
 	$(document).ready(function() { 
 	
 	    $("#newPwd, #newPwdConfirm").on("keyup", function() {
-	        validatePassword();
+	    	pwdCheck();
+	    	validatePassword();
 	    });
 	
 	    $("#newPwd").on("blur", function() {
@@ -86,17 +96,18 @@
 	    }
 	
 	    // 두 값이 다 있을 때만 비교
-	    if (pwd1 !== "" && pwd2 !== "") {
-	        if (pwd1 === pwd2) {
-	            $("#pwdMatchMsg").text("비밀번호가 일치합니다").css("color", "gray");
-	            submitBtn.prop("disabled", false);
-	        } else {
-	            $("#pwdMatchMsg").text("비밀번호가 일치하지 않습니다").css("color", "red");
-	            submitBtn.prop("disabled", true);
-	        }
-	    } else {
-	        submitBtn.prop("disabled", true);
-	    }
+	    if (pwd1 !== "") {
+		    if (pwd2 === "") {
+		        $("#pwdMatchMsg").text("비밀번호를 한번 더 입력해주세요").css("color", "gray");
+		        submitBtn.prop("disabled", true);
+		    } else if (pwd1 === pwd2) {
+		        $("#pwdMatchMsg").text("비밀번호가 일치합니다").css("color", "gray");
+		        submitBtn.prop("disabled", false);
+		    } else {
+		        $("#pwdMatchMsg").text("비밀번호가 일치하지 않습니다").css("color", "red");
+		        submitBtn.prop("disabled", true);
+		    }
+		}
 	}
 	
 	// 비밀번호 체크용 (제약조건)
@@ -171,16 +182,41 @@
 		    
 		    <label>비밀번호</label> <br> 
 			<span style="font-size: 11px; color: gray;">✓ 알파벳 + 숫자로만 조합해주세요 (5글자 이상)</span> <br>
-			<input type="password" id="newPwd" name="newPassword" placeholder="새 비밀번호를 입력하세요"> <br>
+			<input type="password" id="newPwd" name="newPassword" placeholder="새 비밀번호를 입력하세요">
+			<span id="togglePwd">
+				<i class="bi bi-eye"></i>
+			</span> <br>
+			<span id="pwdMatchMsg" style="font-size: 12px;"></span> <br>
 			
 			<label style="margin-top: 10px; display: inline-block;">비밀번호 확인</label> <br>
 			<input type="password" id="newPwdConfirm" placeholder="다시 한번 입력하세요"> <br>
-			
 			<span id="pwdMatchMsg" style="font-size: 12px;"></span> <br>
 			
 			<button type="submit" id="submitBtn" disabled>변경</button>
 		</div>
 	</form>
+	
+	<script type="text/javascript">
+		document.addEventListener("DOMContentLoaded", function () {
+			const pwdInput = document.getElementById("newPwd");
+			const newPwdConfirm = document.getElementById("newPwdConfirm");
+			const togglePwd = document.getElementById("togglePwd");
+					
+			if (togglePwd && pwdInput) {
+				togglePwd.addEventListener("click", function () {
+					if (pwdInput.type === "password") {
+					       pwdInput.type = "text";
+					       newPwdConfirm.type = "text";
+					       this.innerHTML = '<i class="bi bi-eye-slash"></i>';
+					 } else {
+					       pwdInput.type = "password";
+					       newPwdConfirm.type = "password";
+					       this.innerHTML = '<i class="bi bi-eye"></i>';
+					}
+				});
+			}
+		});
+	</script>
 	
 </body>
 </html>

@@ -36,7 +36,7 @@ public class ApiController {
 	 * 네이버 회원이 일반로그인 시도하면 alert으로 성질 좀 내주고
 	 * */
 	
-	// db 없이 로그인 시키기
+	// 로그인 시키기
 	@RequestMapping("/members/naverCallback") 
 	public String naverCallback(
 	    @RequestParam("memName") String memName,
@@ -68,7 +68,7 @@ public class ApiController {
 	    session.setAttribute("loginId", memId);
 	    session.setAttribute("loginUser", user); 
 	    
-	    System.out.println("내가 그래도 컨트롤러는 접근 했어!!!" + memEmail);
+	    // 가입한 정보 보기
 	    System.out.println("user: " + user);
 
 	    return "redirect:/main";
