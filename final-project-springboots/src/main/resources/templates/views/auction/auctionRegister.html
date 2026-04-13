@@ -9,11 +9,10 @@
 <div class="register-container">
     <h2>📣 역경매 구매 요청하기</h2>
 
-    <div th:if="${errorMessage}" style="color:red; margin-bottom:10px;">
-        ⚠️ [[${errorMessage}]]
-    </div>
+    <span th:if="${errorMessage}" id="toast-error" th:data-msg="${errorMessage}" style="display:none;"></span>
+	<span th:if="${successMessage}" id="toast-success" th:data-msg="${successMessage}" style="display:none;"></span>
 
-    <!-- enctype 반드시 필요! 없으면 파일 전송 안 됨 -->
+    <!-- enctype 반드시 필요 없으면 파일 전송 안 됨 -->
     <form action="/auctions" method="post" id="registerForm"
           enctype="multipart/form-data">
 
@@ -44,10 +43,11 @@
 
         <div class="input-group">
             <label>희망 최대가 (₩) *</label>
-            <input type="number" name="auctionTargetPrice"
-                   min="1000" step="1000"
-                   placeholder="1000원 단위로 입력해주세요" required>
-            <small style="color:gray;">1000원 단위 이상, 음수 불가</small>
+            <!-- type="number" → type="text" 로 변경 -->
+			<input type="text" name="auctionTargetPrice" id="auctionTargetPrice"
+			       placeholder="예: 50,000" required
+			       inputmode="numeric">
+			<small style="color:gray;">1000원 단위 이상, 음수 불가</small>
         </div>
 
         <!-- URL 방식 → 파일 업로드 방식으로 변경 -->
@@ -91,5 +91,6 @@
 </div>
 
 <script src="/js/auctionRegister.js"></script>
+<script src="/js/toast.js"></script>
 </body>
 </html>

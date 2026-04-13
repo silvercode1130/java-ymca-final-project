@@ -153,13 +153,20 @@ public class MemberController {
            ra.addFlashAttribute("error", "비밀번호가 틀립니다.");
            return "redirect:/members/login";
        }
-
+       
        // 로그인 성공 → 회원 정보 세션 저장
        MemberVO memberVO = memberService.getMemberVO(memId);
 
        session.setAttribute("isLogin", true);
        session.setAttribute("loginId", memId); 
        session.setAttribute("loginUser", memberVO); // 로그인 세션!! 
+       
+       // 로그인 후 돌아가는 페이지의 세션값을 지워 줌
+       String redirectUrl = (String) session.getAttribute("loginRedirectUrl");
+       if (redirectUrl != null) {
+           session.removeAttribute("loginRedirectUrl"); // 사용 후 제거
+           return "redirect:" + redirectUrl;
+       }
        
        // 결제용 index 추가
        session.setAttribute("memIdx", memberVO.getMemIdx()); 
