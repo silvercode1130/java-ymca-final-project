@@ -167,7 +167,12 @@ public class MemberController {
            session.removeAttribute("loginRedirectUrl"); // 사용 후 제거
            return "redirect:" + redirectUrl;
        }
-       
+
+       // redirect 파라미터가 있으면 해당 URL로 이동 // 수정되었음
+       if (redirect != null && !redirect.isBlank()) {
+           return "redirect:" + redirect;
+       }
+
        // 결제용 index 추가
        session.setAttribute("memIdx", memberVO.getMemIdx()); 
 
