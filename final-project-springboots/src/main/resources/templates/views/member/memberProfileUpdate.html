@@ -146,7 +146,11 @@
 		<div>
 			프로필 <br>
 			JPG, PNG 파일 (최대 100MB) <br>
-			<img id="preview" th:if="${profile.memImg != null}" th:src="@{'/images/profile/' + ${profile.memImg}}" width="150">
+			<img id="preview" th:src="${profile.memImg != null} ? @{'/images/profile/' + ${profile.memImg}} : 
+             					@{'/images/profile/profile_default.png'}"
+								     alt="프로필 이미지"
+								     width="150"
+								     style="border:1px solid #ddd; border-radius:10px; object-fit:cover;">
               <button type="button" onclick="document.getElementById('fileInput').click();">
                 이미지 변경
               </button> 
@@ -162,7 +166,10 @@
 		
 		<div>
 			<label>자기소개</label>
-			<textarea name="memIntro" id="memIntro" th:text="${profile.memIntro}" rows="" cols="" placeholder="픽큐 회원님들에게 나를 알려보세요! 👋"></textarea> <br>
+			<textarea name="memIntro" id="memIntro"
+		          rows="5" cols="40"
+		          placeholder="픽큐 회원님들에게 나를 알려보세요! 👋"
+		          th:utext="${profile.memIntro}"></textarea> <br>
 			<span>최대 200자까지 입력 가능합니다</span>
 			<div id="introMsg" style="color:red; font-size:12px;"></div>
 		</div>
