@@ -87,6 +87,8 @@ public class ReviewController {
 	        List<ReviewVO> list = reviewService.search(searchType, keyword, loginUser.getMemIdx());
 	        model.addAttribute("reviewList", list);
 	        model.addAttribute("keyword", keyword);
+	    } else {
+	        model.addAttribute("keyword", null);
 	    }
 		
 		return "views/review/reviewWrite";  
