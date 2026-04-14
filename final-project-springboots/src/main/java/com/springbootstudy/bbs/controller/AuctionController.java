@@ -290,7 +290,7 @@ public class AuctionController {
         model.addAttribute("detail", detail);
         model.addAttribute("bidList", bidList);
         model.addAttribute("mode", "bidForm");   // 오른쪽 패널: 입찰 폼
-        return "views/auction/auctionDetail";
+        return "views/bid/bidRegister";
     }
 
     // 입찰 등록 (/auctions/{auctionIdx}/bids POST)

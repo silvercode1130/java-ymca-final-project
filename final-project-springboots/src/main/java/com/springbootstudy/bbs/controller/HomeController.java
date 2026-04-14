@@ -1,5 +1,6 @@
 package com.springbootstudy.bbs.controller;
 
+import com.solapi.shadow.retrofit2.http.GET;
 import com.springbootstudy.bbs.domain.AuctionDTO;
 import com.springbootstudy.bbs.domain.MemberVO;
 import com.springbootstudy.bbs.service.AuctionService;
@@ -36,5 +37,45 @@ public class HomeController {
         model.addAttribute("selectedCategory", null);
 
         return "views/main/main"; 
-    } 
+    }
+    
+    // 고객지원 이용안내 페이지
+    @GetMapping("/support/guide")
+    public String supportGuide(Model model, HttpSession session) {
+    	
+    	// 로그인 정보 세팅
+        MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
+        if (loginUser != null) {
+            model.addAttribute("loginUser", loginUser);
+        }
+    	
+    	return "views/support/guide";
+    }
+    
+    // 고객지원 자주 묻는 질문 페이지
+    @GetMapping("/support/faq")
+    public String supportFaq(Model model, HttpSession session) {
+    	
+    	// 로그인 정보 세팅
+    	MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
+    	if (loginUser != null) {
+    		model.addAttribute("loginUser", loginUser);
+    	}
+    	
+    	return "views/support/faq";
+    }
+    
+    // 고객지원 고객문의 페이지
+    @GetMapping("/support/inquiry")
+    public String supportInquiry(Model model, HttpSession session) {
+    	
+    	// 로그인 정보 세팅
+    	MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
+    	if (loginUser != null) {
+    		model.addAttribute("loginUser", loginUser);
+    	}
+    	
+    	return "views/support/inquiry";
+    }
+    
 }
