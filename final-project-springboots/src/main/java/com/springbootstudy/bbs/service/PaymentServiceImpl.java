@@ -93,4 +93,26 @@ public class PaymentServiceImpl implements PaymentService {
     }
     return false;
   }
+
+  @Override
+  @Transactional(rollbackFor = Exception.class)
+  public void shipOrder(PaymentVO paymentVO) throws Exception {
+    // 운송장 정보 저장
+    int result = paymentMapper.updateShippingInfo(paymentVO);
+    if (result == 0) {
+      throw new Exception("배송 처리에 실패했습니다.");
+    }
+    // 경매 상태 배송중(9)으로 변경
+    paymentMapper.updateAuctionStatusByBidIdx(paymentVO.getBidIdx(), 9);
+  }
+
+  @Override
+  @Transactional(rollbackFor = Exception.class)
+  public void confirmReceipt(Long bidIdx) throws Exception {
+    // escrow_status DELIVERED, confirmed_at 기록
+    paymentMapper.updateEscrowStatus(bidIdx, "DELIVERED");
+    paymentMapper.updateConfirmedAt(bidIdx);
+    // 경매 상태 배송완료(10)으로 변경
+    paymentMapper.updateAuctionStatusByBidIdx(bidIdx, 10);
+  }
 }

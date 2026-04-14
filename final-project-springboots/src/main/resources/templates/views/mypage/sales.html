@@ -1,114 +1,128 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	layout:decorate="~{layouts/mypage_layout}">
+<html xmlns:th="http://www.thymeleaf.org">
+
 <head>
-<meta charset="UTF-8">
-<title>나의 판매 내역 - PickQ</title>
+  <meta charset="UTF-8">
+  <title>내 판매 내역</title>
 </head>
+
 <body>
-	<main layout:fragment="content">
 
-		<div
-			class="bg-white border border-gray-100 rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.03)] overflow-hidden">
+  <h2>내 판매 내역</h2>
 
-			<!-- 헤더 -->
-			<div class="px-6 py-5 border-b border-gray-100">
-				<h2 class="text-lg sm:text-xl font-semibold text-[#222222]">나의
-					거래 - 판매 내역</h2>
-				<p class="mt-1 text-xs sm:text-sm text-[#767676]">판매자로 참여한 주문의
-					결제/배송/정산 상태를 확인할 수 있습니다.</p>
-			</div>
+  <table>
+    <thead>
+      <tr>
+        <th>상품명</th>
+        <th>결제 금액</th>
+        <th>구매자 이름</th>
+        <th>배송지</th>
+        <th>연락처</th>
+        <th>배송 상태</th>
+        <th>택배사</th>
+        <th>운송장번호</th>
+        <th>결제일</th>
+        <th>배송처리</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr th:if="${#lists.isEmpty(sales)}">
+                <td colspan="10">판매 내역이 없습니다.</td>
+            </tr>
+            <tr th:each="sale : ${sales}">
+                <td th:text="${sale.itemName}"></td>
+                <td th:text="${#numbers.formatInteger(sale.payAmount, 0, 'COMMA') + '원'}"></td>
+                <td th:text="${sale.buyerName}"></td>
+                <td th:text="${sale.buyerAddr + ' ' + sale.buyerZipcode}"></td>
+                <td th:text="${sale.buyerTel}"></td>
+                <td th:text="${sale.deliveryStatus != null ? sale.deliveryStatus : '배송준비중'}"></td>
+                <td th:text="${sale.courierCompany != null ? sale.courierCompany : '-'}"></td>
+                <td th:text="${sale.trackingNumber != null ? sale.trackingNumber : '-'}"></td>
+                <td th:text="${#temporals.format(sale.payRegdate, 'yyyy-MM-dd HH:mm')}"></td>
+                <td>
+                    <!-- 배송 시작 전인 경우 운송장 입력 버튼 -->
+                    <button th:if="${sale.deliveryStatus == null}"
+                            th:attr="data-bid-idx=${sale.bidIdx}"
+                            onclick="openShipModal(this)">운송장 입력</button>
+                    <!-- 배송중 -->
+                    <span th:if="${sale.deliveryStatus == 'SHIPPING'}">배송중</span>
+                    <!-- 수령완료 -->
+                    <span th:if="${sale.deliveryStatus == 'DELIVERED'}">수령완료</span>
+                </td>
+            </tr>
+        </tbody>
+    </table>
 
-			<!-- 본문: 주문 카드 리스트 -->
-			<div class="px-4 py-4 sm:px-6 sm:py-5">
+    <!-- 운송장 입력 모달 -->
+    <div id="shipModal" style="display:none; position:fixed; top:50%; left:50%;
+         transform:translate(-50%,-50%); background:white; padding:30px;
+         border:1px solid #ccc; border-radius:8px;">
+        <h3>운송장 정보 입력</h3>
+        <input type="hidden" id="modalBidIdx"/>
+        <div>
+            <label>택배사</label>
+            <select id="courierCompany">
+                <option value="CJ대한통운">CJ대한통운</option>
+                <option value="한진택배">한진택배</option>
+                <option value="롯데택배">롯데택배</option>
+                <option value="우체국택배">우체국택배</option>
+                <option value="로젠택배">로젠택배</option>
+            </select>
+        </div>
+        <div>
+            <label>운송장번호</label>
+            <input type="text" id="trackingNumber" placeholder="운송장번호 입력"/>
+        </div>
+        <button onclick="submitShipping()">배송 시작</button>
+        <button onclick="closeShipModal()">취소</button>
+    </div>
 
-				<!-- 비어있을 때 -->
-				<div th:if="${#lists.isEmpty(orders)}"
-					class="py-10 text-center text-sm text-gray-400 border border-dashed border-gray-200 rounded-lg">
-					판매한 주문이 없습니다.</div>
+    <script>
+      function openShipModal(btn) {
+        const bidIdx = btn.getAttribute("data-bid-idx");
+        document.getElementById("modalBidIdx").value = bidIdx;
+        document.getElementById("shipModal").style.display = "block";
+      }
 
-				<!-- 데이터 있을 때 -->
-				<div th:if="${!#lists.isEmpty(orders)}" class="space-y-3">
+      function closeShipModal() {
+        document.getElementById("shipModal").style.display = "none";
+      }
 
-					<div th:each="order : ${orders}"
-						class="cursor-pointer rounded-xl border border-gray-200 bg-gray-50 px-4 py-4 sm:px-5 sm:py-4 hover:border-[#7CBD00] transition-colors"
-						th:onclick="|location.href='/mypage/sales/${order.orderIdx}'|">
+      function submitShipping() {
+        const bidIdx = document.getElementById("modalBidIdx").value;
+        const courierCompany = document.getElementById("courierCompany").value;
+        const trackingNumber = document.getElementById("trackingNumber").value;
 
-						<!-- 제목 + 상태 -->
-						<div class="mb-3 flex items-center justify-between gap-3">
-							<div>
-								<!-- 경매 제목 -->
-								<div class="text-sm font-semibold text-[#222222]"
-									th:text="${order.auctionTitle}">프로 축구공 FIFA 공인구 구함</div>
-								<!-- 구매자 닉네임 -->
-								<div class="mt-1 text-[11px] text-[#999999]">
-									구매자 <span th:text="${order.buyerNickname}">buyer123</span>
-								</div>
-							</div>
+        if (!trackingNumber.trim()) {
+          alert("운송장번호를 입력해주세요.");
+          return;
+        }
 
-							<!-- 주문 상태 배지 -->
-							<div>
-								<span
-									class="inline-flex items-center rounded-full px-3 py-1 text-[11px] font-semibold"
-									th:classappend="
-                      ${order.orderStatusCode} == 'CREATED' ? ' bg-amber-50 text-amber-700' :
-                      (${order.orderStatusCode} == 'PAID' ? ' bg-[#E6F4D6] text-[#4C7C00]' :
-                      (${order.orderStatusCode} == 'CANCELED' ? ' bg-gray-100 text-gray-500' :
-                      ' bg-gray-100 text-gray-600')) "
-									th:text="${order.orderStatusName}"> 결제대기 </span>
-							</div>
-						</div>
+        fetch("/api/payment/ship", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            bidIdx: bidIdx,
+            courierCompany: courierCompany,
+            trackingNumber: trackingNumber
+          })
+        })
+          .then(res => {
+            if (!res.ok) {
+              return res.text().then(text => { throw new Error(text); });
+            }
+            return res.json();
+          })
+          .then(data => {
+            alert("배송 처리가 완료되었습니다!");
+            closeShipModal();
+            location.reload();
+          })
+          .catch(err => {
+            alert("오류가 발생했습니다: " + err.message);
+          });
+      }
+    </script>
 
-						<!-- 정보 4칸 -->
-						<div
-							class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs sm:text-sm">
-							<div>
-								<div class="text-[#9ca3af]">결제 금액</div>
-								<div class="mt-0.5 font-semibold text-[#222222]"
-									th:text="${#numbers.formatInteger(order.orderAmount, 0, 'COMMA') + '원'}">
-									50,000원</div>
-							</div>
-							<div>
-								<div class="text-[#9ca3af]">결제 상태</div>
-								<div class="mt-0.5 font-semibold text-[#222222]"
-									th:text="${order.paymentStatusName}">결제완료</div>
-							</div>
-							<div>
-								<div class="text-[#9ca3af]">배송 상태</div>
-								<div class="mt-0.5 text-[#222222]"
-									th:text="${order.shippingStatusName}">배송전</div>
-							</div>
-							<div>
-								<div class="text-[#9ca3af]">주문일</div>
-								<div class="mt-0.5 text-[#222222]"
-									th:text="${#temporals.format(order.orderRegdate, 'yyyy-MM-dd')}">
-									2026-03-10</div>
-							</div>
-						</div>
-
-						<!-- 하단 버튼 영역 -->
-						<div class="mt-3 flex justify-end gap-2">
-							<!-- 결제완료 + 배송전일 때만 송장등록/배송시작 버튼 -->
-							<button type="button"
-								th:if="${order.orderStatusCode == 'PAID' and order.shippingStatusCode == 'READY'}"
-								class="px-3 py-1.5 rounded-lg bg-[#7CBD00] text-white text-[11px] sm:text-xs font-semibold hover:bg-[#6AA500]"
-								th:onclick="|event.stopPropagation(); location.href='/mypage/sales/${order.orderIdx}/ship'|">
-								송장등록/배송시작</button>
-
-							<!-- 항상 노출되는 상세보기 -->
-							<button type="button"
-								class="px-3 py-1.5 rounded-lg border border-gray-200 text-[11px] sm:text-xs text-gray-700 bg-white hover:bg-gray-50"
-								th:onclick="|event.stopPropagation(); location.href='/mypage/sales/${order.orderIdx}'|">
-								상세보기</button>
-						</div>
-
-					</div>
-				</div>
-
-			</div>
-		</div>
-
-	</main>
 </body>
 </html>

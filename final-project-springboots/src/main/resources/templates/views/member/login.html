@@ -122,18 +122,19 @@
 							입력해주세요</p>
 					</div>
 
-					<div class="px-6 py-3">
-						<form th:action="@{/members/login}" method="post"
-							class="space-y-1">
-
-							<!-- 로그인 메시지 -->
-							<div class="text-sm font-semibold text-[#7CBD00]"
-								th:if="${loginMsg}">
-								<span th:text="${loginMsg}"></span>
+					<div class="px-6 py-6">
+						<form th:action="@{/members/login}" method="post" 
+							class="space-y-6">
+							
+							<!-- 인터셉터 메시지 -->
+							<div style="font-weight: bold;" th:if="${loginMsg}">
+							    <span th:text="${loginMsg}"></span>
 							</div>
 
-							<!-- redirect 유지 -->
-							<input type="hidden" name="redirect" th:value="${redirect}">
+							<input type="hidden" name="redirect" th:value="${redirect}"> 
+							
+							<!-- 잠금처리 당한 아이디 -->
+							<input type="hidden" id="lockedMemId" th:value="${lockedId}">
 
 							<!-- 아이디 -->
 							<div class="space-y-1">
@@ -174,6 +175,9 @@
 							<div th:if="${error}" class="text-xs text-red-500">
 								<span th:text="${error}">아이디나 비밀번호가 틀렸습니다</span>
 							</div>
+							
+							<!-- 실시간 카운트다운 표시 -->
+							<div id="lockTimer" style="color: gray; font-size: 12px; margin-top: 5px;"></div>
 
 							<!-- 로그인 버튼 -->
 							<div class="mt-5 flex justify-center">
@@ -217,11 +221,78 @@
 							</div>
 
 						</form>
+						
+						<hr>
+						
+						<!-- 네이버 버튼 -->
+						<div id="naverIdLogin"></div> 
+						
 					</div>
 				</div>
 
 			</div>
 		</div>
+		
+
+			<script type="text/javascript">
+				// SDK 초기화 및 버튼 생성
+			    var naverLogin = new naver.LoginWithNaverId({
+			        clientId: "2Rk518jWd9bxOQoKuUnD", // 발급받은 Client ID
+			        callbackUrl: "http://localhost:8080/members/naverCallback", // 등록한 Callback URL
+			        isPopup: false, // 팝업 방식으로 진행할지 여부
+			        loginButton: { color: "green", type: 3, height: 60 } // 버튼 스타일 설정
+			    });
+			    naverLogin.init();
+
+				
+				// 새로고침 x / 실시간 o 
+				document.addEventListener("DOMContentLoaded", function () {
+				    const errorText = /*[[${error != null ? error : ''}]]*/ "";
+				    const timerDiv = document.getElementById("lockTimer");
+				    const loginBtn = document.querySelector("input[name='loginBtn']");
+				    const lockedMemId = document.getElementById("lockedMemId")?.value || "";
+				
+				    if (lockedMemId && timerDiv) {
+				
+				        function updateTimer() {
+				            fetch('/members/getRemainingTime?memId=' + encodeURIComponent(lockedMemId))
+				                .then(response => response.json())
+				                .then(data => {
+				                    if (data.remainingSeconds > 0) {
+				                        timerDiv.innerHTML =
+				                            `⏳ 로그인 제한 중 (${data.remainingSeconds}초 남음)`;
+				                        if (loginBtn) loginBtn.disabled = true;
+				                    } else {
+				                        timerDiv.innerHTML = "다시 로그인을 시도해주세요";
+				                        if (loginBtn) loginBtn.disabled = false;
+				                        if (interval) clearInterval(interval);
+				                    }
+				                })
+				                .catch(error => console.error("Timer error:", error));
+				        }
+				
+				        updateTimer();
+				        const interval = setInterval(updateTimer, 1000);
+				    }
+
+				 	// 비번 보기 기능
+					const pwdInput = document.getElementById("memPwd");
+			        const togglePwd = document.getElementById("togglePwd");
+			
+			        if (togglePwd && pwdInput) {
+			            togglePwd.addEventListener("click", function () {
+			                if (pwdInput.type === "password") {
+			                    pwdInput.type = "text";
+			                    this.innerHTML = '<i class="bi bi-eye-slash"></i>';
+			                } else {
+			                    pwdInput.type = "password";
+			                    this.innerHTML = '<i class="bi bi-eye"></i>';
+			                }
+			            });
+			        }
+				    
+				});
+			</script>
 
 	</th:block>
 </body>

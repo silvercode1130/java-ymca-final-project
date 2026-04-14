@@ -17,4 +17,8 @@ public interface PaymentService {
    * 승인된 응답 객체와 우리쪽 VO를 조합하여 결제 정보를 기록하고 상태를 변경합니다.
    */
   boolean savePaymentAndTrackStatus(PaymentVO paymentVO, Map<String, Object> tossResponse) throws Exception;
+
+  void shipOrder(PaymentVO paymentVO) throws Exception;
+
+  void confirmReceipt(Long bidIdx) throws Exception;
 }

@@ -10,6 +10,8 @@
 
   <h2>내 입찰 목록</h2>
 
+  <a href="/mypage/sales" class="btn">판매내역 보기</a>
+
   <table>
     <thead>
       <tr>
@@ -19,25 +21,33 @@
         <th>제안 가격</th>
         <th>입찰 상태</th>
         <th>입찰일</th>
+        <th>배송처리</th>
       </tr>
     </thead>
     <tbody>
       <tr th:if="${#lists.isEmpty(bids)}">
-            <td colspan="6">참여한 입찰이 없습니다.</td>
-        </tr>
-        <tr th:each="bid : ${bids}">
-            <td>
-              <a th:href="@{/auctions/{idx}(idx=${bid.auctionIdx})}"
-                 th:text="${bid.itemName}"></a>
-            </td>
-            <td th:text="${bid.itemName}"></td>
-            <td th:text="${bid.itemBrand != null ? bid.itemBrand : '-'}"></td>
-            <td th:text="${#numbers.formatInteger(bid.bidPrice, 0, 'COMMA') + '원'}"></td>
-            <td th:text="${bid.bidStatusName}"></td>
-            <td th:text="${#temporals.format(bid.bidRegdate, 'yyyy-MM-dd HH:mm')}"></td>
-        </tr>
+        <td colspan="7">참여한 입찰이 없습니다.</td>
+      </tr>
+      <tr th:each="bid : ${bids}">
+        <td>
+          <a th:href="@{/auctions/{idx}(idx=${bid.auctionIdx})}"
+             th:text="${bid.itemName}"></a>
+        </td>
+        <td th:text="${bid.itemName}"></td>
+        <td th:text="${bid.itemBrand != null ? bid.itemBrand : '-'}"></td>
+        <td th:text="${#numbers.formatInteger(bid.bidPrice, 0, 'COMMA') + '원'}"></td>
+        <td th:text="${bid.bidStatusName}"></td>
+        <td th:text="${#temporals.format(bid.bidRegdate, 'yyyy-MM-dd HH:mm')}"></td>
+        <td>
+          <!-- 낙찰(2): sales 페이지로 유도 -->
+          <a th:if="${bid.bidStatusIdx == 2}"
+             href="/mypage/sales">배송처리 하기</a>
+          <!-- 그 외 -->
+          <span th:if="${bid.bidStatusIdx != 2}">-</span>
+        </td>
+      </tr>
     </tbody>
-</table>
+  </table>
 
 </body>
 </html>
