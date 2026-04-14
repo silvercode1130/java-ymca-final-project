@@ -9,8 +9,8 @@
 <div class="register-container">
     <h2>📣 역경매 구매 요청하기</h2>
 
-    <span th:if="${errorMessage}" id="toast-error" th:data-msg="${errorMessage}" style="display:none;"></span>
-	<span th:if="${successMessage}" id="toast-success" th:data-msg="${successMessage}" style="display:none;"></span>
+    <span th:if="${errorMessage}" id="toast-error" th:data-msg="${errorMessage}"></span>
+	<span th:if="${successMessage}" id="toast-success" th:data-msg="${successMessage}"></span>
 
     <!-- enctype 반드시 필요 없으면 파일 전송 안 됨 -->
     <form action="/auctions" method="post" id="registerForm"
@@ -47,7 +47,7 @@
 			<input type="text" name="auctionTargetPrice" id="auctionTargetPrice"
 			       placeholder="예: 50,000" required
 			       inputmode="numeric">
-			<small style="color:gray;">1000원 단위 이상, 음수 불가</small>
+			<small>1000원 단위 이상, 음수 불가</small>
         </div>
 
         <!-- URL 방식 → 파일 업로드 방식으로 변경 -->
@@ -55,10 +55,10 @@
             <label>이미지 (선택)</label>
             <input type="file" name="thumbnailFile" accept="image/*"
                    id="thumbnailFile">
-            <small style="color:gray;">이미지 파일을 선택해주세요 (선택사항)</small>
+            <small>이미지 파일을 선택해주세요 (선택사항)</small>
             <!-- 미리보기 -->
-            <div id="previewBox" style="margin-top:8px; display:none;">
-                <img id="previewImg" style="max-width:200px; max-height:150px; border:1px solid #ddd; border-radius:4px;">
+            <div id="previewBox">
+                <img id="previewImg">
             </div>
         </div>
 
@@ -67,13 +67,13 @@
                 <label>입찰 마감일 *</label>
                 <input type="datetime-local" name="auctionEndAt"
                        id="auctionEndAt" required>
-                <small style="color:gray;">현재 시점 이후만 선택 가능</small>
+                <small>현재 시점 이후만 선택 가능</small>
             </div>
             <div>
                 <label>결정 마감일 *</label>
                 <input type="datetime-local" name="auctionDecisionDeadline"
                        id="auctionDecisionDeadline" required>
-                <small style="color:gray;">입찰 마감일로부터 최대 3일 이내</small>
+                <small>입찰 마감일로부터 최대 3일 이내</small>
             </div>
         </div>
 

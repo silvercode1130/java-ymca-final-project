@@ -37,7 +37,7 @@
 		    "<span th:text='${keyword}'></span>"(이)과 관련된 거래입니다
 		</div>
 		
-		<div>
+		<div th:if="${keyword == null or keyword == '' or !#lists.isEmpty(reviewList)}">
 			<table border="1">
 				<thead>
 					<tr >
@@ -101,9 +101,10 @@
         	// 검색 기능 disabled 
         	const keywordInput = document.querySelector('input[name="keyword"]');
 		    const searchBtn = document.getElementById('searchBtn');
-		    
+		    const searchType = document.querySelector('select[name="searchType"]');
+
 		    keywordInput.addEventListener("input", function() {
-		        if (this.value.trim() === "") {
+		        if (this.value.trim() === "" || searchType.value === "") {
 		            searchBtn.disabled = true;
 		        } else {
 		            searchBtn.disabled = false;

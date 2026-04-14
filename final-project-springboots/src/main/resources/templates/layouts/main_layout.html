@@ -27,8 +27,8 @@
 <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
 <script th:src="@{/js/formcheck.js}"></script>
 </head>
-<body>
-	<div class="container">
+<body class="min-h-screen flex flex-col">
+	<div class="container flex-1 flex flex-col">
 
 		<!-- header -->
 		<div th:replace="~{fragments/header :: header}"></div>
@@ -36,10 +36,11 @@
 		<script th:src="@{/bootstrap/bootstrap.bundle.min.js}"></script>
 
 		<!-- content : 요청마다 교체되는 부분 -->
-		<div layout:fragment="content"></div>
+		<div layout:fragment="content" class="mb-6"></div>
 
 		<!-- footer -->
-		<div th:replace="~{fragments/footer :: footer}"></div>
+		<div class="mt-10"></div>
+		<div th:replace="~{fragments/footer :: footer}" class="mt-10"></div>
 
 	</div>
 </body>
