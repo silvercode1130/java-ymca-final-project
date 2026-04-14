@@ -12,58 +12,35 @@
 -->
 <mapper namespace="com.springbootstudy.bbs.mapper.PaymentMapper">
 
-	<insert id="insertPayment" parameterType="com.springbootstudy.bbs.domain.PaymentVO" 
-          useGeneratedKeys="true" keyProperty="payIdx">
-    INSERT INTO payment (
-        bid_idx, 
-        mem_idx, 
-        payment_key, 
-        order_id, 
-        pay_method, 
-        pay_amount, 
-        pay_status,
-        buyer_name, 
-        buyer_tel, 
-        buyer_addr, 
-        buyer_zipcode, 
-        escrow_status, 
-        pay_regdate
-    ) VALUES (
-        #{bidIdx}, 
-        #{memIdx}, 
-        #{paymentKey}, 
-        #{orderId}, 
-        #{payMethod}, 
-        #{payAmount}, 
-        'READY',        #{buyerName}, 
-        #{buyerTel}, 
-        #{buyerAddr}, 
-        #{buyerZipcode}, 
-        'READY', 
-        NOW()
-    )
-  </insert>
+    <!-- 결제 정보 저장 -->
+    <insert id="insertPayment" parameterType="com.springbootstudy.bbs.domain.PaymentVO"
+        useGeneratedKeys="true" keyProperty="payIdx"> INSERT INTO payment ( bid_idx, mem_idx,
+        payment_key, order_id, pay_method, pay_amount, pay_status, buyer_name, buyer_tel,
+        buyer_addr, buyer_zipcode, pay_regdate ) VALUES ( #{bidIdx}, #{memIdx}, #{paymentKey},
+        #{orderId}, #{payMethod}, #{payAmount}, 'READY', #{buyerName}, #{buyerTel}, #{buyerAddr},
+        #{buyerZipcode}, NOW() ) </insert>
 
-  <update id="updatePaymentStatus">
-    UPDATE payment 
-    SET pay_status = 'DONE'
-    WHERE order_id = #{orderId}
-  </update>
+    <!-- 결제 상태 변경 (READY → DONE) -->
+    <update id="updatePaymentStatus"> UPDATE payment SET pay_status = 'DONE' WHERE order_id =
+        #{orderId} </update>
 
-  <update id="updateAuctionStatus">
-    UPDATE auction 
-    SET auction_status_idx = 8 
-    WHERE auction_idx = (
-        SELECT auction_idx 
-        FROM bid 
-        WHERE bid_idx = #{bidIdx}
-    )
-  </update>
+    <!-- 경매 상태 변경 (결제완료: 8) -->
+    <update id="updateAuctionStatus"> UPDATE auction SET auction_status_idx = 8 WHERE auction_idx =
+        ( SELECT auction_idx FROM bid WHERE bid_idx = #{bidIdx} ) </update>
 
-  <update id="updateBidStatus">
-    UPDATE bid 
-    SET bid_status_idx = 2 
-    WHERE bid_idx = #{bidIdx}
-  </update>
+    <!-- 경매 상태 변경 (배송중: 9, 배송완료: 10 등 동적으로) -->
+    <update id="updateAuctionStatusByBidIdx"> UPDATE auction SET auction_status_idx = #{statusIdx}
+        WHERE auction_idx = ( SELECT auction_idx FROM bid WHERE bid_idx = #{bidIdx} ) </update>
+
+    <!-- 입찰 상태 변경 (낙찰: 2) -->
+    <update id="updateBidStatus"> UPDATE bid SET bid_status_idx = 2 WHERE bid_idx = #{bidIdx} </update>
+
+    <!-- 구매자 수령 확인 -->
+    <update id="updateConfirmedAt"> UPDATE payment SET confirmed_at = NOW(), pay_status =
+        'CONFIRMED' WHERE bid_idx = #{bidIdx} </update>
+
+    <!-- 결제 정보 조회 (중복결제 체크 및 pay_idx 조회용) -->
+    <select id="findPaymentByBidIdx" resultType="com.springbootstudy.bbs.domain.PaymentVO"> SELECT *
+        FROM payment WHERE bid_idx = #{bidIdx} AND pay_status IN ('DONE', 'CONFIRMED') LIMIT 1 </select>
 
 </mapper>	
