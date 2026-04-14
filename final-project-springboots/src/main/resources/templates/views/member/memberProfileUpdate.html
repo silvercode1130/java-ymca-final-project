@@ -146,7 +146,7 @@
 		<div>
 			프로필 <br>
 			JPG, PNG 파일 (최대 100MB) <br>
-			<img id="preview" th:if="${profile.memImg != null}" th:src="@{'/upload/finalProfile/' + ${profile.memImg}}" width="150">
+			<img id="preview" th:if="${profile.memImg != null}" th:src="@{'/images/' + ${profile.memImg}}" width="150">
               <button type="button"
                       onclick="document.getElementById('fileInput').click();">
                 이미지 변경

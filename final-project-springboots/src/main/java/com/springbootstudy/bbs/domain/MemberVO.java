@@ -17,11 +17,12 @@ public class MemberVO {
  private String  		memEmail;      	// 이메일
  private String  		memIp;         	// IP 주소
  private Integer 		memRoleIdx;    	// FK → role.role_idx (권한 등급) 
- private Integer 		memGradeIdx;   	// FK → grade.grade_idx (신용도 등급)
+ private Integer 		memGradeIdx;   	// FK → grade.grade_idx (신용도 등급) 
  private LocalDate     	memBday;     	// 생일
  private LocalDateTime 	memRegdate;  	// 가입일
  private String  		memIsDeleted;   // 'Y' / 'N' (삭제 여부)
  private LocalDateTime 	memDeldate;  	// 탈퇴일 
+ private String 		memLoginType;   // 로그인 타입(로그인 API용)
 
 }
 
