@@ -116,7 +116,7 @@ CREATE TABLE member (
     mem_role_idx   INT        	 NOT NULL COMMENT 'FK → role.role_idx (권한 등급)',
     mem_grade_idx  INT           NOT NULL COMMENT 'FK → grade.grade_idx (신용도 등급)',
 	mem_credit 	   INT 			 NOT NULL DEFAULT 50 COMMENT '신용 크레딧 점수',
-	mem_penalty	   INT 			 NOT NULL DEFAULT 0 COMMENT '패널티 점수';
+	mem_penalty	   INT 			 NOT NULL DEFAULT 0 COMMENT '패널티 점수',
     mem_bday       DATE          DEFAULT NULL COMMENT '생일',
     mem_regdate    DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '가입일',
     mem_is_deleted CHAR(1)       NOT NULL DEFAULT 'N' COMMENT 'Y / N (삭제 여부)',
