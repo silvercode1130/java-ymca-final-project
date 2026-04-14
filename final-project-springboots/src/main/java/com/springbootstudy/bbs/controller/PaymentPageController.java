@@ -37,7 +37,7 @@ public class PaymentPageController {
     // auctionIdx로 낙찰된 bidIdx 조회
     Long bidIdx = mypageService.getWonBidIdxByAuctionIdx(auctionIdx);
     if (bidIdx == null)
-      return "redirect:/auctions";
+      return "redirect:/mypage/auctions";
 
     BidDTO bid = bidService.findBidById(bidIdx);
     if (bid == null)
