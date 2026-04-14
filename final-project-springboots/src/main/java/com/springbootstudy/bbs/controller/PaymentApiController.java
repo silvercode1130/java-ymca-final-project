@@ -126,8 +126,7 @@ public class PaymentApiController {
 
     // 세션 정보 반환 API
     @GetMapping("/session-info")
-    public ResponseEntity<?> getSessionInfo(Ht
-        tpSession session) {
+    public ResponseEntity<?> getSessionInfo(HttpSession session) {
         MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
         if (loginUser == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
