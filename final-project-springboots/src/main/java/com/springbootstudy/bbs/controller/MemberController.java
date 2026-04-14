@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -32,6 +33,10 @@ import com.solapi.sdk.message.exception.SolapiMessageNotReceivedException;
 
 @Controller
 public class MemberController {
+	
+	// 로그인 제한 걸기 기능
+	private static final Map<String, Integer> failCountMap = new ConcurrentHashMap<>();
+    private static final Map<String, Long> lockTimeMap = new ConcurrentHashMap<>();
 
     @Autowired
     private MemberService memberService;
@@ -142,133 +147,106 @@ public class MemberController {
             HttpSession session,
             RedirectAttributes ra) throws ServletException, IOException {
 
-        // 5번 틀리면 타이머
-        Long lockTime = (Long) session.getAttribute("lockTime");
-
-        // if (failCount >= 5) {
-        // long lockTime = System.currentTimeMillis() + (5 * 60 * 1000); // 5분
-        // session.setAttribute("lockTime", lockTime);
-        //
-        // ra.addFlashAttribute("error", "로그인 5회 실패! 5분 후 다시 시도해주세요.");
-        // return "redirect:/members/login";
-        // }
+        // 아이디 기준 잠금 확인
+        Long lockTime = lockTimeMap.get(memId);
 
         if (lockTime != null) {
             long now = System.currentTimeMillis();
 
             if (now < lockTime) {
                 long remainSec = (lockTime - now) / 1000;
-                ra.addFlashAttribute("error", "로그인 제한 중 (" + remainSec + "초 남음)");
+                ra.addFlashAttribute("error", "로그인이 제한된 계정입니다.");
+                ra.addFlashAttribute("lockedId", memId); // 프론트에서 타이머용
                 return "redirect:/members/login";
             } else {
-                // 시간 지나면 해제
-                session.removeAttribute("failCount");
-                session.removeAttribute("lockTime");
+                // 잠금 해제
+                failCountMap.remove(memId);
+                lockTimeMap.remove(memId);
             }
         }
 
-        Integer failCount = (Integer) session.getAttribute("failCount");
-        if (failCount == null)
-            failCount = 0;
+        Integer failCount = failCountMap.getOrDefault(memId, 0);
 
         // 로그인 성공 여부 확인
         int result = memberService.login(memId, memPwd);
 
-        if (result == -1) { // 아이디 없음
-            // 로그인 5번 이상 틀리는 지 카운트 다운
-            // Integer failCount = (Integer) session.getAttribute("failCount");
-            // if (failCount == null) failCount = 0;
-
+        if (result == -1 || result == 0) { // 아이디 없음 or 비밀번호 틀림
             failCount++;
-            session.setAttribute("failCount", failCount);
+            failCountMap.put(memId, failCount);
 
             if (failCount >= 5) {
-                long newLockTime = System.currentTimeMillis() + (5 * 60 * 1000); // 5분
-                session.setAttribute("lockTime", newLockTime);
+                long newLockTime = System.currentTimeMillis() + (5 * 60 * 1000);
+                lockTimeMap.put(memId, newLockTime);
 
-                ra.addFlashAttribute("error", "로그인 5회 실패! 5분 후 다시 시도해주세요.");
+//                long remainSec = (newLockTime - System.currentTimeMillis()) / 1000;
+                ra.addFlashAttribute("error", "5분 후 다시 시도해주세요");
+                ra.addFlashAttribute("lockedId", memId);
                 return "redirect:/members/login";
             }
 
-            // 몇 번째 수정인지 알려주기
-            ra.addFlashAttribute("error", "존재하지 않는 아이디입니다. (" + failCount + "/5)");
-            return "redirect:/members/login";
-
-        } else if (result == 0) { // 비밀번호 틀림
-            // 비밀번호 카운트 다운
-            // Integer failCount = (Integer) session.getAttribute("failCount");
-
-            // if (failCount == null) failCount = 0;
-
-            failCount++;
-            session.setAttribute("failCount", failCount);
-
-            if (failCount >= 5) {
-                long newLockTime = System.currentTimeMillis() + (5 * 60 * 1000); // 5분
-                session.setAttribute("lockTime", newLockTime);
-
-                ra.addFlashAttribute("error", "로그인 5회 실패! 5분 후 다시 시도해주세요.");
-                return "redirect:/members/login";
-            }
-
-            ra.addFlashAttribute("error", "비밀번호가 틀립니다. (" + failCount + "/5)");
+            ra.addFlashAttribute("error", "아이디 혹은 비밀번호가 틀립니다 (" + failCount + "/5)");
             return "redirect:/members/login";
         }
 
-        // 로그인 성공 → 회원 정보 세션 저장
+        // 로그인 성공
         MemberVO memberVO = memberService.getMemberVO(memId);
 
         session.setAttribute("isLogin", true);
         session.setAttribute("loginId", memId);
-        session.setAttribute("loginUser", memberVO); // 로그인 세션!!
+        session.setAttribute("loginUser", memberVO);
+   
+       // 로그인 후 돌아가는 페이지의 세션값을 지워 줌
+       String redirectUrl = (String) session.getAttribute("loginRedirectUrl");
+       if (redirectUrl != null) {
+           session.removeAttribute("loginRedirectUrl"); // 사용 후 제거
+           return "redirect:" + redirectUrl;
+       }
 
-        session.removeAttribute("failCount"); // 로그인 실패 세션
-        session.removeAttribute("lockTime"); // 타이머 5분
+        // 로그인 성공 시 해당 아이디 잠금 해제
+        failCountMap.remove(memId);
+        lockTimeMap.remove(memId);
 
-        // 로그인 후 돌아가는 페이지의 세션값을 지워 줌
-        String redirectUrl = (String) session.getAttribute("loginRedirectUrl");
-        if (redirectUrl != null) {
-            session.removeAttribute("loginRedirectUrl"); // 사용 후 제거
-            return "redirect:" + redirectUrl;
+        String redirectUrl01 = (String) session.getAttribute("loginRedirectUrl");
+        if (redirectUrl01 != null) {
+            session.removeAttribute("loginRedirectUrl");
+            return "redirect:" + redirectUrl01;  
         }
 
+        session.setAttribute("memIdx", memberVO.getMemIdx());
+        System.out.println("memberVO.name : " + memberVO.getMemName());
+        
         // 결제용 index 추가
         session.setAttribute("memIdx", memberVO.getMemIdx());
-
         System.out.println("memberVO.name : " + memberVO.getMemName());
 
-        return "redirect:/main";
+        return "redirect:/main"; 
     }
 
+
     // 실시간 로직(로그인 5회 실패 시 타이머)
-    // @GetMapping("members/getRemainingTime")
-    // public Map<String, Object> getRemainingTime(HttpSession session) {
-    // Map<String, Object> response = new HashMap<>();
-    //
-    // // 1. 세션에서 '잠금 해제 시각(타임스탬프)'을 가져와 (로그인 실패 시 저장된 값)
-    // // 예: loginLockTime = 1713000000000 (밀리초 단위)
-    // Object lockTimeAttr = session.getAttribute("loginLockTime");
-    //
-    // if (lockTimeAttr == null) {
-    // response.put("remainingSeconds", 0);
-    // return response;
-    // }
-    //
-    // long lockTime = (long) lockTimeAttr;
-    // long currentTime = System.currentTimeMillis(); // 현재 시각
-    //
-    // // 2. 남은 시간 계산 (해제 시각 - 현재 시각) / 1000 = 남은 초
-    // long diff = lockTime - currentTime;
-    // long remainingSeconds = diff > 0 ? diff / 1000 : 0;
-    //
-    // // 만약 시간이 다 됐으면 세션에서 삭제
-    // if (remainingSeconds <= 0) {
-    // session.removeAttribute("loginLockTime");
-    // }
-    //
-    // response.put("remainingSeconds", remainingSeconds);
-    // return response;
-    // }
+    @GetMapping("/members/getRemainingTime")
+    @ResponseBody
+    public Map<String, Long> getRemainingTime(@RequestParam(value = "memId", required = false) String memId) {
+        Map<String, Long> result = new HashMap<>();
+        long remainingSeconds = 0;
+
+        if (memId != null) {
+            Long lockTime = lockTimeMap.get(memId);
+
+            if (lockTime != null) {
+                long now = System.currentTimeMillis();
+                if (now < lockTime) {
+                    remainingSeconds = (lockTime - now) / 1000;
+                } else {
+                    lockTimeMap.remove(memId);
+                    failCountMap.remove(memId);
+                }
+            }
+        }
+
+        result.put("remainingSeconds", remainingSeconds);
+        return result;
+    }
 
     // 로그아웃 -----------------------------------------------------------------
 
