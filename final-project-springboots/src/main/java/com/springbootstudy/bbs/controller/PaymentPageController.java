@@ -11,6 +11,7 @@ import com.springbootstudy.bbs.domain.MemberAddrVO;
 import com.springbootstudy.bbs.domain.MemberVO;
 import com.springbootstudy.bbs.service.BidService;
 import com.springbootstudy.bbs.service.MemberAddrService;
+import com.springbootstudy.bbs.service.MyPageService;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -22,27 +23,30 @@ public class PaymentPageController {
 
   private final BidService bidService;
   private final MemberAddrService memberAddrService;
+  private final MyPageService mypageService;
 
   // 1. 결제 페이지 (bid 정보 + 대표 배송지 함께 전달)
   @GetMapping("/pay")
-  public String payPage(@RequestParam("bidIdx") Long bidIdx,
+  public String payPage(@RequestParam("auctionIdx") Long auctionIdx,
       HttpSession session, Model model) {
 
     MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
     if (loginUser == null)
       return "redirect:/members/login";
 
-    // 입찰 정보 조회
+    // auctionIdx로 낙찰된 bidIdx 조회
+    Long bidIdx = mypageService.getWonBidIdxByAuctionIdx(auctionIdx);
+    if (bidIdx == null)
+      return "redirect:/auctions";
+
     BidDTO bid = bidService.findBidById(bidIdx);
     if (bid == null)
       return "redirect:/auctions";
 
-    // 대표 배송지 조회
     MemberAddrVO addr = memberAddrService.getPrimaryAddr(loginUser.getMemIdx());
-
     model.addAttribute("bid", bid);
     model.addAttribute("addr", addr);
-    model.addAttribute("memTel", loginUser.getMemTel()); // 세션에서 직접 꺼내기
+    model.addAttribute("memTel", loginUser.getMemTel());
 
     return "views/payment/pay";
   }
