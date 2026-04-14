@@ -21,27 +21,39 @@
         <th>상태</th>
         <th>마감일</th>
         <th>등록일</th>
+        <th>배송정보</th>
       </tr>
     </thead>
     <tbody>
       <tr th:if="${#lists.isEmpty(auctions)}">
-            <td colspan="8">등록한 경매가 없습니다.</td>
-        </tr>
-        <tr th:each="auction : ${auctions}">
-            <td>
-                <a th:href="@{/auctions/{idx}(idx=${auction.auctionIdx})}"
-                   th:text="${auction.auctionTitle}"></a>
-            </td>
-            <td th:text="${auction.itemCategoryName}"></td>
-            <td th:text="${#numbers.formatInteger(auction.auctionTargetPrice, 0, 'COMMA') + '원'}"></td>
-            <td th:text="${auction.bidCount}"></td>
-            <td th:text="${auction.minBidPrice == 0 ? '입찰 없음' : #numbers.formatInteger(auction.minBidPrice, 0, 'COMMA') + '원'}"></td>
-            <td th:text="${auction.auctionStatusName}"></td>
-            <td th:text="${#temporals.format(auction.auctionEndAt, 'yyyy-MM-dd HH:mm')}"></td>
-            <td th:text="${#temporals.format(auction.auctionRegdate, 'yyyy-MM-dd')}"></td>
-        </tr>
-    </tbody>
-</table>
+        <td colspan="9">등록한 경매가 없습니다.</td>
+      </tr>
+      <tr th:each="auction : ${auctions}">
+        <td>
+          <a th:href="@{/auctions/{idx}(idx=${auction.auctionIdx})}"
+             th:text="${auction.auctionTitle}"></a>
+        </td>
+        <td th:text="${auction.itemCategoryName}"></td>
+        <td th:text="${#numbers.formatInteger(auction.auctionTargetPrice, 0, 'COMMA') + '원'}"></td>
+        <td th:text="${auction.bidCount}"></td>
+        <td th:text="${auction.minBidPrice == 0 ? '입찰 없음' : #numbers.formatInteger(auction.minBidPrice, 0, 'COMMA') + '원'}"></td>
+        <td th:text="${auction.auctionStatusName}"></td>
+        <td th:text="${#temporals.format(auction.auctionEndAt, 'yyyy-MM-dd HH:mm')}"></td>
+        <td th:text="${#temporals.format(auction.auctionRegdate, 'yyyy-MM-dd')}"></td>
+        <td>
+          <!-- 결제대기(7): 결제하기 -->
+          <a th:if="${auction.auctionStatusIdx == 7}"
+             th:href="@{/mypage/payment/pay(auctionIdx=${auction.auctionIdx})}"
+             class="btn-pay">결제하기</a>
 
+          <!-- 배송중(9): 배송중 표시만 -->
+          <span th:if="${auction.auctionStatusIdx == 9}">배송중</span>
+
+          <!-- 배송완료(10): 수령완료 표시 -->
+          <span th:if="${auction.auctionStatusIdx == 10}">수령완료</span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
 </body>
 </html>

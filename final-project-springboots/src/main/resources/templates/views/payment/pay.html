@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>결제</title>
+    <script src="https://js.tosspayments.com/v1/payment"></script>
+</head>
+
+<body>
+
+    <div class="container">
+        <h2>경매 낙찰 결제</h2>
+
+        <!-- 입찰 정보 -->
+        <p th:text="${bid.itemName}"></p>
+        <div class="price" th:text="${#numbers.formatInteger(bid.bidPrice, 0, 'COMMA') + '원'}"></div>
+
+        <!-- 배송지 정보 -->
+        <div th:if="${addr != null}">
+            <p th:text="${addr.memAddr + ' ' + addr.memAddrDetail}"></p>
+            <p th:text="${addr.memZipcode}"></p>
+        </div>
+        <div th:if="${addr == null}">
+            <p>등록된 배송지가 없습니다. <a href="/members/memberAddrInsert">배송지 등록하기</a></p>
+        </div>
+
+        <!-- 결제 버튼 -->
+        <button type="button" class="pay-btn"
+                th:attr="data-idx=${bid.bidIdx},
+                         data-title=${bid.itemName},
+                         data-price=${bid.bidPrice}">
+            토스로 결제하기
+        </button>
+    </div>
+
+    <!-- 세션 정보 JS로 주입 -->
+    <script th:inline="javascript">
+        const loginMemIdx = [[${ session.memIdx }]];
+        const loginMemName = [[${ session.loginUser.memName }]];
+        const loginMemTel = [[${ memTel ne null? memTel : '010-0000-0000'}]];
+        const loginMemAddr = [[${ addr ne null? addr.memAddr + ' ' + addr.memAddrDetail : '주소없음'}]];
+        const loginMemZipcode = [[${ addr ne null? addr.memZipcode : '00000'}]];
+    </script>
+
+    <script src="/js/payment.js"></script>
+
+</body>
+</html>
