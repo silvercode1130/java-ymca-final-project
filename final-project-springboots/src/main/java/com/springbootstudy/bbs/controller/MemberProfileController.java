@@ -58,7 +58,8 @@ public class MemberProfileController {
 
     	if (!memImgFile.isEmpty()) {
 
-    	    String uploadDir = "C:/upload/finalProfile/";
+    	    String uploadDir = System.getProperty("user.dir")
+    	            + "/src/main/resources/static/images/profileUpload/";
 
     	    File dir = new File(uploadDir);
     	    if (!dir.exists()) {
@@ -68,6 +69,11 @@ public class MemberProfileController {
     	    String fileName = memImgFile.getOriginalFilename();
     	    File dest = new File(uploadDir + fileName);
     	    memImgFile.transferTo(dest);
+    	    
+            // 확인용
+	        System.out.println("파일 저장 경로: " + uploadDir);
+	        System.out.println("파일 존재 여부: " + new File(uploadDir).exists());
+	        System.out.println("실제 저장 파일 경로: " + dest.getAbsolutePath());
 
     	    vo.setMemImg(fileName);
 

@@ -63,30 +63,57 @@ function showFieldError(fieldName, message) {
     setTimeout(() => errorEl.remove(), 3000);
 }
 
-// 폼 제출 유효성 검사 - 문제 있는 필드만 초기화
-document.getElementById('registerForm').addEventListener('submit', function (e) {
-    const targetPriceInput = document.querySelector('[name="auctionTargetPrice"]');
-    const targetPrice = Number(targetPriceInput.value);
-    const now = new Date();
-    let hasError = false;
+/* ── 희망 최대가: 실시간 쉼표 + blur 검증 ── */
+const targetPriceInput = document.querySelector('[name="auctionTargetPrice"]');
+if (targetPriceInput) {
 
-    // 희망 최대가 검사
-    if (!targetPriceInput.value || targetPrice <= 0) {
-        showFieldError('auctionTargetPrice', '희망 최대가는 0원보다 커야 합니다.');
-        targetPriceInput.value = '';
-        targetPriceInput.focus();
-        hasError = true;
-    } else if (targetPrice % 1000 !== 0) {
-        showFieldError('auctionTargetPrice', '1000원 단위로 입력해주세요.');
-        targetPriceInput.value = '';
-        targetPriceInput.focus();
-        hasError = true;
+    // 실시간 쉼표 (타이핑할 때마다)
+    targetPriceInput.addEventListener('input', function () {
+        const raw = this.value.replace(/[^0-9]/g, '');
+        if (raw === '') { this.value = ''; return; }
+        this.value = parseInt(raw).toLocaleString();
+    });
+
+    // blur 시 유효성 검사
+    targetPriceInput.addEventListener('blur', function () {
+        const raw = this.value.replace(/,/g, '');
+        const v = parseInt(raw) || 0;
+        if (!raw || v <= 0) {
+            showFieldError('auctionTargetPrice', '희망 최대가는 0원보다 커야 합니다.');
+            this.value = '';
+        } else if (v % 1000 !== 0) {
+            showFieldError('auctionTargetPrice', '1000원 단위로 입력해주세요.');
+            this.value = '';
+        }
+    });
+}
+
+/* ── 폼 제출: 쉼표 제거 후 전송 + 날짜 검증 ── */
+document.getElementById('registerForm').addEventListener('submit', function (e) {
+    let hasError = false;
+    const now = new Date();
+
+    // 희망 최대가 검증 + 쉼표 제거
+    if (targetPriceInput) {
+        const raw = targetPriceInput.value.replace(/,/g, '');
+        const v = parseInt(raw) || 0;
+        if (!raw || v <= 0) {
+            showFieldError('auctionTargetPrice', '희망 최대가는 0원보다 커야 합니다.');
+            targetPriceInput.value = '';
+            hasError = true;
+        } else if (v % 1000 !== 0) {
+            showFieldError('auctionTargetPrice', '1000원 단위로 입력해주세요.');
+            targetPriceInput.value = '';
+            hasError = true;
+        } else {
+            targetPriceInput.value = raw; // 쉼표 제거해서 숫자만 전송
+        }
     }
 
     // 입찰 마감일 검사
     if (!endAtInput.value || new Date(endAtInput.value) <= now) {
         showFieldError('auctionEndAt', '현재 시간 이후로 선택해주세요.');
-        endAtInput.value = ''; // 날짜만 초기화
+        endAtInput.value = '';
         hasError = true;
     }
 
@@ -96,7 +123,7 @@ document.getElementById('registerForm').addEventListener('submit', function (e) 
         hasError = true;
     } else if (endAtInput.value && new Date(deadlineInput.value) <= new Date(endAtInput.value)) {
         showFieldError('auctionDecisionDeadline', '입찰 마감일 이후여야 합니다.');
-        deadlineInput.value = ''; // 결정마감일만 초기화
+        deadlineInput.value = '';
         hasError = true;
     }
 

@@ -20,10 +20,12 @@ public class MemberVO {
  private Integer 		memGradeIdx;   	// FK → grade.grade_idx (신용도 등급)
  private Integer 		memCredit;      // 신용 크레딧 점수 (기본 50, 0~10000 등)
  private Integer 		memPenalty;		// 패널티 점수 (일단 0으로 시작)
+ private Integer 		memGradeIdx;   	// FK → grade.grade_idx (신용도 등급) 
  private LocalDate     	memBday;     	// 생일
  private LocalDateTime 	memRegdate;  	// 가입일
  private String  		memIsDeleted;   // 'Y' / 'N' (삭제 여부)
  private LocalDateTime 	memDeldate;  	// 탈퇴일 
+ private String 		memLoginType;   // 로그인 타입(로그인 API용)
 
 }
 

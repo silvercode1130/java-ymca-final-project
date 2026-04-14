@@ -27,4 +27,5 @@ public class PaymentVO {
   private LocalDateTime payRegdate; // 결제 기록 일시
   private LocalDateTime confirmedAt; // 구매 확정 일시
   private LocalDateTime canceledAt; // 결제 취소 일시
+
 }

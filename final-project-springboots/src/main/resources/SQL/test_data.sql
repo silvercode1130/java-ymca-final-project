@@ -219,7 +219,7 @@ INSERT INTO item (
 ('리조트 숙박권 1박',                      8, 'ResortX','NEW',   NULL, NULL, 'N'),
 
 -- 20: 콘서트 티켓 (accessory = 8)
-('콘서트 티켓 2장',                        8, 'Ticket','NEW',   NULL, NULL, 'N');
+('콘서트 티켓 2장',                        8, 'Ticket','NEW',   NULL, NULL, 'N'),
  
  -- 공/볼 (카테고리 : 1번)
 ('프리미어리그 공인구 - 미개봉 새제품', 1, 'NIKE', 'NEW', '/images/ball_01.jpg', NULL, 'N'),
@@ -360,7 +360,7 @@ INSERT INTO auction (
  NOW() - INTERVAL 12 DAY,
  6,
  NOW() - INTERVAL 18 DAY, NOW() - INTERVAL 12 DAY,
- 'Y', NOW() - INTERVAL 11 DAY);
+ 'Y', NOW() - INTERVAL 11 DAY),
  
  -- 11. 공/볼 (1번) 관련 경매
 (3, 1, 
@@ -462,10 +462,45 @@ INSERT INTO bid (
 
 -- Auction 10 (관리자 삭제된 콘서트 티켓 케이스)
 (10,6,  20,350000, 2, '콘서트 티켓 2장 양도합니다.', 5,
- NOW() - INTERVAL 17 DAY, NOW() - INTERVAL 11 DAY);
+ NOW() - INTERVAL 17 DAY, NOW() - INTERVAL 11 DAY),
 
 -- Auction 11
 (11, 7, 21, 110000, 1, '미개봉 나이키 공인구입니다. 박스 풀셋이에요.', 1, NOW() - INTERVAL 5 HOUR, NULL),
 
 -- Auction 13
 (13, 1, 23, 85000, 1, '언더아머 백팩인데 수납공간 정말 많고 깨끗합니다.', 1, NOW() - INTERVAL 2 HOUR, NULL);
+
+
+ /* ==========================================
+   리뷰 더미 데이터 (각 상태별)
+   ========================================== */
+   
+INSERT INTO review (
+    buyer_idx, bidder_idx, auction_idx, bid_idx,
+    review_title, review_content, review_star
+) VALUES
+-- auction 4 (낙찰 성공 케이스)
+(10, 10, 4, 9,
+ '빠른 거래 감사합니다!',
+ '제품 상태도 설명과 동일했고 거래도 빠르게 진행되어 매우 만족합니다. 다음에도 거래하고 싶어요!',
+ 5),
+-- auction 5 (낙찰 성공 케이스)
+(8, 8, 5, 12,
+ '좋은 상품 감사합니다',
+ '수영 세트 상태도 좋고 가격도 합리적이어서 만족스러운 거래였습니다. 배송도 빨랐어요.',
+ 4),
+-- auction 1 (진행중이지만 테스트용)
+(1, 9, 1, 1,
+ '괜찮은 제안이었어요',
+ '가격과 상품 상태 모두 괜찮았고 응답도 빨라서 좋았습니다. 다음에도 기회되면 거래하고 싶어요.',
+ 4),
+-- auction 2
+(2, 4, 2, 4,
+ '가성비 좋네요',
+ '중고지만 상태 괜찮고 가격도 합리적이라 만족합니다. 잘 쓰겠습니다!',
+ 4),
+-- auction 3
+(9, 1, 3, 7,
+ '추천합니다',
+ '헬멧 상태 좋고 설명 그대로였습니다. 안전하게 잘 쓰겠습니다.',
+ 5);
