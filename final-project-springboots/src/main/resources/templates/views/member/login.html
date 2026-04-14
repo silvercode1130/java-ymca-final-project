@@ -87,7 +87,7 @@
 								<div class="relative">
 									<span
 										class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs">ID</span>
-									<input
+									<input 
 										class="w-full border border-gray-300 rounded-md px-3 py-2 pl-10 text-sm text-gray-900 placeholder:text-gray-400"
 										id="memId" name="memId" placeholder="🏷️ your ID"
 										oninput="checkValid()"> <br>
@@ -192,10 +192,10 @@
 				                .then(data => {
 				                    if (data.remainingSeconds > 0) {
 				                        timerDiv.innerHTML =
-				                            `로그인 제한 중 (${data.remainingSeconds}초 남음)`;
+				                            `⏳ 로그인 제한 중 (${data.remainingSeconds}초 남음)`;
 				                        if (loginBtn) loginBtn.disabled = true;
 				                    } else {
-				                        timerDiv.innerHTML = "이제 다시 로그인을 시도할 수 있습니다.";
+				                        timerDiv.innerHTML = "다시 로그인을 시도해주세요";
 				                        if (loginBtn) loginBtn.disabled = false;
 				                        if (interval) clearInterval(interval);
 				                    }

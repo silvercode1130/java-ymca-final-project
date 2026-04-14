@@ -47,7 +47,7 @@
 	    WHERE a.mem_idx = #{memIdx}
 	    
 	    ORDER BY 
-	        a.is_primary DESC,   -- 대표주소지가 최상단으로!
+	        a.is_primary DESC,   
 	        a.addr_idx DESC      
 	</select>
 
