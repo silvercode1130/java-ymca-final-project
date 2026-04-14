@@ -1,10 +1,162 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layouts/main_layout}">
 <head>
 <meta charset="UTF-8">
-<title th:text="${detail.auctionTitle} + ' - 경매 상세'">경매 상세</title>
+<title>경매 상세 - PickQ</title>
+<style>
+.bid-item:hover {
+	background: #f8f9fa;
+}
+
+.bid-selected {
+	background: #e8f5e9;
+	border-left: 4px solid #7CBD00;
+}
+</style>
+<script th:src="@{/js/chatPopup.js}"></script>
 </head>
 <body>
+	<th:block layout:fragment="content">
+		<body class="bg-[#ffffff]">
+
+			<div class="container mx-auto px-4 py-6">
+
+				<!-- 상단 breadcrumb -->
+				<div class="text-sm text-gray-500 mb-3">홈 / 경매 /
+					[[${detail.itemCategoryName}]] / 상세</div>
+
+				<div class="row g-4">
+
+					<!-- ================= LEFT ================= -->
+					<div class="col-lg-6">
+
+						<div class="card shadow-sm rounded-3 border-0">
+							<div class="card-body p-4">
+
+								<!-- 🔥 mode == list (기본 경매 정보) -->
+								<th:block th:if="${mode == 'list'}">
+
+									<div class="d-flex gap-4">
+
+										<!-- 썸네일 -->
+										<div style="width: 180px;" class="d-flex flex-column gap-2">
+											<img
+												th:src="${detail.auctionThumbnailImg != null and detail.auctionThumbnailImg != ''
+                   ? detail.auctionThumbnailImg
+                   : '/images/common/default_image.png'}"
+												class="img-fluid rounded" alt="경매 이미지"
+												style="cursor: pointer;">
+
+											<!-- 채팅 버튼: 썸네일과 동일 너비 180px -->
+											<button type="button" class="btn btn-dark w-100"
+												th:onclick="|openChatPopup(${chatroomIdx})|">
+												<i class="bi bi-chat-dots me-1"></i> 구매자와 채팅
+											</button>
+										</div>
+
+										<!-- 정보 -->
+										<div class="flex-grow-1 d-flex flex-column">
+
+											<!-- 상태 + 타이머 -->
+											<div class="d-flex justify-content-between mb-2">
+
+												<span class="badge bg-success"
+													th:if="${detail.auctionStatusIdx == 1}">진행중</span> <span
+													class="badge bg-secondary"
+													th:if="${detail.auctionStatusIdx == 3}">마감</span> <span
+													class="badge bg-danger"
+													th:if="${detail.auctionStatusIdx == 4}">유찰</span> <span
+													class="fw-bold text-secondary"
+													th:text="${detail.timeDisplay}"></span>
+											</div>
+
+											<h4 class="fw-bold mb-3" th:text="${detail.auctionTitle}"></h4>
+
+											<!-- 가격 -->
+											<div class="mt-auto text-end">
+												<div class="text-muted small">희망 예산</div>
+												<div class="fw-bold fs-5">
+													[[${#numbers.formatInteger(detail.auctionTargetPrice,0,'COMMA')}]]원
+												</div>
+
+												<div class="text-muted small">현재 최저가</div>
+												<div class="fw-bold text-danger fs-5">
+													[[${detail.minBidPrice == 0 ? '-' :
+													#numbers.formatInteger(detail.minBidPrice,0,'COMMA')}]]원</div>
+											</div>
+
+										</div>
+									</div>
+
+									<!-- 상세 설명 -->
+									<div class="border rounded p-4 bg-light mt-4">
+										<h6 class="fw-bold mb-2">상세 요청</h6>
+										<p th:text="${detail.auctionDesc}"
+											style="white-space: pre-line;"></p>
+									</div>
+								</th:block>
+
+
+								<!-- 🔥 mode == bidDetail -->
+								<th:block th:if="${mode == 'bidDetail'}">
+
+									<div class="d-flex justify-content-between mb-3">
+										<h5 class="fw-bold">입찰 상세</h5>
+										<span class="badge bg-primary"
+											th:text="${selectedBid.bidStatusName}"></span>
+									</div>
+
+									<div class="row mb-3">
+										<div class="col">
+											<small class="text-muted">판매자</small>
+											<div class="fw-semibold">[[${selectedBid.memName}]]</div>
+										</div>
+
+										<div class="col text-end">
+											<small class="text-muted">제안 금액</small>
+											<div class="fw-bold text-primary fs-5">
+												[[${#numbers.formatInteger(selectedBid.bidPrice,0,'COMMA')}]]원</div>
+										</div>
+									</div>
+
+									<div class="mb-3">
+										<small class="text-muted">상품명</small>
+										<div class="fw-semibold">[[${selectedBid.itemName}]]</div>
+									</div>
+
+									<div class="mb-3">
+										<small class="text-muted">브랜드</small>
+										<div>[[${selectedBid.itemBrand}]]</div>
+									</div>
+
+									<div class="border rounded p-3 bg-light">
+										[[${selectedBid.bidMessage}]]</div>
+
+									<!-- 낙찰 버튼 -->
+									<div class="mt-4"
+										th:if="${selectedBid.bidStatusIdx == 1 and (detail.auctionStatusIdx == 2 or (detail.auctionStatusIdx == 1 and detail.bidCount > 0))}">
+										<form
+											th:action="@{/auctions/{aId}/bids/{bId}/win(aId=${detail.auctionIdx},bId=${selectedBid.bidIdx})}"
+											method="post" onsubmit="return confirm('낙찰하시겠습니까?')">
+											<button class="btn btn-success w-100">🏆 낙찰하기</button>
+										</form>
+									</div>
+
+									<button class="btn btn-outline-secondary mt-3 w-100"
+										th:onclick="|location.href='/auctions/${detail.auctionIdx}'|">
+										← 경매로 돌아가기</button>
+
+								</th:block>
+
+							</div>
+						</div>
+
+						<!-- 목록 버튼 -->
+						<button class="btn btn-outline-secondary mt-3"
+							onclick="location.href='/auctions'">← 목록으로</button>
+
 <div class="detail-layout">
 	<div class="detail-left">
 		
@@ -266,6 +418,68 @@
 						</label>
 						<input type="text" name="itemName" placeholder="제안할 상품명을 입력하세요" required>
 					</div>
+
+
+					<!-- ================= RIGHT ================= -->
+					<div class="col-lg-6">
+
+						<div class="card shadow-sm border-0 rounded-3">
+							<div class="card-body p-4">
+
+								<!-- CTA -->
+								<div class="text-center mb-3">
+									<p class="fw-medium text-gray-700">매력적인 상품을 제안해보세요</p>
+								</div>
+
+								<!-- 입찰 버튼 -->
+								<th:block th:if="${detail.auctionStatusIdx == 1}">
+									<button class="btn w-100 mb-4 text-white"
+										style="background: #ef6253;"
+										th:onclick="|location.href='/auctions/${detail.auctionIdx}/bids'|">
+										입찰하기</button>
+								</th:block>
+
+								<!-- 리스트 -->
+								<div class="d-flex justify-content-between mb-2">
+									<h6 class="fw-bold">입찰내역</h6>
+									<span class="text-muted">([[${bidList.size()}]]건)</span>
+								</div>
+
+								<div class="border rounded overflow-hidden">
+
+									<div th:each="bid : ${bidList}"
+										th:onclick="|location.href='/auctions/${detail.auctionIdx}/bids/${bid.bidIdx}'|"
+										class="p-3 border-bottom bid-item" style="cursor: pointer;">
+
+										<div class="d-flex justify-content-between mb-1">
+
+											<div class="fw-semibold text-sm">[[${bid.bidderName}]]</div>
+
+											<div class="fw-bold">
+												[[${#numbers.formatInteger(bid.bidPrice,0,'COMMA')}]]원</div>
+
+										</div>
+
+										<div class="text-muted small mb-1">[[${bid.itemName}]]</div>
+
+										<div class="d-flex justify-content-between">
+											<span class="text-muted small"> [[${bid.itemBrand}]] </span>
+											<span class="badge bg-secondary"
+												th:text="${bid.bidStatusName}"></span>
+										</div>
+
+									</div>
+
+									<div th:if="${#lists.isEmpty(bidList)}"
+										class="text-center p-4 text-muted">입찰이 없습니다</div>
+
+								</div>
+
+							</div>
+						</div>
+
+					</div>
+
 					
 					<div class="input-group">
 						<label>
@@ -396,14 +610,8 @@
 						← 경매 상세 보기
 					</button>
 				</div>
-			  </div>
-		</th:block>
-		<!-- /mode == bidDetail -->
-	</div>
-	<!-- /detail-right -->
-</div>
-<!-- /detail-layout -->
-<script src="/js/auctionDetail.js"></script>
-<script src="/js/toast.js"></script>
+			</div>
+	</th:block>
+
 </body>
 </html>

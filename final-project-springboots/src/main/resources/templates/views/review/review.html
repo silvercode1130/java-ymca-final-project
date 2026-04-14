@@ -69,16 +69,25 @@
 			</div>
 		</div>
 		
-		<div class="starAverage" th:with="avg=${avgRating != null ? avgRating : 0}">
-		    별점 평균 
-		    <!-- 채운 별 -->
-		    <span th:each="i : ${#numbers.sequence(1, T(java.lang.Math).floor(avg))}">
-		        <i class="bi bi-star-fill" style="color: gold;"></i>
-		    </span>
-		    <!-- 반개 별 -->
-		    <span th:if="${avg % 1 >= 0.5}">
+		<div class="starAverage" th:with="avg=${avgRating != null ? avgRating : 0}, 
+											full=${T(java.lang.Math).floor(avg)}, 
+											half=${avg % 1 >= 0.5 ? 1 : 0}, 
+											empty=${5 - full - half}">
+		    별점 평균
+		
+		    <th:block th:if="${avg > 0}">
+		        <span th:each="i : ${#numbers.sequence(1, full)}">
+		            <i class="bi bi-star-fill" style="color: gold;"></i>
+		        </span>
+		    </th:block>
+		
+		    <span th:if="${half == 1}">
 		        <i class="bi bi-star-half" style="color: gold;"></i>
-		    </span> 
+		    </span>
+		    
+		    <span th:each="i : ${#numbers.sequence(1, empty)}">
+			    <i class="bi bi-star" style="color: gold;"></i>
+			</span>
 		</div>
 		
 		<div>
@@ -105,7 +114,7 @@
 						    </span>
 						    <!-- 빈 별 -->
 						    <span th:if="${star < 5}" th:each="i : ${#numbers.sequence(1, 5 - star)}">
-						        <i class="bi bi-star"></i> 
+						        <i class="bi bi-star" style="color: gold;"></i> 
 						    </span>
 						</td>
 						<td th:text="${#temporals.format(review.reviewRegdate, 'yyyy-MM-dd HH:mm')}"></td>

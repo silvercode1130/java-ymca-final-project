@@ -282,6 +282,22 @@ public class MemberController {
           return "redirect:/main"; 
       } 
       
+      // 회원정보 수정에서 비번 바꾸기
+      @PostMapping("/checkOldPwd")
+      @ResponseBody
+      public boolean checkOldPwd(@RequestParam("newPwd") String newPwd,
+                                HttpSession session) {
+
+          MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
+
+          // 최신 정보 가져오기
+          String dbPwd = memberService.selectPwdById(loginUser.getMemId());
+          
+          // 기존 비밀번호랑 비교
+          return newPwd.equals(loginUser.getMemPwd());
+      }
+      
+      
    // 비밀번호 찾기 -----------------------------------------------------------------
       
       // 창 띄우기
@@ -323,6 +339,15 @@ public class MemberController {
            * 
            * Run -> Run Configrations... -> Environment -> add -> 환경변수 + api키 2가지 넣기
            * 필요하신 분들은 카톡으로 연락 주시면 보내드리겠습니다!(외부 유출금지ㅠ -> 금액 폭탄 맞을 수 있어요...)
+           * 
+           * 에러 뜰 경우
+           * build.gradle 확인해주세요 implementation 'com.solapi:sdk:1.0.3' 있어야 해요!
+           * 
+           * 임포트 4개 있어야 해요
+           * import com.solapi.sdk.message.model.Message;
+           * import com.solapi.sdk.message.service.DefaultMessageService;
+           * import com.solapi.sdk.SolapiClient;
+           * import com.solapi.sdk.message.exception.SolapiMessageNotReceivedException;
            * */
           
           // 인증번호 6자리 랜덤 전송
@@ -340,7 +365,7 @@ public class MemberController {
           
 	       // Message 패키지가 중복될 경우 com.solapi.sdk.message.model.Message로 치환하여 주세요
 	       Message message = new Message();
-	       message.setFrom("01024152943"); 
+	       message.setFrom("01024152943"); // 보내는 사람 번호
 	       message.setTo(memTel.replace("-", "")); 
 	       message.setText("PickQ의 본인 확인을 위한 인증번호는 [" + code + "]입니다."); 
 	
@@ -354,10 +379,6 @@ public class MemberController {
 	       } catch (Exception exception) {
 	         System.out.println(exception.getMessage());
 	       }
-	       
-	       // 3. 인증번호 확인하기
-	       
-	       // 4. 새 비밀번호 서버에 알리기
 	          
           return "redirect:/members/pwdFind"; 
       }
@@ -376,17 +397,6 @@ public class MemberController {
           }
       }
       
-      // 비밀번호 동일한지 체크
-//      @PostMapping("/auth/checkSamePwd")
-//      @ResponseBody
-//      public String checkSamePwd(@RequestParam("newPwd") String newPwd, HttpSession session) {
-//          MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
-//          
-//          if (loginUser != null && loginUser.getMemPwd().equals(newPwd)) {
-//              return "same"; 
-//          }
-//          return "different";
-//      }
       @PostMapping("/auth/checkSamePwd")
       @ResponseBody
       public String checkSamePwd(@RequestParam("newPwd") String newPwd, HttpSession session) {

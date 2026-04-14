@@ -37,43 +37,46 @@ public class WebConfig implements WebMvcConfigurer {
 	}
 
 	/*
-	 * 어떤 요청에 대해서 요청을 처리한 결과 데이터인 모델은 필요 없고 화면만
-	 * 보여주는 경우 아래와 같이 addViewControllers() 메서드를 오버라이드하여
-	 * 뷰 전용 컨트롤러를 설정할 수 있다.
+	 * 어떤 요청에 대해서 요청을 처리한 결과 데이터인 모델은 필요 없고 화면만 보여주는 경우 아래와 같이 addViewControllers()
+	 * 메서드를 오버라이드하여 뷰 전용 컨트롤러를 설정할 수 있다.
 	 **/
 	@Override
 	public void addViewControllers(ViewControllerRegistry registry) {
 		/*
-		 * 아래는 /writeForm과 /writeBoard 요청에 대한 뷰를 지정한 것이다.
-		 * 여기서 지정한 뷰의 이름과 prefix, suffix를 조합하여 실제 뷰의
-		 * 물리적인 이름이 결정된다.
+		 * 아래는 /writeForm과 /writeBoard 요청에 대한 뷰를 지정한 것이다. 여기서 지정한 뷰의 이름과 prefix, suffix를
+		 * 조합하여 실제 뷰의 물리적인 이름이 결정된다.
 		 **/
 		registry.addViewController("/writeForm").setViewName("views/writeForm");
 		registry.addViewController("/writeBoard").setViewName("views/writeForm");
 	}
-	
-	// 이미지 업로드 기능
-	@Override
-	public void addResourceHandlers(ResourceHandlerRegistry registry) {
-		
-		registry
-			.addResourceHandler("/upload/finalProfile/**")
-			.addResourceLocations("file:///C:/upload/finalProfile/");
-					
-		// 경매 이미지 
-	    registry.addResourceHandler("/images/auction/**")
-	            .addResourceLocations("file:///" + System.getProperty("user.dir").replace("\\", "/")
-	    				+ "/src/main/resources/static/images/auction/");
-	    
-	    // 입찰 이미지 
-	    registry.addResourceHandler("/images/bid/**")
-	            .addResourceLocations("file:///" + System.getProperty("user.dir").replace("\\", "/")
-	    				+ "/src/main/resources/static/images/bid/");
+
+	// 프로필 이미지 업로드 기능
+@Override
+public void addResourceHandlers(ResourceHandlerRegistry registry) {
+
+    // 프로필 이미지
+    registry.addResourceHandler("/images/profile/**")
+            .addResourceLocations("file:///" 
+                + System.getProperty("user.dir").replace("\\", "/")
+                + "/src/main/resources/static/images/profileUpload/");
+
+    // 경매 이미지
+    registry.addResourceHandler("/images/auction/**")
+            .addResourceLocations("file:///"
+                + System.getProperty("user.dir").replace("\\", "/")
+                + "/src/main/resources/static/images/auction/");
+
+    // 입찰 이미지
+    registry.addResourceHandler("/images/bid/**")
+            .addResourceLocations("file:///"
+                + System.getProperty("user.dir").replace("\\", "/")
+                + "/src/main/resources/static/images/bid/");
 
 		// 게시글 이미지 - src/main/resources/static/images/board 실시간 서빙
 		registry
-			.addResourceHandler("/images/board/**")
-			.addResourceLocations("file:///" + System.getProperty("user.dir").replace("\\", "/")
-				+ "/src/main/resources/static/images/board/");
+				.addResourceHandler("/images/board/**")
+				.addResourceLocations("file:///" + System.getProperty("user.dir").replace("\\", "/")
+						+ "/src/main/resources/static/images/board/");
+
 	}
 }

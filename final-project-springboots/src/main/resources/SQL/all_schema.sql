@@ -48,7 +48,7 @@ SET FOREIGN_KEY_CHECKS = 1;
 
 -- 0-1) ROLE (권한 코드: 1 USER, 2 ADMIN)
 CREATE TABLE role (
-    role_idx   BIGINT       NOT NULL AUTO_INCREMENT COMMENT 'PK',
+    role_idx   INT       	NOT NULL AUTO_INCREMENT COMMENT 'PK',
     role_name  VARCHAR(20)  NOT NULL COMMENT '권한 등급 명칭 (USER/ADMIN)',
     PRIMARY KEY (role_idx)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='권한 코드 테이블';
@@ -107,15 +107,17 @@ CREATE TABLE board_type (
 
 -- 1-1) MEMBER (회원 기본 정보)
 CREATE TABLE member (
-    mem_idx         BIGINT       NOT NULL AUTO_INCREMENT COMMENT 'PK',
+    mem_idx        BIGINT        NOT NULL AUTO_INCREMENT COMMENT 'PK',
     mem_id         VARCHAR(50)   NOT NULL COMMENT '로그인 ID',
     mem_pwd        VARCHAR(255)  NOT NULL COMMENT '비밀번호 해시',
     mem_name       VARCHAR(50)   DEFAULT NULL COMMENT '성명', 
     mem_tel        VARCHAR(20)   DEFAULT NULL COMMENT '전화번호',
     mem_email      VARCHAR(100)  DEFAULT NULL COMMENT '이메일',
     mem_ip         VARCHAR(100)  NOT NULL COMMENT 'IP 주소',
-    mem_role_idx   BIGINT        NOT NULL COMMENT 'FK → role.role_idx (권한 등급)',
+    mem_role_idx   INT        	 NOT NULL COMMENT 'FK → role.role_idx (권한 등급)',
     mem_grade_idx  INT           NOT NULL COMMENT 'FK → grade.grade_idx (신용도 등급)',
+	mem_credit 	   INT 			 NOT NULL DEFAULT 50 COMMENT '신용 크레딧 점수',
+	mem_penalty	   INT 			 NOT NULL DEFAULT 0 COMMENT '패널티 점수',
     mem_bday       DATE          DEFAULT NULL COMMENT '생일',
     mem_regdate    DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '가입일',
     mem_is_deleted CHAR(1)       NOT NULL DEFAULT 'N' COMMENT 'Y / N (삭제 여부)',
@@ -154,7 +156,6 @@ CREATE TABLE member_addr (
         FOREIGN KEY (mem_idx) REFERENCES member(mem_idx)
         ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='회원 배송지 테이블';
-
 
 
 /* ==========================================
@@ -245,6 +246,59 @@ CREATE TABLE bid (
 
 
 /* ==========================================
+   4. 리뷰 (review)
+   ========================================== */
+CREATE TABLE review (
+    review_idx        BIGINT        NOT NULL AUTO_INCREMENT COMMENT 'PK',
+
+    buyer_idx         BIGINT        NOT NULL COMMENT '구매자 (FK → member.mem_idx)',
+    bidder_idx        BIGINT        NOT NULL COMMENT '판매자/입찰자 (FK → member.mem_idx)',
+    
+    auction_idx       BIGINT        NOT NULL COMMENT 'FK → auction', 
+    bid_idx           BIGINT        NOT NULL COMMENT 'FK → bid (선택된 입찰)',
+
+    review_title      VARCHAR(200)  NOT NULL COMMENT '리뷰 제목',
+    review_content    TEXT          NOT NULL COMMENT '리뷰 내용 (20자 이상 - db말고 컨트롤러에서 조건줄 것!)',
+    review_star       INT           NOT NULL COMMENT '1~5점',
+
+    review_regdate    DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '작성일',
+
+    review_is_deleted CHAR(1)       NOT NULL DEFAULT 'N', 
+    review_deldate    DATETIME      DEFAULT NULL,
+
+    PRIMARY KEY (review_idx),
+
+    KEY idx_review_buyer (buyer_idx),
+    KEY idx_review_bidder (bidder_idx),
+    KEY idx_review_auction (auction_idx),
+    KEY idx_review_bid (bid_idx),
+
+    -- 한 거래당 하나씩 리뷰 남기기! (같은 사람에게 여러번 리뷰 남기는건 가능 / 같은 거래에 중복 리뷰 불가능)
+    UNIQUE KEY ux_review_unique (bid_idx), 
+
+    -- 별점 제한 (1 ~ 5)
+    CONSTRAINT ck_review_star CHECK (review_star BETWEEN 1 AND 5),
+
+    -- 삭제 여부 (기본은 N)
+    CONSTRAINT ck_review_is_deleted CHECK (review_is_deleted IN ('Y','N')),
+
+    -- FK
+    CONSTRAINT fk_review_buyer
+        FOREIGN KEY (buyer_idx) REFERENCES member(mem_idx) ON DELETE CASCADE,
+
+    CONSTRAINT fk_review_bidder
+        FOREIGN KEY (bidder_idx) REFERENCES member(mem_idx) ON DELETE CASCADE,
+
+    CONSTRAINT fk_review_auction
+        FOREIGN KEY (auction_idx) REFERENCES auction(auction_idx) ON DELETE CASCADE,
+
+    CONSTRAINT fk_review_bid
+        FOREIGN KEY (bid_idx) REFERENCES bid(bid_idx) ON DELETE CASCADE
+
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='리뷰 테이블';
+
+
+/* ==========================================
    4. 커뮤니티 (게시판 / 댓글)
    ========================================== */
 
@@ -302,22 +356,136 @@ CREATE TABLE reply (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='댓글 테이블';
 
 
-
 /* ==========================================
-   5. 코드 테이블 기본 데이터
+   5. 패널티 (추가기능)
    ========================================== */
 
--- 5-1) ROLE 코드 (1 USER, 2 ADMIN)
+CREATE TABLE member_penalty (
+    penalty_idx      BIGINT       NOT NULL AUTO_INCREMENT COMMENT 'PK',
+    mem_idx          BIGINT       NOT NULL COMMENT 'FK → member.mem_idx (패널티 받은 회원)',
+    auction_idx      BIGINT       DEFAULT NULL COMMENT '관련 경매 FK → auction.auction_idx',
+    bid_idx          BIGINT       DEFAULT NULL COMMENT '관련 입찰 FK → bid.bid_idx',
+    penalty_code     VARCHAR(50)  NOT NULL COMMENT '패널티 코드 (e.g. NO_PAYMENT, NO_SHIPMENT, LATE_CANCEL)',
+    penalty_reason   VARCHAR(255) DEFAULT NULL COMMENT '추가 설명(운영자 메모 등)',
+    penalty_score    INT          NOT NULL DEFAULT 1 COMMENT '패널티 점수/카운트 (보통 1로 고정 후 누적)',
+    created_at       DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '부과 일시',
+    PRIMARY KEY (penalty_idx),
+    KEY idx_penalty_mem (mem_idx),
+    KEY idx_penalty_auction (auction_idx),
+    KEY idx_penalty_bid (bid_idx),
+    CONSTRAINT fk_penalty_member
+        FOREIGN KEY (mem_idx) REFERENCES member(mem_idx) ON DELETE CASCADE,
+    CONSTRAINT fk_penalty_auction
+        FOREIGN KEY (auction_idx) REFERENCES auction(auction_idx) ON DELETE SET NULL,
+    CONSTRAINT fk_penalty_bid
+        FOREIGN KEY (bid_idx) REFERENCES bid(bid_idx) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='회원 패널티 이력 테이블';
+
+/* ==========================================
+   6. 결제 관련 (추가기능)
+   ========================================== */
+
+CREATE TABLE payment (
+    pay_idx          BIGINT        NOT NULL AUTO_INCREMENT COMMENT 'PK',
+    bid_idx          BIGINT        NOT NULL COMMENT 'FK → bid.bid_idx (낙찰 정보)',
+    mem_idx          BIGINT        NOT NULL COMMENT 'FK → member.mem_idx (구매자)',
+    
+    -- 결제 식별 정보 (토스페이먼츠 기준)
+    payment_key      VARCHAR(255)  NOT NULL COMMENT '토스 결제 고유 키 (승인/취소 시 사용)',
+    order_id         VARCHAR(255)  NOT NULL COMMENT '우리 시스템 주문번호 (UUID 등)',
+    
+    -- 결제 금액 및 수단
+    pay_method       VARCHAR(100)  NOT NULL COMMENT '결제 수단 (카드, 가상계좌, 간편결제 등)',
+    pay_amount       BIGINT        NOT NULL COMMENT '실제 결제 금액',
+    pay_status       VARCHAR(20)   NOT NULL DEFAULT 'READY'
+                     COMMENT '결제 상태 (READY, DONE, CONFIRMED, CANCELED, EXPIRED)',
+
+    -- 배송지 정보 스냅샷
+    buyer_name       VARCHAR(50)   NOT NULL COMMENT '수령인 성함',
+    buyer_tel        VARCHAR(20)   NOT NULL COMMENT '수령인 연락처',
+    buyer_addr       VARCHAR(500)  NOT NULL COMMENT '배송지 주소',
+    buyer_zipcode    VARCHAR(20)   NOT NULL COMMENT '우편번호',
+    
+    -- 배송 정보
+    courier_company  VARCHAR(50)   NULL COMMENT '택배사',
+    tracking_number  VARCHAR(100)  NULL COMMENT '운송장번호',
+    shipped_at       DATETIME      NULL COMMENT '발송일시',
+
+    -- 에스크로 및 처리 일시
+    escrow_status    VARCHAR(20)   DEFAULT 'READY'
+                     COMMENT '배송 상태 (READY, SHIPPING, DELIVERED)',
+    pay_regdate      DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '결제 완료 일시',
+    confirmed_at     DATETIME      NULL COMMENT '구매 확정 일시',
+    canceled_at      DATETIME      NULL COMMENT '결제 취소 일시',
+
+    PRIMARY KEY (pay_idx),
+    UNIQUE KEY ux_payment_key (payment_key),
+    UNIQUE KEY ux_order_id (order_id),
+    CONSTRAINT fk_payment_bid    FOREIGN KEY (bid_idx) REFERENCES bid(bid_idx),
+    CONSTRAINT fk_payment_buyer  FOREIGN KEY (mem_idx) REFERENCES member(mem_idx)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='결제 상세 정보 테이블';
+
+
+/* ==========================================
+   채팅 관련 (추가기능)
+   ========================================== */
+   
+   CREATE TABLE chatroom (
+    chatroom_idx   BIGINT      NOT NULL AUTO_INCREMENT COMMENT 'PK',
+    auction_idx    BIGINT      NOT NULL COMMENT 'FK auction.auctionidx',
+    buyer_idx      BIGINT      NOT NULL COMMENT 'FK member.memidx (구매자)',
+    bidder_idx     BIGINT      NOT NULL COMMENT 'FK member.memidx (입찰자)',
+    created_at     DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '방 생성 시각',
+    PRIMARY KEY (chatroom_idx),
+    UNIQUE KEY ux_chatroom_unique (auction_idx, buyer_idx, bidder_idx),
+    KEY idx_chatroom_auction (auction_idx),
+    KEY idx_chatroom_buyer (buyer_idx),
+    KEY idx_chatroom_bidder (bidder_idx),
+    CONSTRAINT fk_chatroom_auction
+        FOREIGN KEY (auction_idx) REFERENCES auction(auction_idx)
+        ON DELETE CASCADE,
+    CONSTRAINT fk_chatroom_buyer
+        FOREIGN KEY (buyer_idx) REFERENCES member(mem_idx)
+        ON DELETE CASCADE,
+    CONSTRAINT fk_chatroom_bidder
+        FOREIGN KEY (bidder_idx) REFERENCES member(mem_idx)
+        ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='경매별 1:1 채팅방';
+
+CREATE TABLE chatmessage (
+    message_idx    BIGINT      NOT NULL AUTO_INCREMENT COMMENT 'PK',
+    chatroom_idx   BIGINT      NOT NULL COMMENT 'FK chatroom.chatroom_idx',
+    sender_idx     BIGINT      NOT NULL COMMENT 'FK member.memidx',
+    message_content VARCHAR(1000) NOT NULL COMMENT '메시지 내용',
+    sent_at        DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '보낸 시각',
+    PRIMARY KEY (message_idx),
+    KEY idx_chatmessage_room (chatroom_idx),
+    KEY idx_chatmessage_sender (sender_idx),
+    CONSTRAINT fk_chatmessage_room
+        FOREIGN KEY (chatroom_idx) REFERENCES chatroom(chatroom_idx)
+        ON DELETE CASCADE,
+    CONSTRAINT fk_chatmessage_sender
+        FOREIGN KEY (sender_idx) REFERENCES member(mem_idx)
+        ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='채팅 메시지';
+
+
+/* ==========================================
+   7. 코드 테이블 기본 데이터
+   ========================================== */
+
+-- 7-1) ROLE 코드 (1 USER, 2 ADMIN)
 INSERT INTO role (role_idx, role_name) VALUES (1, 'USER');
 INSERT INTO role (role_idx, role_name) VALUES (2, 'ADMIN');
 
--- 5-2) GRADE 코드
-INSERT INTO grade (grade_idx, grade_name, grade_credit) VALUES (1, 'basic',  0.00);
-INSERT INTO grade (grade_idx, grade_name, grade_credit) VALUES (2, 'silver', 3.50);
-INSERT INTO grade (grade_idx, grade_name, grade_credit) VALUES (3, 'gold',   4.00);
-INSERT INTO grade (grade_idx, grade_name, grade_credit) VALUES (4, 'vip',    4.50);
+-- 7-2) GRADE 코드
+INSERT INTO grade (grade_idx, grade_name, grade_credit) VALUES (1, 'normal',  0);
+INSERT INTO grade (grade_idx, grade_name, grade_credit) VALUES (2, 'bronze',  500);
+INSERT INTO grade (grade_idx, grade_name, grade_credit) VALUES (3, 'silver', 2000);
+INSERT INTO grade (grade_idx, grade_name, grade_credit) VALUES (4, 'gold',   5000);
+INSERT INTO grade (grade_idx, grade_name, grade_credit) VALUES (5, 'vip',    10000);
 
--- 5-3) ITEM_CATEGORY 코드
+-- 7-3) ITEM_CATEGORY 코드
 INSERT INTO item_category (item_category_idx, item_category_code, item_category_name)
 VALUES (1, 'ball',        '공/볼');
 
@@ -343,7 +511,7 @@ INSERT INTO item_category (item_category_idx, item_category_code, item_category_
 VALUES (8, 'accessory',   '액세서리/잡화');
 
 
--- 5-4) AUCTION_STATUS 코드
+-- 7-4) AUCTION_STATUS 코드
 INSERT INTO auction_status (auction_status_idx, auction_status_code, auction_status_name)
 VALUES (1, 'open','진행중');
 INSERT INTO auction_status (auction_status_idx, auction_status_code, auction_status_name)
@@ -357,7 +525,7 @@ VALUES (5, 'canceled','취소');
 INSERT INTO auction_status (auction_status_idx, auction_status_code, auction_status_name)
 VALUES (6, 'deleted','삭제됨');
 
--- 5-5) BID_STATUS 코드
+-- 7-5) BID_STATUS 코드
 INSERT INTO bid_status (bid_status_idx, bid_status_code, bid_status_name)
 VALUES (1, 'normal',   '일반');
 INSERT INTO bid_status (bid_status_idx, bid_status_code, bid_status_name)
@@ -369,49 +537,35 @@ VALUES (4, 'canceled', '취소');
 INSERT INTO bid_status (bid_status_idx, bid_status_code, bid_status_name)
 VALUES (5, 'deleted', '삭제됨');
 
--- 5-6) BOARD_TYPE 코드
+-- 7-6) BOARD_TYPE 코드
 INSERT INTO board_type (board_type_idx, board_type_code, board_type_name, board_can_comment, board_min_role)
 VALUES (1,  'soccer',    '축구',     'Y', 1);
-
 INSERT INTO board_type (board_type_idx, board_type_code, board_type_name, board_can_comment, board_min_role)
 VALUES (2,  'baseball',  '야구',     'Y', 1);
-
 INSERT INTO board_type (board_type_idx, board_type_code, board_type_name, board_can_comment, board_min_role)
 VALUES (3,  'basketball','농구',     'Y', 1);
-
 INSERT INTO board_type (board_type_idx, board_type_code, board_type_name, board_can_comment, board_min_role)
 VALUES (4,  'golf',      '골프',     'Y', 1);
-
 INSERT INTO board_type (board_type_idx, board_type_code, board_type_name, board_can_comment, board_min_role)
 VALUES (5,  'ski',       '스키',     'Y', 1);
-
 INSERT INTO board_type (board_type_idx, board_type_code, board_type_name, board_can_comment, board_min_role)
 VALUES (6,  'tennis',    '테니스',   'Y', 1);
-
 INSERT INTO board_type (board_type_idx, board_type_code, board_type_name, board_can_comment, board_min_role)
 VALUES (7,  'badminton', '배드민턴', 'Y', 1);
-
 INSERT INTO board_type (board_type_idx, board_type_code, board_type_name, board_can_comment, board_min_role)
 VALUES (8,  'tabletennis','탁구',    'Y', 1);
-
 INSERT INTO board_type (board_type_idx, board_type_code, board_type_name, board_can_comment, board_min_role)
 VALUES (9,  'running',   '러닝',     'Y', 1);
-
 INSERT INTO board_type (board_type_idx, board_type_code, board_type_name, board_can_comment, board_min_role)
 VALUES (10, 'cycling',   '자전거',   'Y', 1);
-
 INSERT INTO board_type (board_type_idx, board_type_code, board_type_name, board_can_comment, board_min_role)
 VALUES (11, 'fitness',   '헬스',     'Y', 1);
-
 INSERT INTO board_type (board_type_idx, board_type_code, board_type_name, board_can_comment, board_min_role)
 VALUES (12, 'yoga',      '요가',     'Y', 1);
-
 INSERT INTO board_type (board_type_idx, board_type_code, board_type_name, board_can_comment, board_min_role)
 VALUES (13, 'pilates',   '필라테스', 'Y', 1);
-
 INSERT INTO board_type (board_type_idx, board_type_code, board_type_name, board_can_comment, board_min_role)
 VALUES (14, 'aerobics',  '에어로빅', 'Y', 1);
-
 INSERT INTO board_type (board_type_idx, board_type_code, board_type_name, board_can_comment, board_min_role)
 VALUES (15, 'swimming',  '수영',     'Y', 1);
 

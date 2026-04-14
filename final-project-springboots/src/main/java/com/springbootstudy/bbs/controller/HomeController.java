@@ -35,6 +35,6 @@ public class HomeController {
         model.addAttribute("keyword", null);
         model.addAttribute("selectedCategory", null);
 
-        return "views/main/main";
-    }
+        return "views/main/main"; 
+    } 
 }

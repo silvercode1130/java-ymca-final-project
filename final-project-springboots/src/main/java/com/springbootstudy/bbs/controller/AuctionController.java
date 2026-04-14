@@ -19,6 +19,7 @@ import com.springbootstudy.bbs.domain.BidDTO;
 import com.springbootstudy.bbs.domain.MemberVO;
 import com.springbootstudy.bbs.service.AuctionService;
 import com.springbootstudy.bbs.service.BidService;
+import com.springbootstudy.bbs.service.ChatRoomService;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
@@ -38,6 +39,9 @@ public class AuctionController {
 
     @Autowired
     private BidService bidService;
+    
+    @Autowired
+    private ChatRoomService chatRoomService;
 
     // 경매 목록 (/auctions)
     @GetMapping("/auctions")
@@ -82,6 +86,7 @@ public class AuctionController {
     @GetMapping("/auctions/{auctionIdx}")
     public String auctionDetail(
             @PathVariable("auctionIdx") Long auctionIdx,
+            HttpSession session,
             Model model) {
 
         auctionService.updateExpiredAuctions();
@@ -93,7 +98,14 @@ public class AuctionController {
 
         model.addAttribute("detail", detail);
         model.addAttribute("bidList", bidList);
-        model.addAttribute("mode", "list");   // 입찰 목록 표시
+        model.addAttribute("mode", "list");
+
+        MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
+        Long chatroomIdx = chatRoomService.prepareChatroomForAuction(
+                auctionIdx, loginUser, detail
+        );
+        model.addAttribute("chatroomIdx", chatroomIdx);
+
         return "views/auction/auctionDetail";
     }
 

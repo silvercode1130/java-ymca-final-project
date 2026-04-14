@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>채팅 - PickQ</title>
+<link rel="stylesheet" th:href="@{/bootstrap/bootstrap.min.css}">
+</head>
+<body class="bg-[#f5f5f5]">
+	<div class="min-h-screen flex flex-col">
+
+		<!-- 상단 제목/닫기 -->
+		<header
+			class="flex items-center justify-between px-3 py-2 border-b bg-white">
+			<h1 class="text-sm font-semibold text-[#222222]">채팅방</h1>
+			<button type="button" class="text-xs text-[#767676]"
+				onclick="window.close();">닫기</button>
+		</header>
+
+		<main class="flex-grow-1 overflow-auto p-3 bg-light">
+
+			<!-- 대화가 없을 때 -->
+			<div th:if="${#lists.isEmpty(messageList)}">
+				<p class="text-muted small mb-0">
+					아직 대화가 없습니다.<br>대화를 시작해보세요.
+				</p>
+			</div>
+
+			<!-- 메시지 리스트 -->
+			<div th:each="msg : ${messageList}"
+				th:classappend="${msg.senderIdx == session.loginUser.memIdx} ? ' text-end' : ' text-start'">
+
+				<div class="d-inline-block px-2 py-1 my-1 rounded bg-white small">
+					<span th:text="${msg.messageContent}">메시지 내용</span>
+				</div>
+			</div>
+		</main>
+		
+		<!-- 입력 폼 -->
+		<footer class="border-t bg-white px-2 py-2">
+			<form th:action="@{|/chats/${chatroomIdx}/messages|}" method="post"
+				class="flex gap-2">
+				<input type="text" name="messageContent"
+					class="flex-1 border rounded px-2 py-1 text-sm"
+					placeholder="메시지를 입력하세요">
+				<button type="submit"
+					class="px-3 py-1 rounded bg-[#222222] text-white text-xs">
+					전송</button>
+			</form>
+		</footer>
+
+	</div>
+</body>
+</html>
