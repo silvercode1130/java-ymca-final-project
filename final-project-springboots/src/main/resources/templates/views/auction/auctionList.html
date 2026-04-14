@@ -9,31 +9,29 @@
 <div class="list-header">
     <h2>전체 경매 리스트</h2>
 
-    <div style="margin-bottom:16px; display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+    <div>
 		
 		<!-- 상태 필터 탭 (진행중 / 마감된 경매) -->
-		<div style="display:flex; gap:6px; margin-bottom:12px;">
+		<div>
 		
 		    <a th:href="${selectedCategory != null}
 		                ? @{/auctions/category/{cat}(cat=${selectedCategory}, sortBy=${sortBy}, statusFilter='open')}
 		                : @{/auctions(sortBy=${sortBy}, statusFilter='open')}"
-		       th:classappend="${statusFilter == 'open' or statusFilter == null} ? ' active-status' : ''"
-		       style="padding:6px 18px; border-radius:20px; font-size:13px; text-decoration:none; border:1px solid #ddd;">
+		       th:classappend="${statusFilter == 'open' or statusFilter == null} ? ' active-status' : ''">
 		        🟢 진행중
 		    </a>
 		
 		    <a th:href="${selectedCategory != null}
 		                ? @{/auctions/category/{cat}(cat=${selectedCategory}, sortBy=${sortBy}, statusFilter='closed')}
 		                : @{/auctions(sortBy=${sortBy}, statusFilter='closed')}"
-		       th:classappend="${statusFilter == 'closed'} ? ' active-status' : ''"
-		       style="padding:6px 18px; border-radius:20px; font-size:13px; text-decoration:none; border:1px solid #ddd;">
+		       th:classappend="${statusFilter == 'closed'} ? ' active-status' : ''">
 		        🔒 마감된 경매
 		    </a>
 		
 		</div>
 		
         <!-- 카테고리 필터: 클릭하면 /auctions/{code} 로 이동 -->
-        <div style="display:flex; gap:6px; flex-wrap:wrap;">
+        <div>
             <a th:href="@{/auctions(sortBy=${sortBy}, statusFilter=${statusFilter})}"
                th:classappend="${selectedCategory == null} ? ' active-category' : ''">
                전체
@@ -74,19 +72,17 @@
 
         <!-- 키워드 검색 -->
         <form th:action="${selectedCategory != null} ? @{/auctions/{cat}(cat=${selectedCategory})} : @{/auctions}"
-              method="get"
-              style="display:flex; gap:6px;">
+              method="get">
             <input type="hidden" name="sortBy"       th:value="${sortBy}">
     		<input type="hidden" name="statusFilter" th:value="${statusFilter}">
             <input type="text" name="keyword"
                    th:value="${keyword}"
-                   placeholder="제목 검색"
-                   style="padding:6px 10px; border:1px solid #ddd; border-radius:4px;">
-            <button type="submit" style="padding:6px 12px;">검색</button>
+                   placeholder="제목 검색">
+            <button type="submit">검색</button>
         </form>
         
         <!-- 정렬 버튼 -->
-		<div style="display:flex; gap:6px; margin-bottom:10px;">
+		<div>
 		    <a th:href="${selectedCategory != null}
 		                ? @{/auctions/category/{cat}(cat=${selectedCategory}, sortBy='latest', keyword=${keyword}, statusFilter=${statusFilter})}
 		                : @{/auctions(sortBy='latest', keyword=${keyword}, statusFilter=${statusFilter})}"
@@ -119,9 +115,9 @@
 
 <!-- 에러/성공 메시지 - 보이지 않는 hidden 요소로 메시지 전달 -->
 <span th:if="${successMessage}" id="toast-success"
-      th:data-msg="${successMessage}" style="display:none;"></span>
+      th:data-msg="${successMessage}"></span>
 <span th:if="${errorMessage}"   id="toast-error"
-      th:data-msg="${errorMessage}"   style="display:none;"></span>
+      th:data-msg="${errorMessage}"></span>
 
 <table>
     <thead>
@@ -154,12 +150,11 @@
 
             <td th:text="${item.itemCategoryName}">헬스/홈트</td>
             <td>
-			    <div style="width:50px; height:50px; overflow:hidden; border-radius:4px;">
+			    <div>
 			        <img th:src="${item.auctionThumbnailImg != null and item.auctionThumbnailImg != ''
 			                       ? item.auctionThumbnailImg
 			                       : '/images/auction/auction_default.png'}"
-			             alt="썸네일"
-			             style="width:100%; height:100%; object-fit:cover;">
+			             alt="썸네일">
 			    </div>
 			</td>
             <td th:text="${item.auctionTitle}">제목</td>
