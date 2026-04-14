@@ -10,6 +10,8 @@
 
   <h2>내 경매 목록</h2>
 
+  <a href="/mypage/payments" class="btn">구매 내역 보기</a>
+
   <table>
     <thead>
       <tr>
@@ -43,7 +45,7 @@
         <td>
           <!-- 결제대기(7): 결제하기 -->
           <a th:if="${auction.auctionStatusIdx == 7}"
-             th:href="@{/mypage/payment/pay(auctionIdx=${auction.auctionIdx})}"
+             th:href="@{/payment/pay(auctionIdx=${auction.auctionIdx})}"
              class="btn-pay">결제하기</a>
 
           <!-- 배송중(9): 배송중 표시만 -->
