@@ -430,6 +430,52 @@ CREATE TABLE payment (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='결제 상세 정보 테이블';
 
 
+CREATE TABLE orders (
+    orderidx       BIGINT      NOT NULL AUTO_INCREMENT COMMENT 'PK',
+    auctionidx     BIGINT      NOT NULL COMMENT 'FK auction.auctionidx',
+    bididx         BIGINT      NOT NULL COMMENT 'FK bid.bididx',
+
+    buyeridx       BIGINT      NOT NULL COMMENT 'FK member.memidx (구매자)',
+    selleridx      BIGINT      NOT NULL COMMENT 'FK member.memidx (판매자)',
+
+    orderamount    BIGINT      NOT NULL COMMENT '주문 금액(낙찰가)',
+
+    orderstatus    VARCHAR(20) NOT NULL COMMENT 'CREATED, PAID, SHIPPED, CONFIRMED, CANCELED',
+    paymentstatus  VARCHAR(20) NOT NULL COMMENT 'READY, PAID, REFUND, FAIL',
+    shippingstatus VARCHAR(20) NOT NULL COMMENT 'NONE, READY, SHIPPED, DELIVERED, CONFIRMED',
+
+    trackingnumber VARCHAR(100) DEFAULT NULL COMMENT '송장번호',
+    couriername    VARCHAR(100) DEFAULT NULL COMMENT '택배사명',
+
+    issettled      CHAR(1)     NOT NULL DEFAULT 'N' COMMENT '정산 여부 Y/N',
+
+    paidat         DATETIME     DEFAULT NULL COMMENT '결제 완료 일시',
+    shippedat      DATETIME     DEFAULT NULL COMMENT '배송 시작 일시',
+    confirmedat    DATETIME     DEFAULT NULL COMMENT '배송 확정 일시',
+    refundat       DATETIME     DEFAULT NULL COMMENT '환불 일시',
+
+    orderregdate   DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '주문 생성일',
+
+    PRIMARY KEY (orderidx),
+
+    KEY idx_order_auction  (auctionidx),
+    KEY idx_order_bid      (bididx),
+    KEY idx_order_buyer    (buyeridx),
+    KEY idx_order_seller   (selleridx),
+
+    CONSTRAINT fk_order_auction FOREIGN KEY (auctionidx)
+        REFERENCES auction(auctionidx) ON DELETE CASCADE,
+    CONSTRAINT fk_order_bid FOREIGN KEY (bididx)
+        REFERENCES bid(bididx),
+    CONSTRAINT fk_order_buyer FOREIGN KEY (buyeridx)
+        REFERENCES member(memidx) ON DELETE CASCADE,
+    CONSTRAINT fk_order_seller FOREIGN KEY (selleridx)
+        REFERENCES member(memidx) ON DELETE CASCADE,
+
+    CONSTRAINT ck_order_issettled CHECK (issettled IN ('Y','N'))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='역경매 주문/에스크로';
+
+
 /* ==========================================
    채팅 관련 (추가기능)
    ========================================== */
