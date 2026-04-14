@@ -1,18 +1,22 @@
 package com.springbootstudy.bbs.controller;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.springbootstudy.bbs.domain.DeliveryVO;
+import com.springbootstudy.bbs.domain.MemberAddrVO;
 import com.springbootstudy.bbs.domain.MemberVO;
 import com.springbootstudy.bbs.domain.PaymentVO;
 import com.springbootstudy.bbs.service.DeliveryService;
+import com.springbootstudy.bbs.service.MemberAddrService;
 import com.springbootstudy.bbs.service.MyPageService;
 import com.springbootstudy.bbs.service.PaymentService;
 
@@ -28,7 +32,7 @@ public class PaymentApiController {
 
     private final PaymentService paymentService;
     private final DeliveryService deliveryService;
-    private final MyPageService myPageService;
+    private final MemberAddrService memberAddrService;
 
     // 결제 승인
     @PostMapping("/confirm")
@@ -118,6 +122,26 @@ public class PaymentApiController {
             log.error("수령 확인 중 에러: ", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
+    }
+
+    // 세션 정보 반환 API
+    @GetMapping("/session-info")
+    public ResponseEntity<?> getSessionInfo(Ht
+        tpSession session) {
+        MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
+        if (loginUser == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+        }
+
+        MemberAddrVO addr = memberAddrService.getPrimaryAddr(loginUser.getMemIdx());
+
+        Map<String, Object> info = new HashMap<>();
+        info.put("memName", loginUser.getMemName());
+        info.put("memTel", loginUser.getMemTel() != null ? loginUser.getMemTel() : "010-0000-0000");
+        info.put("buyerAddr", addr != null ? addr.getMemAddr() + " " + addr.getMemAddrDetail() : "주소없음");
+        info.put("buyerZipcode", addr != null ? addr.getMemZipcode() : "00000");
+
+        return ResponseEntity.ok(info);
     }
 
 }

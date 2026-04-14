@@ -18,11 +18,13 @@
 
         <!-- 배송지 정보 -->
         <div th:if="${addr != null}">
+            <h4>배송지 정보</h4>
             <p th:text="${addr.memAddr + ' ' + addr.memAddrDetail}"></p>
             <p th:text="${addr.memZipcode}"></p>
+            <p th:text="${memTel != null ? memTel : '연락처 없음'}"></p>
         </div>
         <div th:if="${addr == null}">
-            <p>등록된 배송지가 없습니다. <a href="/members/memberAddrInsert">배송지 등록하기</a></p>
+            <p>등록된 배송지가 없습니다. <a href="/mypage/addresses/new">배송지 등록하기</a></p>
         </div>
 
         <!-- 결제 버튼 -->

@@ -53,7 +53,15 @@ public class PaymentPageController {
 
   // 2. 결제 성공 페이지
   @GetMapping("/success")
-  public String successPage() {
+  public String successPage(HttpSession session, Model model) {
+    MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
+    if (loginUser == null)
+      return "redirect:/members/login";
+
+    MemberAddrVO addr = memberAddrService.getPrimaryAddr(loginUser.getMemIdx());
+    model.addAttribute("addr", addr);
+    model.addAttribute("memTel", loginUser.getMemTel());
+
     return "views/payment/pay_success";
   }
 
