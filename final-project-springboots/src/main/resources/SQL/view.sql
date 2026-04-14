@@ -18,6 +18,7 @@ SELECT
     a.item_category_idx,
     a.auction_thumbnail_img,
     a.auction_title,
+    a.auction_desc,
     a.auction_target_price,
     a.auction_end_at,
     a.auction_decision_deadline,
@@ -38,7 +39,7 @@ LEFT JOIN bid b            ON a.auction_idx          = b.auction_idx
                           AND b.bid_status_idx NOT IN (4, 5)  -- ← 취소/삭제 제외
 GROUP BY
     a.auction_idx, a.buyer_idx, a.item_category_idx,
-    a.auction_thumbnail_img, a.auction_title, a.auction_target_price,
+    a.auction_thumbnail_img, a.auction_title, a.auction_desc, a.auction_target_price,
     a.auction_end_at, a.auction_decision_deadline, a.auction_view_count,
     a.auction_status_idx, s.auction_status_name, s.auction_status_code,
     ic.item_category_name, ic.item_category_code,

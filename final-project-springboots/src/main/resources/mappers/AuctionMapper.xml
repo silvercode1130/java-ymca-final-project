@@ -27,6 +27,7 @@
 	    <if test="keyword != null and keyword != ''">
 	        AND (
 	            auction_title LIKE CONCAT('%', #{keyword}, '%')
+	            OR auction_desc  LIKE CONCAT('%', #{keyword}, '%')
 	            OR item_category_name LIKE CONCAT('%', #{keyword}, '%')
 	        )
 	    </if>
