@@ -37,4 +37,5 @@ public class AuctionDTO {
     // private int discountRate;
     private String timeDisplay;
     private String statusBadge;
+    private Long auctionViewCount;   // ← 추가
 }

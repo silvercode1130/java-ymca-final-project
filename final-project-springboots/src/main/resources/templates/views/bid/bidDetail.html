@@ -15,7 +15,7 @@
         <p><strong>제안 가격:</strong> [[${#numbers.formatInteger(bid.bidPrice, 0, 'COMMA')}]]원</p>
         <p><strong>수량:</strong> [[${bid.bidQuantity}]]개</p>
         <p><strong>제안 메시지:</strong></p>
-        <p th:text="${bid.bidMessage}" style="padding:10px; border:1px solid #ddd; border-radius:4px;">
+        <p th:text="${bid.bidMessage}" style="white-space:pre-line; padding:10px; border:1px solid #ddd; border-radius:4px;">
             메시지 내용
         </p>
         <p><strong>제안일:</strong> [[${#temporals.format(bid.bidRegdate, 'yyyy-MM-dd HH:mm')}]]</p>
@@ -24,7 +24,7 @@
         <!-- 이미지가 있으면 표시 -->
         <div th:if="${bid.itemThumbnailImg != null and bid.itemThumbnailImg != ''}">
             <p><strong>제안 이미지:</strong></p>
-            <img th:src="@{'/images/' + ${bid.itemThumbnailImg}}"
+            <img th:src="@{${bid.itemThumbnailImg}}"
                  style="max-width:300px; border:1px solid #ddd; border-radius:4px;">
         </div>
     </div>

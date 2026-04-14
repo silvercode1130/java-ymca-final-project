@@ -36,6 +36,7 @@ DROP TABLE IF EXISTS member;
 
 DROP TABLE IF EXISTS grade;
 DROP TABLE IF EXISTS role;
+DROP TABLE IF EXISTS payment;
 
 SET FOREIGN_KEY_CHECKS = 1;
 
@@ -223,7 +224,7 @@ CREATE TABLE bid (
     item_idx          BIGINT        NOT NULL COMMENT 'FK → item (실제 제안 상품)',
     bid_price         BIGINT        NOT NULL COMMENT '제안 가격',
     bid_quantity      INT           NOT NULL DEFAULT 1 COMMENT '수량',
-    bid_message       VARCHAR(500)  DEFAULT NULL COMMENT '제안 조건/설명',
+    bid_message       LONGTEXT		DEFAULT NULL COMMENT '제안 조건/설명',
     bid_status_idx    INT           NOT NULL COMMENT 'FK → bid_status',
     bid_regdate       DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '등록일',
     bid_moddate       DATETIME      DEFAULT NULL COMMENT '수정/취소일',
@@ -355,15 +356,6 @@ INSERT INTO auction_status (auction_status_idx, auction_status_code, auction_sta
 VALUES (5, 'canceled','취소');
 INSERT INTO auction_status (auction_status_idx, auction_status_code, auction_status_name)
 VALUES (6, 'deleted','삭제됨');
-INSERT INTO auction_status (auction_status_idx, auction_status_code, auction_status_name)
-VALUES (7, 'paying','결제대기');
-INSERT INTO auction_status (auction_status_idx, auction_status_code, auction_status_name)
-VALUES (8, 'paid','결제완료');
-INSERT INTO auction_status (auction_status_idx, auction_status_code, auction_status_name)
-VALUES (9, 'shipping','배송중');
-INSERT INTO auction_status (auction_status_idx, auction_status_code, auction_status_name)
-VALUES (10, 'delivered','배송완료');
-
 
 -- 5-5) BID_STATUS 코드
 INSERT INTO bid_status (bid_status_idx, bid_status_code, bid_status_name)

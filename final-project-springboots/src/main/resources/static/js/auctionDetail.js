@@ -1,53 +1,149 @@
-// 에러 메시지 표시 함수
+/* ── 공통: 에러 표시 함수 ── */
 function showFieldError(fieldName, message) {
     const existing = document.querySelector('[data-error="' + fieldName + '"]');
     if (existing) existing.remove();
-
     const input = document.getElementById(fieldName) || document.querySelector('[name="' + fieldName + '"]');
     if (!input) return;
-
-    const errorEl = document.createElement('p');
-    errorEl.setAttribute('data-error', fieldName);
-    errorEl.style.cssText = 'color:red; font-size:12px; margin:4px 0 0;';
-    errorEl.textContent = '⚠️ ' + message;
-    input.parentNode.insertBefore(errorEl, input.nextSibling);
-
-    setTimeout(() => errorEl.remove(), 3000);
+    const el = document.createElement('p');
+    el.setAttribute('data-error', fieldName);
+    el.style.cssText = 'color:red; font-size:12px; margin:4px 0 0;';
+    el.textContent = '⚠️ ' + message;
+    input.parentNode.insertBefore(el, input.nextSibling);
+    setTimeout(() => el.remove(), 3000);
 }
 
-// 입찰 이미지 미리보기
-document.getElementById('bidImageFile').addEventListener('change', function () {
-    const file = this.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = e => {
-            document.getElementById('bidPreviewImg').src = e.target.result;
-            document.getElementById('bidPreviewBox').style.display = 'block';
-        };
-        reader.readAsDataURL(file);
-    } else {
-        document.getElementById('bidPreviewBox').style.display = 'none';
-    }
-});
+/* ── 입찰 이미지 미리보기 ── */
+const bidImgEl = document.getElementById('bidImageFile');
+if (bidImgEl) {
+    bidImgEl.addEventListener('change', function () {
+        const file = this.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = e => {
+                document.getElementById('bidPreviewImg').src = e.target.result;
+                document.getElementById('bidPreviewBox').style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        } else {
+            document.getElementById('bidPreviewBox').style.display = 'none';
+        }
+    });
+}
 
-// 입찰 폼 유효성 검사 - 가격 필드만 초기화
-document.getElementById('bidForm').addEventListener('submit', function (e) {
-    const bidPriceInput = document.getElementById('bidPrice');
-    const bidPrice = Number(bidPriceInput.value);
-    let hasError = false;
+/* ── 입찰 가격: 실시간 쉼표 + blur 검증 ── */
+const bidPriceInput = document.getElementById('bidPrice');
+if (bidPriceInput) {
+    const maxPrice = parseInt(bidPriceInput.getAttribute('data-max-price')) || 0;
 
-    if (!bidPriceInput.value || bidPrice <= 0) {
-        showFieldError('bidPrice', '제안 가격은 0원보다 커야 합니다.');
-        bidPriceInput.value = ''; // 가격 필드만 초기화
-        bidPriceInput.focus();
-        hasError = true;
-    } else if (bidPrice % 1000 !== 0) {
-        showFieldError('bidPrice', '1000원 단위로 입력해주세요.');
-        bidPriceInput.value = ''; // 가격 필드만 초기화
-        bidPriceInput.focus();
-        hasError = true;
+    function getRaw(el) {
+        return parseInt(el.value.replace(/,/g, '')) || 0;
     }
 
-    if (hasError) e.preventDefault();
-});
+    // 실시간 쉼표
+    bidPriceInput.addEventListener('input', function () {
+        const raw = this.value.replace(/[^0-9]/g, '');
+        if (raw === '') { this.value = ''; return; }
+        this.value = parseInt(raw).toLocaleString();
+    });
 
+    // blur 검증
+    bidPriceInput.addEventListener('blur', function () {
+        const v = getRaw(this);
+        if (!this.value || v <= 0) {
+            showFieldError('bidPrice', '제안 가격은 0원보다 커야 합니다.');
+            this.value = '';
+        } else if (v % 1000 !== 0) {
+            showFieldError('bidPrice', '1000원 단위로 입력해주세요.');
+            this.value = '';
+        } else if (maxPrice > 0 && v > maxPrice) {
+            showFieldError('bidPrice', '희망 최대가(' + maxPrice.toLocaleString() + '원)를 초과할 수 없습니다.');
+            this.value = '';
+        }
+    });
+}
+
+/* ── 입찰 폼 제출 최종 검증 ── */
+const bidForm = document.getElementById('bidForm');
+if (bidForm) {
+    bidForm.addEventListener('submit', function (e) {
+		
+		// 이미지 필수 체크
+        const imgInput = document.getElementById('bidImageFile');
+        if (imgInput && (!imgInput.files || imgInput.files.length === 0)) {
+            alert('제안 상품 이미지를 첨부해주세요 📸');
+            imgInput.focus();
+            e.preventDefault();
+            return;
+        }
+		
+		// 가격 검증
+        const inp = document.getElementById('bidPrice');
+        if (!inp) return;
+        const raw = inp.value.replace(/,/g, '');
+        const v = parseInt(raw);
+        const max = parseInt(inp.getAttribute('data-max-price')) || 0;
+
+        if (!raw || isNaN(v) || v <= 0) {
+            showFieldError('bidPrice', '제안 가격은 0원보다 커야 합니다.');
+            inp.value = ''; e.preventDefault();
+        } else if (v % 1000 !== 0) {
+            showFieldError('bidPrice', '1000원 단위로 입력해주세요.');
+            inp.value = ''; e.preventDefault();
+        } else if (max > 0 && v > max) {
+            showFieldError('bidPrice', '희망 최대가(' + max.toLocaleString() + '원)를 초과할 수 없습니다.');
+            inp.value = ''; e.preventDefault();
+        } else {
+            // 쉼표 제거 후 전송
+            inp.value = raw;
+        }
+		
+		
+    });
+}
+/* ── 실시간 타이머 (상세 페이지) ── */
+function initDetailTimer() {
+    const timerEl = document.getElementById('realtime-timer');
+    if (!timerEl) return;
+
+    function pad(n) { return String(n).padStart(2, '0'); }
+
+    function update() {
+        const status   = parseInt(timerEl.getAttribute('data-status'));
+        const endTime  = new Date(timerEl.getAttribute('data-end'));
+        const deadline = new Date(timerEl.getAttribute('data-deadline'));
+        const now      = new Date();
+
+        let target = null;
+        let prefix = '';
+        if (status === 1)      { target = endTime;  prefix = '입찰 마감까지 '; }
+        else if (status === 2) { target = deadline; prefix = '결정 마감까지 '; }
+        else { timerEl.innerText = ''; return; }
+
+        if (!target || isNaN(target.getTime())) { timerEl.innerText = ''; return; }
+
+        const diff = target - now;
+        if (diff <= 0) {
+            timerEl.innerText = '';
+            if (!timerEl.getAttribute('data-reloaded')) {
+                timerEl.setAttribute('data-reloaded', 'true');
+                setTimeout(() => location.reload(), 1500);
+            }
+            return;
+        }
+
+        const d = Math.floor(diff / 86400000);
+        const h = Math.floor((diff / 3600000) % 24);
+        const m = Math.floor((diff / 60000)   % 60);
+        const s = Math.floor((diff / 1000)    % 60);
+
+        let str = prefix;
+        if (d > 0) str += d + '일 ';
+        str += pad(h) + ':' + pad(m) + ':' + pad(s);
+        if (timerEl.innerText !== str) timerEl.innerText = str;
+    }
+
+    setInterval(update, 1000);
+    update();
+}
+
+window.addEventListener('load', initDetailTimer);

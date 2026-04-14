@@ -22,7 +22,7 @@ public interface BidMapper {
     // 입찰 정보 등록
     int insertBid(BidDTO bidDto);
     
-    // 입찰 삭제 (소프트 딜리트: 입찰자 본인)
+    // 입찰 취소 (소프트 딜리트: 입찰자 본인)
     int softDeleteBid(@Param("bidIdx") Long bidIdx, @Param("bidderIdx") Long bidderIdx);
 
     // 입찰 삭제 (관리자 전용: bidder_idx 조건 없음)
@@ -34,7 +34,7 @@ public interface BidMapper {
     // 낙찰된 입찰 외 나머지 입찰들 실패(거절) 처리
     int rejectOtherBids(@Param("auctionIdx") Long auctionIdx, @Param("bidIdx") Long bidIdx);
 
-    // 입찰 정보 수정
-    int updateBid(BidDTO bidDto);
+    // 경매 취소 시 해당 경매의 진행중 입찰 일괄 취소
+    int cancelBidsByAuction(@Param("auctionIdx") Long auctionIdx);
     
 }
