@@ -27,13 +27,13 @@ public class MemberAddrController {
 	@GetMapping("/mypage/addresses/new") 
 	public String memberAddrInsert(HttpSession session, Model model) {
 
-	    MemberVO loginMember = (MemberVO) session.getAttribute("loginUser");
+        MemberVO loginMember = (MemberVO) session.getAttribute("loginUser");
 
-	    if (loginMember == null) {
-	        return "redirect:/members/login"; 
-	    }
+        if (loginMember == null) {
+            return "redirect:/members/login";
+        }
 
-	    model.addAttribute("member", loginMember);  
+        model.addAttribute("member", loginMember);
 
 	    return "/views/member/memberAddrInsert";  
 	}
@@ -56,7 +56,7 @@ public class MemberAddrController {
     @GetMapping("/mypage/addresses") 
     public String memberAddr(HttpSession session, Model model) {
 
-    	// 로그인 안했으면 쫓아내기
+        // 로그인 안했으면 쫓아내기
         MemberVO loginMember = (MemberVO) session.getAttribute("loginUser");
         if (loginMember == null) {
             return "redirect:/members/login";
@@ -66,9 +66,8 @@ public class MemberAddrController {
         model.addAttribute("addrList", addrList);
         model.addAttribute("member", loginMember);
 
-        return "/views/member/memberAddr"; 
-    } 
-
+        return "/views/member/memberAddr";
+    }
 
     // 주소 삭제 -----------------------------------------------------------------
     
@@ -79,35 +78,33 @@ public class MemberAddrController {
 
         return "redirect:/mypage/addresses";
     }
-    
-    
+
     // 주소 수정 -----------------------------------------------------------------
     
     @GetMapping("/mypage/addresses/edit") 
     public String updateAddrForm(@RequestParam("addrIdx") Long addrIdx,HttpSession session, Model model) { 
     	// 로그인 정보 받아오기
         MemberVO loginMember = (MemberVO) session.getAttribute("loginUser");
-        
+
         // 로그인 안했으면 쫓아내기
         if (loginMember == null) {
             return "redirect:/members/login";  
         }
-        
+
         // 주소가 없어도 쫓아내기
         if (addrIdx == null) {
             return "redirect:/mypage/addresses";
         }
-        
+
         MemberAddrVO addr = memberAddrService.selectOne(addrIdx);
-    	
+
         // 로그인 세션
-    	model.addAttribute("member", loginMember); 
-    	model.addAttribute("addr", addr);
-    	
-    	return "/views/member/memberAddrUpdate"; 
+        model.addAttribute("member", loginMember);
+        model.addAttribute("addr", addr);
+
+        return "/views/member/memberAddrUpdate";
     }
-    
-    
+
     @PostMapping("/member/updateAddrAjax.do")
     @ResponseBody
     public int updateAddr(MemberAddrVO vo) {
