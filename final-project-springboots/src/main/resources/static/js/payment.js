@@ -1,7 +1,3 @@
-/**
- * 결제 통합 모듈 (payment.js)
- */
-
 const clientKey = "test_ck_GePWvyJnrKPx4nM5Kogb8gLzN97E";
 const tossPayments = TossPayments(clientKey);
 
@@ -11,7 +7,7 @@ const PaymentModule = {
     tossPayments
       .requestPayment(data.payMethod || "카드", {
         amount: data.amount,
-        orderId: data.orderId, // "ORD_bidIdx_timestamp" 형식
+        orderId: data.orderId,
         orderName: data.orderName,
         customerName: data.customerName,
         successUrl: window.location.origin + "/payment/success",
@@ -35,16 +31,28 @@ const PaymentModule = {
     });
   },
 
-  // [함수 3] 결제 버튼 자동 연결
+  // [함수 3] 세션 정보 서버에서 가져오기
+  getSessionInfo: function () {
+    return fetch("/api/payment/session-info", {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    }).then((res) => {
+      if (!res.ok) throw new Error("세션 정보를 가져올 수 없습니다.");
+      return res.json();
+    });
+  },
+
+  // [함수 4] 결제 버튼 자동 연결
   initButtons: function () {
     document.querySelectorAll(".pay-btn").forEach((btn) => {
       btn.addEventListener("click", () => {
         const bidIdx = btn.getAttribute("data-idx");
         const payData = {
           amount: btn.getAttribute("data-price"),
-          orderId: "ORD_" + bidIdx + "_" + new Date().getTime(), // bidIdx 포함
+          orderId: "ORD_" + bidIdx + "_" + new Date().getTime(),
           orderName: btn.getAttribute("data-title"),
-          customerName: loginMemName,
+          customerName:
+            typeof loginMemName !== "undefined" ? loginMemName : "구매자",
           payMethod: "카드",
         };
         this.request(payData);
@@ -66,22 +74,32 @@ document.addEventListener("DOMContentLoaded", function () {
     const orderId = urlParams.get("orderId");
     const amount = urlParams.get("amount");
 
-    // orderId에서 bidIdx 추출 (ORD_bidIdx_timestamp)
+    // 필수값 없으면 바로 fail로
+    if (!paymentKey || !orderId || !amount) {
+      alert("결제 정보가 없습니다.");
+      location.href = "/payment/fail";
+      return;
+    }
+
     const bidIdx = orderId.split("_")[1];
 
-    PaymentModule.confirm({
-      paymentKey: paymentKey,
-      orderId: orderId,
-      amount: amount,
-      bidIdx: bidIdx, // orderId에서 추출
-      buyerName: loginMemName, // 세션에서 주입된 값
-      buyerTel: loginMemTel,
-      buyerAddr: loginMemAddr,
-      buyerZipcode: loginMemZipcode,
-    })
+    // 세션 정보 서버에서 가져온 후 결제 승인
+    PaymentModule.getSessionInfo()
+      .then((sessionInfo) => {
+        return PaymentModule.confirm({
+          paymentKey: paymentKey,
+          orderId: orderId,
+          amount: amount,
+          bidIdx: bidIdx,
+          buyerName: sessionInfo.memName || "구매자",
+          buyerTel: sessionInfo.memTel || "010-0000-0000",
+          buyerAddr: sessionInfo.buyerAddr || "주소없음",
+          buyerZipcode: sessionInfo.buyerZipcode || "00000",
+        });
+      })
       .then((data) => {
         alert("결제가 완료되었습니다!");
-        location.href = "/auctions";
+        location.href = "/mypage/payments";
       })
       .catch((err) => {
         alert("결제 승인 실패: " + err.message);

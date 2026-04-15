@@ -17,7 +17,9 @@ public class MemberVO {
  private String  		memEmail;      	// 이메일
  private String  		memIp;         	// IP 주소
  private Integer 		memRoleIdx;    	// FK → role.role_idx (권한 등급) 
- private Integer 		memGradeIdx;   	// FK → grade.grade_idx (신용도 등급) 
+ private Integer 		memGradeIdx;   	// FK → grade.grade_idx (신용도 등급)
+ private Integer 		memCredit;      // 신용 크레딧 점수 (기본 50, 0~10000 등)
+ private Integer 		memPenalty;		// 패널티 점수 (일단 0으로 시작)
  private LocalDate     	memBday;     	// 생일
  private LocalDateTime 	memRegdate;  	// 가입일
  private String  		memIsDeleted;   // 'Y' / 'N' (삭제 여부)
