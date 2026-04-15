@@ -33,9 +33,9 @@ import com.solapi.sdk.message.exception.SolapiMessageNotReceivedException;
 
 @Controller
 public class MemberController {
-	
-	// 로그인 제한 걸기 기능
-	private static final Map<String, Integer> failCountMap = new ConcurrentHashMap<>();
+
+    // 로그인 제한 걸기 기능
+    private static final Map<String, Integer> failCountMap = new ConcurrentHashMap<>();
     private static final Map<String, Long> lockTimeMap = new ConcurrentHashMap<>();
 
     @Autowired
@@ -169,7 +169,7 @@ public class MemberController {
 
         // 로그인 성공 여부 확인
         int result = memberService.login(memId, memPwd);
-        
+
         // 탈퇴한 회원은 같은 아이디로 로그인 못하게 하는 기능
         MemberVO memberVO = memberService.getMemberVO(memId);
         if (memberVO != null && "Y".equals(memberVO.getMemIsDeleted())) {
@@ -185,11 +185,11 @@ public class MemberController {
                 long newLockTime = System.currentTimeMillis() + (5 * 60 * 1000);
                 lockTimeMap.put(memId, newLockTime);
 
-//                long remainSec = (newLockTime - System.currentTimeMillis()) / 1000;
+                // long remainSec = (newLockTime - System.currentTimeMillis()) / 1000;
                 ra.addFlashAttribute("error", "5분 후 다시 시도해주세요");
                 ra.addFlashAttribute("lockedId", memId);
                 return "redirect:/members/login";
-            } 
+            }
 
             ra.addFlashAttribute("error", "아이디 혹은 비밀번호가 틀립니다 (" + failCount + "/5)");
             return "redirect:/members/login";
@@ -198,39 +198,35 @@ public class MemberController {
         session.setAttribute("isLogin", true);
         session.setAttribute("loginId", memId);
         session.setAttribute("loginUser", memberVO);
-   
-       // 로그인 후 돌아가는 페이지의 세션값을 지워 줌
-//       String redirectUrl = (String) session.getAttribute("loginRedirectUrl");
-//       if (redirectUrl != null) {
-//           session.removeAttribute("loginRedirectUrl"); // 사용 후 제거
-//           return "redirect:" + redirectUrl;
-//       }
-       
-       // redirect 파라미터가 있으면 해당 URL로 이동 // 수정되었음
-       if (redirect != null && !redirect.isBlank()) {
-           return "redirect:" + redirect;
-       }
+
+        // 로그인 후 돌아가는 페이지의 세션값을 지워 줌
+        // String redirectUrl = (String) session.getAttribute("loginRedirectUrl");
+        // if (redirectUrl != null) {
+        // session.removeAttribute("loginRedirectUrl"); // 사용 후 제거
+        // return "redirect:" + redirectUrl;
+        // }
+
+        // redirect 파라미터가 있으면 해당 URL로 이동 // 수정되었음
+        if (redirect != null && !redirect.isBlank()) {
+            return "redirect:" + redirect;
+        }
 
         // 로그인 성공 시 해당 아이디 잠금 해제
         failCountMap.remove(memId);
-        lockTimeMap.remove(memId);  
+        lockTimeMap.remove(memId);
 
         String redirectUrl01 = (String) session.getAttribute("loginRedirectUrl");
         if (redirectUrl01 != null) {
             session.removeAttribute("loginRedirectUrl");
-            return "redirect:" + redirectUrl01;   
+            return "redirect:" + redirectUrl01;
         }
 
-        session.setAttribute("memIdx", memberVO.getMemIdx());
-        System.out.println("memberVO.name : " + memberVO.getMemName());
-        
         // 결제용 index 추가
         session.setAttribute("memIdx", memberVO.getMemIdx());
         System.out.println("memberVO.name : " + memberVO.getMemName());
 
-        return "redirect:/main"; 
+        return "redirect:/main";
     }
-
 
     // 실시간 로직(로그인 5회 실패 시 타이머)
     @GetMapping("/members/getRemainingTime")

@@ -292,9 +292,12 @@ public class BoardController {
             @PathVariable("boardIdx") Long boardIdx,
             @RequestParam(value = "replyPage", defaultValue = "1") int replyPage,
             @RequestParam(value = "sortType", defaultValue = "oldest") String sortType,
+            @RequestParam(value = "from", required = false) String from,
+            @RequestParam(value = "page", defaultValue = "1") int page,
             HttpSession session) {
         boardService.likeBoardIfNotYet(boardIdx, session);
-        return "redirect:/boards/" + typeCode + "/" + boardIdx + "?replyPage=" + replyPage + "&sortType=" + sortType;
+        String fromParam = (from != null ? "&from=" + from : "") + "&page=" + page;
+        return "redirect:/boards/" + typeCode + "/" + boardIdx + "?replyPage=" + replyPage + "&sortType=" + sortType + fromParam;
     }
 
     // ── 댓글 좋아요 ───────────────────────────────────────────

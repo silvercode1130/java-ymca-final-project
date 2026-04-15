@@ -1,183 +1,222 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layouts/mypage_layout}">
 <head>
 <meta charset="UTF-8">
-<title>Insert title here</title>
+<title>나의 프로필 - 마이페이지</title>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 </head>
 <body>
-	<form class="memberProfileUpdate" action="/mypage/profile" method="post" enctype="multipart/form-data">
-		
-		<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-	
-		<script>
-		$(document).ready(function() {
+	<div layout:fragment="content">
 
-		    let isNicknameOk = true;
+		<form class="memberProfileUpdate" action="/mypage/profile"
+			method="post" enctype="multipart/form-data">
 
-		    // 기존 이미지 파일명 추출
-		    let originalImg = $('#preview').attr('src') 
-		        ? $('#preview').attr('src').split('/').pop()
-		        : "";
+			<script>
+      $(document).ready(function() {
 
-		    // 초기 데이터
-		    let originalData = {
-		        nickname: $('#memNickname').val(),
-		        intro: $('#memIntro').val(),
-		        img: originalImg
-		    };
+        let isNicknameOk = true;
 
-		    // 닉네임 입력
-		    $('#memNickname').on('input', function() {
-		        let nickname = $(this).val().trim();
+        // 기존 이미지 파일명 추출
+        let originalImg = $('#preview').attr('src')
+            ? $('#preview').attr('src').split('/').pop()
+            : "";
 
-		        if (nickname.length < 2 || nickname.length > 10) {
-		            $('#nicknameMsg').text("닉네임 2~10자 이내로 작성해주세요");
-		            isNicknameOk = false;
-		            validateAndCheck();
-		            return;
-		        }
+        // 초기 데이터
+        let originalData = {
+          nickname: $('#memNickname').val(),
+          intro: $('#memIntro').val(),
+          img: originalImg
+        };
 
-		        if (nickname === originalData.nickname) {
-		            $('#nicknameMsg').text("사용 가능한 닉네임 입니다");
-		            isNicknameOk = true;
-		            validateAndCheck();
-		            return;
-		        }
+        // 닉네임 입력
+        $('#memNickname').on('input', function() {
+          let nickname = $(this).val().trim();
 
-		        $.ajax({
-		            url: '/members/checkNickname',
-		            type: 'POST',
-		            data: { memNickname: nickname },
-		            success: function(res) {
-		                if (res > 0) {
-		                    $('#nicknameMsg').text("이미 사용중인 닉네임 입니다");
-		                    isNicknameOk = false;
-		                } else {
-		                    $('#nicknameMsg').text("사용 가능한 닉네임 입니다");
-		                    isNicknameOk = true;
-		                }
-		                validateAndCheck();
-		            },
-		            error: function() {
-		                $('#nicknameMsg').text("확인 실패하였습니다 다시 시도해주세요");
-		                isNicknameOk = false;
-		                validateAndCheck();
-		            }
-		        });
-		    });
+          if (nickname.length < 2 || nickname.length > 10) {
+            $('#nicknameMsg').text("닉네임 2~10자 이내로 작성해주세요");
+            isNicknameOk = false;
+            validateAndCheck();
+            return;
+          }
 
-		    // 자기소개
-		    $('#memIntro').on('input', validateAndCheck);
+          if (nickname === originalData.nickname) {
+            $('#nicknameMsg').text("사용 가능한 닉네임 입니다");
+            isNicknameOk = true;
+            validateAndCheck();
+            return;
+          }
 
-		    // 파일 변경
-		    $('#fileInput').on('change', validateAndCheck);
+          $.ajax({
+            url: '/members/checkNickname',
+            type: 'POST',
+            data: { memNickname: nickname },
+            success: function(res) {
+              if (res > 0) {
+                $('#nicknameMsg').text("이미 사용중인 닉네임 입니다");
+                isNicknameOk = false;
+              } else {
+                $('#nicknameMsg').text("사용 가능한 닉네임 입니다");
+                isNicknameOk = true;
+              }
+              validateAndCheck();
+            },
+            error: function() {
+              $('#nicknameMsg').text("확인 실패하였습니다 다시 시도해주세요");
+              isNicknameOk = false;
+              validateAndCheck();
+            }
+          });
+        });
 
-		    function validateAndCheck() {
-		        let nickname = $('#memNickname').val().trim();
-		        let intro = $('#memIntro').val().trim();
+        // 자기소개
+        $('#memIntro').on('input', validateAndCheck);
 
-		        let isValid = true;
-		        let isChanged = false;
+        // 파일 변경
+        $('#fileInput').on('change', validateAndCheck);
 
-		        // 닉네임 검증
-		        if (nickname.length < 2 || nickname.length > 10) {
-		            $('#nicknameMsg').text("닉네임 2~10자 이내로 작성해주세요");
-		            isValid = false;
-		        }
+        function validateAndCheck() {
+          let nickname = $('#memNickname').val().trim();
+          let intro = $('#memIntro').val().trim();
 
-		        if (!isNicknameOk) {
-		            isValid = false;
-		        }
+          let isValid = true;
+          let isChanged = false;
 
-		        // 자기소개 검증
-		        if (intro.length === 0 || intro.length > 200) {
-		            $('#introMsg').text("자기소개 1~200자 이내로 작성해주세요");
-		            isValid = false;
-		        } else {
-		            $('#introMsg').text("");
-		        }
+          // 닉네임 검증
+          if (nickname.length < 2 || nickname.length > 10) {
+            $('#nicknameMsg').text("닉네임 2~10자 이내로 작성해주세요");
+            isValid = false;
+          }
 
-		        // 이미지 비교 핵심
-		        let selectedFile = $('#fileInput')[0].files[0];
-		        let isImageChanged = false;
+          if (!isNicknameOk) {
+            isValid = false;
+          }
 
-		        if (selectedFile) {
-		            if (selectedFile.name !== originalData.img) {
-		                isImageChanged = true;
-		            }
-		        }
+          // 자기소개 검증
+          if (intro.length === 0 || intro.length > 200) {
+            $('#introMsg').text("자기소개 1~200자 이내로 작성해주세요");
+            isValid = false;
+          } else {
+            $('#introMsg').text("");
+          }
 
-		        // 변경 감지
-		        if (
-		            originalData.nickname !== nickname ||
-		            originalData.intro !== intro ||
-		            isImageChanged
-		        ) {
-		            isChanged = true;
-		        }
+          // 이미지 변경 여부
+          let selectedFile = $('#fileInput')[0].files[0];
+          let isImageChanged = false;
 
-		        // 버튼 제어
-		        $('input[type="submit"]').prop('disabled', !(isValid && isChanged));
-		    }
+          if (selectedFile) {
+            if (selectedFile.name !== originalData.img) {
+              isImageChanged = true;
+            }
+          }
 
-		    // 이미지 미리보기
-		    window.previewImage = function(input) {
-		        if (input.files && input.files[0]) {
-		            const reader = new FileReader();
-		            reader.onload = function(e) {
-		                $('#preview').attr('src', e.target.result);
-		            }
-		            reader.readAsDataURL(input.files[0]);
-		        }
-		    }
+          // 변경 감지
+          if (
+              originalData.nickname !== nickname ||
+              originalData.intro !== intro ||
+              isImageChanged
+          ) {
+            isChanged = true;
+          }
 
-		    validateAndCheck();
-		});
-		</script> 
-	
-		<input type="hidden" name="memIdx" th:value="${session.loginUser.memIdx}">
-	
-		<div>
-			<h2>나의 프로필</h2> 
-			<span>프로필 이미지, 닉네임, 자기소개를 수정하세요</span>
-		</div>
-		
-		<div>
-			프로필 <br>
-			JPG, PNG 파일 (최대 100MB) <br>
-			<img id="preview" th:src="${profile.memImg != null} ? @{'/images/profile/' + ${profile.memImg}} : 
-             					@{'/images/profile/profile_default.png'}"
-								     alt="프로필 이미지"
-								     width="150"
-								     style="border:1px solid #ddd; border-radius:10px; object-fit:cover;">
-              <button type="button" onclick="document.getElementById('fileInput').click();">
-                이미지 변경
-              </button> 
-              <input type="file" name="memImgFile" id="fileInput" onchange="previewImage(this)" style="display:none;"> 
-		</div>
-		
-		<div>
-			<label>닉네임</label>
-			<input name="memNickname" id="memNickname" type="text" th:value="${profile.memNickname}" placeholder="ex) 픽큐"> <br>
-			<span>2~10자 이내로 입력해주세요</span>
-			<div id="nicknameMsg" style="color:red; font-size:12px;"></div>
-		</div>
-		
-		<div>
-			<label>자기소개</label>
-			<textarea name="memIntro" id="memIntro"
-		          rows="5" cols="40"
-		          placeholder="픽큐 회원님들에게 나를 알려보세요! 👋"
-		          th:utext="${profile.memIntro}"></textarea> <br>
-			<span>최대 200자까지 입력 가능합니다</span>
-			<div id="introMsg" style="color:red; font-size:12px;"></div>
-		</div>
-		
-		<div>
-			<input type="submit" value="프로필 업데이트" disabled>
-		</div>
-		
-	</form>
+          // 버튼 제어 (submit 버튼 하나만이라 이 정도면 충분)
+          $('input[type="submit"]').prop('disabled', !(isValid && isChanged));
+        }
+
+        // 이미지 미리보기
+        window.previewImage = function(input) {
+          if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+              $('#preview').attr('src', e.target.result);
+            }
+            reader.readAsDataURL(input.files[0]);
+          }
+        }
+
+        validateAndCheck();
+      });
+    </script>
+
+			<input type="hidden" name="memIdx"
+				th:value="${session.loginUser.memIdx}">
+
+			<div
+				class="border border-gray-100 bg-white rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.02)]">
+				<!-- 헤더 -->
+				<div class="px-6 py-5 border-b border-gray-100">
+					<h2 class="text-lg sm:text-xl font-bold text-[#222222]">나의 프로필</h2>
+					<p class="mt-1 text-xs sm:text-sm text-[#767676]">프로필 이미지, 닉네임,
+						자기소개를 수정하세요</p>
+				</div>
+
+				<!-- 내용 -->
+				<div class="px-6 py-6 sm:py-7 space-y-6">
+
+					<!-- 프로필 이미지 -->
+					<div class="flex flex-col sm:flex-row items-start gap-6">
+						<div class="flex-shrink-0">
+							<div
+								class="w-24 h-24 sm:w-32 sm:h-32 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
+								<img id="preview"
+									th:src="${profile.memImg != null} ? @{'/images/profile/' + ${profile.memImg}} :
+                           @{'/images/profile/profile_default.png'}"
+									alt="프로필 이미지"
+									class="w-full h-full object-cover border border-gray-200 rounded-full">
+							</div>
+						</div>
+
+						<div class="flex-1">
+							<label class="text-sm font-medium text-gray-900">프로필 이미지</label>
+							<p class="text-xs text-gray-500 mb-3">JPG, PNG 파일 (최대 100MB)</p>
+							<div class="flex flex-wrap gap-2">
+								<button type="button"
+									class="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md text-xs sm:text-sm text-gray-700 hover:bg-gray-50"
+									onclick="document.getElementById('fileInput').click();">
+									<i class="bi bi-upload mr-1 text-[13px]"></i> 이미지 변경
+								</button>
+								<button type="button" th:if="${profile.memImg != null}"
+									class="inline-flex items-center px-3 py-2 border border-red-300 rounded-md text-xs sm:text-sm text-red-600 hover:bg-red-50">
+									삭제</button>
+							</div>
+							<input type="file" name="memImgFile" id="fileInput"
+								accept="image/*" onchange="previewImage(this)" class="hidden">
+						</div>
+					</div>
+
+					<!-- 닉네임 -->
+					<div class="space-y-1.5">
+						<label for="memNickname" class="text-sm font-medium text-gray-900">닉네임</label>
+						<input name="memNickname" id="memNickname" type="text"
+							th:value="${profile.memNickname}" placeholder="ex) 픽큐"
+							class="w-full bg-white border border-gray-300 rounded-md px-3 h-10 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#7CBD00]">
+						<p class="text-[11px] text-gray-500">2~10자 이내로 입력해주세요</p>
+						<div id="nicknameMsg" class="text-[11px] text-red-500"></div>
+					</div>
+
+					<!-- 자기소개 -->
+					<div class="space-y-1.5">
+						<label for="memIntro" class="text-sm font-medium text-gray-900">자기소개</label>
+						<textarea name="memIntro" id="memIntro" rows="4"
+							placeholder="픽큐 회원님들에게 나를 알려보세요! 👋"
+							th:utext="${profile.memIntro}"
+							class="w-full bg-white border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-900 resize-none focus:outline-none focus:ring-2 focus:ring-[#7CBD00]"></textarea>
+						<p class="text-[11px] text-gray-500">최대 200자까지 입력 가능합니다</p>
+						<div id="introMsg" class="text-[11px] text-red-500"></div>
+					</div>
+
+					<!-- 버튼 -->
+					<div>
+						<input type="submit" value="프로필 업데이트" disabled
+							class="inline-flex items-center px-4 py-2.5 bg-[#7CBD00] text-white rounded-lg text-sm font-semibold hover:bg-[#6BAD00] disabled:bg-gray-300 disabled:cursor-not-allowed">
+					</div>
+
+				</div>
+			</div>
+
+		</form>
+
+	</div>
 </body>
 </html>

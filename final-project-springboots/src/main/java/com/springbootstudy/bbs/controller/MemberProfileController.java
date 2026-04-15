@@ -13,7 +13,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.springbootstudy.bbs.domain.MemberProfileVO;
 import com.springbootstudy.bbs.domain.MemberVO;
-import com.springbootstudy.bbs.mapper.MemberProfileMapper;
 import com.springbootstudy.bbs.service.MemberProfileService;
 
 import jakarta.servlet.http.HttpSession;
