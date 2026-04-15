@@ -126,16 +126,6 @@
                   ← 목록으로
                 </button>
 
-                
-                <th:block th:if="${detail.auctionStatusIdx == 1}">
-                  <!-- 비회원 -->
-                  <th:block th:if="${session.loginUser == null}">
-                    <button class="btn btn-primary" onclick="location.href='/members/login'">
-                      🔒 로그인 후 입찰하기
-                    </button>
-                  </th:block>
-                </th:block>
-
                 <!-- 구매자 본인 + 진행중 → 취소 / 수동 마감 -->
                 <th:block th:if="${session.loginUser != null
                                    and session.loginUser.memIdx == detail.buyerIdx
@@ -164,7 +154,6 @@
 
             </th:block>
             <!-- /mode == list -->
-
 
             <!-- ── mode == bidForm : 입찰 폼 ── -->
             <th:block th:if="${mode == 'bidForm'}">
@@ -361,7 +350,16 @@
                 💰 입찰하기
               </button>
             </th:block>
-
+			
+			<th:block th:if="${detail.auctionStatusIdx == 1}">
+            	<!-- 비회원 -->
+            	<th:block th:if="${session.loginUser == null}">
+	                <button class="btn btn-primary" onclick="location.href='/members/login'">
+	                  🔒 로그인 후 입찰하기
+	                </button>
+            	</th:block>
+            </th:block>
+			
             <!-- 입찰 목록 헤더 -->
             <div class="d-flex justify-content-between align-items-center mb-2">
               <h6 class="fw-bold mb-0">📋 입찰 목록</h6>
