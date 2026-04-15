@@ -76,10 +76,12 @@
 	</select>
     
     <!-- 탈퇴 -->
-    <delete id="deleteMember" parameterType="string">
-	    DELETE FROM member
+    <update id="deleteMember" parameterType="string">
+	    UPDATE member
+	    SET mem_is_deleted = 'Y',
+	        mem_deldate = NOW()
 	    WHERE mem_id = #{memId}
-	</delete>
+	</update>
 	
 	
 	<update id="update">

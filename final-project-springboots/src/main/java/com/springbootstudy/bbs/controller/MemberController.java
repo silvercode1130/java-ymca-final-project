@@ -169,6 +169,13 @@ public class MemberController {
 
         // 로그인 성공 여부 확인
         int result = memberService.login(memId, memPwd);
+        
+        // 탈퇴한 회원은 같은 아이디로 로그인 못하게 하는 기능
+        MemberVO memberVO = memberService.getMemberVO(memId);
+        if (memberVO != null && "Y".equals(memberVO.getMemIsDeleted())) {
+            ra.addFlashAttribute("error", "탈퇴한 회원입니다");
+            return "redirect:/members/login";
+        }
 
         if (result == -1 || result == 0) { // 아이디 없음 or 비밀번호 틀림
             failCount++;
@@ -187,9 +194,6 @@ public class MemberController {
             ra.addFlashAttribute("error", "아이디 혹은 비밀번호가 틀립니다 (" + failCount + "/5)");
             return "redirect:/members/login";
         }
-
-        // 로그인 성공
-        MemberVO memberVO = memberService.getMemberVO(memId);
 
         session.setAttribute("isLogin", true);
         session.setAttribute("loginId", memId);
