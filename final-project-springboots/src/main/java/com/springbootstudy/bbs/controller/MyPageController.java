@@ -91,10 +91,20 @@ public class MyPageController {
     if (loginUser == null)
       return "redirect:/members/login";
 
-      var sales = mypageService.getMySales(loginUser.getMemIdx());
+    var sales = mypageService.getMySales(loginUser.getMemIdx());
     model.addAttribute("sales", sales);
 
     return "views/mypage/sales";
+  }
+
+  // 멤버 탈퇴
+  @GetMapping("/delete")
+  public String memberDelete(HttpSession session, Model model) {
+    MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
+    if (loginUser == null)
+      return "redirect:/members/login";
+
+    return "views/mypage/memberDelete";
   }
 
 }

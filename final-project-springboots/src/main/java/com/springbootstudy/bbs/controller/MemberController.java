@@ -263,7 +263,7 @@ public class MemberController {
 
     // 탈퇴 --------------------------------------------------------------------
 
-    @GetMapping("/memberDelete")
+    @RequestMapping("/memberDelete")
     public String deleteMember(HttpSession session, HttpServletResponse response) throws IOException {
 
         String memId = (String) session.getAttribute("loginId");

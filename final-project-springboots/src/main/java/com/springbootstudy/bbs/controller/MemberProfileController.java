@@ -13,7 +13,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.springbootstudy.bbs.domain.MemberProfileVO;
 import com.springbootstudy.bbs.domain.MemberVO;
-import com.springbootstudy.bbs.mapper.MemberProfileMapper;
 import com.springbootstudy.bbs.service.MemberProfileService;
 
 import jakarta.servlet.http.HttpSession;
@@ -59,7 +58,7 @@ public class MemberProfileController {
     	if (!memImgFile.isEmpty()) {
 
     	    String uploadDir = System.getProperty("user.dir")
-    	            + "/src/main/resources/static/images/profileUpload/";
+    	            + "/src/main/resources/static/images/profile/";
 
     	    File dir = new File(uploadDir);
     	    if (!dir.exists()) {
