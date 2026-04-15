@@ -81,7 +81,7 @@ public class MemberController {
                     memId, memPwd, memName, memTel, fullEmail,
                     memIp, memRoleIdx, memGradeIdx);
 
-            return "redirect:/main";
+            return "redirect:/members/login";
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -202,23 +202,14 @@ public class MemberController {
 
             ra.addFlashAttribute("error", "아이디 혹은 비밀번호가 틀립니다 (" + failCount + "/5)");
             return "redirect:/members/login";
-        }
+        } 
 
-        // 로그인 성공
-        MemberVO memberVO = memberService.getMemberVO(memId);
-
+        // 세션 담을 변수 선언(은정)
         String loginRedirectUrl = (String) session.getAttribute("loginRedirectUrl");
 
         session.setAttribute("isLogin", true);
         session.setAttribute("loginId", memId);
         session.setAttribute("loginUser", memberVO);
-
-        // 로그인 후 돌아가는 페이지의 세션값을 지워 줌
-        // String redirectUrl = (String) session.getAttribute("loginRedirectUrl");
-        // if (redirectUrl != null) {
-        // session.removeAttribute("loginRedirectUrl"); // 사용 후 제거
-        // return "redirect:" + redirectUrl;
-        // }
 
         // redirect 파라미터가 있으면 해당 URL로 이동 // 수정되었음
         if (redirect != null && !redirect.isBlank()) {
@@ -235,10 +226,11 @@ public class MemberController {
             return "redirect:" + redirectUrl01;
         }
 
-        // 결제용 index 추가
+        // 결제용 index 추가(정민님)
         session.setAttribute("memIdx", memberVO.getMemIdx());
         System.out.println("memberVO.name : " + memberVO.getMemName());
 
+        // 추가(은정)
         session.removeAttribute("loginRedirectUrl");
 
         // redirect 파라미터(hidden input) → 세션에서 꺼낸 값 → 기본 메인 순으로 우선순위

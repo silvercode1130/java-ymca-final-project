@@ -47,6 +47,8 @@ public class MemberAddrController {
 	    int result = memberAddrService.registerAddr(vo);
 	    vo.setIsPrimary("N");
 	    
+	    // 주소 저장 안한 사람의 결제 리다이렉트
+	    
 	    return result; 
 	}
 
