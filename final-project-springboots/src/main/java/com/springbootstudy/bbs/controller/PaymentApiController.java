@@ -17,7 +17,6 @@ import com.springbootstudy.bbs.domain.MemberVO;
 import com.springbootstudy.bbs.domain.PaymentVO;
 import com.springbootstudy.bbs.service.DeliveryService;
 import com.springbootstudy.bbs.service.MemberAddrService;
-import com.springbootstudy.bbs.service.MyPageService;
 import com.springbootstudy.bbs.service.PaymentService;
 
 import jakarta.servlet.http.HttpSession;
