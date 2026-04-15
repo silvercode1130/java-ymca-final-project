@@ -110,7 +110,7 @@
 
 				<!-- 수정/삭제 (작성자만) -->
 				<div class="flex gap-2 mb-6"
-					th:if="${session.loginUser != null and session.loginUser.memIdx == board.memIdx}">
+					th:if="${session.loginUser != null and (session.loginUser.memIdx == board.memIdx or session.loginUser.memRoleIdx == 2)}">
 					<a
 						th:href="@{/boards/{tc}/{id}/edit(tc=${board.boardTypeCode}, id=${board.boardIdx})}"
 						class="inline-flex items-center gap-1 px-3 py-1.5 rounded-md text-xs sm:text-sm
@@ -209,7 +209,7 @@
 
 												<!-- 댓글 수정/삭제 -->
 												<div
-													th:if="${session.loginUser != null and session.loginUser.memIdx == r.memIdx}"
+													th:if="${session.loginUser != null and (session.loginUser.memIdx == board.memIdx or session.loginUser.memRoleIdx == 2)}"
 													class="flex items-center gap-1">
 													<button type="button"
 														class="inline-flex items-center px-2 py-1 rounded-md text-[11px] sm:text-xs
