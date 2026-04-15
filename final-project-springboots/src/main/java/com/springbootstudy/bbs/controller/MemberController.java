@@ -201,6 +201,11 @@ public class MemberController {
            session.removeAttribute("loginRedirectUrl"); // 사용 후 제거
            return "redirect:" + redirectUrl;
        }
+       
+       // redirect 파라미터가 있으면 해당 URL로 이동 // 수정되었음
+       if (redirect != null && !redirect.isBlank()) {
+           return "redirect:" + redirect;
+       }
 
         // 로그인 성공 시 해당 아이디 잠금 해제
         failCountMap.remove(memId);
