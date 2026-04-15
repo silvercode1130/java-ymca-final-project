@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <meta charset="UTF-8">
+  <title>내 판매 내역</title>
+</head>
+
+<body>
+
+  <h2>내 판매 내역</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>상품명</th>
+        <th>결제 금액</th>
+        <th>구매자 이름</th>
+        <th>배송지</th>
+        <th>연락처</th>
+        <th>배송 상태</th>
+        <th>택배사</th>
+        <th>운송장번호</th>
+        <th>결제일</th>
+        <th>배송처리</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr th:if="${#lists.isEmpty(sales)}">
+                <td colspan="10">판매 내역이 없습니다.</td>
+            </tr>
+            <tr th:each="sale : ${sales}">
+                <td th:text="${sale.itemName}"></td>
+                <td th:text="${#numbers.formatInteger(sale.payAmount, 0, 'COMMA') + '원'}"></td>
+                <td th:text="${sale.buyerName}"></td>
+                <td th:text="${sale.buyerAddr + ' ' + sale.buyerZipcode}"></td>
+                <td th:text="${sale.buyerTel}"></td>
+                <td th:text="${sale.deliveryStatus != null ? sale.deliveryStatus : '배송준비중'}"></td>
+                <td th:text="${sale.courierCompany != null ? sale.courierCompany : '-'}"></td>
+                <td th:text="${sale.trackingNumber != null ? sale.trackingNumber : '-'}"></td>
+                <td th:text="${#temporals.format(sale.payRegdate, 'yyyy-MM-dd HH:mm')}"></td>
+                <td>
+                    <!-- 배송 시작 전인 경우 운송장 입력 버튼 -->
+                    <button th:if="${sale.deliveryStatus == null}"
+                            th:attr="data-bid-idx=${sale.bidIdx}"
+                            onclick="openShipModal(this)">운송장 입력</button>
+                    <!-- 배송중 -->
+                    <span th:if="${sale.deliveryStatus == 'SHIPPING'}">배송중</span>
+                    <!-- 수령완료 -->
+                    <span th:if="${sale.deliveryStatus == 'DELIVERED'}">수령완료</span>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- 운송장 입력 모달 -->
+    <div id="shipModal" style="display:none; position:fixed; top:50%; left:50%;
+         transform:translate(-50%,-50%); background:white; padding:30px;
+         border:1px solid #ccc; border-radius:8px;">
+        <h3>운송장 정보 입력</h3>
+        <input type="hidden" id="modalBidIdx"/>
+        <div>
+            <label>택배사</label>
+            <select id="courierCompany">
+                <option value="CJ대한통운">CJ대한통운</option>
+                <option value="한진택배">한진택배</option>
+                <option value="롯데택배">롯데택배</option>
+                <option value="우체국택배">우체국택배</option>
+                <option value="로젠택배">로젠택배</option>
+            </select>
+        </div>
+        <div>
+            <label>운송장번호</label>
+            <input type="text" id="trackingNumber" placeholder="운송장번호 입력"/>
+        </div>
+        <button onclick="submitShipping()">배송 시작</button>
+        <button onclick="closeShipModal()">취소</button>
+    </div>
+
+    <script>
+      function openShipModal(btn) {
+        const bidIdx = btn.getAttribute("data-bid-idx");
+        document.getElementById("modalBidIdx").value = bidIdx;
+        document.getElementById("shipModal").style.display = "block";
+      }
+
+      function closeShipModal() {
+        document.getElementById("shipModal").style.display = "none";
+      }
+
+      function submitShipping() {
+        const bidIdx = document.getElementById("modalBidIdx").value;
+        const courierCompany = document.getElementById("courierCompany").value;
+        const trackingNumber = document.getElementById("trackingNumber").value;
+
+        if (!trackingNumber.trim()) {
+          alert("운송장번호를 입력해주세요.");
+          return;
+        }
+
+        fetch("/api/payment/ship", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            bidIdx: bidIdx,
+            courierCompany: courierCompany,
+            trackingNumber: trackingNumber
+          })
+        })
+          .then(res => {
+            if (!res.ok) {
+              return res.text().then(text => { throw new Error(text); });
+            }
+            return res.json();
+          })
+          .then(data => {
+            alert("배송 처리가 완료되었습니다!");
+            closeShipModal();
+            location.reload();
+          })
+          .catch(err => {
+            alert("오류가 발생했습니다: " + err.message);
+          });
+      }
+    </script>
+
+</body>
+</html>

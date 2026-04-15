@@ -58,7 +58,7 @@ public void addResourceHandlers(ResourceHandlerRegistry registry) {
     registry.addResourceHandler("/images/profile/**")
             .addResourceLocations("file:///" 
                 + System.getProperty("user.dir").replace("\\", "/")
-                + "/src/main/resources/static/images/profileUpload/");
+                + "/src/main/resources/static/images/profile/");
 
     // 경매 이미지
     registry.addResourceHandler("/images/auction/**")

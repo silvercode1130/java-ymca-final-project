@@ -4,9 +4,6 @@ import java.time.LocalDateTime;
 
 import lombok.Data;
 
-// 임시 VO 입니다
-// DB 확정 전이라 사라질 수 있어요!
-
 @Data
 public class ReviewVO {
 	private Long reviewIdx;	// pk - 리뷰
