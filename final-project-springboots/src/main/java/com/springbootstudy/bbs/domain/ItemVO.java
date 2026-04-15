@@ -5,8 +5,6 @@ import java.time.LocalDateTime;
 
 import lombok.Data;
 
-import java.time.LocalDateTime;
-
 //아이템(상품) 정보
 @Data
 public class ItemVO {
