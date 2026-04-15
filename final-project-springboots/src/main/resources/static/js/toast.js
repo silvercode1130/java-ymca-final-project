@@ -55,20 +55,32 @@ function showToast(message, type) {
 }
 
 // 페이지 로드 시 Thymeleaf 플래시 메시지 자동 감지
-window.addEventListener('DOMContentLoaded', function () {
+window.addEventListener('pageshow', function (event) {
 
-    // data-toast 속성이 있는 hidden 요소를 찾아서 토스트로 띄움
+    // 뒤로가기(bfcache 복원)면 토스트 띄우지 않음
+    if (event.persisted) return;
+
+    // 이미 이 페이지에서 토스트를 띄웠으면 다시 안 띄움
+    const toastShownKey = 'toastShown_' + location.pathname;
+    if (sessionStorage.getItem(toastShownKey)) {
+        sessionStorage.removeItem(toastShownKey);
+        return;
+    }
+
     const successEl = document.getElementById('toast-success');
     const errorEl   = document.getElementById('toast-error');
     const bidErrEl  = document.getElementById('toast-bid-error');
 
     if (successEl && successEl.dataset.msg) {
         showToast(successEl.dataset.msg, 'success');
+        sessionStorage.setItem(toastShownKey, '1');
     }
     if (errorEl && errorEl.dataset.msg) {
         showToast(errorEl.dataset.msg, 'error');
+        sessionStorage.setItem(toastShownKey, '1');
     }
     if (bidErrEl && bidErrEl.dataset.msg) {
         showToast(bidErrEl.dataset.msg, 'error');
+        sessionStorage.setItem(toastShownKey, '1');
     }
 });
