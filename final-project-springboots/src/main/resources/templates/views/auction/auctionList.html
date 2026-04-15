@@ -114,50 +114,66 @@
 						</div>
 
 						<!-- 상단 카운트 / 정렬 버튼 -->
-						<div class="mb-5 flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-gray-100">
-							<div class="text-xs sm:text-sm text-[#767676]">
-								총
-								<span class="mx-1 font-semibold text-[#222222]" th:text="${#lists.size(auctionList)}">0</span>개
-							</div>
-							<div class="flex items-center gap-2 text-xs sm:text-sm">
-								<!-- 상태 필터 탭 -->
-								<a th:href="${selectedCategory != null}
-										? @{/auctions/category/{cat}(cat=${selectedCategory}, sortBy=${sortBy}, statusFilter='open')}
-										: @{/auctions(sortBy=${sortBy}, statusFilter='open')}"
-									class="block rounded-lg px-3 py-2 transition-colors"
-									th:classappend="${statusFilter == 'open' or statusFilter == null} ? 'bg-gray-100 text-[#222222] font-semibold' : 'text-[#767676] hover:bg-gray-50 hover:text-[#222222]'">
-									🟢 진행중
-								</a>
-								<a th:href="${selectedCategory != null}
-										? @{/auctions/category/{cat}(cat=${selectedCategory}, sortBy=${sortBy}, statusFilter='closed')}
-										: @{/auctions(sortBy=${sortBy}, statusFilter='closed')}"
-									class="block rounded-lg px-3 py-2 transition-colors"
-									th:classappend="${statusFilter == 'closed'} ? 'bg-gray-100 text-[#222222] font-semibold' : 'text-[#767676] hover:bg-gray-50 hover:text-[#222222]'">
-									🔒 마감된 경매
-								</a>
-								<!-- 정렬 -->
-								<a th:href="${selectedCategory != null}
-										? @{/auctions/category/{cat}(cat=${selectedCategory}, sortBy='latest', keyword=${keyword}, statusFilter=${statusFilter})}
-										: @{/auctions(sortBy='latest', keyword=${keyword}, statusFilter=${statusFilter})}"
-									class="px-3 py-1 text-[#767676] hover:text-[#222222]"
-									th:classappend="${sortBy == 'latest' or sortBy == null} ? ' font-semibold text-[#222222]' : ''">
-									📅 최신순
-								</a>
-								<a th:href="${selectedCategory != null}
-										? @{/auctions/category/{cat}(cat=${selectedCategory}, sortBy='views', keyword=${keyword}, statusFilter=${statusFilter})}
-										: @{/auctions(sortBy='views', keyword=${keyword}, statusFilter=${statusFilter})}"
-									class="px-3 py-1 text-[#767676] hover:text-[#222222]"
-									th:classappend="${sortBy == 'views'} ? ' font-semibold text-[#222222]' : ''">
-									👀 조회수순
-								</a>
-								<a th:href="${selectedCategory != null}
-										? @{/auctions/category/{cat}(cat=${selectedCategory}, sortBy='deadline', keyword=${keyword}, statusFilter=${statusFilter})}
-										: @{/auctions(sortBy='deadline', keyword=${keyword}, statusFilter=${statusFilter})}"
-									class="px-3 py-1 text-[#767676] hover:text-[#222222]"
-									th:classappend="${sortBy == 'deadline'} ? ' font-semibold text-[#222222]' : ''">
-									⏰ 마감임박순
-								</a>
-							</div>
+						<div class="mb-5 pb-3 border-b border-gray-100">
+						
+						    <!-- 1행: 총 개수(왼쪽) + 상태 필터(오른쪽) -->
+						    <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+						        <span class="text-xs sm:text-sm text-[#767676]">
+						            총 <span class="font-semibold text-[#222222]" th:text="${#lists.size(auctionList)}">0</span>개
+						        </span>
+						        <div class="flex items-center gap-2">
+						            <a th:href="${selectedCategory != null}
+						                        ? @{/auctions/category/{cat}(cat=${selectedCategory}, sortBy=${sortBy}, statusFilter='open')}
+						                        : @{/auctions(sortBy=${sortBy}, statusFilter='open')}"
+						               class="inline-flex items-center rounded-full px-3 py-1 text-xs sm:text-sm font-medium border transition-colors"
+						               th:classappend="${statusFilter == 'open' or statusFilter == null}
+						                               ? 'bg-[#222222] text-white border-[#222222]'
+						                               : 'bg-white text-[#767676] border-gray-200 hover:border-[#222222] hover:text-[#222222]'">
+						                🟢 진행중
+						            </a>
+						            <a th:href="${selectedCategory != null}
+						                        ? @{/auctions/category/{cat}(cat=${selectedCategory}, sortBy=${sortBy}, statusFilter='closed')}
+						                        : @{/auctions(sortBy=${sortBy}, statusFilter='closed')}"
+						               class="inline-flex items-center rounded-full px-3 py-1 text-xs sm:text-sm font-medium border transition-colors"
+						               th:classappend="${statusFilter == 'closed'}
+						                               ? 'bg-[#222222] text-white border-[#222222]'
+						                               : 'bg-white text-[#767676] border-gray-200 hover:border-[#222222] hover:text-[#222222]'">
+						                🔒 마감된 경매
+						            </a>
+						        </div>
+						    </div>
+						
+						    <!-- 2행: 정렬(오른쪽 정렬) -->
+						    <div class="flex items-center justify-end gap-1 text-xs sm:text-sm">
+						        <a th:href="${selectedCategory != null}
+						                    ? @{/auctions/category/{cat}(cat=${selectedCategory}, sortBy='latest', keyword=${keyword}, statusFilter=${statusFilter})}
+						                    : @{/auctions(sortBy='latest', keyword=${keyword}, statusFilter=${statusFilter})}"
+						           class="px-2.5 py-1 rounded transition-colors"
+						           th:classappend="${sortBy == 'latest' or sortBy == null}
+						                           ? 'bg-gray-100 font-semibold text-[#222222]'
+						                           : 'text-[#767676] hover:text-[#222222]'">
+						            📅 최신순
+						        </a>
+						        <a th:href="${selectedCategory != null}
+						                    ? @{/auctions/category/{cat}(cat=${selectedCategory}, sortBy='views', keyword=${keyword}, statusFilter=${statusFilter})}
+						                    : @{/auctions(sortBy='views', keyword=${keyword}, statusFilter=${statusFilter})}"
+						           class="px-2.5 py-1 rounded transition-colors"
+						           th:classappend="${sortBy == 'views'}
+						                           ? 'bg-gray-100 font-semibold text-[#222222]'
+						                           : 'text-[#767676] hover:text-[#222222]'">
+						            👀 조회수순
+						        </a>
+						        <a th:href="${selectedCategory != null}
+						                    ? @{/auctions/category/{cat}(cat=${selectedCategory}, sortBy='deadline', keyword=${keyword}, statusFilter=${statusFilter})}
+						                    : @{/auctions(sortBy='deadline', keyword=${keyword}, statusFilter=${statusFilter})}"
+						           class="px-2.5 py-1 rounded transition-colors"
+						           th:classappend="${sortBy == 'deadline'}
+						                           ? 'bg-gray-100 font-semibold text-[#222222]'
+						                           : 'text-[#767676] hover:text-[#222222]'">
+						            ⏰ 마감임박순
+						        </a>
+						    </div>
+						
 						</div>
 
 						<!-- 토스트 메시지 -->
