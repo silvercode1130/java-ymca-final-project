@@ -173,7 +173,7 @@ public class ReviewController {
 		// 리뷰 취소 기능
 		reviewService.cancelDelete(reviewIdx);
 
-		return "views/review/reviewAdmin";
+		return "redirect:/reviewAdmin";
 	}
 
 	// 관리자 리뷰 페이지 -----------------------------------------------------------------
