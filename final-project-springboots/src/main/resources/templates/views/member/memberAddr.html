@@ -47,14 +47,14 @@
 
 					<div th:each="addr : ${addrList}"
 						class="border border-gray-200 bg-white rounded-xl"
-						th:classappend="${addr.isPrimary} ? ' ring-2 ring-[#7CBD00]' : ''">
+						th:classappend="${addr.isPrimary == 'Y'} ? ' ring-2 ring-[#7CBD00]' : ''">
 						<!-- 카드 헤더 -->
 						<div class="px-6 py-4 border-b border-gray-100">
 							<div class="flex items-center justify-between">
 								<h3 class="text-sm sm:text-base font-semibold text-gray-900"
 									th:text="${addr.addrName != null ? addr.addrName : '배송지'}">
 									자택</h3>
-								<span th:if="${addr.isPrimary}"
+								<span th:if="${addr.isPrimary == 'Y'}"
 									class="inline-flex items-center px-2 py-1 rounded-full bg-[#7CBD00] text-white text-[11px] font-medium">
 									대표 배송지 </span>
 							</div>
@@ -88,7 +88,7 @@
 									th:onclick="|deleteAddr(${addr.addrIdx})|">삭제</button>
 
 								<!-- 대표 배송지 설정: isPrimary가 false일 때만 노출 처리하려면 if 추가 -->
-								<button type="button" th:if="${!addr.isPrimary}"
+								<button type="button" th:if="${addr.isPrimary != 'Y'}"
 									class="inline-flex items-center px-3 py-1.5 rounded-md border border-[#7CBD00] text-xs sm:text-sm text-[#7CBD00] hover:bg-[#F4FCE3]"
 									th:onclick="|location.href='@{/mypage/addresses/primary(addrIdx=${addr.addrIdx})}'|">
 									대표 배송지로 설정</button>
