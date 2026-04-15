@@ -261,10 +261,10 @@
           AND r.reply_is_deleted = 'N'
         <choose>
             <when test="sortType == 'latest'">
-                ORDER BY r.reply_ref DESC, r.reply_step ASC
+                ORDER BY COALESCE(r.reply_ref, r.reply_idx) DESC, r.reply_step ASC
             </when>
             <otherwise>
-                ORDER BY r.reply_ref ASC, r.reply_step ASC
+                ORDER BY COALESCE(r.reply_ref, r.reply_idx) ASC, r.reply_step ASC
             </otherwise>
         </choose>
         LIMIT #{limit} OFFSET #{offset}
@@ -301,7 +301,7 @@
         LEFT JOIN member_profile mp ON r.mem_idx = mp.mem_idx
         WHERE r.board_idx = #{boardIdx}
           AND r.reply_is_deleted = 'N'
-        ORDER BY r.reply_ref DESC, r.reply_step ASC
+        ORDER BY COALESCE(r.reply_ref, r.reply_idx) DESC, r.reply_step ASC
     </select>
 
     <!-- 댓글 등록 -->
