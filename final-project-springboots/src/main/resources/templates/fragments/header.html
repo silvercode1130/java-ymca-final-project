@@ -62,7 +62,7 @@
            <!-- 로그인 X (데스크탑) -->
            <div class="hidden md:flex items-center gap-2"
               th:if="${session.loginUser == null}">
-              <a th:href="@{/members/login}"
+              <a href="#" onclick="location.href='/members/login?redirect=' + encodeURIComponent(location.href)"
                  class="px-3 py-1.5 rounded text-sm text-[#222222] hover:text-[#7CBD00]">
                  로그인 </a> <a th:href="@{/members/register}"
                  class="px-3 py-1.5 rounded text-sm bg-[#7CBD00] text-white font-semibold hover:bg-[#6BAD00]">
@@ -74,7 +74,8 @@
 							<a th:if="${session.loginUser != null}" th:href="@{/mypage/boards}"
 								class="px-2 py-1 rounded text-xs bg-gray-100 text-[#222222]">
 								<span th:text="${session.loginUser.memName}">내정보</span>
-							</a> <a th:if="${session.loginUser == null}" th:href="@{/members/login}"
+							</a> <a th:if="${session.loginUser == null}" href="#"
+								onclick="location.href='/members/login?redirect=' + encodeURIComponent(location.href)"
 								class="px-2 py-1 rounded text-xs bg-[#7CBD00] text-white">
 								로그인 </a>
 						</div>
