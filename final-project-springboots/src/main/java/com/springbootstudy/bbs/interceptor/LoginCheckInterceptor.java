@@ -22,7 +22,7 @@ public class LoginCheckInterceptor implements HandlerInterceptor {
     * 또는 컨트롤러 자체를 실행하지 않게 할 수 있다.
     **/
 
-	 // 로그인 실패 시 띄워주는 인터셉터
+	// 로그인 실패 시 띄워주는 인터셉터
 	@Override
 	public boolean preHandle(HttpServletRequest request,
 	      HttpServletResponse response, Object handler) throws Exception {
@@ -31,24 +31,35 @@ public class LoginCheckInterceptor implements HandlerInterceptor {
 
 	   HttpSession session = request.getSession();
 	   String uri = request.getRequestURI();
+	   String query = request.getQueryString();
 
 	   // 로그인 필요한 경로는 차단
 	   // 여기에 등록 안하면 인터셉터 안뜹니다!!
 	   // 다른분들의 페이지는 나중에 끝나고 경로 추가할 부분 알려주세요!!
 	   boolean needLogin =
-	         uri.startsWith("/members/memberUpdate") ||
-	         uri.startsWith("/members/memberAddr") ||
-	         uri.startsWith("/members/memberAddrUpdate") ||
-	         uri.startsWith("/members/memberProfileUpdate") ||
-	         uri.startsWith("/memberDelete") ||
-	         uri.startsWith("/mypage/auctions"); 
-
-	   if (needLogin && session.getAttribute("isLogin") == null) {
-	      session.setAttribute("loginMsg", "로그인이 필요한 서비스 입니다");
-	      response.sendRedirect("/members/login");
-	      return false; 
-	   }
-	   return true; 
+			   uri.startsWith("/members/memberUpdate") ||
+               uri.startsWith("/members/memberAddr") ||
+               uri.startsWith("/members/memberAddrUpdate") ||
+               uri.startsWith("/members/memberProfileUpdate") ||
+               uri.startsWith("/memberDelete") ||
+               uri.startsWith("/mypage/") ||
+               uri.startsWith("/auctions/new") ||
+               uri.startsWith("/auctions/") && uri.contains("/bids") ||
+               uri.startsWith("/boards/write") ||
+               uri.startsWith("/boards/edit") ||
+               uri.startsWith("/review/write");
+	   
+	   // 페이징
+	   if (needLogin && session.getAttribute("loginUser") == null) {
+           // 현재 URL(쿼리스트링 포함)을 세션에 저장
+           String returnUrl = uri;
+           if (query != null) returnUrl += "?" + query;
+           session.setAttribute("loginRedirectUrl", returnUrl);
+           session.setAttribute("loginMsg", "로그인이 필요한 서비스입니다.");
+           response.sendRedirect("/members/login");
+           return false;
+       }
+       return true;
 	}
 	
 	/*

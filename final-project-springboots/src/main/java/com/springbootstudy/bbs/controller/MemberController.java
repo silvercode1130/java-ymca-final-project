@@ -111,6 +111,7 @@ public class MemberController {
     // login.html - 창 띄우기
     @GetMapping("/members/login")
     public String loginForm(@RequestParam(value = "redirect", required = false) String redirect,
+            @RequestParam(value = "returnUrl", required = false) String returnUrl,
             HttpServletResponse response, HttpSession session, Model model, RedirectAttributes ra) {
 
         // 뒤로가기 했을 때 로그인 안풀리는 기능
@@ -134,6 +135,14 @@ public class MemberController {
         // 로그인(인터셉터) 후 보던 페이지로 돌아오기
         if (redirect != null)
             model.addAttribute("redirect", redirect);
+        if (returnUrl != null)
+            model.addAttribute("returnUrl", returnUrl);
+
+        // 인터셉터/컨트롤러가 세션에 저장해둔 URL을 hidden input으로 전달
+        String sessionRedirectUrl = (String) session.getAttribute("loginRedirectUrl");
+        if (sessionRedirectUrl != null && redirect == null && returnUrl == null) {
+            model.addAttribute("returnUrl", sessionRedirectUrl);
+        }
 
         return "views/member/login";
     }
@@ -195,6 +204,11 @@ public class MemberController {
             return "redirect:/members/login";
         }
 
+        // 로그인 성공
+        MemberVO memberVO = memberService.getMemberVO(memId);
+
+        String loginRedirectUrl = (String) session.getAttribute("loginRedirectUrl");
+
         session.setAttribute("isLogin", true);
         session.setAttribute("loginId", memId);
         session.setAttribute("loginUser", memberVO);
@@ -225,7 +239,14 @@ public class MemberController {
         session.setAttribute("memIdx", memberVO.getMemIdx());
         System.out.println("memberVO.name : " + memberVO.getMemName());
 
-        return "redirect:/main";
+        session.removeAttribute("loginRedirectUrl");
+
+        // redirect 파라미터(hidden input) → 세션에서 꺼낸 값 → 기본 메인 순으로 우선순위
+        String redirectTarget = (redirect != null && !redirect.isBlank()) ? redirect
+                : (loginRedirectUrl != null) ? loginRedirectUrl
+                        : "/main";
+
+        return "redirect:" + redirectTarget;
     }
 
     // 실시간 로직(로그인 5회 실패 시 타이머)

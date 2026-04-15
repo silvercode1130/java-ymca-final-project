@@ -92,7 +92,7 @@
 							    <span th:text="${loginMsg}"></span>
 							</div>
 
-							<input type="hidden" name="redirect" th:value="${redirect}"> 
+							<input type="hidden" name="redirect" th:value="${returnUrl != null ? returnUrl : redirect}">
 							
 							<!-- 잠금처리 당한 아이디 -->
 							<input type="hidden" id="lockedMemId" th:value="${lockedId}">
