@@ -130,7 +130,7 @@
 									정보</h3>
 							</div>
 							<div class="px-2 py-2 space-y-1 mb-2">
-								<a th:href="@{/mypage/member}"
+								<a th:href="@{/mypage/info}"
 									class="w-full inline-flex items-center rounded-lg px-3 py-3 text-[15px] transition-colors"
 									th:classappend="${activeMenu == 'member'} ?
                                   ' bg-gray-100 text-[#222222]' :
@@ -143,7 +143,7 @@
 											class="absolute -bottom-1 left-1/2 h-[6px] w-[10px] -translate-x-1/2 rounded-full border border-[#7C7F88] border-t-0"></span>
 									</span>
 								</span> <span>개인정보확인/수정</span>
-								</a> <a th:href="@{/mypage/address}"
+								</a> <a th:href="@{/mypage/addresses}"
 									class="w-full inline-flex items-center rounded-lg px-3 py-3 text-[15px] transition-colors"
 									th:classappend="${activeMenu == 'address'} ?
                                   ' bg-gray-100 text-[#222222]' :
@@ -156,17 +156,21 @@
 											class="absolute -bottom-[3px] left-1/2 h-[6px] w-[6px] -translate-x-1/2 border-l-2 border-b-2 border-[#7C7F88] rotate-45"></span>
 									</span>
 								</span> <span>배송지 관리</span>
-								</a> <a th:href="@{/mypage/delete}"
-									class="w-full inline-flex items-center rounded-lg px-3 py-3 text-[15px] transition-colors"
-									th:classappend="${activeMenu == 'delete'} ?
-                                  ' bg-[#FFF5F5] text-[#D64545]' :
-                                  ' text-[#D64545] hover:bg-[#FFF5F5]'">
-									<span
-									class="mr-2 inline-flex h-6 w-6 items-center justify-center rounded-md border border-[#F08C8C]">
-										<span
-										class="block h-3 w-2 border border-[#D64545] border-t-0 rounded-b-[3px]"></span>
-								</span> <span>회원탈퇴</span>
-								</a>
+								</a> 
+								
+								<!-- 회원탈퇴 post로 바꾸기 위해
+								form 추가 및 a 태그의 href 제거 했습니다!
+								확인 결과 탈퇴처리 잘 됩니다! -->
+								<form id="delete-form" th:action="@{/mypage/delete}" method="post" style="display: none;"></form>
+									<a class="w-full inline-flex items-center rounded-lg px-3 py-3 text-[15px] transition-colors"
+										th:classappend="${activeMenu == 'delete'} ? ' bg-[#FFF5F5] text-[#D64545]' : ' text-[#D64545] hover:bg-[#FFF5F5]'"
+										onclick="if(confirm('정말 탈퇴하시겠습니까?')) { document.getElementById('delete-form').submit(); }">
+										<span class="mr-2 inline-flex h-6 w-6 items-center justify-center rounded-md border border-[#F08C8C]">
+											<span class="block h-3 w-2 border border-[#D64545] border-t-0 rounded-b-[3px]"></span>
+										</span> 
+										<span>회원탈퇴</span>
+									</a>
+								
 							</div>
 
 						</div>

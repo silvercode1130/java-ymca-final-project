@@ -196,11 +196,11 @@ public class MemberController {
         session.setAttribute("loginUser", memberVO);
    
        // 로그인 후 돌아가는 페이지의 세션값을 지워 줌
-       String redirectUrl = (String) session.getAttribute("loginRedirectUrl");
-       if (redirectUrl != null) {
-           session.removeAttribute("loginRedirectUrl"); // 사용 후 제거
-           return "redirect:" + redirectUrl;
-       }
+//       String redirectUrl = (String) session.getAttribute("loginRedirectUrl");
+//       if (redirectUrl != null) {
+//           session.removeAttribute("loginRedirectUrl"); // 사용 후 제거
+//           return "redirect:" + redirectUrl;
+//       }
        
        // redirect 파라미터가 있으면 해당 URL로 이동 // 수정되었음
        if (redirect != null && !redirect.isBlank()) {
@@ -209,12 +209,12 @@ public class MemberController {
 
         // 로그인 성공 시 해당 아이디 잠금 해제
         failCountMap.remove(memId);
-        lockTimeMap.remove(memId);
+        lockTimeMap.remove(memId);  
 
         String redirectUrl01 = (String) session.getAttribute("loginRedirectUrl");
         if (redirectUrl01 != null) {
             session.removeAttribute("loginRedirectUrl");
-            return "redirect:" + redirectUrl01;  
+            return "redirect:" + redirectUrl01;   
         }
 
         session.setAttribute("memIdx", memberVO.getMemIdx());
@@ -266,7 +266,7 @@ public class MemberController {
 
     // 탈퇴 --------------------------------------------------------------------
 
-    @GetMapping("/memberDelete")
+    @PostMapping("mypage/delete")
     public String deleteMember(HttpSession session, HttpServletResponse response) throws IOException {
 
         String memId = (String) session.getAttribute("loginId");

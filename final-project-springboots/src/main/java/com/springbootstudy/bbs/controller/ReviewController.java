@@ -24,7 +24,7 @@ public class ReviewController {
 	
 	// 리뷰 조회 창 -----------------------------------------------------------------
 
-	@GetMapping("/review") 
+	@GetMapping("/mypage/reviews") 
 	public String review(HttpSession session, Model model) {
 
 	    MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
@@ -49,14 +49,11 @@ public class ReviewController {
 	}
 	
 	
-
-	
-	
 	// 리뷰 작성창 -----------------------------------------------------------------
 	
 	
 	// 검색 전에도 기본 리스트가 table에 뜨도록 추가
-	@GetMapping("/review/reviewWrite")
+	@GetMapping("/mypage/reviews/reviewWrite")
 	public String reviewWrite(HttpSession session, Model model) { 
 		
 		MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
@@ -75,7 +72,7 @@ public class ReviewController {
 	// 리뷰 검색창 -----------------------------------------------------------------
 	
 	// 리뷰 작성전 검색하기(검색기능)
-	@GetMapping("/review/reviewSearch")
+	@GetMapping("/mypage/reviews/reviewSearch")
 	public String reviewSearch(@RequestParam(value="searchType", required = false) String searchType, 
 							  @RequestParam(value="keyword", required = false) String keyword, 
 							  HttpSession session,
@@ -97,7 +94,7 @@ public class ReviewController {
 	 
 	// 리뷰 글쓰기 -----------------------------------------------------------------
 	
-	@PostMapping("/review/reviewWrite")
+	@PostMapping("/mypage/reviews/reviewWrite")
 	public String reviewSubmit(
 	        @RequestParam("buyer_idx") Long buyerIdx,
 	        @RequestParam("bid_idx") Long bidIdx,
@@ -117,12 +114,12 @@ public class ReviewController {
 
 	    reviewService.insertReview(vo);
 
-	    return "redirect:/review";
+	    return "redirect:/mypage/reviews";
 	}
 	
 	// 리뷰 상세보기 -----------------------------------------------------------------
 	
-	@GetMapping("/review/reviewDetail")
+	@GetMapping("/mypage/reviews/reviewDetail")
 	public String reviewDetail(@RequestParam("reviewIdx") Long reviewIdx, Model model) {
 		
 		ReviewVO review = reviewService.getReviewDetail(reviewIdx);
@@ -148,7 +145,7 @@ public class ReviewController {
 	    // 삭제
 	    reviewService.deleteReview(reviewIdx);
 
-	    return "redirect:/reviewAdmin";
+	    return "redirect:/reviewAdmin"; 
 	}
 	
 	// 영구 삭제
@@ -179,7 +176,7 @@ public class ReviewController {
 	    // 리뷰 취소 기능
 	    reviewService.cancelDelete(reviewIdx);
 		
-		return "views/review/reviewAdmin";
+		return "views/review/reviewAdmin"; 
 	}
 	
 	// 관리자 리뷰 페이지 -----------------------------------------------------------------

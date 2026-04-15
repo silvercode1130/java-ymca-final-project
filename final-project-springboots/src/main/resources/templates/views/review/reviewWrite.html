@@ -16,7 +16,7 @@
 			<h2>리뷰 작성하기</h2>
 		</div>
 		
-		<form action="/review/reviewSearch" method="get" class="search-box">
+		<form action="/mypage/reviews/reviewSearch" method="get" class="search-box">
 		    <select name="searchType">
 		    	<option value="">선택하기</option>
 		    	<option value="auctionTitle">경매 제목</option>
@@ -68,7 +68,7 @@
 		</div>
 		
 		<!-- 리뷰 작성 버튼 누르면 생김 -->
-		<form id="reviewForm" action="/review/reviewWrite" method="post" style="display:none;">
+		<form id="reviewForm" action="/mypage/reviews/reviewWrite" method="post" style="display:none;">
         
         <input type="hidden" name="buyer_idx" th:value="${session.loginUser.memIdx}">
         <input type="hidden" name="bid_idx" id="bid_idx">
@@ -77,7 +77,6 @@
 
 		<div>
 			<input type="text" id="reviewTitle" name="reviewTitle" placeholder="리뷰 제목(5글자 이상)"> 
-			
 		</div>
 		
 		<div id="stars" name="stars" style="font-size: 30px; cursor: pointer;">

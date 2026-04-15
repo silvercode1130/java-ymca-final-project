@@ -44,7 +44,7 @@
 						</td>
 						<td th:text="${#temporals.format(review.reviewRegdate, 'yyyy-MM-dd HH:mm')}"></td>
 						<td>
-							<button type="button" th:onclick="|location.href='@{/review/reviewDetail(reviewIdx=${review.reviewIdx})}'|">
+							<button type="button" th:onclick="|location.href='@{/mypage/reviews/reviewDetail(reviewIdx=${review.reviewIdx})}'|">
 							    상세보기
 							</button>
                         	<button th:if="${session.loginUser.memRoleIdx == 2}">
@@ -60,7 +60,7 @@
 		</div> 
 		
 		<div>
-			<input type="button" value="리뷰 남기기" onclick="location.href='review/reviewWrite'">
+			<input type="button" value="리뷰 남기기" onclick="location.href='/mypage/reviews/reviewWrite'">
 		</div>
 		
 		<div class="review">
@@ -126,7 +126,7 @@
 						</td>
 						<td th:text="${#temporals.format(review.reviewRegdate, 'yyyy-MM-dd HH:mm')}"></td>
 						<td>
-							<button type="button" th:onclick="|location.href='@{/review/reviewDetail(reviewIdx=${review.reviewIdx})}'|">
+							<button type="button" th:onclick="|location.href='@{/mypage/reviews/reviewDetail(reviewIdx=${review.reviewIdx})}'|">
 							    상세보기
 							</button>
                         	<button th:if="${session.loginUser.memRoleIdx == 2}">
