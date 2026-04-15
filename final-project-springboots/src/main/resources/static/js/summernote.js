@@ -1,5 +1,5 @@
 // Summernote 공통 초기화
-function initSummernote(targetId) {
+function initSummernote(targetId, onChangeCallback) {
   $(document).ready(function () {
     $('#' + targetId).summernote({
       lang: 'ko-KR',
@@ -8,6 +8,11 @@ function initSummernote(targetId) {
         onImageUpload: function (files) {
           for (var i = 0; i < files.length; i++) {
             uploadSummernoteImage(files[i], targetId);
+          }
+        },
+        onChange: function (contents) {
+          if (typeof onChangeCallback === 'function') {
+            onChangeCallback(contents);
           }
         }
       }
