@@ -90,7 +90,7 @@
 											class="absolute -bottom-1 left-1/2 h-[6px] w-[10px] -translate-x-1/2 rounded-full border border-[#7C7F88] border-t-0"></span>
 									</span>
 								</span> <span>나의 프로필</span>
-								</a> <a th:href="@{/mypage/posts}"
+								</a> <a th:href="@{/mypage/boards}"
 									class="w-full inline-flex items-center rounded-lg px-3 py-3 text-[15px] transition-colors"
 									th:classappend="${activeMenu == 'posts'} ?
                                   ' bg-gray-100 text-[#222222]' :
@@ -100,17 +100,7 @@
 										<span
 										class="block h-3 w-2 border border-[#7C7F88] border-t-2 rounded-[3px]"></span>
 								</span> <span>내가 쓴 글</span>
-								</a> <a th:href="@{/mypage/comments}"
-									class="w-full inline-flex items-center rounded-lg px-3 py-3 text-[15px] transition-colors"
-									th:classappend="${activeMenu == 'comments'} ?
-                                  ' bg-gray-100 text-[#222222]' :
-                                  ' text-[#4B4E57] hover:bg-gray-50 hover:text-[#222222]'">
-									<span
-									class="mr-2 inline-flex h-6 w-6 items-center justify-center rounded-full border border-[#C5C7CE]">
-										<span
-										class="block h-3 w-3 rounded-full border border-[#7C7F88] border-b-[6px]"></span>
-								</span> <span>내가 쓴 댓글</span>
-								</a> <a th:href="@{/mypage/reviews}"
+								</a> <a th:href="@{/review}"
 									class="w-full inline-flex items-center rounded-lg px-3 py-3 text-[15px] transition-colors"
 									th:classappend="${activeMenu == 'reviews'} ?
                                   ' bg-gray-100 text-[#222222]' :
@@ -119,7 +109,7 @@
 									class="mr-2 inline-flex h-6 w-6 items-center justify-center rounded-full border border-[#C5C7CE]">
 										<span
 										class="block h-0 w-0 border-l-[6px] border-r-[6px] border-b-[9px] border-l-transparent border-r-transparent border-b-[#7C7F88]"></span>
-								</span> <span>리뷰관리</span>
+								</span> <span>리뷰 관리</span>
 								</a>
 							</div>
 
@@ -130,7 +120,7 @@
 									정보</h3>
 							</div>
 							<div class="px-2 py-2 space-y-1 mb-2">
-								<a th:href="@{/mypage/member}"
+								<a th:href="@{/mypage/info}"
 									class="w-full inline-flex items-center rounded-lg px-3 py-3 text-[15px] transition-colors"
 									th:classappend="${activeMenu == 'member'} ?
                                   ' bg-gray-100 text-[#222222]' :
@@ -143,7 +133,7 @@
 											class="absolute -bottom-1 left-1/2 h-[6px] w-[10px] -translate-x-1/2 rounded-full border border-[#7C7F88] border-t-0"></span>
 									</span>
 								</span> <span>개인정보확인/수정</span>
-								</a> <a th:href="@{/mypage/address}"
+								</a> <a th:href="@{/mypage/addresses}"
 									class="w-full inline-flex items-center rounded-lg px-3 py-3 text-[15px] transition-colors"
 									th:classappend="${activeMenu == 'address'} ?
                                   ' bg-gray-100 text-[#222222]' :
