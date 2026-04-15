@@ -202,6 +202,11 @@ public class MemberController {
            return "redirect:" + redirectUrl;
        }
 
+       // redirect 파라미터가 있으면 해당 URL로 이동 // 수정되었음
+       if (redirect != null && !redirect.isBlank()) {
+           return "redirect:" + redirect;
+       }
+
         // 로그인 성공 시 해당 아이디 잠금 해제
         failCountMap.remove(memId);
         lockTimeMap.remove(memId);
@@ -212,9 +217,7 @@ public class MemberController {
             return "redirect:" + redirectUrl01;  
         }
 
-        session.setAttribute("memIdx", memberVO.getMemIdx());
-        System.out.println("memberVO.name : " + memberVO.getMemName());
-        
+ 
         // 결제용 index 추가
         session.setAttribute("memIdx", memberVO.getMemIdx());
         System.out.println("memberVO.name : " + memberVO.getMemName());
