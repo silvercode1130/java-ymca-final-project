@@ -216,7 +216,6 @@ public class MemberController {
             session.removeAttribute("loginRedirectUrl");
             return "redirect:" + redirectUrl01;  
         }
-
  
         // 결제용 index 추가
         session.setAttribute("memIdx", memberVO.getMemIdx());
