@@ -136,14 +136,14 @@ public class ReviewController {
 		MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
 
 		if (loginUser == null || loginUser.getMemRoleIdx() != 2) {
-			return "redirect:/main";
+			return "redirect:/main"; 
 		}
 
 		// 삭제
 		reviewService.deleteReview(reviewIdx);
 
 		return "redirect:/reviewAdmin";
-	}
+	} 
 
 	// 영구 삭제
 	@GetMapping("/review/hardDelete")
