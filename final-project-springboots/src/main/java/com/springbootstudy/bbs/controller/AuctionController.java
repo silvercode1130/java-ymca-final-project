@@ -452,6 +452,7 @@ public class AuctionController {
 
         try {
             bidService.selectWinner(bidIdx, auctionIdx);
+            auctionService.updateAuctionStatus(auctionIdx, 7);
             ra.addFlashAttribute("successMessage", "낙찰 처리가 완료되었습니다");
         } catch (IllegalArgumentException e) {
             ra.addFlashAttribute("bidError", e.getMessage());
