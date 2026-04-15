@@ -32,10 +32,10 @@ public class MemberAddrController {
         if (loginMember == null) {
             return "redirect:/members/login";
         }
-
+        
         model.addAttribute("member", loginMember);
 
-	    return "/views/member/memberAddrInsert";  
+        return "/views/member/memberAddrInsert";  
 	}
 	
 	// memberAddrInsert.html 의 Ajax 저장용
@@ -53,7 +53,7 @@ public class MemberAddrController {
 	// 주소목록창 -----------------------------------------------------------------
 	
 	// 저장된 값 보여주기 
-    @GetMapping("/mypage/addresses") 
+	@GetMapping("/mypage/addresses") 
     public String memberAddr(HttpSession session, Model model) {
 
         // 로그인 안했으면 쫓아내기
@@ -64,7 +64,7 @@ public class MemberAddrController {
 
         List<MemberAddrVO> addrList = memberAddrService.selectAddrList(loginMember.getMemIdx());
         model.addAttribute("addrList", addrList);
-        model.addAttribute("member", loginMember);
+        model.addAttribute("member", loginMember); 
 
         return "/views/member/memberAddr";
     }
