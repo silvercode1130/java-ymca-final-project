@@ -59,7 +59,7 @@ public class MemberProfileController {
     	if (!memImgFile.isEmpty()) {
 
     	    String uploadDir = System.getProperty("user.dir")
-    	            + "/src/main/resources/static/images/profileUpload/";
+    	            + "/src/main/resources/static/images/profile/";
 
     	    File dir = new File(uploadDir);
     	    if (!dir.exists()) {

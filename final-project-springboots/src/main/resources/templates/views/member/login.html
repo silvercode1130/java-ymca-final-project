@@ -56,44 +56,6 @@
 				}
 			}
 
-			// Naver SDK + 비번 토글
-			document
-					.addEventListener(
-							"DOMContentLoaded",
-							function() {
-								var naverLogin = new naver.LoginWithNaverId(
-										{
-											clientId : "2Rk518jWd9bxOQoKuUnD",
-											callbackUrl : "http://localhost:8080/members/naverCallback",
-											isPopup : false,
-											loginButton : {
-												color : "green",
-												type : 3,
-												height : 60
-											}
-										});
-								naverLogin.init();
-
-								const pwdInput = document
-										.getElementById("memPwd");
-								const togglePwd = document
-										.getElementById("togglePwd");
-
-								if (togglePwd && pwdInput) {
-									togglePwd
-											.addEventListener(
-													"click",
-													function() {
-														if (pwdInput.type === "password") {
-															pwdInput.type = "text";
-															this.innerHTML = '<i class="bi bi-eye-slash"></i>';
-														} else {
-															pwdInput.type = "password";
-															this.innerHTML = '<i class="bi bi-eye"></i>';
-														}
-													});
-								}
-							});
 		</script>
 
 		<div
