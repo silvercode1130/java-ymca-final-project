@@ -128,6 +128,7 @@ public class AuctionController {
             HttpSession session,
             RedirectAttributes ra) {
         MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
+
         if (loginUser == null) return "redirect:/members/login?redirect=/auctions/new";
 
         

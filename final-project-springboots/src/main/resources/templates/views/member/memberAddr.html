@@ -10,18 +10,34 @@
 	<div layout:fragment="content">
 
 		<div class="space-y-6">
-			<!-- 배송지 카드들 -->
-			<div th:if="${#lists.size(addressList) > 0}" class="space-y-4">
-				<div th:each="addr : ${addressList}"
-					class="border border-gray-200 bg-white rounded-xl"
-					th:classappend="${addr.defaultYn} == 'Y' ? ' ring-2 ring-[#7CBD00]' : ''">
-					<div class="px-6 py-4 border-b border-gray-100">
-						<div class="flex items-center justify-between">
-							<h3 class="text-sm sm:text-base font-semibold text-gray-900"
-								th:text="${addr.addressName}">자택</h3>
-							<span th:if="${addr.defaultYn} == 'Y'"
-								class="inline-flex items-center px-2 py-1 rounded-full bg-[#7CBD00] text-white text-[11px] font-medium">
-								대표 배송지 </span>
+
+			<!-- 제목 영역 -->
+			<div>
+				<h2 class="text-lg sm:text-xl font-bold text-[#222222]">배송지 관리</h2>
+				<p class="mt-1 text-xs sm:text-sm text-[#767676]">주문 시 사용할 배송지를
+					관리하세요</p>
+			</div>
+
+			<!-- 기존 form 유지 -->
+			<form action="/mypage/addresses/edit" id="memberAddr"
+				name="memberAddrForm">
+
+				<input type="hidden" name="addrIdx" id="deleteAddrIdx">
+
+				<!-- 배송지 카드 목록 -->
+				<div th:if="${addrList != null and !#lists.isEmpty(addrList)}"
+					class="space-y-4">
+
+					<div th:each="addr : ${addrList}"
+						class="border border-gray-200 bg-white rounded-xl"
+						th:classappend="${addr.isPrimary == 'Y'} ? ' ring-2 ring-[#7CBD00]' : ''">
+						<!-- 카드 헤더 -->
+						<div class="px-6 py-4 border-b border-gray-100">
+							<div class="flex items-center justify-between">
+								<span th:if="${addr.isPrimary == 'Y'}"
+									class="inline-flex items-center px-2 py-1 rounded-full bg-[#7CBD00] text-white text-[11px] font-medium">
+									대표 배송지 </span>
+							</div>
 						</div>
 					</div>
 					<div class="px-6 py-4 space-y-3">

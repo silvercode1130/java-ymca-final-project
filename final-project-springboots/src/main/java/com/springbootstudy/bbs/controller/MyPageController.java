@@ -117,5 +117,4 @@ public class MyPageController {
     return "views/mypage/sales";
   }
 
-
 }
