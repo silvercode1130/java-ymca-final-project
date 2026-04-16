@@ -18,14 +18,10 @@
 						<div class="flex items-center gap-3">
 							<div
 								class="flex items-center justify-center w-10 h-10 rounded-full bg-[#7CBD00]/10 text-[#7CBD00]">
-								<!-- 벨 아이콘 대신 이모지로 -->
-								🔔
-							</div>
-							<h1 class="text-2xl sm:text-3xl font-bold text-gray-900">알림
-							</h1>
+								🔔</div>
+							<h1 class="text-2xl sm:text-3xl font-bold text-gray-900">알림</h1>
 						</div>
 
-						<!-- 모두 읽음 버튼 (unreadCount 있을 때만) -->
 						<button th:if="${unreadCount != null and unreadCount > 0}"
 							type="button" onclick="markAllAsRead()"
 							class="hidden sm:inline-flex items-center text-sm px-3 py-1.5 rounded-full
@@ -35,20 +31,16 @@
 						</button>
 					</div>
 
-					<!-- 탭 (전체 / 읽지 않음) -->
+					<!-- 탭 -->
 					<div
 						class="flex items-center gap-2 border-b border-gray-200 text-sm">
 
-						<!-- 전체 -->
 						<a th:href="@{/notifications}"
 							th:class="${filter} == 'all' ?
                  'px-4 py-2 border-b-2 border-[#7CBD00] text-[#7CBD00] font-medium' :
                  'px-4 py-2 border-b-2 border-transparent text-gray-600 hover:text-gray-900'">
 							전체 <span th:text="'(' + ${notifications.size()} + ')'">(0)</span>
-						</a>
-
-						<!-- 읽지 않음 -->
-						<a th:href="@{/notifications/unread}"
+						</a> <a th:href="@{/notifications/unread}"
 							th:class="${filter} == 'unread' ?
                  'px-4 py-2 border-b-2 border-[#7CBD00] text-[#7CBD00] font-medium' :
                  'px-4 py-2 border-b-2 border-transparent text-gray-600 hover:text-gray-900'">
@@ -58,10 +50,10 @@
 					</div>
 				</div>
 
-				<!-- 알림 리스트 카드 -->
-				<div class="space-y-4">
+				<!-- 알림 리스트 -->
+				<div class="mb-2">
 
-					<!-- 알림이 없을 때 -->
+					<!-- 알림 없음 -->
 					<div th:if="${#lists.isEmpty(notifications)}"
 						class="bg-white rounded-lg border border-gray-200 p-12 text-center">
 						<div
@@ -72,8 +64,8 @@
 							알림이 없습니다</p>
 					</div>
 
-					<!-- 알림이 있을 때 -->
-					<div th:if="${!#lists.isEmpty(notifications)}">
+					<!-- 알림 있음 -->
+					<div th:if="${!#lists.isEmpty(notifications)}" class="space-y-4">
 
 						<div th:each="n : ${notifications}"
 							th:if="${filter} == 'unread' ? ${n.isRead} == 'N' : true"
@@ -84,7 +76,6 @@
 							<div class="p-4 sm:p-5">
 								<div class="flex items-start gap-4">
 
-									<!-- 아이콘 원 배경도 톤 차이 -->
 									<div
 										th:class="${n.isRead} == 'Y' ?
                                'flex-shrink-0 w-11 h-11 rounded-full bg-gray-100 flex items-center justify-center' :
@@ -94,10 +85,8 @@
                                     'text-gray-400' : 'text-gray-700 text-lg'">⏰</span>
 									</div>
 
-									<!-- 내용 영역 -->
 									<div class="flex-1 min-w-0">
 
-										<!-- 제목 + 우측 아이콘들 -->
 										<div class="flex items-start justify-between gap-2 mb-2">
 											<h3 th:text="${n.notificationTitle}"
 												th:class="${n.isRead == 'Y'} ?
@@ -107,25 +96,21 @@
 
 											<div
 												class="flex items-center gap-2 flex-shrink-0 text-gray-400">
-												<!-- 읽지 않았을 때만 '읽음' 버튼 노출 -->
 												<button type="button" th:if="${n.isRead == 'N'}"
 													class="hidden text-xs sm:inline-flex items-center hover:text-[#7CBD00]">
 													✔</button>
-												<!-- 삭제 아이콘 자리 -->
 												<button type="button"
 													class="hidden text-xs sm:inline-flex items-center hover:text-red-500">
 													🗑</button>
 											</div>
 										</div>
 
-										<!-- 메시지 -->
 										<p th:text="${n.notificationMessage}"
 											th:class="${n.isRead == 'Y'} ?
                                              'text-sm mb-2 text-gray-500' :
                                              'text-sm mb-2 text-gray-700'">
 											알림 내용</p>
 
-										<!-- 경매 제목 / 이동 링크 + 시간  -->
 										<div
 											class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
 											<div>
@@ -144,6 +129,7 @@
 									</div>
 								</div>
 							</div>
+
 						</div>
 
 					</div>
@@ -152,10 +138,7 @@
 			</div>
 
 			<script th:inline="javascript">
-				/* 간단 예시: 모두 읽음 호출용 (원하면 AJAX로 구현) */
 				function markAllAsRead() {
-					// TODO: /mypage/notifications/read-all 로 AJAX POST 날리기
-					// 일단은 페이지 리로드만
 					location.reload();
 				}
 			</script>
