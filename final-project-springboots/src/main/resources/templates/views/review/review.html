@@ -48,6 +48,10 @@
 									</p>
 								</div>
 								<div class="text-right text-xs text-yellow-500">
+<<<<<<< feature/board
+									<!-- 별점 아이콘 그대로 구현 -->
+=======
+>>>>>>> develop
 									<span th:with="star=${review.reviewStar}"> <span
 										th:each="i : ${#numbers.sequence(1, star)}"> <i
 											class="bi bi-star-fill"></i>
@@ -65,10 +69,11 @@
 							<div class="mt-2 flex gap-2 justify-end">
 								<button type="button"
 									class="inline-flex items-center px-3 py-1.5 rounded-md border border-gray-300 text-xs sm:text-sm text-gray-700 hover:bg-gray-50"
-									th:onclick="|location.href='@{/review/reviewDetail(reviewIdx=${review.reviewIdx})}'|">
+									th:onclick="|location.href='@{/mypage/reviews/reviewDetail(reviewIdx=${review.reviewIdx})}'|">
 									상세보기</button>
 								<button type="button"
 									th:if="${session.loginUser.memRoleIdx == 2}"
+									th:onclick="|location.href='@{/reviewDelete(reviewIdx=${review.reviewIdx})}'|"
 									class="inline-flex items-center px-3 py-1.5 rounded-md border border-red-300 text-xs sm:text-sm text-red-600 hover:bg-red-50">
 									삭제</button>
 							</div>
@@ -83,7 +88,7 @@
 					<!-- 리뷰 남기기 버튼 -->
 					<div class="pt-2">
 						<input type="button" value="리뷰 남기기"
-							onclick="location.href='review/reviewWrite'"
+							onclick="location.href='/mypage/reviews/reviewWrite'"
 							class="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2.5 bg-[#7CBD00] text-white rounded-md text-sm font-semibold hover:bg-[#6BAD00] cursor-pointer">
 					</div>
 
@@ -99,7 +104,16 @@
 						<h3 class="text-base sm:text-lg font-bold text-gray-900">거래 후
 							내가 받은 리뷰</h3>
 					</div>
+<<<<<<< feature/board
+					
+					<!-- 수정 시 내가 참고용으로 만든 것!! [지우지 말아주세요 - 디버깅할 때 쓰는 참고자료입니당] -->
+		    <!-- <div class="reviewTitle">별점 평균</div>
+		    <div>평균값 확인: <span th:text="${avg}"></span></div> -->
+					
+					<!-- 평균 별점 -->
+=======
 
+>>>>>>> develop
 					<div class="starAverage flex items-center gap-2 text-sm"
 						th:with="
                 avg=${avgRating != null ? avgRating : 0.0},
@@ -107,12 +121,27 @@
                 hasHalf=${avg - T(java.lang.Math).floor(avg) > 0},
                 half=${hasHalf ? 1 : 0},
                 empty=${5 - full - half}">
+<<<<<<< feature/board
+						<span class="text-xs text-gray-500">평균 별점</span>
+						<!-- 꽉 찬 별 -->
+						<span th:if="${full > 0}"
+							th:each="i : ${#numbers.sequence(1, full)}"> <i
+							class="bi bi-star-fill" style="color: gold;"></i>
+						</span>
+						<!-- 반쪽 별 -->
+						<span th:if="${half == 1}"> <i class="bi bi-star-half"
+							style="color: gold;"></i>
+						</span>
+						<!-- 빈 별 -->
+						<span th:if="${empty > 0}"
+=======
 						<span class="text-xs text-gray-500">평균 별점</span> <span
 							th:if="${full > 0}" th:each="i : ${#numbers.sequence(1, full)}">
 							<i class="bi bi-star-fill" style="color: gold;"></i>
 						</span> <span th:if="${half == 1}"> <i class="bi bi-star-half"
 							style="color: gold;"></i>
 						</span> <span th:if="${empty > 0}"
+>>>>>>> develop
 							th:each="i : ${#numbers.sequence(1, empty)}"> <i
 							class="bi bi-star" style="color: gold;"></i>
 						</span> <span class="text-xs text-gray-500 ml-1"
@@ -121,6 +150,10 @@
 				</div>
 
 				<div class="px-6 py-6">
+<<<<<<< feature/board
+					<!-- 받은 리뷰 리스트 -->
+=======
+>>>>>>> develop
 					<div th:if="${!#lists.isEmpty(receivedReviewList)}"
 						class="space-y-3">
 						<div th:each="review : ${receivedReviewList}"
@@ -134,7 +167,7 @@
 									</p>
 								</div>
 								<div class="text-right text-xs text-yellow-500">
-									<span th:with="star=${review.reviewStar}"> <span
+									<span th:with="star=${review.reviewStar}"> <span 
 										th:each="i : ${#numbers.sequence(1, star)}"> <i
 											class="bi bi-star-fill"></i>
 									</span> <span th:if="${star < 5}"
@@ -151,7 +184,7 @@
 							<div class="mt-2 flex gap-2 justify-end">
 								<button type="button"
 									class="inline-flex items-center px-3 py-1.5 rounded-md border border-gray-300 text-xs sm:text-sm text-gray-700 hover:bg-gray-50"
-									th:onclick="|location.href='@{/review/reviewDetail(reviewIdx=${review.reviewIdx})}'|">
+									th:onclick="|location.href='@{/mypage/reviews/reviewDetail(reviewIdx=${review.reviewIdx})}'|">
 									상세보기</button>
 								<button type="button"
 									th:if="${session.loginUser.memRoleIdx == 2}"
@@ -161,6 +194,10 @@
 						</div>
 					</div>
 
+<<<<<<< feature/board
+					<!-- 받은 리뷰 없을 때 -->
+=======
+>>>>>>> develop
 					<div th:if="${#lists.isEmpty(receivedReviewList)}"
 						class="py-10 text-center text-sm text-gray-500">받은 리뷰가 없습니다
 					</div>
