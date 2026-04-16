@@ -9,7 +9,7 @@
 	namespace="com.springbootstudy.bbs.mapper.NotificationMapper">
 
 	<!-- 알림 생성 -->
-	<insert id="insertNotification"
+	<insert id="insertNotification" useGeneratedKeys="true" keyProperty="notificationIdx" keyColumn="notification_idx"
 		parameterType="com.springbootstudy.bbs.domain.NotificationVO">
 		INSERT INTO notification
 		(receiver_idx, sender_idx,

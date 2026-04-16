@@ -1,11 +1,18 @@
 package com.springbootstudy.bbs.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import com.springbootstudy.bbs.domain.AuctionDTO;
+import com.springbootstudy.bbs.domain.BidDTO;
+import com.springbootstudy.bbs.domain.BoardVO;
 import com.springbootstudy.bbs.domain.NotificationVO;
+import com.springbootstudy.bbs.domain.ReplyVO;
 import com.springbootstudy.bbs.mapper.NotificationMapper;
 
 @Service
@@ -14,9 +21,31 @@ public class NotificationService {
 	@Autowired
 	private NotificationMapper notificationMapper;
 
+	@Autowired
+	private SimpMessagingTemplate simpMessagingTemplate;
+
 	// 알림 저장
 	public void sendNotification(NotificationVO notification) {
 		notificationMapper.insertNotification(notification);
+	}
+
+	// 알림 저장 + 실시간 푸시
+	@Transactional
+	public void sendAndPush(NotificationVO notification) {
+		if (notification == null || notification.getReceiverIdx() == null) {
+			throw new IllegalArgumentException("receiverIdx는 필수입니다.");
+		}
+
+		notification.setIsRead("N");
+		if (notification.getCreatedAt() == null) {
+			notification.setCreatedAt(LocalDateTime.now());
+		}
+
+		notificationMapper.insertNotification(notification);
+		simpMessagingTemplate.convertAndSend(
+				"/topic/notifications/" + notification.getReceiverIdx(),
+				notification
+		);
 	}
 
 	// 회원별 알림 전체 조회
@@ -42,5 +71,107 @@ public class NotificationService {
 	// 안 읽은 알림 개수 (정확한 갯수가 필요)
 	public int getUnreadCount(Long memIdx) {
 		return notificationMapper.countUnread(memIdx);
+	}
+
+	public void notifyNewBidToAuctionWriter(AuctionDTO auction, BidDTO bid) {
+		if (auction == null || bid == null || auction.getBuyerIdx() == null) {
+			return;
+		}
+		if (auction.getBuyerIdx().equals(bid.getBidderIdx())) {
+			return;
+		}
+
+		NotificationVO notification = new NotificationVO();
+		notification.setReceiverIdx(auction.getBuyerIdx());
+		notification.setSenderIdx(bid.getBidderIdx());
+		notification.setAuctionIdx(auction.getAuctionIdx());
+		notification.setBidIdx(bid.getBidIdx());
+		notification.setNotificationType("AUCTION_NEW_BID");
+		notification.setNotificationTitle("새 입찰이 등록되었습니다");
+		notification.setNotificationMessage("내 경매에 새로운 입찰이 도착했습니다.");
+		notification.setTargetUrl("/auctions/" + auction.getAuctionIdx());
+		sendAndPush(notification);
+	}
+
+	public void notifyAuctionBidClosedToOwner(AuctionDTO auction) {
+		if (auction == null || auction.getBuyerIdx() == null) {
+			return;
+		}
+
+		NotificationVO notification = new NotificationVO();
+		notification.setReceiverIdx(auction.getBuyerIdx());
+		notification.setAuctionIdx(auction.getAuctionIdx());
+		notification.setNotificationType("AUCTION_BID_CLOSED");
+		notification.setNotificationTitle("입찰 마감 알림");
+		notification.setNotificationMessage("입찰이 마감되어 낙찰자 결정을 진행할 수 있습니다.");
+		notification.setTargetUrl("/auctions/" + auction.getAuctionIdx());
+		sendAndPush(notification);
+	}
+
+	public void notifyAuctionDecisionClosedToOwner(AuctionDTO auction) {
+		if (auction == null || auction.getBuyerIdx() == null) {
+			return;
+		}
+
+		NotificationVO notification = new NotificationVO();
+		notification.setReceiverIdx(auction.getBuyerIdx());
+		notification.setAuctionIdx(auction.getAuctionIdx());
+		notification.setNotificationType("AUCTION_DECISION_CLOSED");
+		notification.setNotificationTitle("결정 마감 알림");
+		notification.setNotificationMessage("낙찰자 선정 기한이 종료되었습니다.");
+		notification.setTargetUrl("/auctions/" + auction.getAuctionIdx());
+		sendAndPush(notification);
+	}
+
+	public void notifyWinnerSelectedToBidder(Long auctionIdx, BidDTO winnerBid) {
+		if (winnerBid == null || winnerBid.getBidderIdx() == null || auctionIdx == null) {
+			return;
+		}
+
+		NotificationVO notification = new NotificationVO();
+		notification.setReceiverIdx(winnerBid.getBidderIdx());
+		notification.setSenderIdx(null);
+		notification.setAuctionIdx(auctionIdx);
+		notification.setBidIdx(winnerBid.getBidIdx());
+		notification.setNotificationType("AUCTION_WINNER_SELECTED");
+		notification.setNotificationTitle("낙찰자로 선정되었습니다");
+		notification.setNotificationMessage("입찰하신 건이 낙찰되어 거래를 진행할 수 있습니다.");
+		notification.setTargetUrl("/mypage/orders");
+		sendAndPush(notification);
+	}
+
+	public void notifyDecisionDeadlineToBidder(AuctionDTO auction, Long bidderIdx) {
+		if (auction == null || bidderIdx == null) {
+			return;
+		}
+
+		NotificationVO notification = new NotificationVO();
+		notification.setReceiverIdx(bidderIdx);
+		notification.setAuctionIdx(auction.getAuctionIdx());
+		notification.setNotificationType("AUCTION_DECISION_DEADLINE_REACHED");
+		notification.setNotificationTitle("결정 마감 기한 도래");
+		notification.setNotificationMessage("해당 경매의 낙찰자 선정 기한이 종료되었습니다.");
+		notification.setTargetUrl("/auctions/" + auction.getAuctionIdx());
+		sendAndPush(notification);
+	}
+
+	public void notifyNewReplyToBoardWriter(BoardVO board, ReplyVO reply) {
+		if (board == null || reply == null || board.getMemIdx() == null) {
+			return;
+		}
+		if (board.getMemIdx().equals(reply.getMemIdx())) {
+			return;
+		}
+
+		NotificationVO notification = new NotificationVO();
+		notification.setReceiverIdx(board.getMemIdx());
+		notification.setSenderIdx(reply.getMemIdx());
+		notification.setBoardIdx(board.getBoardIdx());
+		notification.setReplyIdx(reply.getReplyIdx());
+		notification.setNotificationType("BOARD_NEW_REPLY");
+		notification.setNotificationTitle("내 게시글에 새 댓글이 달렸습니다");
+		notification.setNotificationMessage("게시글에 새로운 댓글이 등록되었습니다.");
+		notification.setTargetUrl("/boards/" + board.getBoardTypeCode() + "/" + board.getBoardIdx());
+		sendAndPush(notification);
 	}
 }

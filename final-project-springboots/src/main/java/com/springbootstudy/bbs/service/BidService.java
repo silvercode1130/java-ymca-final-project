@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.springbootstudy.bbs.domain.AuctionDTO;
 import com.springbootstudy.bbs.domain.BidDTO;
 import com.springbootstudy.bbs.mapper.AuctionMapper;
 import com.springbootstudy.bbs.mapper.BidMapper;
@@ -22,6 +23,9 @@ public class BidService {
 	
 	@Autowired
 	private AuctionMapper auctionMapper;
+
+    @Autowired
+    private NotificationService notificationService;
 	
 	// 특정 경매의 입찰 리스트 조회 (이름 마스킹 포함)
 	public List<BidDTO> BidList(Long auctionIdx) {
@@ -57,6 +61,11 @@ public class BidService {
         
         // 위에서 생성된 itemIdx를 가지고 입찰(bid) 정보 저장
         bidMapper.insertBid(bidDto);
+
+        AuctionDTO auction = auctionMapper.auctionDetail(bidDto.getAuctionIdx());
+        if (auction != null) {
+            notificationService.notifyNewBidToAuctionWriter(auction, bidDto);
+        }
         
     }
     
@@ -80,6 +89,8 @@ public class BidService {
     // 낙찰 처리 (경매 상태 변경 및 타 입찰 거절 포함)
     @Transactional
     public void selectWinner(Long bidIdx, Long auctionIdx) {
+		BidDTO winnerBid = bidMapper.findBidById(bidIdx);
+
     	// 해당 입찰건을 '낙찰(2)' 상태로 변경
         int result = bidMapper.selectWinnerBid(bidIdx, auctionIdx);
         if (result == 0) {
@@ -90,6 +101,8 @@ public class BidService {
         
         // 경매 자체의 상태를 '마감(3)'으로 즉시 변경
         auctionMapper.updateAuctionStatus(auctionIdx, 3);
+
+		notificationService.notifyWinnerSelectedToBidder(auctionIdx, winnerBid);
     }
 
     // 입찰 단건 상세 조회
