@@ -24,9 +24,6 @@ import jakarta.servlet.http.HttpSession;
 public class MyPageController {
   @Autowired
   private MyPageService mypageService;
-  
-  @Autowired
-  private OrdersService ordersService;
 
   // 내 경매 목록
   @GetMapping("/auctions")
@@ -60,21 +57,6 @@ public class MyPageController {
     return "views/mypage/bids";
   }
   
-  // 내 거래 목록
-  @GetMapping("/orders")
-  public String myOrders(HttpSession session, Model model) {
-
-    MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
-    if (loginUser == null) {
-      return "redirect:/members/login";
-    }
-
-    Long memIdx = loginUser.getMemIdx();
-    List<OrdersVO> orders = ordersService.getMyOrders(memIdx);
-    model.addAttribute("orders", orders);
-
-    return "views/mypage/orders";
-  }
 
   // 내 게시글 목록
   @GetMapping("/boards")
