@@ -70,16 +70,23 @@
 								회원가입 </a>
 						</div>
 
-						<!-- 모바일: 간단 버전 (풀 메뉴는 나중에 JS로) -->
+						<!-- 모바일: 햄버거 메뉴 버튼 -->
 						<div class="md:hidden flex items-center gap-2">
 							<a th:if="${session.loginUser != null}"
 								th:href="@{/mypage/boards}"
 								class="px-2 py-1 rounded text-xs bg-gray-100 text-[#222222]">
 								<span th:text="${session.loginUser.memName}">내정보</span>
-							</a> <a th:if="${session.loginUser == null}" href="#"
+							</a>
+							<a th:if="${session.loginUser == null}" href="#"
 								onclick="location.href='/members/login?redirect=' + encodeURIComponent(location.href)"
 								class="px-2 py-1 rounded text-xs bg-[#7CBD00] text-white">
 								로그인 </a>
+							<!-- 햄버거 버튼 -->
+							<button onclick="openMobileNav()"
+									class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors"
+									aria-label="메뉴 열기">
+								<i class="bi bi-list text-[#222222] text-2xl"></i>
+							</button>
 						</div>
 
 					</div>
@@ -92,6 +99,9 @@
 				feather.replace();
 			}
 		</script>
+
+		<!-- 모바일 드로어 네비게이션 -->
+		<div th:replace="~{fragments/mobile-nav :: mobileNav}"></div>
 
 	</th:block>
 </body>
