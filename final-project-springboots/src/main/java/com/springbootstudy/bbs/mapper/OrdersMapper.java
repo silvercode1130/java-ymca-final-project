@@ -3,6 +3,7 @@ package com.springbootstudy.bbs.mapper;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import com.springbootstudy.bbs.domain.OrdersVO;
 
@@ -10,7 +11,7 @@ import com.springbootstudy.bbs.domain.OrdersVO;
 public interface OrdersMapper {
 
     // 낙찰된 특정 경매+입찰 조합으로 주문 한 건 조회
-    OrdersVO findByAuctionAndBid(Long auctionIdx, Long bidIdx);
+    OrdersVO findByAuctionAndBid(@Param("auctionIdx") Long auctionIdx,@Param("bidIdx") Long bidIdx);
 
     // bid 기준으로 주문 한 건 조회 (배송/수령확인에서 사용)
     OrdersVO findByBidIdx(Long bidIdx);
