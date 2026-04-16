@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import com.springbootstudy.bbs.domain.PaymentVO;
+import com.springbootstudy.bbs.domain.OrdersVO;
 import com.springbootstudy.bbs.mapper.PaymentMapper;
 
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 public class PaymentServiceImpl implements PaymentService {
 
   private final PaymentMapper paymentMapper;
+  private final OrdersService ordersService;
   private final RestTemplate restTemplate = new RestTemplate();
 
   // 토스페이먼츠 테스트 시크릿 키 (내 정보에 맞게 수정 가능)
@@ -89,6 +91,11 @@ public class PaymentServiceImpl implements PaymentService {
       // 5. 입찰 상태 변경 (2: 낙찰/결제성공)
       paymentMapper.updateBidStatus(paymentVO.getBidIdx(), 2);
 
+      OrdersVO order = ordersService.findByBidIdx(paymentVO.getBidIdx());
+      if (order != null) {
+        ordersService.markOrderPaid(order.getOrderIdx());
+      }
+
       return true;
     }
     return false;
@@ -104,6 +111,11 @@ public class PaymentServiceImpl implements PaymentService {
     }
     // 경매 상태 배송중(9)으로 변경
     paymentMapper.updateAuctionStatusByBidIdx(paymentVO.getBidIdx(), 9);
+
+    OrdersVO order = ordersService.findByBidIdx(paymentVO.getBidIdx());
+    if (order != null) {
+      ordersService.markOrderShipped(order.getOrderIdx());
+    }
   }
 
   @Override
@@ -114,5 +126,10 @@ public class PaymentServiceImpl implements PaymentService {
     paymentMapper.updateConfirmedAt(bidIdx);
     // 경매 상태 배송완료(10)으로 변경
     paymentMapper.updateAuctionStatusByBidIdx(bidIdx, 10);
+
+    OrdersVO order = ordersService.findByBidIdx(bidIdx);
+    if (order != null) {
+      ordersService.markOrderConfirmed(order.getOrderIdx());
+    }
   }
 }
