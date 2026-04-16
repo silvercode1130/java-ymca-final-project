@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+	<!-- 우하단 플로팅 버튼 영역 -->
+	<div th:fragment="floating-buttons"
+		class="fixed bottom-6 right-6 z-50 flex flex-col items-center gap-3">
+
+		<!-- 채팅 버튼 -->
+		<button type="button"
+			class="w-12 h-12 rounded-full bg-white shadow-md shadow-gray-300 flex items-center justify-center hover:shadow-lg transition"
+			onclick="openChatModal()">
+			<!-- feather icons: message-circle -->
+			<i data-feather="message-circle" class="w-5 h-5 text-gray-700"></i>
+		</button>
+
+		<!-- 페이지 위/아래 버튼 그룹 -->
+		<div class="flex flex-col gap-2">
+
+			<!-- 위로 버튼 -->
+			<button type="button" id="scrollTopBtn"
+				class="w-10 h-10 rounded-full bg-white shadow-md shadow-gray-300 flex items-center justify-center hover:shadow-lg transition disabled:opacity-40 disabled:hover:shadow-md"
+				onclick="scrollToTop()">
+				<!-- 꺾쇠 위 (chevron-up) -->
+				<i data-feather="chevron-up" class="w-4 h-4 text-gray-700"></i>
+			</button>
+
+			<!-- 아래로 버튼 -->
+			<button type="button" id="scrollBottomBtn"
+				class="w-10 h-10 rounded-full bg-white shadow-md shadow-gray-300 flex items-center justify-center hover:shadow-lg transition disabled:opacity-40 disabled:hover:shadow-md"
+				onclick="scrollToBottom()">
+				<!-- 꺾쇠 아래 (chevron-down) -->
+				<i data-feather="chevron-down" class="w-4 h-4 text-gray-700"></i>
+			</button>
+		</div>
+
+		<!-- 간단한 스크롤/상태 제어 스크립트 -->
+		<script th:inline="javascript">
+			function updateScrollButtons() {
+				const topBtn = document.getElementById('scrollTopBtn');
+				const bottomBtn = document.getElementById('scrollBottomBtn');
+
+				const scrollTop = window.pageYOffset
+						|| document.documentElement.scrollTop;
+				const scrollHeight = document.documentElement.scrollHeight;
+				const clientHeight = document.documentElement.clientHeight;
+
+				const isTop = scrollTop
+				<= 0;
+            const isBottom = scrollTop + clientHeight >= scrollHeight-2;
+
+				if (topBtn) {
+					topBtn.disabled = isTop;
+				}
+				if (bottomBtn) {
+					bottomBtn.disabled = isBottom;
+				}
+			}
+
+			function scrollToTop() {
+				window.scrollTo({
+					top : 0,
+					behavior : 'smooth'
+				});
+			}
+
+			function scrollToBottom() {
+				const scrollHeight = document.documentElement.scrollHeight;
+				window.scrollTo({
+					top : scrollHeight,
+					behavior : 'smooth'
+				});
+			}
+
+			function openChatModal() {
+				// TODO: 여기서 채팅 모달 open 로직 연결 (예: AlpineJS/JS 모달)
+				console.log('openChatModal() 호출됨');
+			}
+
+			window.addEventListener('scroll', updateScrollButtons);
+			window.addEventListener('load', function() {
+				updateScrollButtons();
+				if (window.feather) {
+					feather.replace();
+				}
+			});
+		</script>
+
+	</div>
+
+</body>
+</html>
