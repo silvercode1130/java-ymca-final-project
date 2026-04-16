@@ -15,7 +15,7 @@ import com.springbootstudy.bbs.domain.BidDTO;
 import com.springbootstudy.bbs.domain.BoardVO;
 import com.springbootstudy.bbs.domain.MemberVO;
 import com.springbootstudy.bbs.domain.MyPagePaymentVO;
-import com.springbootstudy.bbs.domain.OrderVO;
+
 import com.springbootstudy.bbs.mapper.DeliveryMapper;
 import com.springbootstudy.bbs.mapper.PaymentMapper;
 import com.springbootstudy.bbs.service.MyPageService;
@@ -73,22 +73,6 @@ public class MyPageController {
     model.addAttribute("bids", bidViews);
 
     return "views/mypage/bids";
-  }
-
-  // 내 거래 목록
-  @GetMapping("/orders")
-  public String myOrders(HttpSession session, Model model) {
-
-    MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
-    if (loginUser == null) {
-      return "redirect:/members/login";
-    }
-
-    Long memIdx = loginUser.getMemIdx();
-    List<OrderVO> orders = null; // 기존 서비스 있으면 사용
-    model.addAttribute("orders", orders);
-
-    return "views/mypage/orders";
   }
 
   // 내 게시글 목록

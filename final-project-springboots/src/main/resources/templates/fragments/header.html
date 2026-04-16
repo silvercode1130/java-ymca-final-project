@@ -35,7 +35,7 @@
 						<!-- 로그인 O (데스크탑) -->
 						<div class="hidden md:flex items-center gap-3" th:if="${session.loginUser != null}">
 							<!-- 알림 버튼 -->
-							<a th:href="@{/#}"
+							<a th:href="@{/notifications}"
 								class="relative w-9 h-9 rounded-full hover:bg-gray-100 transition-colors flex items-center justify-center">
 								<i data-feather="bell" class="w-4 h-4 text-[#222222]"></i> <!-- 추후 새 알림 여부에 따라 조건부 렌더링 -->
 								<span class="absolute top-1 right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white"></span>
@@ -65,7 +65,7 @@
 								회원가입 </a>
 						</div>
 
-						<!-- 모바일: 간단 버전 (풀 메뉴는 나중에 JS로) -->
+						<!-- 모바일: 간단 버전 -->
 						<div class="md:hidden flex items-center gap-2">
 							<a th:if="${session.loginUser != null}" th:href="@{/mypage/boards}"
 								class="px-2 py-1 rounded text-xs bg-gray-100 text-[#222222]">
