@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.springbootstudy.bbs.mapper.AlarmMapper">
+
+    <resultMap id="AlarmResultMap" type="AlarmVO">
+        <id property="alarmIdx" column="alarm_idx"/>
+        <result property="receiverIdx" column="receiver_idx"/>
+        <result property="senderIdx" column="sender_idx"/>
+        <result property="auctionIdx" column="auction_idx"/>
+        <result property="bidIdx" column="bid_idx"/>
+        <result property="alarmType" column="alarm_type"/>
+        <result property="alarmContent" column="alarm_content"/>
+        <result property="targetUrl" column="target_url"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="isRead" column="is_read"/>
+    </resultMap>
+
+    <insert id="insertAlarm" parameterType="AlarmVO" useGeneratedKeys="true" keyProperty="alarmIdx">
+        INSERT INTO alarm (
+            receiver_idx,
+            sender_idx,
+            auction_idx,
+            bid_idx,
+            alarm_type,
+            alarm_content,
+            target_url,
+            created_at,
+            is_read
+        ) VALUES (
+            #{receiverIdx},
+            #{senderIdx},
+            #{auctionIdx},
+            #{bidIdx},
+            #{alarmType},
+            #{alarmContent},
+            #{targetUrl},
+            NOW(),
+            'N'
+        )
+    </insert>
+
+</mapper>
