@@ -163,8 +163,10 @@ public class BoardController {
             HttpServletRequest request,
             HttpSession session) {
         MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
-        if (loginUser == null)
-            return "redirect:/members/login";
+        if (loginUser == null) {
+            String redirectUrl = "/boards/" + typeCode + "/new" + ("all".equals(from) ? "?from=all" : "");
+            return "redirect:/members/login?redirect=" + redirectUrl;
+        }
 
         BoardTypeVO boardType = boardService.getBoardTypeByCode(typeCode);
         if (boardType == null)
@@ -226,13 +228,17 @@ public class BoardController {
     public String delete(
             @PathVariable("typeCode") String typeCode,
             @PathVariable("boardIdx") Long boardIdx,
+            @RequestParam(value = "from", required = false) String from,
+            @RequestParam(value = "page", defaultValue = "1") int page,
             HttpSession session) {
         MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
         if (loginUser == null)
             return "redirect:/members/login";
 
         boardService.removeBoard(boardIdx);
-        return "redirect:/boards/" + typeCode;
+        return "all".equals(from)
+                ? "redirect:/boards?page=" + page
+                : "redirect:/boards/" + typeCode + "?page=" + page;
     }
 
     // ── 댓글 등록 ────────────────────────────────────────────
@@ -249,8 +255,16 @@ public class BoardController {
             HttpServletRequest request,
             HttpSession session) {
         MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
-        if (loginUser == null)
-            return "redirect:/members/login";
+        if (loginUser == null) {
+            String redirectUrl = "/boards/" + typeCode + "/" + boardIdx
+                    + "?replyPage=" + replyPage + "&sortType=" + sortType
+                    + (from != null ? "&from=" + from : "") + "&page=" + page;
+            try {
+                return "redirect:/members/login?redirect=" + java.net.URLEncoder.encode(redirectUrl, "UTF-8");
+            } catch (Exception e) {
+                return "redirect:/members/login";
+            }
+        }
 
         ReplyVO reply = new ReplyVO();
         reply.setBoardIdx(boardIdx);

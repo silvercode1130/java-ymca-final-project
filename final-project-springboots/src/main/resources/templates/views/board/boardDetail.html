@@ -120,6 +120,8 @@
 					<form
 						th:action="@{/boards/{tc}/{id}/delete(tc=${board.boardTypeCode}, id=${board.boardIdx})}"
 						method="post">
+						<input type="hidden" name="from" th:value="${param.from}">
+						<input type="hidden" name="page" th:value="${param.page}">
 						<button type="submit" onclick="return confirm('삭제하시겠습니까?')"
 							class="inline-flex items-center gap-1 px-3 py-1.5 rounded-md text-xs sm:text-sm
                          border border-red-300 text-red-600 bg-white hover:bg-red-50">
@@ -209,7 +211,7 @@
 
 												<!-- 댓글 수정/삭제 -->
 												<div
-													th:if="${session.loginUser != null and (session.loginUser.memIdx == board.memIdx or session.loginUser.memRoleIdx == 2)}"
+													th:if="${session.loginUser != null and (session.loginUser.memIdx == r.memIdx or session.loginUser.memRoleIdx == 2)}"
 													class="flex items-center gap-1">
 													<button type="button"
 														class="inline-flex items-center px-2 py-1 rounded-md text-[11px] sm:text-xs
@@ -291,6 +293,8 @@
 													th:value="${r.replyIdx}"> <input type="hidden"
 													name="replyPage" th:value="${replyPage}"> <input
 													type="hidden" name="sortType" th:value="${sortType}">
+												<input type="hidden" name="from" th:value="${param.from}">
+												<input type="hidden" name="page" th:value="${param.page}">
 												<textarea name="replyContent" rows="2"
 													class="form-control form-control-sm mb-1"
 													placeholder="답글을 입력하세요"></textarea>

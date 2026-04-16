@@ -264,6 +264,12 @@
 			</div>
 		</div>
 
+		<script th:src="@{/js/board.js}"></script>
+		<script>
+			// 게시글 등록 성공 후 draft 삭제
+			if (typeof clearDraftOnSuccess === 'function') clearDraftOnSuccess();
+		</script>
+
 	</th:block>
 </body>
 </html>

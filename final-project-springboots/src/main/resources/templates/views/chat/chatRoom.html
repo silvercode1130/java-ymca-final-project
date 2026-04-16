@@ -16,8 +16,7 @@
 				onclick="window.close();">닫기</button>
 		</header>
 
-		<main id="chatContainer"
-			class="flex-grow-1 overflow-auto p-3 bg-light">
+		<main id="chatContainer" class="flex-grow-1 overflow-auto p-3 bg-light">
 
 			<!-- 대화가 없을 때 -->
 			<div id="emptyMessageBox" th:if="${#lists.isEmpty(messageList)}">
@@ -31,8 +30,7 @@
 				<div th:each="msg : ${messageList}"
 					th:classappend="${msg.senderIdx == session.loginUser.memIdx} ? ' text-end' : ' text-start'">
 
-					<div
-						th:classappend="${msg.senderIdx == session.loginUser.memIdx} ? ' bg-dark text-white' : ' bg-white'"
+					<div th:classappend="${msg.senderIdx == session.loginUser.memIdx} ? ' bg-dark text-white' : ' bg-white'"
 						class="d-inline-block px-2 py-1 my-1 rounded small">
 						<span th:text="${msg.messageContent}">메시지 내용</span>
 					</div>
@@ -42,8 +40,8 @@
 
 		<!-- 입력 폼 -->
 		<footer class="border-t bg-white px-2 py-2">
-			<form id="chatForm" th:action="@{|/chats/${chatroomIdx}/messages|}"
-				method="post" class="flex gap-2">
+			<form id="chatForm" th:action="@{|/chats/${chatroomIdx}/messages|}" method="post"
+				class="flex gap-2">
 				<input id="messageContent" type="text" name="messageContent"
 					class="flex-1 border rounded px-2 py-1 text-sm"
 					placeholder="메시지를 입력하세요" autocomplete="off">
@@ -55,14 +53,12 @@
 
 	</div>
 
-	<script
-		src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
-	<script
-		src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
 	<script th:inline="javascript">
 		/*<![CDATA[*/
-		const chatroomIdx = /*[[${chatroomIdx}]]*/0;
-		const currentUserIdx = /*[[${session.loginUser.memIdx}]]*/0;
+		const chatroomIdx = /*[[${chatroomIdx}]]*/ 0;
+		const currentUserIdx = /*[[${session.loginUser.memIdx}]]*/ 0;
 
 		const chatContainer = document.getElementById('chatContainer');
 		const messageListWrap = document.getElementById('messageListWrap');
@@ -112,11 +108,10 @@
 
 			stompClient.connect({}, function() {
 				websocketConnected = true;
-				stompClient.subscribe('/topic/chatroom/' + chatroomIdx,
-						function(frame) {
-							const message = JSON.parse(frame.body);
-							appendMessage(message);
-						});
+				stompClient.subscribe('/topic/chatroom/' + chatroomIdx, function(frame) {
+					const message = JSON.parse(frame.body);
+					appendMessage(message);
+				});
 			}, function() {
 				websocketConnected = false;
 			});
@@ -135,9 +130,9 @@
 			}
 
 			stompClient.send('/app/chat/send', {}, JSON.stringify({
-				chatroomIdx : chatroomIdx,
-				senderIdx : currentUserIdx,
-				messageContent : content
+				chatroomIdx: chatroomIdx,
+				senderIdx: currentUserIdx,
+				messageContent: content
 			}));
 
 			messageInput.value = '';

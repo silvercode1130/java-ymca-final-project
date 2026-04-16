@@ -129,9 +129,16 @@ public class BoardService {
             return 1;
         } else {
             ReplyVO parent = boardMapper.findReplyById(parentReplyIdx);
-            int ref   = parent.getReplyRef();
-            int step  = parent.getReplyStep();
-            int depth = parent.getReplyDepth();
+            if (parent == null) return -2; // 부모 댓글 없음
+
+            Integer replyRef = parent.getReplyRef();
+            Integer replyStep = parent.getReplyStep();
+            Integer replyDepth = parent.getReplyDepth();
+
+            // replyRef가 null이면 자기 자신의 idx를 ref로 사용
+            int ref   = (replyRef != null) ? replyRef : parent.getReplyIdx().intValue();
+            int step  = (replyStep != null) ? replyStep : 0;
+            int depth = (replyDepth != null) ? replyDepth : 0;
 
             // 대댓글 depth 3 제한 (대대대댓글까지만 허용)
             if (depth >= 3) {
