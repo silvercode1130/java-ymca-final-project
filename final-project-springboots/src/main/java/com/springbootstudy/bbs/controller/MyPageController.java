@@ -13,7 +13,9 @@ import com.springbootstudy.bbs.domain.BidDTO;
 import com.springbootstudy.bbs.domain.BoardVO;
 import com.springbootstudy.bbs.domain.MemberVO;
 import com.springbootstudy.bbs.domain.MyPagePaymentVO;
+import com.springbootstudy.bbs.domain.OrdersVO;
 import com.springbootstudy.bbs.service.MyPageService;
+import com.springbootstudy.bbs.service.OrdersService;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -54,6 +56,7 @@ public class MyPageController {
 
     return "views/mypage/bids";
   }
+  
 
   // 내 게시글 목록
   @GetMapping("/boards")
