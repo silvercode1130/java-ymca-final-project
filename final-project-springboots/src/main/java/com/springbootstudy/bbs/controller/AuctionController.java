@@ -26,7 +26,6 @@ import lombok.extern.slf4j.Slf4j;
 
 @Controller
 @Slf4j
-
 public class AuctionController {
 
     // 이미지 저장 경로 & 기본 이미지 경로 상수
