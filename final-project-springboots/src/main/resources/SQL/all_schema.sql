@@ -477,6 +477,7 @@ CREATE TABLE orders (
     KEY idx_order_bid      (bid_idx),
     KEY idx_order_buyer    (buyer_idx),
     KEY idx_order_seller   (seller_idx),
+    UNIQUE KEY ux_order_bid (bid_idx),
 
     CONSTRAINT fk_order_auction FOREIGN KEY (auction_idx)
         REFERENCES auction(auction_idx) ON DELETE CASCADE,
@@ -487,7 +488,8 @@ CREATE TABLE orders (
     CONSTRAINT fk_order_seller FOREIGN KEY (seller_idx)
         REFERENCES member(mem_idx) ON DELETE CASCADE,
 
-    CONSTRAINT ck_order_is_settled CHECK (is_settled IN ('Y','N'))
+    CONSTRAINT ck_order_is_settled CHECK (is_settled IN ('Y','N')),
+    CONSTRAINT ck_order_status CHECK (order_status IN ('CREATED','PAID','SHIPPED','CONFIRMED','CANCELED'))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='역경매 주문/거래 마스터';
 
 /* ==========================================

@@ -53,23 +53,33 @@
                            th:classappend="${activeMenu == 'myAuctions'} ?
                                   ' bg-gray-100 text-[#222222]' :
                                   ' text-[#767676] hover:bg-gray-50 hover:text-[#222222]'">
-                           <span
-                           class="mr-2 inline-flex h-6 w-6 items-center justify-center rounded-md border border-[#222222]">
-                              <span
-                              class="block h-3 w-3 rounded-[3px] border border-[#222222]"></span>
-                        </span> <span>나의 경매 목록</span>
-                        </a> <a th:href="@{/mypage/bids}"
-                           class="w-full inline-flex items-center rounded-lg px-3 py-3 text-[15px] transition-colors"
-                           th:classappend="${activeMenu == 'myBids'} ?
+									<span
+									class="mr-2 inline-flex h-6 w-6 items-center justify-center rounded-md border border-[#222222]">
+										<span
+										class="block h-3 w-3 rounded-[3px] border border-[#222222]"></span>
+								</span> <span>내 경매 내역</span>
+								</a> <a th:href="@{/mypage/bids}"
+									class="w-full inline-flex items-center rounded-lg px-3 py-3 text-[15px] transition-colors"
+									th:classappend="${activeMenu == 'myBids'} ?
                                   ' bg-gray-100 text-[#222222]' :
                                   ' text-[#767676] hover:bg-gray-50 hover:text-[#222222]'">
-                           <span
-                           class="mr-2 inline-flex h-6 w-6 items-center justify-center rounded-md border border-[#C5C7CE]">
-                              <span
-                              class="block h-3 w-3 border-l-2 border-b-2 border-[#7C7F88] rotate-[-35deg] translate-x-[1px]"></span>
-                        </span> <span>나의 입찰 목록</span>
-                        </a>
-                     </div>
+									<span
+									class="mr-2 inline-flex h-6 w-6 items-center justify-center rounded-md border border-[#C5C7CE]">
+										<span
+										class="block h-3 w-3 border-l-2 border-b-2 border-[#7C7F88] rotate-[-35deg] translate-x-[1px]"></span>
+								</span> <span>내 입찰 내역</span>
+								</a> <a th:href="@{/mypage/orders}"
+									class="w-full inline-flex items-center rounded-lg px-3 py-3 text-[15px] transition-colors"
+									th:classappend="${activeMenu == 'myOrders'} ?
+                                  ' bg-gray-100 text-[#222222]' :
+                                  ' text-[#767676] hover:bg-gray-50 hover:text-[#222222]'">
+									<span
+									class="mr-2 inline-flex h-6 w-6 items-center justify-center rounded-md border border-[#C5C7CE]">
+										<span
+										class="block h-3 w-3 border-l-2 border-b-2 border-[#7C7F88] rotate-[-35deg] translate-x-[1px]"></span>
+								</span> <span>내 거래 내역</span>
+								</a>
+							</div>
 
                      <!-- MY 활동 -->
                      <div class="px-4 py-3 border-y border-gray-100 bg-gray-50 mt-1">
@@ -106,13 +116,13 @@
                            th:classappend="${activeMenu == 'reviews'} ?
                                   ' bg-gray-100 text-[#222222]' :
                                   ' text-[#4B4E57] hover:bg-gray-50 hover:text-[#222222]'">
-                           <span
-                           class="mr-2 inline-flex h-6 w-6 items-center justify-center rounded-full border border-[#C5C7CE]">
-                              <span
-                              class="block h-0 w-0 border-l-[6px] border-r-[6px] border-b-[9px] border-l-transparent border-r-transparent border-b-[#7C7F88]"></span>
-                        </span> <span>리뷰 관리</span>
-                        </a>
-                     </div>
+									<span
+									class="mr-2 inline-flex h-6 w-6 items-center justify-center rounded-full border border-[#C5C7CE]">
+										<span
+										class="block h-0 w-0 border-l-[6px] border-r-[6px] border-b-[9px] border-l-transparent border-r-transparent border-b-[#7C7F88]"></span>
+								</span> <span>내 리뷰 관리</span>
+								</a>
+							</div>
 
                      <!-- MY 정보 -->
                      <div class="px-4 py-3 border-y border-gray-100 bg-gray-50 mt-1">
