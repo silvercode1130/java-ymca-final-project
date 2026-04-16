@@ -20,6 +20,7 @@ import com.springbootstudy.bbs.domain.MemberVO;
 import com.springbootstudy.bbs.service.AuctionService;
 import com.springbootstudy.bbs.service.BidService;
 import com.springbootstudy.bbs.service.ChatRoomService;
+import com.springbootstudy.bbs.service.OrdersService;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
@@ -42,6 +43,9 @@ public class AuctionController {
 
     @Autowired
     private ChatRoomService chatRoomService;
+    
+    @Autowired
+    private OrdersService ordersService;
 
     // 경매 목록 (/auctions)
     @GetMapping("/auctions")
@@ -128,11 +132,8 @@ public class AuctionController {
             HttpSession session,
             RedirectAttributes ra) {
         MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
-<<<<<<< feature/board
         if (loginUser == null) return "redirect:/members/login?redirect=/auctions/new";
-=======
-        if (loginUser == null) return "redirect:/members/login";
->>>>>>> develop
+
         
         // DTO에 로그인한 사용자의 고유 번호(buyerIdx) 세팅
         dto.setBuyerIdx(loginUser.getMemIdx());
@@ -465,7 +466,12 @@ public class AuctionController {
 
         try {
             bidService.selectWinner(bidIdx, auctionIdx);
-            auctionService.updateAuctionStatus(auctionIdx, 7);
+            // orders 처리를 위한 부분
+            BidDTO bid = bidService.findBidById(bidIdx);		// 입찰 정보 받아오기
+            ordersService.createOrderOnWinner(auction, bid);	// 거래 객체 생성
+            auctionService.updateAuctionStatus(auctionIdx, 3);	// 경매상태 마감처리
+            
+//            auctionService.updateAuctionStatus(auctionIdx, 7);	// 기존 로직 - 여차할 때 복구합니다
             ra.addFlashAttribute("successMessage", "낙찰 처리가 완료되었습니다");
         } catch (IllegalArgumentException e) {
             ra.addFlashAttribute("bidError", e.getMessage());
