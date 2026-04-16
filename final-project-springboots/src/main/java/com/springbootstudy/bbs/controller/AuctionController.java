@@ -128,11 +128,7 @@ public class AuctionController {
             HttpSession session,
             RedirectAttributes ra) {
         MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
-<<<<<<< feature/board
         if (loginUser == null) return "redirect:/members/login?redirect=/auctions/new";
-=======
-        if (loginUser == null) return "redirect:/members/login";
->>>>>>> develop
         
         // DTO에 로그인한 사용자의 고유 번호(buyerIdx) 세팅
         dto.setBuyerIdx(loginUser.getMemIdx());
