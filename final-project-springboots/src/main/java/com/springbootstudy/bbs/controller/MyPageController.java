@@ -109,6 +109,4 @@ public class MyPageController {
 
 	    return "views/mypage/memberDelete";
 	  }
-
-
 }

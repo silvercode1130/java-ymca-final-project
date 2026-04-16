@@ -19,29 +19,51 @@
 					<aside class="lg:col-span-1">
 						<div
 							class="bg-white border border-gray-100 rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.03)] sticky top-24">
-							<div class="px-4 py-3 border-b border-gray-100">
+							<!-- Mobile accordion header -->
+							<button id="sidebar-accordion-toggle"
+								class="lg:hidden w-full flex items-center justify-between px-4 py-3 border-b border-gray-100 text-sm font-semibold text-[#222222]"
+								aria-expanded="false"
+								aria-controls="sidebar-accordion-body"
+								onclick="toggleSidebarAccordion()">
+								<span class="flex items-center gap-2">
+									<span>종목별 게시판</span>
+									<span id="sidebar-current-board"
+										class="text-xs font-normal text-[#767676]"
+										th:text="${currentType != null} ? '· ' + ${currentType.boardTypeName} : '· 전체 게시판'">
+									</span>
+								</span>
+								<i class="bi bi-chevron-down text-[#767676] transition-transform duration-300"
+									id="sidebar-accordion-icon"></i>
+							</button>
+							<!-- Desktop header (hidden on mobile) -->
+							<div class="hidden lg:block px-4 py-3 border-b border-gray-100">
 								<h3 class="text-sm font-semibold text-[#222222]">종목별 게시판</h3>
 							</div>
 
-							<div class="px-2 py-2">
-								<!-- 전체 게시판 -->
-								<a th:href="@{/boards}"
-									class="w-full inline-flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-colors"
-									th:classappend="${typeCode == null} ?
-                    ' bg-gray-100 text-[#222222]' :
-                    ' text-[#767676] hover:bg-gray-50 hover:text-[#222222]'">
-									전체 게시판 </a>
-
-								<!-- 개별 게시판 -->
-								<div class="mt-1 space-y-1">
-									<a th:each="bt : ${boardTypes}"
-										th:href="@{/boards/{tc}(tc=${bt.boardTypeCode})}"
+							<div id="sidebar-accordion-body"
+								role="region"
+								aria-labelledby="sidebar-accordion-toggle"
+								class="overflow-hidden transition-[max-height] duration-300 ease-in-out max-h-0 lg:max-h-none lg:overflow-visible">
+								<div class="px-2 py-2">
+									<!-- 전체 게시판 -->
+									<a th:href="@{/boards}"
 										class="w-full inline-flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-colors"
-										th:classappend="${typeCode != null and typeCode == bt.boardTypeCode} ?
+										th:classappend="${typeCode == null} ?
                       ' bg-gray-100 text-[#222222]' :
                       ' text-[#767676] hover:bg-gray-50 hover:text-[#222222]'">
-										<span th:text="${bt.boardTypeName}">축구</span>
-									</a>
+										전체 게시판 </a>
+
+									<!-- 개별 게시판 -->
+									<div class="mt-1 space-y-1">
+										<a th:each="bt : ${boardTypes}"
+											th:href="@{/boards/{tc}(tc=${bt.boardTypeCode})}"
+											class="w-full inline-flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-colors"
+											th:classappend="${typeCode != null and typeCode == bt.boardTypeCode} ?
+                        ' bg-gray-100 text-[#222222]' :
+                        ' text-[#767676] hover:bg-gray-50 hover:text-[#222222]'">
+											<span th:text="${bt.boardTypeName}">축구</span>
+										</a>
+									</div>
 								</div>
 							</div>
 						</div>
@@ -128,7 +150,7 @@
 										class="w-full sm:w-40 rounded-md border border-gray-300 bg-white px-2 py-2 text-xs sm:text-sm">
 										<option value="all"
 											th:selected="${searchType == null or searchType == 'all'}">
-											제목</option>
+											제목+내용</option>
 										<option value="title" th:selected="${searchType == 'title'}">제목</option>
 										<option value="content"
 											th:selected="${searchType == 'content'}">내용</option>
@@ -268,6 +290,39 @@
 		<script>
 			// 게시글 등록 성공 후 draft 삭제
 			if (typeof clearDraftOnSuccess === 'function') clearDraftOnSuccess();
+		</script>
+		<script>
+			function toggleSidebarAccordion() {
+				var toggle = document.getElementById('sidebar-accordion-toggle');
+				var body = document.getElementById('sidebar-accordion-body');
+				var icon = document.getElementById('sidebar-accordion-icon');
+				var currentBoard = document.getElementById('sidebar-current-board');
+
+				if (!toggle || !body) return;
+
+				var isExpanded = toggle.getAttribute('aria-expanded') === 'true';
+
+				if (isExpanded) {
+					// Collapse: set current scrollHeight first, then animate to 0
+					body.style.maxHeight = body.scrollHeight + 'px';
+					requestAnimationFrame(function() {
+						body.style.maxHeight = '0px';
+					});
+					toggle.setAttribute('aria-expanded', 'false');
+					if (icon) icon.style.transform = 'rotate(0deg)';
+					if (currentBoard) currentBoard.style.display = '';
+				} else {
+					// Expand: animate from 0 to scrollHeight, then set to none
+					body.style.maxHeight = body.scrollHeight + 'px';
+					body.addEventListener('transitionend', function handler() {
+						body.style.maxHeight = 'none';
+						body.removeEventListener('transitionend', handler);
+					});
+					toggle.setAttribute('aria-expanded', 'true');
+					if (icon) icon.style.transform = 'rotate(180deg)';
+					if (currentBoard) currentBoard.style.display = 'none';
+				}
+			}
 		</script>
 
 	</th:block>

@@ -34,13 +34,17 @@
 						<!-- 카드 헤더 -->
 						<div class="px-6 py-4 border-b border-gray-100">
 							<div class="flex items-center justify-between">
-								<h3 class="text-sm sm:text-base font-semibold text-gray-900"
-									th:text="${addr.addrName != null ? addr.addrName : '배송지'}">
-									자택</h3>
 								<span th:if="${addr.isPrimary == 'Y'}"
 									class="inline-flex items-center px-2 py-1 rounded-full bg-[#7CBD00] text-white text-[11px] font-medium">
 									대표 배송지 </span>
 							</div>
+						</div>
+					</div>
+					<div class="px-6 py-4 space-y-3">
+						<div>
+							<div class="text-sm text-gray-500 mb-1">주소</div>
+							<div class="text-sm text-gray-900" th:text="${addr.address}">
+								서울시 강남구 테헤란로 123</div>
 						</div>
 
 						<!-- 카드 내용 -->

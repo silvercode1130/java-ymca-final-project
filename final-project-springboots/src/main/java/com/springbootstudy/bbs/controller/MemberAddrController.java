@@ -29,6 +29,7 @@ public class MemberAddrController {
 
         MemberVO loginMember = (MemberVO) session.getAttribute("loginUser");
 
+        // 로그인 안한 사람 로그인으로
         if (loginMember == null) {
             return "redirect:/members/login";
         }
@@ -46,8 +47,6 @@ public class MemberAddrController {
 		// 두개 확인 필요
 	    int result = memberAddrService.registerAddr(vo);
 	    vo.setIsPrimary("N");
-	    
-	    // 주소 저장 안한 사람의 결제 리다이렉트
 	    
 	    return result; 
 	}
