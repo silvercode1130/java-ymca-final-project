@@ -21,6 +21,7 @@ const PaymentModule = {
     return fetch("/api/payment/confirm", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
+      credentials: "include",
       body: JSON.stringify(requestData),
     }).then((res) => {
       if (!res.ok)
@@ -31,11 +32,11 @@ const PaymentModule = {
     });
   },
 
-  // [함수 3] 세션 정보 서버에서 가져오기
   getSessionInfo: function () {
     return fetch("/api/payment/session-info", {
       method: "GET",
       headers: { "Content-Type": "application/json" },
+      credentials: "include",
     }).then((res) => {
       if (!res.ok) throw new Error("세션 정보를 가져올 수 없습니다.");
       return res.json();

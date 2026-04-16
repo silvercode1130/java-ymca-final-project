@@ -128,8 +128,9 @@ public class AuctionController {
             HttpSession session,
             RedirectAttributes ra) {
         MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
-        if (loginUser == null) return "redirect:/members/login";
-        
+        if (loginUser == null)
+            return "redirect:/members/login";
+
         // DTO에 로그인한 사용자의 고유 번호(buyerIdx) 세팅
         dto.setBuyerIdx(loginUser.getMemIdx());
 
@@ -198,7 +199,8 @@ public class AuctionController {
             HttpSession session,
             RedirectAttributes ra) {
         MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
-        if (loginUser == null) return "redirect:/members/login";
+        if (loginUser == null)
+            return "redirect:/members/login";
 
         // 관리자(memRoleIdx == 2)만 접근 가능
         if (loginUser.getMemRoleIdx() == null || loginUser.getMemRoleIdx() != 2) {
@@ -221,7 +223,8 @@ public class AuctionController {
             HttpSession session,
             RedirectAttributes ra) {
         MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
-        if (loginUser == null) return "redirect:/members/login";
+        if (loginUser == null)
+            return "redirect:/members/login";
 
         AuctionDTO detail = auctionService.auctionDetail(auctionIdx);
         if (detail == null || !detail.getBuyerIdx().equals(loginUser.getMemIdx())) {
