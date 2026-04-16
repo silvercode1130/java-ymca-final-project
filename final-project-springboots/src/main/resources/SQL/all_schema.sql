@@ -33,6 +33,7 @@ DROP TABLE IF EXISTS item_category;
 DROP TABLE IF EXISTS member_addr;
 DROP TABLE IF EXISTS member_profile;
 DROP TABLE IF EXISTS member;
+DROP TABLE IF EXISTS review;
 
 DROP TABLE IF EXISTS grade;
 DROP TABLE IF EXISTS role;
@@ -126,6 +127,7 @@ CREATE TABLE member (
     mem_regdate    DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '가입일',
     mem_is_deleted CHAR(1)       NOT NULL DEFAULT 'N' COMMENT 'Y / N (삭제 여부)',
     mem_deldate    DATETIME      DEFAULT NULL COMMENT '탈퇴일',
+    mem_login_type VARCHAR(10)    DEFAULT NULL COMMENT 'LOCAL, NAVER',
     PRIMARY KEY (mem_idx),
     UNIQUE KEY ux_member_mem_id (mem_id),
     CONSTRAINT ck_member_is_deleted CHECK (mem_is_deleted IN ('Y','N')),
