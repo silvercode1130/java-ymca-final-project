@@ -38,7 +38,8 @@ public class PaymentApiController {
     public ResponseEntity<?> confirmPayment(@RequestBody Map<String, Object> requestData,
             HttpSession session) {
         try {
-            Long memIdx = (Long) session.getAttribute("memIdx");
+        	MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
+            Long memIdx = loginUser.getMemIdx();
             if (memIdx == null) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
             }
