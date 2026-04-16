@@ -126,16 +126,6 @@
                   ← 목록으로
                 </button>
 
-                
-                <th:block th:if="${detail.auctionStatusIdx == 1}">
-                  <!-- 비회원 -->
-                  <th:block th:if="${session.loginUser == null}">
-                    <button class="btn btn-primary" onclick="location.href='/members/login?redirect=' + encodeURIComponent(location.href)">
-                      🔒 로그인 후 입찰하기
-                    </button>
-                  </th:block>
-                </th:block>
-
                 <!-- 구매자 본인 + 진행중 → 취소 / 수동 마감 -->
                 <th:block th:if="${session.loginUser != null
                                    and session.loginUser.memIdx == detail.buyerIdx
