@@ -18,6 +18,9 @@ public class BoardService {
     @Autowired
     private BoardMapper boardMapper;
 
+    @Autowired
+    private NotificationService notificationService;
+
     // ── 게시판 타입 ──────────────────────────────────────────
     public List<BoardTypeVO> getBoardTypes() {
         return boardMapper.findAllBoardTypes();
@@ -126,6 +129,7 @@ public class BoardService {
             update.setReplyContent(reply.getReplyContent());
             update.setReplyIp(reply.getReplyIp());
             boardMapper.updateReplyRef(update);
+			notifyBoardWriterOnNewReply(reply);
             return 1;
         } else {
             ReplyVO parent = boardMapper.findReplyById(parentReplyIdx);
@@ -149,8 +153,20 @@ public class BoardService {
             reply.setReplyRef(ref);
             reply.setReplyStep(step + 1);
             reply.setReplyDepth(depth + 1);
-            return boardMapper.insertReply(reply);
+            int inserted = boardMapper.insertReply(reply);
+            if (inserted > 0) {
+                notifyBoardWriterOnNewReply(reply);
+            }
+            return inserted;
         }
+    }
+
+    private void notifyBoardWriterOnNewReply(ReplyVO reply) {
+        BoardVO board = boardMapper.findBoardById(reply.getBoardIdx());
+        if (board == null) {
+            return;
+        }
+        notificationService.notifyNewReplyToBoardWriter(board, reply);
     }
 
     // ── 댓글 수정 ────────────────────────────────────────────

@@ -20,6 +20,9 @@ public class AuctionService {
 	
 	@Autowired
 	private BidMapper bidMapper;
+
+	@Autowired
+	private NotificationService notificationService;
 	
 	// 경매 리스트 조회 (검색 및 카테고리 필터링 포함)
 	public List<AuctionDTO> AuctionList(String categoryCode, String keyword, String sortBy, String statusFilter) {
@@ -137,7 +140,15 @@ public class AuctionService {
 	    for (AuctionDTO dto : expiredList) {
 	        int bidCount = dto.getBidCount() != null ? dto.getBidCount() : 0;
 	        // 입찰 있으면 결정대기(2), 없으면 유찰(4)
-	        auctionMapper.updateAuctionStatus(dto.getAuctionIdx(), bidCount > 0 ? 2 : 4);
+	        int nextStatus = bidCount > 0 ? 2 : 4;
+	        auctionMapper.updateAuctionStatus(dto.getAuctionIdx(), nextStatus);
+
+	        if (nextStatus == 2) {
+	            AuctionDTO detail = auctionMapper.auctionDetail(dto.getAuctionIdx());
+	            if (detail != null) {
+	                notificationService.notifyAuctionBidClosedToOwner(detail);
+	            }
+	        }
 	    }
 
 	    // 결정마감 지난 결정대기(2) → 유찰(4)
@@ -145,6 +156,21 @@ public class AuctionService {
 	    List<AuctionDTO> expiredDecisions = auctionMapper.findExpiredDecisions();
 	    for (AuctionDTO dto : expiredDecisions) {
 	        auctionMapper.updateAuctionStatus(dto.getAuctionIdx(), 4);
+
+	        AuctionDTO detail = auctionMapper.auctionDetail(dto.getAuctionIdx());
+	        if (detail == null) {
+	            continue;
+	        }
+
+	        notificationService.notifyAuctionDecisionClosedToOwner(detail);
+
+	        List<Long> bidderIdxList = bidMapper.findDistinctBidderIdxByAuction(dto.getAuctionIdx());
+	        for (Long bidderIdx : bidderIdxList) {
+	            if (bidderIdx == null) {
+	                continue;
+	            }
+	            notificationService.notifyDecisionDeadlineToBidder(detail, bidderIdx);
+	        }
 	    }
 	}
 	

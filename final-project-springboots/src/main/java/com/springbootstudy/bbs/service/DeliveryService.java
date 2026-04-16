@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.springbootstudy.bbs.domain.DeliveryVO;
+import com.springbootstudy.bbs.domain.OrdersVO;
 import com.springbootstudy.bbs.domain.PaymentVO;
 import com.springbootstudy.bbs.mapper.DeliveryMapper;
 import com.springbootstudy.bbs.mapper.PaymentMapper;
@@ -17,6 +18,9 @@ public class DeliveryService {
 
   @Autowired
   private PaymentMapper paymentMapper;
+
+  @Autowired
+  private OrdersService ordersService;
 
   // 판매자 운송장 입력 + 배송 시작
   @Transactional(rollbackFor = Exception.class)
@@ -42,6 +46,11 @@ public class DeliveryService {
 
     // 경매 상태 배송중(9)으로 변경
     paymentMapper.updateAuctionStatusByBidIdx(deliveryVO.getBidIdx(), 9);
+
+    OrdersVO order = ordersService.findByBidIdx(deliveryVO.getBidIdx());
+    if (order != null) {
+      ordersService.markOrderShipped(order.getOrderIdx());
+    }
   }
 
   // 구매자 수령 확인
@@ -65,6 +74,11 @@ public class DeliveryService {
 
     // 경매 상태 배송완료(10)으로 변경
     paymentMapper.updateAuctionStatusByBidIdx(bidIdx, 10);
+
+    OrdersVO order = ordersService.findByBidIdx(bidIdx);
+    if (order != null) {
+      ordersService.markOrderConfirmed(order.getOrderIdx());
+    }
   }
 
   // 배송 정보 조회

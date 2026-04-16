@@ -177,8 +177,8 @@
 							<!-- List Header -->
 							<div
 								class="grid grid-cols-12 gap-1 px-6 py-3 bg-gray-50 text-[11px] sm:text-xs font-semibold text-[#222222]">
-								<div class="col-span-1 text-center">종목</div>
-								<div class="col-span-6 text-center">제목</div>
+								<div class="col-span-2 text-center">종목</div>
+								<div class="col-span-5 text-center">제목</div>
 								<div class="col-span-2 text-center">작성자</div>
 								<div class="col-span-1 text-center">조회</div>
 								<div class="col-span-1 text-center">추천</div>
@@ -197,7 +197,7 @@
 									class="grid grid-cols-12 gap-1 px-6 py-3 text-[11px] sm:text-sm hover:bg-gray-50 transition-colors">
 
 									<!-- 종목 -->
-									<div class="col-span-1 flex items-center justify-center">
+									<div class="col-span-2 flex items-center justify-center">
 										<a th:href="@{/boards/{tc}(tc=${b.boardTypeCode})}"
 											class="inline-flex items-center rounded-full bg-gray-100 px-2 py-1 text-[10px] sm:text-xs text-[#767676]">
 											<span th:text="${b.boardTypeName}">축구</span>
@@ -205,7 +205,7 @@
 									</div>
 
 									<!-- 제목 -->
-									<div class="col-span-6">
+									<div class="col-span-5">
 										<div class="flex items-center gap-2 overflow-hidden">
 											<a
 												th:href="${typeCode == null} 
