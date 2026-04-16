@@ -16,31 +16,32 @@ const PaymentModule = {
             .catch((err) => alert("결제 요청 에러: " + err.message));
     },
 
-    // [함수 2] 서버 최종 승인 요청
-    confirm: function(requestData) {
-        return fetch("/api/payment/confirm", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(requestData),
-        }).then((res) => {
-            if (!res.ok)
-                return res.text().then((text) => {
-                    throw new Error(text);
-                });
-            return res.json();
+  // [함수 2] 서버 최종 승인 요청
+  confirm: function (requestData) {
+    return fetch("/api/payment/confirm", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify(requestData),
+    }).then((res) => {
+      if (!res.ok)
+        return res.text().then((text) => {
+          throw new Error(text);
         });
-    },
+      return res.json();
+    });
+  },
 
-    // [함수 3] 세션 정보 서버에서 가져오기
-    getSessionInfo: function() {
-        return fetch("/api/payment/session-info", {
-            method: "GET",
-            headers: { "Content-Type": "application/json" },
-        }).then((res) => {
-            if (!res.ok) throw new Error("세션 정보를 가져올 수 없습니다.");
-            return res.json();
-        });
-    },
+  getSessionInfo: function () {
+    return fetch("/api/payment/session-info", {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+    }).then((res) => {
+      if (!res.ok) throw new Error("세션 정보를 가져올 수 없습니다.");
+      return res.json();
+    });
+  },
 
     // [함수 4] 결제 버튼 자동 연결
     initButtons: function() {
