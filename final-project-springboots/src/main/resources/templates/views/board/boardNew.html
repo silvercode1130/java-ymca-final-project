@@ -6,7 +6,6 @@
 <meta charset="UTF-8">
 <title th:text="${currentType.boardTypeName} + ' 글쓰기 - PickQ'">글쓰기
 	- PickQ</title>
-<link rel="stylesheet" th:href="@{/css/board.css}">
 <link rel="stylesheet"
 	href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.css">
 </head>
@@ -43,6 +42,7 @@
 
 							<input type="hidden" id="fromInput" name="from"
 								th:value="${from}">
+							<input type="hidden" id="isLoggedIn" th:value="${session.loginUser != null}">
 
 							<!-- 카테고리 -->
 							<div class="mb-4">
@@ -103,13 +103,14 @@
 		<script
 			src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/lang/summernote-ko-KR.min.js"></script>
 		<script th:src="@{/js/summernote.js}"></script>
+		<script th:src="@{/js/board.js}"></script>
 		<script>
 			function changeCategory(typeCode) {
 				document.getElementById('writeForm').action = '/boards/'
 						+ typeCode;
 			}
-			initSummernote('boardContent');
-			bindSummernoteSubmit('writeForm', 'boardContent');
+			initSummernote('boardContent', saveDraftContent);
+			initBoardForm('writeForm');
 		</script>
 
 	</th:block>
