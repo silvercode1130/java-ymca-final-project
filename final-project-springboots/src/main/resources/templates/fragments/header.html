@@ -59,53 +59,35 @@
 							</form>
 						</div>
 
-<<<<<<< feature/board
-						<!-- 로그인 X (데스크탑) -->
-						<div class="hidden md:flex items-center gap-2"
-							th:if="${session.loginUser == null}">
-							<a href="#"
-								onclick="location.href='/members/login?redirect=' + encodeURIComponent(location.href)"
-								class="px-3 py-1.5 rounded text-sm text-[#222222] hover:text-[#7CBD00]">
-								로그인 </a> <a th:href="@{/members/register}"
-								class="px-3 py-1.5 rounded text-sm bg-[#7CBD00] text-white font-semibold hover:bg-[#6BAD00]">
-								회원가입 </a>
-						</div>
-=======
-           <!-- 로그인 X (데스크탑) -->
-           <div class="hidden md:flex items-center gap-2"
-              th:if="${session.loginUser == null}">
-              <a href="javascript:void(0);" 
-   				 onclick="location.href='/members/login?redirect=' + encodeURIComponent(location.pathname + location.search)"
-                 class="px-3 py-1.5 rounded text-sm text-[#222222] hover:text-[#7CBD00]">
-                 로그인 
-              </a> 
-              <a th:href="@{/members/register}"
-                 class="px-3 py-1.5 rounded text-sm bg-[#7CBD00] text-white font-semibold hover:bg-[#6BAD00]">
-                 회원가입 
-              </a>
-           </div>
->>>>>>> develop
-
+			           <!-- 로그인 X (데스크탑) -->
+			           <div class="hidden md:flex items-center gap-2"
+			              th:if="${session.loginUser == null}">
+			              <a href="javascript:void(0);" 
+			   				 onclick="location.href='/members/login?redirect=' + encodeURIComponent(location.pathname + location.search)"
+			                 class="px-3 py-1.5 rounded text-sm text-[#222222] hover:text-[#7CBD00]">
+			                 로그인 
+			              </a> 
+			              <a th:href="@{/members/register}"
+			                 class="px-3 py-1.5 rounded text-sm bg-[#7CBD00] text-white font-semibold hover:bg-[#6BAD00]">
+			                 회원가입 
+			              </a>
+			           </div>
+           
 						<!-- 모바일: 간단 버전 (풀 메뉴는 나중에 JS로) -->
 						<div class="md:hidden flex items-center gap-2">
 							<a th:if="${session.loginUser != null}"
 								th:href="@{/mypage/boards}"
 								class="px-2 py-1 rounded text-xs bg-gray-100 text-[#222222]">
 								<span th:text="${session.loginUser.memName}">내정보</span>
-<<<<<<< feature/board
-							</a> <a th:if="${session.loginUser == null}" href="#"
-								onclick="location.href='/members/login?redirect=' + encodeURIComponent(location.href)"
-								class="px-2 py-1 rounded text-xs bg-[#7CBD00] text-white">
-								로그인 </a>
-=======
 							</a> 
+							
 							<a th:if="${session.loginUser == null}" 
 							   href="javascript:void(0);"
 							   onclick="location.href='/members/login?redirect=' + encodeURIComponent(location.pathname + location.search)"
 							   class="px-2 py-1 rounded text-xs bg-[#7CBD00] text-white">
 								로그인 
 							</a>
->>>>>>> develop
+							
 						</div>
 
 					</div>

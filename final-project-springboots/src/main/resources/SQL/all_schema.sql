@@ -42,6 +42,13 @@ DROP TABLE IF EXISTS payment;
 DROP TABLE IF EXISTS chatroom;
 DROP TABLE IF EXISTS chatmessage;
 
+DROP TABLE IF EXISTS member_penalty;
+DROP TABLE IF EXISTS review;
+
+DROP TABLE IF EXISTS delivery;
+DROP TABLE IF EXISTS notification;
+DROP TABLE IF EXISTS orders;
+
 SET FOREIGN_KEY_CHECKS = 1;
 
 
@@ -126,9 +133,11 @@ CREATE TABLE member (
     mem_regdate    DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '가입일',
     mem_is_deleted CHAR(1)       NOT NULL DEFAULT 'N' COMMENT 'Y / N (삭제 여부)',
     mem_deldate    DATETIME      DEFAULT NULL COMMENT '탈퇴일',
+    mem_login_type VARCHAR(10)   DEFAULT NULL COMMENT 'LOCAL, NAVER',
     PRIMARY KEY (mem_idx),
     UNIQUE KEY ux_member_mem_id (mem_id),
     CONSTRAINT ck_member_is_deleted CHECK (mem_is_deleted IN ('Y','N')),
+    CONSTRAINT ck_member_login_type CHECK (mem_login_type IN ('LOCAL','NAVER')),
     CONSTRAINT fk_member_role  FOREIGN KEY (mem_role_idx)  REFERENCES role(role_idx),
     CONSTRAINT fk_member_grade FOREIGN KEY (mem_grade_idx) REFERENCES grade(grade_idx)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='회원 기본 정보 테이블';
@@ -344,7 +353,7 @@ CREATE TABLE reply (
     reply_moddate    DATETIME       DEFAULT NULL COMMENT '수정일',
     reply_is_deleted CHAR(1)        NOT NULL DEFAULT 'N' COMMENT 'Y / N',
     reply_deldate    DATETIME       DEFAULT NULL COMMENT '삭제일',
-    reply_ref        INT            DEFAULT NULL COMMENT '원댓',
+    reply_ref        INT            NOT NULL COMMENT '원댓',
     reply_step       INT            DEFAULT NULL COMMENT '댓글 순서',
     reply_depth      INT            DEFAULT NULL COMMENT '댓글 깊이',
     PRIMARY KEY (reply_idx),
@@ -386,7 +395,7 @@ CREATE TABLE member_penalty (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='회원 패널티 이력 테이블';
 
 /* ==========================================
-   6. 결제 관련 (추가기능)
+   6. 결제 관련 (수정본)
    ========================================== */
 
 CREATE TABLE payment (
@@ -409,15 +418,6 @@ CREATE TABLE payment (
     buyer_tel        VARCHAR(20)   NOT NULL COMMENT '수령인 연락처',
     buyer_addr       VARCHAR(500)  NOT NULL COMMENT '배송지 주소',
     buyer_zipcode    VARCHAR(20)   NOT NULL COMMENT '우편번호',
-    
-    -- 배송 정보
-    courier_company  VARCHAR(50)   NULL COMMENT '택배사',
-    tracking_number  VARCHAR(100)  NULL COMMENT '운송장번호',
-    shipped_at       DATETIME      NULL COMMENT '발송일시',
-
-    -- 에스크로 및 처리 일시
-    escrow_status    VARCHAR(20)   DEFAULT 'READY'
-                     COMMENT '배송 상태 (READY, SHIPPING, DELIVERED)',
     pay_regdate      DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '결제 완료 일시',
     confirmed_at     DATETIME      NULL COMMENT '구매 확정 일시',
     canceled_at      DATETIME      NULL COMMENT '결제 취소 일시',
@@ -429,52 +429,66 @@ CREATE TABLE payment (
     CONSTRAINT fk_payment_buyer  FOREIGN KEY (mem_idx) REFERENCES member(mem_idx)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='결제 상세 정보 테이블';
 
+-- delivery 테이블 새로 생성
+CREATE TABLE delivery (
+    delivery_idx     BIGINT        NOT NULL AUTO_INCREMENT COMMENT 'PK',
+    pay_idx          BIGINT        NOT NULL COMMENT 'FK → payment.pay_idx',
+    bid_idx          BIGINT        NOT NULL COMMENT 'FK → bid.bid_idx',
+    courier_company  VARCHAR(50)   NULL COMMENT '택배사',
+    tracking_number  VARCHAR(100)  NULL COMMENT '운송장번호',
+    shipped_at       DATETIME      NULL COMMENT '발송일시',
+    delivered_at     DATETIME      NULL COMMENT '배송완료일시',
+    delivery_status  VARCHAR(20)   NOT NULL DEFAULT 'READY'
+                     COMMENT '배송 상태 (READY, SHIPPING, DELIVERED)',
+    PRIMARY KEY (delivery_idx),
+    CONSTRAINT fk_delivery_payment FOREIGN KEY (pay_idx) REFERENCES payment(pay_idx),
+    CONSTRAINT fk_delivery_bid     FOREIGN KEY (bid_idx) REFERENCES bid(bid_idx)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='배송 정보 테이블';
 
+-- 거래 마스터용 vo
 CREATE TABLE orders (
-    orderidx       BIGINT      NOT NULL AUTO_INCREMENT COMMENT 'PK',
-    auctionidx     BIGINT      NOT NULL COMMENT 'FK auction.auctionidx',
-    bididx         BIGINT      NOT NULL COMMENT 'FK bid.bididx',
+    order_idx       BIGINT      NOT NULL AUTO_INCREMENT COMMENT 'PK',
+    
+    -- 어떤 거래인지 식별 (경매 + 입찰 + 양 당사자)
+    auction_idx     BIGINT      NOT NULL COMMENT 'FK auction.auctionidx',
+    bid_idx         BIGINT      NOT NULL COMMENT 'FK bid.bididx',
+    buyer_idx       BIGINT      NOT NULL COMMENT 'FK member.memidx (구매자)',
+    seller_idx      BIGINT      NOT NULL COMMENT 'FK member.memidx (판매자)',
 
-    buyeridx       BIGINT      NOT NULL COMMENT 'FK member.memidx (구매자)',
-    selleridx      BIGINT      NOT NULL COMMENT 'FK member.memidx (판매자)',
+    -- 거래 금액 (낙찰가 스냅샷)
+    order_amount    BIGINT      NOT NULL COMMENT '주문 금액(낙찰가)',
 
-    orderamount    BIGINT      NOT NULL COMMENT '주문 금액(낙찰가)',
+    -- 거래 전체의 상태 (메인 타임라인)
+    order_status    VARCHAR(20) NOT NULL COMMENT 'CREATED, PAID, SHIPPED, CONFIRMED, CANCELED',
 
-    orderstatus    VARCHAR(20) NOT NULL COMMENT 'CREATED, PAID, SHIPPED, CONFIRMED, CANCELED',
-    paymentstatus  VARCHAR(20) NOT NULL COMMENT 'READY, PAID, REFUND, FAIL',
-    shippingstatus VARCHAR(20) NOT NULL COMMENT 'NONE, READY, SHIPPED, DELIVERED, CONFIRMED',
+    -- 정산 여부
+    is_settled      CHAR(1)     NOT NULL DEFAULT 'N' COMMENT '정산 여부 Y/N',
 
-    trackingnumber VARCHAR(100) DEFAULT NULL COMMENT '송장번호',
-    couriername    VARCHAR(100) DEFAULT NULL COMMENT '택배사명',
+    -- 중요한 시점만 요약 (상세 시간/값은 payment, delivery에 있음)
+    order_regdate   DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '주문 생성일',
+    paid_at         DATETIME    DEFAULT NULL COMMENT '결제 완료 일시',
+    shipped_at      DATETIME    DEFAULT NULL COMMENT '배송 시작 일시',
+    confirmed_at    DATETIME    DEFAULT NULL COMMENT '구매 확정 일시',
+    refund_at       DATETIME    DEFAULT NULL COMMENT '환불 일시',
 
-    issettled      CHAR(1)     NOT NULL DEFAULT 'N' COMMENT '정산 여부 Y/N',
+    PRIMARY KEY (order_idx),
 
-    paidat         DATETIME     DEFAULT NULL COMMENT '결제 완료 일시',
-    shippedat      DATETIME     DEFAULT NULL COMMENT '배송 시작 일시',
-    confirmedat    DATETIME     DEFAULT NULL COMMENT '배송 확정 일시',
-    refundat       DATETIME     DEFAULT NULL COMMENT '환불 일시',
+    KEY idx_order_auction  (auction_idx),
+    KEY idx_order_bid      (bid_idx),
+    KEY idx_order_buyer    (buyer_idx),
+    KEY idx_order_seller   (seller_idx),
 
-    orderregdate   DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '주문 생성일',
+    CONSTRAINT fk_order_auction FOREIGN KEY (auction_idx)
+        REFERENCES auction(auction_idx) ON DELETE CASCADE,
+    CONSTRAINT fk_order_bid FOREIGN KEY (bid_idx)
+        REFERENCES bid(bid_idx),
+    CONSTRAINT fk_order_buyer FOREIGN KEY (buyer_idx)
+        REFERENCES member(mem_idx) ON DELETE CASCADE,
+    CONSTRAINT fk_order_seller FOREIGN KEY (seller_idx)
+        REFERENCES member(mem_idx) ON DELETE CASCADE,
 
-    PRIMARY KEY (orderidx),
-
-    KEY idx_order_auction  (auctionidx),
-    KEY idx_order_bid      (bididx),
-    KEY idx_order_buyer    (buyeridx),
-    KEY idx_order_seller   (selleridx),
-
-    CONSTRAINT fk_order_auction FOREIGN KEY (auctionidx)
-        REFERENCES auction(auctionidx) ON DELETE CASCADE,
-    CONSTRAINT fk_order_bid FOREIGN KEY (bididx)
-        REFERENCES bid(bididx),
-    CONSTRAINT fk_order_buyer FOREIGN KEY (buyeridx)
-        REFERENCES member(memidx) ON DELETE CASCADE,
-    CONSTRAINT fk_order_seller FOREIGN KEY (selleridx)
-        REFERENCES member(memidx) ON DELETE CASCADE,
-
-    CONSTRAINT ck_order_issettled CHECK (issettled IN ('Y','N'))
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='역경매 주문/에스크로';
-
+    CONSTRAINT ck_order_is_settled CHECK (is_settled IN ('Y','N'))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='역경매 주문/거래 마스터';
 
 /* ==========================================
    채팅 관련 (추가기능)
@@ -519,6 +533,51 @@ CREATE TABLE chatmessage (
         ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='채팅 메시지';
 
+CREATE TABLE notification (
+    notification_idx     BIGINT        NOT NULL AUTO_INCREMENT COMMENT 'PK',
+    receiver_idx         BIGINT        NOT NULL COMMENT '알림 수신자 FK → member.mem_idx',
+    sender_idx           BIGINT        DEFAULT NULL COMMENT '알림 발생시킨 회원 FK → member.mem_idx',
+
+    auction_idx          BIGINT        DEFAULT NULL COMMENT '관련 경매 FK → auction.auction_idx',
+    bid_idx              BIGINT        DEFAULT NULL COMMENT '관련 입찰 FK → bid.bid_idx',
+    board_idx            BIGINT        DEFAULT NULL COMMENT '관련 게시글 FK → board.board_idx',
+    reply_idx            BIGINT        DEFAULT NULL COMMENT '관련 댓글 FK → reply.reply_idx',
+
+    notification_type    VARCHAR(50)   NOT NULL COMMENT 'AUCTION_..., TRADE_..., BOARD_... 등',
+    notification_title   VARCHAR(200)  NOT NULL COMMENT '알림 제목/요약',
+    notification_message VARCHAR(500)  NOT NULL COMMENT '알림 상세 내용',
+    target_url           VARCHAR(255)  DEFAULT NULL COMMENT '클릭 시 이동 URL',
+
+    is_read              CHAR(1)       NOT NULL DEFAULT 'N' COMMENT '읽음 여부 Y/N',
+    created_at           DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '생성일',
+    read_at              DATETIME      DEFAULT NULL COMMENT '읽은 시각',
+
+    PRIMARY KEY (notification_idx),
+
+    KEY idx_notification_receiver (receiver_idx),
+    KEY idx_notification_sender (sender_idx),
+    KEY idx_notification_auction (auction_idx),
+    KEY idx_notification_bid (bid_idx),
+    KEY idx_notification_board (board_idx),
+    KEY idx_notification_reply (reply_idx),
+
+    CONSTRAINT ck_notification_is_read
+        CHECK (is_read IN ('Y','N'))
+    
+    -- FK들은 지금 바로 걸어도 되고, 개발 속도 생각해서 나중에 alter table로 추가해도 됨
+    -- CONSTRAINT fk_notification_receiver
+    --     FOREIGN KEY (receiver_idx) REFERENCES member(mem_idx) ON DELETE CASCADE,
+    -- CONSTRAINT fk_notification_sender
+    --     FOREIGN KEY (sender_idx)  REFERENCES member(mem_idx) ON DELETE SET NULL,
+    -- CONSTRAINT fk_notification_auction
+    --     FOREIGN KEY (auction_idx) REFERENCES auction(auction_idx) ON DELETE CASCADE,
+    -- CONSTRAINT fk_notification_bid
+    --     FOREIGN KEY (bid_idx)     REFERENCES bid(bid_idx) ON DELETE CASCADE,
+    -- CONSTRAINT fk_notification_board
+    --     FOREIGN KEY (board_idx)   REFERENCES board(board_idx) ON DELETE CASCADE,
+    -- CONSTRAINT fk_notification_reply
+    --     FOREIGN KEY (reply_idx)   REFERENCES reply(reply_idx) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='알림 테이블';
 
 /* ==========================================
    7. 코드 테이블 기본 데이터
@@ -627,53 +686,3 @@ VALUES (14, 'aerobics',  '에어로빅', 'Y', 1);
 INSERT INTO board_type (board_type_idx, board_type_code, board_type_name, board_can_comment, board_min_role)
 VALUES (15, 'swimming',  '수영',     'Y', 1);
 
-/* ==========================================
-   6. 결제 관련 (수정본)
-   ========================================== */
-
-CREATE TABLE payment (
-    pay_idx          BIGINT        NOT NULL AUTO_INCREMENT COMMENT 'PK',
-    bid_idx          BIGINT        NOT NULL COMMENT 'FK → bid.bid_idx (낙찰 정보)',
-    mem_idx          BIGINT        NOT NULL COMMENT 'FK → member.mem_idx (구매자)',
-    
-    -- 결제 식별 정보 (토스페이먼츠 기준)
-    payment_key      VARCHAR(255)  NOT NULL COMMENT '토스 결제 고유 키 (승인/취소 시 사용)',
-    order_id         VARCHAR(255)  NOT NULL COMMENT '우리 시스템 주문번호 (UUID 등)',
-    
-    -- 결제 금액 및 수단
-    pay_method       VARCHAR(100)  NOT NULL COMMENT '결제 수단 (카드, 가상계좌, 간편결제 등)',
-    pay_amount       BIGINT        NOT NULL COMMENT '실제 결제 금액',
-    pay_status       VARCHAR(20)   NOT NULL DEFAULT 'READY'
-                     COMMENT '결제 상태 (READY, DONE, CONFIRMED, CANCELED, EXPIRED)',
-
-    -- 배송지 정보 스냅샷
-    buyer_name       VARCHAR(50)   NOT NULL COMMENT '수령인 성함',
-    buyer_tel        VARCHAR(20)   NOT NULL COMMENT '수령인 연락처',
-    buyer_addr       VARCHAR(500)  NOT NULL COMMENT '배송지 주소',
-    buyer_zipcode    VARCHAR(20)   NOT NULL COMMENT '우편번호',
-    pay_regdate      DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '결제 완료 일시',
-    confirmed_at     DATETIME      NULL COMMENT '구매 확정 일시',
-    canceled_at      DATETIME      NULL COMMENT '결제 취소 일시',
-
-    PRIMARY KEY (pay_idx),
-    UNIQUE KEY ux_payment_key (payment_key),
-    UNIQUE KEY ux_order_id (order_id),
-    CONSTRAINT fk_payment_bid    FOREIGN KEY (bid_idx) REFERENCES bid(bid_idx),
-    CONSTRAINT fk_payment_buyer  FOREIGN KEY (mem_idx) REFERENCES member(mem_idx)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='결제 상세 정보 테이블';
-
--- delivery 테이블 새로 생성
-CREATE TABLE delivery (
-    delivery_idx     BIGINT        NOT NULL AUTO_INCREMENT COMMENT 'PK',
-    pay_idx          BIGINT        NOT NULL COMMENT 'FK → payment.pay_idx',
-    bid_idx          BIGINT        NOT NULL COMMENT 'FK → bid.bid_idx',
-    courier_company  VARCHAR(50)   NULL COMMENT '택배사',
-    tracking_number  VARCHAR(100)  NULL COMMENT '운송장번호',
-    shipped_at       DATETIME      NULL COMMENT '발송일시',
-    delivered_at     DATETIME      NULL COMMENT '배송완료일시',
-    delivery_status  VARCHAR(20)   NOT NULL DEFAULT 'READY'
-                     COMMENT '배송 상태 (READY, SHIPPING, DELIVERED)',
-    PRIMARY KEY (delivery_idx),
-    CONSTRAINT fk_delivery_payment FOREIGN KEY (pay_idx) REFERENCES payment(pay_idx),
-    CONSTRAINT fk_delivery_bid     FOREIGN KEY (bid_idx) REFERENCES bid(bid_idx)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='배송 정보 테이블';

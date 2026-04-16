@@ -147,3 +147,23 @@ function initDetailTimer() {
 }
 
 window.addEventListener('load', initDetailTimer);
+
+/* ── 낙찰 전 최종 확인 및 제출 (초간결 버전) ── */
+function confirmWin(e, form) {
+    // 일단 폼 제출을 막음 (확인 버튼 누르기 전까지)
+    e.preventDefault();
+
+    // 사용자한테 한 번 더 물어보기
+    if (!confirm('이 입찰을 낙찰하시겠습니까?')) return;
+
+    // 중복 클릭 방지 (이거 안 하면 낙찰이 두 번 될 수도 있음)
+    const btn = form.querySelector('button');
+    if(btn) {
+        btn.disabled = true;
+        btn.innerText = '처리 중...';
+    }
+
+    // 이제 진짜 폼을 제출
+    // 인터셉터를 피해서 컨트롤러로 바로 꽂아줌
+    form.submit();
+}

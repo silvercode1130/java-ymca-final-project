@@ -10,10 +10,12 @@ function toLocalDateTimeString(date) {
 endAtInput.min = toLocalDateTimeString(new Date());
 deadlineInput.min = toLocalDateTimeString(new Date());
 
-// 1분마다 min 갱신 (오래 켜두면 과거가 될 수 있어서)
+// 1초마다 min 갱신 (오래 켜두면 과거가 될 수 있어서)
 setInterval(() => {
-    endAtInput.min = toLocalDateTimeString(new Date());
-}, 60000);
+    const now = toLocalDateTimeString(new Date());
+    endAtInput.min = now;
+    if (!endAtInput.value) deadlineInput.min = now;
+}, 1000);
 
 // 입찰 마감일 바뀌면 결정 마감일 min/max 자동 조정
 endAtInput.addEventListener('change', function () {
@@ -32,16 +34,23 @@ endAtInput.addEventListener('change', function () {
 
 // 이미지 미리보기
 document.getElementById('thumbnailFile').addEventListener('change', function () {
-    const file = this.files[0];
+    const file        = this.files[0];
+    const previewImg  = document.getElementById('previewImg');
+    const placeholder = document.getElementById('previewPlaceholder');
+ 
     if (file) {
         const reader = new FileReader();
         reader.onload = e => {
-            document.getElementById('previewImg').src = e.target.result;
-            document.getElementById('previewBox').style.display = 'block';
+            previewImg.src = e.target.result;
+            previewImg.classList.remove('hidden');
+            previewImg.style.display = 'block';
+            if (placeholder) placeholder.style.display = 'none';
         };
         reader.readAsDataURL(file);
     } else {
-        document.getElementById('previewBox').style.display = 'none';
+        previewImg.classList.add('hidden');
+        previewImg.style.display = '';
+        if (placeholder) placeholder.style.display = '';
     }
 });
 

@@ -128,11 +128,7 @@ public class AuctionController {
             HttpSession session,
             RedirectAttributes ra) {
         MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
-<<<<<<< feature/board
         if (loginUser == null) return "redirect:/members/login?redirect=/auctions/new";
-=======
-        if (loginUser == null) return "redirect:/members/login";
->>>>>>> develop
         
         // DTO에 로그인한 사용자의 고유 번호(buyerIdx) 세팅
         dto.setBuyerIdx(loginUser.getMemIdx());
@@ -448,15 +444,19 @@ public class AuctionController {
     // 낙찰 처리 (/auctions/{auctionIdx}/bids/{bidIdx}/win)
     @PostMapping("/auctions/{auctionIdx}/bids/{bidIdx}/win")
     public String selectWinner(@PathVariable("auctionIdx") Long auctionIdx,
-            @PathVariable("bidIdx") Long bidIdx,
-            HttpSession session,
-            RedirectAttributes ra) {
+                                 @PathVariable("bidIdx") Long bidIdx,
+                                 HttpSession session,
+                                 RedirectAttributes ra) {
+
         MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
+
+        // 세션 만료 → 로그인 페이지로 (loginRedirectUrl 경매 상세로 설정)
         if (loginUser == null) {
             session.setAttribute("loginRedirectUrl", "/auctions/" + auctionIdx);
+            ra.addFlashAttribute("errorMessage", "로그인이 필요합니다. 다시 로그인 후 낙찰을 진행해주세요.");
             return "redirect:/members/login";
         }
-
+        
         AuctionDTO auction = auctionService.auctionDetail(auctionIdx);
         if (auction == null || !auction.getBuyerIdx().equals(loginUser.getMemIdx())) {
             ra.addFlashAttribute("bidError", "권한이 없습니다.");
@@ -465,9 +465,12 @@ public class AuctionController {
 
         try {
             bidService.selectWinner(bidIdx, auctionIdx);
-            ra.addFlashAttribute("successMessage", "낙찰 처리가 완료되었습니다");
+            ra.addFlashAttribute("successMessage", "낙찰 처리가 완료되었습니다 🎉");
         } catch (IllegalArgumentException e) {
             ra.addFlashAttribute("bidError", e.getMessage());
+        } catch (Exception e) {
+            log.error("낙찰 처리 중 오류", e);
+            ra.addFlashAttribute("bidError", "낙찰 처리 중 오류가 발생했습니다. 다시 시도해주세요.");
         }
         return "redirect:/auctions/" + auctionIdx;
     }

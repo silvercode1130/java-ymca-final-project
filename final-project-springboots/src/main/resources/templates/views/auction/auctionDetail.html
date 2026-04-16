@@ -92,7 +92,7 @@
                     </div>
                     <div class="text-muted small">현재 최저가</div>
                     <div class="fw-bold text-danger fs-5">
-                      <span th:text="${detail.minBidPrice == 0 ? '-' : #numbers.formatInteger(detail.minBidPrice, 0, 'COMMA') + '원'}"></span>
+                      <span th:text="${detail.minBidPrice == 0 ? '제안없음' : #numbers.formatInteger(detail.minBidPrice, 0, 'COMMA') + '원'}"></span>
                     </div>
                   </div>
 
@@ -125,16 +125,6 @@
                 <button class="btn btn-outline-secondary" onclick="location.href='/auctions'">
                   ← 목록으로
                 </button>
-
-                
-                <th:block th:if="${detail.auctionStatusIdx == 1}">
-                  <!-- 비회원 -->
-                  <th:block th:if="${session.loginUser == null}">
-                    <button class="btn btn-primary" onclick="location.href='/members/login?redirect=' + encodeURIComponent(location.href)">
-                      🔒 로그인 후 입찰하기
-                    </button>
-                  </th:block>
-                </th:block>
 
                 <!-- 구매자 본인 + 진행중 → 취소 / 수동 마감 -->
                 <th:block th:if="${session.loginUser != null
@@ -325,13 +315,13 @@
 		              and selectedBid.bidStatusIdx == 1
 		              and (detail.auctionStatusIdx == 2
 		                   or (detail.auctionStatusIdx == 1 and detail.bidCount > 0))}"
-		     class="mt-3">
+		     		class="mt-3">
                 <form th:action="@{/auctions/{aId}/bids/{bId}/win(aId=${detail.auctionIdx},bId=${selectedBid.bidIdx})}"
-                      method="post" onsubmit="return confirm('이 입찰을 낙찰하시겠습니까?')">
+                      method="post" onsubmit="return confirmWin(event, this)">
                   <button class="btn btn-success w-100">🏆 낙찰하기</button>
                 </form>
               </div>
-
+              
               <button class="btn btn-outline-secondary mt-3 w-100"
                       th:onclick="|location.href='/auctions/${detail.auctionIdx}'|">
                 ← 경매 상세 보기

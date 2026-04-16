@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+   xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -11,7 +11,7 @@
 
 <!-- Bootstrap Icons -->
 <link rel="stylesheet"
-	href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+   href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
 <!-- Tailwind (테스트용) -->
 <script src="https://cdn.tailwindcss.com"></script>
@@ -28,20 +28,20 @@
 <script th:src="@{/js/formcheck.js}"></script>
 </head>
 <body class="min-h-screen flex flex-col">
-	<div class="container flex-1 flex flex-col">
+   <div class="container flex-1 flex flex-col">
 
-		<!-- header -->
-		<div th:replace="~{fragments/header :: header}"></div>
+      <!-- header -->
+      <div th:replace="~{fragments/header :: header}"></div>
 
-		<script th:src="@{/bootstrap/bootstrap.bundle.min.js}"></script>
+      <script th:src="@{/bootstrap/bootstrap.bundle.min.js}"></script>
 
-		<!-- content : 요청마다 교체되는 부분 -->
-		<div layout:fragment="content" class="mb-6"></div>
+      <!-- content : 요청마다 교체되는 부분 -->
+      <div layout:fragment="content" class="mb-6"></div>
 
-		<!-- footer -->
-		<div class="mt-10"></div>
-		<div th:replace="~{fragments/footer :: footer}" class="mt-10"></div>
+      <!-- footer -->
+      <div class="mt-10"></div>
+      <div th:replace="~{fragments/footer :: footer}" class="mt-10"></div>
 
-	</div>
+   </div>
 </body>
 </html>
