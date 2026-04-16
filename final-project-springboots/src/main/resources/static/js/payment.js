@@ -2,19 +2,19 @@ const clientKey = "test_ck_GePWvyJnrKPx4nM5Kogb8gLzN97E";
 const tossPayments = TossPayments(clientKey);
 
 const PaymentModule = {
-  // [함수 1] 토스 결제창 호출
-  request: function (data) {
-    tossPayments
-      .requestPayment(data.payMethod || "카드", {
-        amount: data.amount,
-        orderId: data.orderId,
-        orderName: data.orderName,
-        customerName: data.customerName,
-        successUrl: window.location.origin + "/payment/success",
-        failUrl: window.location.origin + "/payment/fail",
-      })
-      .catch((err) => alert("결제 요청 에러: " + err.message));
-  },
+    // [함수 1] 토스 결제창 호출
+    request: function(data) {
+        tossPayments
+            .requestPayment(data.payMethod || "카드", {
+                amount: data.amount,
+                orderId: data.orderId,
+                orderName: data.orderName,
+                customerName: data.customerName,
+                successUrl: window.location.origin + "/payment/success",
+                failUrl: window.location.origin + "/payment/fail",
+            })
+            .catch((err) => alert("결제 요청 에러: " + err.message));
+    },
 
   // [함수 2] 서버 최종 승인 요청
   confirm: function (requestData) {
@@ -43,77 +43,77 @@ const PaymentModule = {
     });
   },
 
-  // [함수 4] 결제 버튼 자동 연결
-  initButtons: function () {
-    document.querySelectorAll(".pay-btn").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        const bidIdx = btn.getAttribute("data-idx");
-        const payData = {
-          amount: btn.getAttribute("data-price"),
-          orderId: "ORD_" + bidIdx + "_" + new Date().getTime(),
-          orderName: btn.getAttribute("data-title"),
-          customerName:
-            typeof loginMemName !== "undefined" ? loginMemName : "구매자",
-          payMethod: "카드",
-        };
-        this.request(payData);
-      });
-    });
-  },
+    // [함수 4] 결제 버튼 자동 연결
+    initButtons: function() {
+        document.querySelectorAll(".pay-btn").forEach((btn) => {
+            btn.addEventListener("click", () => {
+                const bidIdx = btn.getAttribute("data-idx");
+                const payData = {
+                    amount: btn.getAttribute("data-price"),
+                    orderId: "ORD_" + bidIdx + "_" + new Date().getTime(),
+                    orderName: btn.getAttribute("data-title"),
+                    customerName:
+                        typeof loginMemName !== "undefined" ? loginMemName : "구매자",
+                    payMethod: "카드",
+                };
+                this.request(payData);
+            });
+        });
+    },
 };
 
 // 페이지 로드 시 버튼 자동 활성화
 document.addEventListener("DOMContentLoaded", () =>
-  PaymentModule.initButtons(),
+    PaymentModule.initButtons(),
 );
 
 // 결제 성공 페이지 처리
-document.addEventListener("DOMContentLoaded", function () {
-  if (window.location.pathname.includes("/payment/success")) {
-    const urlParams = new URLSearchParams(window.location.search);
-    const paymentKey = urlParams.get("paymentKey");
-    const orderId = urlParams.get("orderId");
-    const amount = urlParams.get("amount");
+document.addEventListener("DOMContentLoaded", function() {
+    if (window.location.pathname.includes("/payment/success")) {
+        const urlParams = new URLSearchParams(window.location.search);
+        const paymentKey = urlParams.get("paymentKey");
+        const orderId = urlParams.get("orderId");
+        const amount = urlParams.get("amount");
 
-    // 필수값 없으면 바로 fail로
-    if (!paymentKey || !orderId || !amount) {
-      alert("결제 정보가 없습니다.");
-      location.href = "/payment/fail";
-      return;
+        // 필수값 없으면 바로 fail로
+        if (!paymentKey || !orderId || !amount) {
+            alert("결제 정보가 없습니다.");
+            location.href = "/payment/fail";
+            return;
+        }
+
+        const bidIdx = orderId.split("_")[1];
+
+        // 세션 정보 서버에서 가져온 후 결제 승인
+        PaymentModule.getSessionInfo()
+            .then((sessionInfo) => {
+                return PaymentModule.confirm({
+                    paymentKey: paymentKey,
+                    orderId: orderId,
+                    amount: amount,
+                    bidIdx: bidIdx,
+                    buyerName: sessionInfo.memName || "구매자",
+                    buyerTel: sessionInfo.memTel || "010-0000-0000",
+                    buyerAddr: sessionInfo.buyerAddr || "주소없음",
+                    buyerZipcode: sessionInfo.buyerZipcode || "00000",
+                });
+            })
+            .then((data) => {
+                alert("결제가 완료되었습니다!");
+                location.href = "/mypage/payments";
+            })
+            .catch((err) => {
+                alert("결제 승인 실패: " + err.message);
+                location.href = "/payment/fail";
+            });
     }
-
-    const bidIdx = orderId.split("_")[1];
-
-    // 세션 정보 서버에서 가져온 후 결제 승인
-    PaymentModule.getSessionInfo()
-      .then((sessionInfo) => {
-        return PaymentModule.confirm({
-          paymentKey: paymentKey,
-          orderId: orderId,
-          amount: amount,
-          bidIdx: bidIdx,
-          buyerName: sessionInfo.memName || "구매자",
-          buyerTel: sessionInfo.memTel || "010-0000-0000",
-          buyerAddr: sessionInfo.buyerAddr || "주소없음",
-          buyerZipcode: sessionInfo.buyerZipcode || "00000",
-        });
-      })
-      .then((data) => {
-        alert("결제가 완료되었습니다!");
-        location.href = "/mypage/payments";
-      })
-      .catch((err) => {
-        alert("결제 승인 실패: " + err.message);
-        location.href = "/payment/fail";
-      });
-  }
 });
 
 // 결제 실패 페이지 처리
 if (window.location.pathname.includes("/payment/fail")) {
-  const urlParams = new URLSearchParams(window.location.search);
-  const msg = urlParams.get("message");
+    const urlParams = new URLSearchParams(window.location.search);
+    const msg = urlParams.get("message");
 
-  const failElem = document.getElementById("fail-reason");
-  if (failElem) failElem.innerText = "사유: " + (msg || "알 수 없는 오류");
+    const failElem = document.getElementById("fail-reason");
+    if (failElem) failElem.innerText = "사유: " + (msg || "알 수 없는 오류");
 }
