@@ -371,7 +371,7 @@ public class MemberController {
     }
 
     // 비밀번호 찾기 -----------------------------------------------------------------
-
+    
     // 창 띄우기
     @GetMapping("/members/pwdFind")
     public String pwdFind() {
@@ -502,5 +502,4 @@ public class MemberController {
         ra.addFlashAttribute("msg", "비밀번호가 변경 되었습니다");
         return "redirect:/members/login";
     }
-
 }
