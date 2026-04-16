@@ -15,6 +15,10 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         registry.addEndpoint("/ws-chat")
                 .setAllowedOriginPatterns("http://localhost:*", "http://127.0.0.1:*")
                 .withSockJS();
+
+        registry.addEndpoint("/ws-notification")
+            .setAllowedOriginPatterns("http://localhost:*", "http://127.0.0.1:*")
+            .withSockJS();
     }
 
     @Override

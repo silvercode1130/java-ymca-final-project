@@ -36,4 +36,7 @@ public interface BidMapper {
     // 경매 취소 시 해당 경매의 진행중 입찰 일괄 취소
     int cancelBidsByAuction(@Param("auctionIdx") Long auctionIdx);
 
+    // 특정 경매에 입찰한 회원 목록
+    List<Long> findDistinctBidderIdxByAuction(@Param("auctionIdx") Long auctionIdx);
+
 }
