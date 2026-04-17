@@ -30,6 +30,8 @@ public interface OrdersMapper {
 
     int updateOrderConfirmed(Long orderIdx);
 
+    int updateOrderCanceled(Long orderIdx);
+
     // 구매자로 참여한 거래 전체 조회
     List<OrdersListDTO> findAllByBuyerIdx(Long buyerIdx);
 

@@ -85,11 +85,8 @@ public class PaymentServiceImpl implements PaymentService {
       // 3. 결제 상태 업데이트 (READY -> DONE) ★필수 추가★
       paymentMapper.updatePaymentStatus(paymentVO.getOrderId(), "DONE");
 
-      // 4. 경매 상태 변경 (8: 결제완료)
-      paymentMapper.updateAuctionStatus(paymentVO.getBidIdx(), 8);
-
-      // 5. 입찰 상태 변경 (2: 낙찰/결제성공)
-      paymentMapper.updateBidStatus(paymentVO.getBidIdx(), 2);
+      // 비즈니스 룰: 마감/낙찰 이후 auctionStatus/bidStatus는 더 이상 변경하지 않는다.
+      log.debug("bidIdx={} 결제완료 후 auctionStatus/bidStatus 갱신은 비활성화됨", paymentVO.getBidIdx());
 
       OrdersVO order = ordersService.findByBidIdx(paymentVO.getBidIdx());
       if (order != null) {
@@ -109,8 +106,9 @@ public class PaymentServiceImpl implements PaymentService {
     if (result == 0) {
       throw new Exception("배송 처리에 실패했습니다.");
     }
-    // 경매 상태 배송중(9)으로 변경
-    paymentMapper.updateAuctionStatusByBidIdx(paymentVO.getBidIdx(), 9);
+
+    // 비즈니스 룰: 마감/낙찰 이후 auctionStatus/bidStatus는 더 이상 변경하지 않는다.
+    log.debug("bidIdx={} 배송시작 후 auctionStatus 갱신은 비활성화됨", paymentVO.getBidIdx());
 
     OrdersVO order = ordersService.findByBidIdx(paymentVO.getBidIdx());
     if (order != null) {
@@ -124,8 +122,9 @@ public class PaymentServiceImpl implements PaymentService {
     // escrow_status DELIVERED, confirmed_at 기록
     paymentMapper.updateEscrowStatus(bidIdx, "DELIVERED");
     paymentMapper.updateConfirmedAt(bidIdx);
-    // 경매 상태 배송완료(10)으로 변경
-    paymentMapper.updateAuctionStatusByBidIdx(bidIdx, 10);
+
+    // 비즈니스 룰: 마감/낙찰 이후 auctionStatus/bidStatus는 더 이상 변경하지 않는다.
+    log.debug("bidIdx={} 수령확인 후 auctionStatus 갱신은 비활성화됨", bidIdx);
 
     OrdersVO order = ordersService.findByBidIdx(bidIdx);
     if (order != null) {

@@ -12,6 +12,8 @@
         <result property="senderIdx"      column="sender_idx"/>
         <result property="messageContent" column="message_content"/>
         <result property="sentAt"         column="sent_at"/>
+        <result property="isRead"         column="is_read"/>
+        <result property="readAt"         column="read_at"/>
     </resultMap>
 
     <!-- 특정 채팅방의 메시지 목록 (오래된 순서) -->
@@ -22,7 +24,9 @@
             chatroom_idx,
             sender_idx,
             message_content,
-            sent_at
+            sent_at,
+            is_read,
+            read_at
         FROM chatmessage
         WHERE chatroom_idx = #{chatroomIdx}
         ORDER BY sent_at ASC, message_idx ASC
@@ -35,14 +39,36 @@
             chatroom_idx,
             sender_idx,
             message_content,
-            sent_at
+            sent_at,
+            is_read,
+            read_at
         ) VALUES (
             #{chatroomIdx},
             #{senderIdx},
             #{messageContent},
-            NOW()
+            NOW(),
+            'N',
+            NULL
         )
     </insert>
+
+    <update id="markRoomMessagesRead" parameterType="map">
+        UPDATE chatmessage
+        SET is_read = 'Y',
+            read_at = NOW()
+        WHERE chatroom_idx = #{chatroomIdx}
+          AND sender_idx != #{viewerIdx}
+          AND is_read = 'N'
+    </update>
+
+    <select id="countUnreadForMember" parameterType="long" resultType="int">
+        SELECT COUNT(*)
+        FROM chatmessage cm
+        INNER JOIN chatroom cr ON cr.chatroom_idx = cm.chatroom_idx
+        WHERE (cr.buyer_idx = #{memIdx} OR cr.bidder_idx = #{memIdx})
+          AND cm.sender_idx != #{memIdx}
+          AND cm.is_read = 'N'
+    </select>
 
     <!-- 방 삭제 시 메시지 전체 삭제하고 싶을 때 사용 -->
     <delete id="deleteByChatroom" parameterType="long">

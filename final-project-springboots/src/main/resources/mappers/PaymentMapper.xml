@@ -24,20 +24,18 @@
     <update id="updatePaymentStatus"> UPDATE payment SET pay_status = 'DONE' WHERE order_id =
         #{orderId} </update>
 
-    <!-- 경매 상태 변경 (결제완료: 8) -->
-    <update id="updateAuctionStatus"> UPDATE auction SET auction_status_idx = 8 WHERE auction_idx =
-        ( SELECT auction_idx FROM bid WHERE bid_idx = #{bidIdx} ) </update>
-
-    <!-- 경매 상태 변경 (배송중: 9, 배송완료: 10 등 동적으로) -->
-    <update id="updateAuctionStatusByBidIdx"> UPDATE auction SET auction_status_idx = #{statusIdx}
-        WHERE auction_idx = ( SELECT auction_idx FROM bid WHERE bid_idx = #{bidIdx} ) </update>
-
-    <!-- 입찰 상태 변경 (낙찰: 2) -->
-    <update id="updateBidStatus"> UPDATE bid SET bid_status_idx = 2 WHERE bid_idx = #{bidIdx} </update>
-
     <!-- 구매자 수령 확인 -->
     <update id="updateConfirmedAt"> UPDATE payment SET confirmed_at = NOW(), pay_status =
         'CONFIRMED' WHERE bid_idx = #{bidIdx} </update>
+
+    <!-- 판매자 거래 취소 시 환불(에스크로 취소) 처리 -->
+    <update id="cancelEscrowPaymentByBidIdx">
+        UPDATE payment
+        SET pay_status = 'CANCELED',
+            canceled_at = CASE WHEN canceled_at IS NULL THEN NOW() ELSE canceled_at END
+        WHERE bid_idx = #{bidIdx}
+          AND pay_status = 'DONE'
+    </update>
 
     <!-- 결제 정보 조회 (중복결제 체크 및 pay_idx 조회용) -->
     <select id="findPaymentByBidIdx" resultType="com.springbootstudy.bbs.domain.PaymentVO"> SELECT *

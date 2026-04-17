@@ -74,4 +74,46 @@
         ORDER BY created_at DESC
     </select>
 
+    <select id="findRoomSummariesByMember" parameterType="long" resultType="map">
+        SELECT
+            cr.chatroom_idx AS chatroomIdx,
+            cr.auction_idx AS auctionIdx,
+            CASE
+                WHEN cr.buyer_idx = #{memIdx} THEN cr.bidder_idx
+                ELSE cr.buyer_idx
+            END AS opponentIdx,
+            COALESCE(mp.mem_nickname, m.mem_name, m.mem_id) AS opponentName,
+            lm.message_content AS lastMessage,
+            lm.sent_at AS lastMessageAt,
+            COALESCE(uc.unread_count, 0) AS unreadCount
+        FROM chatroom cr
+        INNER JOIN member m
+            ON m.mem_idx = CASE
+                WHEN cr.buyer_idx = #{memIdx} THEN cr.bidder_idx
+                ELSE cr.buyer_idx
+            END
+        LEFT JOIN member_profile mp
+            ON mp.mem_idx = m.mem_idx
+        LEFT JOIN chatmessage lm
+            ON lm.message_idx = (
+                SELECT cm2.message_idx
+                FROM chatmessage cm2
+                WHERE cm2.chatroom_idx = cr.chatroom_idx
+                ORDER BY cm2.sent_at DESC, cm2.message_idx DESC
+                LIMIT 1
+            )
+        LEFT JOIN (
+            SELECT cm.chatroom_idx, COUNT(*) AS unread_count
+            FROM chatmessage cm
+            INNER JOIN chatroom c ON c.chatroom_idx = cm.chatroom_idx
+            WHERE cm.is_read = 'N'
+              AND cm.sender_idx != #{memIdx}
+              AND (c.buyer_idx = #{memIdx} OR c.bidder_idx = #{memIdx})
+            GROUP BY cm.chatroom_idx
+        ) uc ON uc.chatroom_idx = cr.chatroom_idx
+        WHERE cr.buyer_idx = #{memIdx}
+           OR cr.bidder_idx = #{memIdx}
+        ORDER BY COALESCE(lm.sent_at, cr.created_at) DESC
+    </select>
+
 </mapper>

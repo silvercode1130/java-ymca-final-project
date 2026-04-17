@@ -518,9 +518,13 @@ CREATE TABLE chatmessage (
     sender_idx     BIGINT      NOT NULL COMMENT 'FK member.memidx',
     message_content VARCHAR(1000) NOT NULL COMMENT '메시지 내용',
     sent_at        DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '보낸 시각',
+    is_read        CHAR(1)     NOT NULL DEFAULT 'N' COMMENT '읽음 여부 Y/N',
+    read_at        DATETIME    DEFAULT NULL COMMENT '읽은 시각',
     PRIMARY KEY (message_idx),
     KEY idx_chatmessage_room (chatroom_idx),
     KEY idx_chatmessage_sender (sender_idx),
+    KEY idx_chatmessage_unread (is_read),
+    CONSTRAINT ck_chatmessage_is_read CHECK (is_read IN ('Y', 'N')),
     CONSTRAINT fk_chatmessage_room
         FOREIGN KEY (chatroom_idx) REFERENCES chatroom(chatroom_idx)
         ON DELETE CASCADE,
@@ -629,14 +633,6 @@ INSERT INTO auction_status (auction_status_idx, auction_status_code, auction_sta
 VALUES (5, 'canceled','취소');
 INSERT INTO auction_status (auction_status_idx, auction_status_code, auction_status_name)
 VALUES (6, 'deleted','삭제됨');
-INSERT INTO auction_status (auction_status_idx, auction_status_code, auction_status_name)
-VALUES (7, 'paying','결제대기');
-INSERT INTO auction_status (auction_status_idx, auction_status_code, auction_status_name)
-VALUES (8, 'paid','결제완료');
-INSERT INTO auction_status (auction_status_idx, auction_status_code, auction_status_name)
-VALUES (9, 'shipping','배송중');
-INSERT INTO auction_status (auction_status_idx, auction_status_code, auction_status_name)
-VALUES (10, 'delivered','배송완료');
 
 -- 7-5) BID_STATUS 코드
 INSERT INTO bid_status (bid_status_idx, bid_status_code, bid_status_name)

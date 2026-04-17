@@ -1,6 +1,7 @@
 package com.springbootstudy.bbs.mapper;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -19,4 +20,5 @@ public interface ChatRoomMapper {
 
     int insertChatRoom(ChatRoomVO chatRoom);	// 새로운 채팅 생성
     List<ChatRoomVO> findByMember(Long memIdx); // 내가 참여한 방 목록 조회
+    List<Map<String, Object>> findRoomSummariesByMember(Long memIdx); // 목록 표시용 요약 정보
 }

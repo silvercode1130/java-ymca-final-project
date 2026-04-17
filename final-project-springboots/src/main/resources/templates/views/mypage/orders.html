@@ -52,9 +52,11 @@
 						<!-- 제목 + 상태 -->
 						<div class="mb-3 flex items-center justify-between gap-3">
 							<div>
-								<!-- 경매 제목 -->
-								<div class="text-sm font-semibold text-[#222222]"
-									th:text="${order.auctionTitle}">프로 축구공 FIFA 공인구 구함</div>
+								<div class="text-sm font-semibold text-[#222222]" th:text="${order.auctionTitle}">프로 축구공 FIFA 공인구 구함</div>
+								<div class="mt-1" th:if="${order.itemName != null and !#strings.isEmpty(order.itemName)}">
+									<span class="inline-flex items-center rounded-full bg-[#F3FAE8] px-2.5 py-1 text-[11px] font-semibold text-[#4C7C00]"
+										th:text="${'낙찰 상품: ' + order.itemName}">낙찰 상품: 상품명</span>
+								</div>
 								<div class="mt-1 text-[11px] text-[#999999]" th:if="${order.userRole == 'BUYER'}">
 									판매자 <span th:text="${order.sellerNickname}">seller123</span>
 								</div>
