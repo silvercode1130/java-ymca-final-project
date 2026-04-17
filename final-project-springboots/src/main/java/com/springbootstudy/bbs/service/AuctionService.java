@@ -62,7 +62,7 @@ public class AuctionService {
 	    auctionMapper.updateAuctionStatus(auctionIdx, statusIdx);
 	}
 	
-	// 경매 데이터 가공 (남은 시간 계산)
+	// 경매 데이터 가공 (남은 시간 계산 및 ID 마스킹)
 	private void refine(AuctionDTO dto) {
 	    LocalDateTime now = LocalDateTime.now();
 
@@ -82,6 +82,22 @@ public class AuctionService {
 
 	    } else {
 	        dto.setTimeDisplay(""); // 마감/유찰/취소 등은 timeDisplay 없음
+	    }
+	    
+	    // 구매자 ID 마스킹
+	    maskBuyerMemId(dto);
+	}
+	
+	// 구매자 ID 마스킹 처리
+	private void maskBuyerMemId(AuctionDTO dto) {
+	    String buyerMemId = dto.getBuyerMemId();
+	    if (buyerMemId != null && buyerMemId.length() > 2) {
+	        // 첫 2글자 + * + 마지막 1글자 형태로 마스킹 (예: user123 → us***3)
+	        int len = buyerMemId.length();
+	        dto.setBuyerMemIdMasked(buyerMemId.substring(0, 2) + "*".repeat(Math.max(1, len - 3)) + buyerMemId.substring(len - 1));
+	    } else if (buyerMemId != null) {
+	        // 3글자 미만은 간단하게 처리
+	        dto.setBuyerMemIdMasked(buyerMemId.substring(0, 1) + "*".repeat(Math.max(1, buyerMemId.length() - 1)));
 	    }
 	}
 	

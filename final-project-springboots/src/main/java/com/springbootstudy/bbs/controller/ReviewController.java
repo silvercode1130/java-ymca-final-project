@@ -10,7 +10,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.springbootstudy.bbs.domain.MemberVO;
 import com.springbootstudy.bbs.domain.NotificationVO;
+import com.springbootstudy.bbs.domain.AuctionDTO;
+import com.springbootstudy.bbs.domain.BidDTO;
 import com.springbootstudy.bbs.domain.ReviewVO;
+import com.springbootstudy.bbs.service.AuctionService;
+import com.springbootstudy.bbs.service.BidService;
 import com.springbootstudy.bbs.service.NotificationService;
 import com.springbootstudy.bbs.service.ReviewService;
 
@@ -23,6 +27,12 @@ public class ReviewController {
 
 	@Autowired
 	ReviewService reviewService;
+
+	@Autowired
+	private AuctionService auctionService;
+
+	@Autowired
+	private BidService bidService;
 	
 	@Autowired
 	private NotificationService notificationService;
@@ -81,6 +91,9 @@ public class ReviewController {
 			Model model) {
 
 		MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
+		if (loginUser == null) {
+			return "redirect:/members/login";
+		}
 
 		if (keyword != null && !keyword.trim().isEmpty()) {
 			List<ReviewVO> list = reviewService.search(searchType, keyword, loginUser.getMemIdx());
@@ -105,18 +118,36 @@ public class ReviewController {
 			@RequestParam("reviewStar") int reviewStar,
 			@RequestParam("content") String content,
 			HttpSession session) {
+			MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
+			if (loginUser == null) {
+				return "redirect:/members/login";
+			}
+
+			AuctionDTO auction = auctionService.auctionDetail(auctionIdx);
+			BidDTO bid = bidService.findBidById(bidIdx);
+			if (auction == null || bid == null) {
+				return "redirect:/mypage/reviews/reviewWrite";
+			}
+			if (!auctionIdx.equals(bid.getAuctionIdx()) || !auction.getBuyerIdx().equals(loginUser.getMemIdx())) {
+				return "redirect:/mypage/reviews/reviewWrite";
+			}
+			if (bid.getBidStatusIdx() == null || bid.getBidStatusIdx() != 2) {
+				return "redirect:/mypage/reviews/reviewWrite";
+			}
+			if (bid.getBidderIdx() == null || !bid.getBidderIdx().equals(bidderIdx)) {
+				return "redirect:/mypage/reviews/reviewWrite";
+			}
+
 		ReviewVO reviewVO = new ReviewVO();
-		reviewVO.setBuyerIdx(buyerIdx);
+		reviewVO.setBuyerIdx(auction.getBuyerIdx());
 		reviewVO.setBidIdx(bidIdx);
 		reviewVO.setAuctionIdx(auctionIdx);
-		reviewVO.setBidderIdx(bidderIdx);
+		reviewVO.setBidderIdx(bid.getBidderIdx());
 		reviewVO.setReviewTitle(reviewTitle);
 		reviewVO.setReviewStar(reviewStar);
 		reviewVO.setContent(content);
 
 		reviewService.insertReview(reviewVO);
-		
-		MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
 		
 		if (loginUser != null) {
 		    NotificationVO reviewNoti = new NotificationVO();

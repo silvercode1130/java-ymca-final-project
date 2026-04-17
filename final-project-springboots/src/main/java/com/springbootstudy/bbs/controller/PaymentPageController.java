@@ -6,9 +6,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.springbootstudy.bbs.domain.AuctionDTO;
 import com.springbootstudy.bbs.domain.BidDTO;
 import com.springbootstudy.bbs.domain.MemberAddrVO;
 import com.springbootstudy.bbs.domain.MemberVO;
+import com.springbootstudy.bbs.service.AuctionService;
 import com.springbootstudy.bbs.service.BidService;
 import com.springbootstudy.bbs.service.MemberAddrService;
 import com.springbootstudy.bbs.service.MyPageService;
@@ -21,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class PaymentPageController {
 
+  private final AuctionService auctionService;
   private final BidService bidService;
   private final MemberAddrService memberAddrService;
   private final MyPageService mypageService;
@@ -33,6 +36,11 @@ public class PaymentPageController {
     MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
     if (loginUser == null)
       return "redirect:/members/login";
+
+    AuctionDTO auction = auctionService.auctionDetail(auctionIdx);
+    if (auction == null || auction.getBuyerIdx() == null || !auction.getBuyerIdx().equals(loginUser.getMemIdx())) {
+      return "redirect:/mypage/auctions";
+    }
 
     // auctionIdx로 낙찰된 bidIdx 조회
     Long bidIdx = mypageService.getWonBidIdxByAuctionIdx(auctionIdx);
