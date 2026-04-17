@@ -68,6 +68,15 @@ function _createToast(innerHTML, bgColor, borderLeft, onClick) {
     return toast;
 }
 
+function _escapeHtml(value) {
+    return String(value == null ? '' : value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
 // ── 일반 토스트 (성공/에러/정보) ──
 function showToast(message, type, onClick) {
     const styles = {
@@ -78,7 +87,7 @@ function showToast(message, type, onClick) {
     const s = styles[type] || styles.info;
     _createToast(
         `<div style="display:flex;align-items:center;gap:8px;color:${s.color};">
-            <span>${s.icon}</span><span>${message}</span>
+            <span>${s.icon}</span><span>${_escapeHtml(message)}</span>
         </div>`,
         s.bg, null, onClick
     );
@@ -89,11 +98,11 @@ function showNotificationToast(title, message, targetUrl) {
     _createToast(
         `<div style="display:flex;align-items:center;gap:6px;">
             <span style="font-size:15px;">🔔</span>
-            <strong style="font-size:13px;color:#222;">${title}</strong>
+            <strong style="font-size:13px;color:#222;">${_escapeHtml(title)}</strong>
             <span style="font-size:10px;margin-left:auto;color:#888;">알림</span>
         </div>
         <div style="font-size:12px;color:#555;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:270px;">
-            ${message}
+            ${_escapeHtml(message)}
         </div>`,
         '#ffffff', '#7CBD00',
         () => { window.location.href = targetUrl || '/notifications'; }
@@ -105,11 +114,11 @@ function showChatToast(senderName, message, chatroomIdx) {
     _createToast(
         `<div style="display:flex;align-items:center;gap:6px;color:#3C1E1E;">
             <span style="font-size:15px;">💬</span>
-            <strong style="font-size:13px;">${senderName}</strong>
+            <strong style="font-size:13px;">${_escapeHtml(senderName)}</strong>
             <span style="font-size:10px;margin-left:auto;opacity:0.6;">채팅</span>
         </div>
         <div style="font-size:12px;color:#3C1E1E;opacity:0.85;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:270px;">
-            ${message}
+            ${_escapeHtml(message)}
         </div>`,
         '#FEE500', '#3C1E1E',
         () => {

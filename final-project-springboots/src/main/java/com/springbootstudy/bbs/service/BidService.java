@@ -39,6 +39,17 @@ public class BidService {
 	        } else {
 	            dto.setBidderName(name); // 한 글자 이름은 그대로
 	        }
+	        
+	        // memId(아이디)를 마스킹해서 bidderMemIdMasked에 세팅
+	        String memId = dto.getBidderMemId();
+	        if (memId != null && memId.length() > 2) {
+	            // 첫 2글자 + * + 마지막 1글자 형태로 마스킹 (예: user123 → us***3)
+	            int len = memId.length();
+	            dto.setBidderMemIdMasked(memId.substring(0, 2) + "*".repeat(Math.max(1, len - 3)) + memId.substring(len - 1));
+	        } else if (memId != null) {
+	            // 3글자 미만은 간단하게 처리
+	            dto.setBidderMemIdMasked(memId.substring(0, 1) + "*".repeat(Math.max(1, memId.length() - 1)));
+	        }
 	    }
 	    return list;
 	}
@@ -109,6 +120,15 @@ public class BidService {
                 dto.setBidderName(name.substring(0, 1) + "*".repeat(name.length() - 1));
             } else {
                 dto.setBidderName(name);
+            }
+            
+            // memId 마스킹 처리
+            String memId = dto.getBidderMemId();
+            if (memId != null && memId.length() > 2) {
+                int len = memId.length();
+                dto.setBidderMemIdMasked(memId.substring(0, 2) + "*".repeat(Math.max(1, len - 3)) + memId.substring(len - 1));
+            } else if (memId != null) {
+                dto.setBidderMemIdMasked(memId.substring(0, 1) + "*".repeat(Math.max(1, memId.length() - 1)));
             }
         }
         return dto;

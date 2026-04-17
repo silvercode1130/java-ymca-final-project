@@ -37,6 +37,8 @@ public class AuctionDTO {
 
     // 작성자
     private Long buyerIdx;
+    private String buyerMemId;     // 구매자 회원 아이디 (마스킹 전)
+    private String buyerMemIdMasked; // 구매자 회원 아이디 (마스킹됨)
 
     // 서비스 가공 데이터
     // private int discountRate;

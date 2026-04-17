@@ -73,6 +73,11 @@
 
                   <h4 class="fw-bold mb-3" th:text="${detail.auctionTitle}"></h4>
 
+                  <!-- 구매자 정보 -->
+                  <div class="text-muted small mb-2">
+                    구매자: <span class="fw-semibold" th:text="${detail.buyerMemIdMasked}" th:if="${detail.buyerMemIdMasked}"></span>
+                  </div>
+
                   <!-- 카테고리 / 마감일 -->
                   <div class="text-muted small mb-1">
                     카테고리: [[${detail.itemCategoryName}]]
@@ -379,12 +384,35 @@
                    class="p-3 border-bottom bid-item">
 
                 <div class="d-flex justify-content-between mb-1">
-                  <!-- 구매자: 실명 / 그 외: 마스킹 (1번 기준) -->
-                  <div class="fw-semibold small">
-                    <span th:if="${session.loginUser != null and session.loginUser.memIdx == detail.buyerIdx}"
-                          th:text="${bid.memName}"></span>
-                    <span th:unless="${session.loginUser != null and session.loginUser.memIdx == detail.buyerIdx}"
-                          th:text="${bid.bidderName}"></span>
+                  <!-- 입찰자 ID (마스킹) + Grade 컬러 원 + 평균 별점 -->
+                  <div class="fw-semibold small d-flex align-items-center gap-2">
+                    <!-- Grade별 컬러 원 (bronze 이상부터 표시) -->
+                    <th:block th:switch="${bid.bidderGradeName}">
+                      <th:block th:case="'bronze'">
+                        <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#CD7F32;"></span>
+                      </th:block>
+                      <th:block th:case="'silver'">
+                        <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#C0C0C0;"></span>
+                      </th:block>
+                      <th:block th:case="'gold'">
+                        <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#FFD700;"></span>
+                      </th:block>
+                      <th:block th:case="'vip'">
+                        <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#7B61FF;"></span>
+                      </th:block>
+                      <th:block th:case="'platinum'">
+                        <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#7B61FF;"></span>
+                      </th:block>
+                    </th:block>
+
+                    <!-- 입찰자 ID (마스킹) -->
+                    <span th:text="${bid.bidderMemIdMasked != null ? bid.bidderMemIdMasked : '-'}"></span>
+
+                    <!-- 평균 별점 -->
+                    <span class="small" th:if="${bid.bidderAverageRating != null and bid.bidderAverageRating > 0}">
+                      <span style="color:#F5C542;">★</span>
+                      [[${#numbers.formatDecimal(bid.bidderAverageRating, 1, 1)}]]
+                    </span>
                   </div>
                   <div class="fw-bold">
                     [[${#numbers.formatInteger(bid.bidPrice, 0, 'COMMA')}]]원
@@ -395,13 +423,14 @@
 
                 <div class="d-flex justify-content-between align-items-center">
                   <span class="text-muted small">[[${bid.itemBrand != null ? bid.itemBrand : '-'}]]</span>
-                  <span th:class="${bid.bidStatusIdx == 2 ? 'badge bg-warning text-dark' :
-					                  bid.bidStatusIdx == 3 ? 'badge bg-danger' :
-					                  bid.bidStatusIdx == 4 ? 'badge bg-secondary' :
-					                  bid.bidStatusIdx == 5 ? 'badge bg-dark' :
-					                  'badge bg-primary'}"
-					      th:text="${bid.bidStatusName}">
-					</span>
+                  <!-- 낙찰자 결정 후 실패(lost) 배지는 입찰내역에서 표시하지 않음 -->
+                  <span th:if="${bid.bidStatusIdx != 3}"
+                        th:class="${bid.bidStatusIdx == 2 ? 'badge bg-warning text-dark' :
+                                   bid.bidStatusIdx == 4 ? 'badge bg-secondary' :
+                                   bid.bidStatusIdx == 5 ? 'badge bg-dark' :
+                                   'badge bg-primary'}"
+                        th:text="${bid.bidStatusName}">
+                  </span>
                 </div>
 
                 <!-- 관리 버튼 (클릭 이벤트 버블링 방지) -->
