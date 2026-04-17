@@ -24,9 +24,6 @@ public class ReviewController {
 	@Autowired
 	ReviewService reviewService;
 	
-	@Autowired
-	private NotificationService notificationService;
-
 	// 리뷰 조회 창 -----------------------------------------------------------------
 
 	@GetMapping("/mypage/reviews")
@@ -116,19 +113,6 @@ public class ReviewController {
 
 		reviewService.insertReview(reviewVO);
 		
-		MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
-		
-		if (loginUser != null) {
-		    NotificationVO reviewNoti = new NotificationVO();
-		    reviewNoti.setReceiverIdx(reviewVO.getBidderIdx());
-		    reviewNoti.setSenderIdx(loginUser.getMemIdx());
-		    reviewNoti.setNotificationType("REVIEW_RECEIVED");
-		    reviewNoti.setNotificationTitle("새 리뷰가 등록되었습니다");
-		    reviewNoti.setNotificationMessage("별점 " + reviewVO.getReviewStar() + "점 리뷰가 작성되었습니다.");
-		    reviewNoti.setTargetUrl("/mypage/reviews");
-		    notificationService.sendAndPush(reviewNoti);
-		}
-
 		return "redirect:/mypage/reviews";
 	}
 

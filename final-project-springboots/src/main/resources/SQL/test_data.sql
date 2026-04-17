@@ -177,298 +177,255 @@ INSERT INTO reply (
    ========================================== */
 
 INSERT INTO item (
-    item_name, item_category_idx, item_brand, item_condition,
-    item_thumbnail_img, item_detail_img,
-    item_is_deleted
+    item_name, item_category_idx, item_brand,
+    item_condition, item_thumbnail_img,
+    item_regdate, item_is_deleted
 ) VALUES
--- 1~3: 러닝화 (카테고리 fitness = 5)
-('10km 대회용 러닝화 - 쿠션 좋은 모델', 5, 'ASICS',  'USED_A', NULL, NULL, 'N'),
-('경량 러닝화 - 전시 제품',                 5, 'NIKE',   'NEW',    NULL, NULL, 'N'),
-('초보자용 러닝화 - 한 달 사용',            5, 'HOKA',   'USED_B', NULL, NULL, 'N'),
+('[실사용 B급/득근 추천] 입문용 스쿼트 랙 + 바벨 세트 팝니다', 5, '비싼거',
+ 'NEW', '/images/bid/fit_dm1-1.png',
+ NOW(), 'N'),
 
--- 4~6: 골프 아이언 세트 (racket = 2)
-('중고 아이언 세트 - 사용감 있음',         2, 'Callaway',  'USED_B', NULL, NULL, 'N'),
-('아이언 세트 - 거의 새 제품',             2, 'TaylorMade','USED_A', NULL, NULL, 'N'),
-('연습용 아이언 세트',                     2, 'PING',      'USED_B', NULL, NULL, 'N'),
+('✨ [AURA-ZEN] 코스믹 글리터 🧘‍♀️ ''유니콘 갤럭시'' 요가매트', 5, 'AURA-ZEN',
+ 'NEW', '/images/bid/fit_dm2-1.png',
+ NOW(), 'N'),
 
--- 7~8: 자전거 헬멧 (accessory = 8)
-('로드용 헬멧 A - 한 시즌 사용',           8, 'GIRO',   'USED_A', NULL, NULL, 'N'),
-('경량 로드 헬멧 B',                       8, 'KASK',   'USED_A', NULL, NULL, 'N'),
+('요넥스 나노플레어 700 (5U)', 2, '요넥스 (YONEX)',
+ 'NEW', '/images/bid/ra_dm1-1.png',
+ NOW(), 'N'),
 
--- 9~11: 홈트 세트 관련 (fitness = 5)
-('아령 세트 + 두꺼운 매트',                5, 'NoBrand', 'USED_A', NULL, NULL, 'N'),
-('브랜드 홈트 세트',                       5, 'IFIT',    'USED_A', NULL, NULL, 'N'),
-('가성비 홈트 세트',                       5, 'LOCAL',   'USED_B', NULL, NULL, 'N'),
+('요넥스 아스트록스 66 민트', 2, '요넥스 (YONEX)',
+ 'NEW', '/images/bid/ra_dm1-2.png',
+ NOW(), 'N'),
 
--- 12~14: 수영 세트 (swim = 7)
-('수영 입문 세트 A (수경+수모+수영복)',     7, 'Arena',  'NEW',    NULL, NULL, 'N'),
-('수영 세트 B - 수경 사용감 있음',         7, 'Speedo', 'USED_A', NULL, NULL, 'N'),
-('브랜드 수영 세트 C',                     7, 'Mizuno', 'USED_B', NULL, NULL, 'N'),
+('[미개봉] 요넥스 나노레이 10F', 2, '요넥스 (YONEX)',
+ 'NEW', '/images/bid/ra_dm1-3.png',
+ NOW(), 'N'),
 
--- 15~16: 축구 스파이크 (ball = 1)
-('인조잔디용 축구 스파이크 A',             1, 'Adidas', 'USED_A', NULL, NULL, 'N'),
-('발볼 넓은 축구 스파이크 B',              1, 'Nike',   'USED_B', NULL, NULL, 'N'),
+('나이키 에어줌 페가수스 40 (240mm)', 4, '나이키 (NIKE)',
+ 'NEW', '/images/bid/sh_dm1-1.png',
+ NOW(), 'N'),
 
--- 17: 스키 세트 (outdoor = 6)
-('스키 풀세트 (구형 장비)',                6, 'Rossignol', 'USED_B', NULL, NULL, 'N'),
-
--- 18: 요가 매트 (fitness = 5)
-('두꺼운 요가 매트',                       5, 'Reebok', 'USED_A', NULL, NULL, 'N'),
-
--- 19: 리조트 숙박권 (accessory = 8)
-('리조트 숙박권 1박',                      8, 'ResortX','NEW',   NULL, NULL, 'N'),
-
--- 20: 콘서트 티켓 (accessory = 8)
-('콘서트 티켓 2장',                        8, 'Ticket','NEW',   NULL, NULL, 'N'),
+('나이키 에어줌 페가수스 39', 4, '나이키 (NIKE)',
+ 'NEW', '/images/bid/sh_dm1-2.png',
+ NOW(), 'N'),
  
- -- 공/볼 (카테고리 : 1번)
-('프리미어리그 공인구 - 미개봉 새제품', 1, 'NIKE', 'NEW', '/images/ball_01.jpg', NULL, 'N'),
-('KBL 공식 시합용 농구공', 1, 'Wilson', 'USED_A', '/images/ball_02.jpg', NULL, 'N'),
+ -- 골프 드라이버 입찰용
+('[S급] 테일러메이드 스텔스2 드라이버 (여성용/12도)', 2, 'TaylorMade',
+ 'NEW', '/images/bid/ra_dm2-1',
+ NOW(), 'N'),
 
--- 액세서리/잡화 (카테고리 : 8번)
-('대용량 스포츠 백팩 (신발주머니 포함)', 8, 'UnderArmour', 'USED_A', '/images/bag_01.jpg', NULL, 'N'),
-('겨울철 야외 러닝용 스마트폰 터치 장갑', 8, 'Adidas', 'NEW', '/images/gloves_01.jpg', NULL, 'N');
+-- 전기 자전거 입찰용
+('🚲 퀄리 Q3 미니 (그레이/배터리 14Ah 추가)', 8, 'Qualisports',
+ 'NEW', '/images/bid/ac_dm2-1',
+ NOW(), 'N');
+
+SET @i = (SELECT MIN(item_idx) FROM item ORDER BY item_idx DESC LIMIT 9);
  
  /* ==========================================
    AUCTION 더미 데이터 (10건)
    ========================================== */
 
 INSERT INTO auction (
-    buyer_idx, item_category_idx,
+    buyer_idx, item_category_idx, auction_thumbnail_img,
     auction_title, auction_desc,
     auction_target_price, auction_view_count,
     auction_start_at, auction_end_at, auction_decision_deadline,
-    auction_status_idx,
-    auction_regdate, auction_moddate,
+    auction_status_idx, auction_regdate, auction_moddate,
     auction_is_deleted, auction_deldate
 ) VALUES
--- 1. 진행중 경매 (open) - 러닝화
-(1, 4,
- '10km 대회용 러닝화 추천받습니다',
- '10km 대회 출전 예정이라, 초보 러너에게 맞는 쿠션 좋은 러닝화 추천받고 싶습니다.',
- 150000, 35,
- NOW() - INTERVAL 1 DAY,
- NOW() + INTERVAL 3 DAY,
- NOW() + INTERVAL 5 DAY,
- 1,
- NOW() - INTERVAL 1 DAY, NULL,
- 'N', NULL),
+(1, 5, '/images/auction/fit_dm.png',
+ '입문용 스쿼트 랙 + 바벨 세트 구해요! 🏋️‍♀️',
+ '이제 막 홈짐 시작하려는 헬린이입니다. 아파트라 너무 크지 않은 미니 랙이나 분리형 랙이었으면 좋겠어요. 바벨은 탄력봉 아니어도 되니까 저렴하게 넘겨주실 판매자님 찾습니다!',
+ 200000, 0, NOW(), NOW() + INTERVAL 5 DAY, NOW() + INTERVAL 7 DAY,
+ 1, NOW(), NULL, 'N', NULL),
 
--- 2. 진행중 경매 (open) - 골프 아이언
-(2, 2,
- '골프 아이언 세트 역경매 (중급자용)',
- '현재 핸디 90대 초반, 중급자용 아이언 세트 제안 부탁드립니다. 중고/새 제품 모두 가능.',
- 800000, 42,
- NOW() - INTERVAL 2 DAY,
- NOW() + INTERVAL 5 DAY,
- NOW() + INTERVAL 7 DAY,
- 1,
- NOW() - INTERVAL 2 DAY, NULL,
- 'N', NULL),
+(2, 5, '/images/auction/fit_dm2.png',
+ '요가매트 8mm 이상 두꺼운 거 파실 분? 🧘‍♀️',
+ '무릎이 아파서 아주 푹신하고 두꺼운 TPE 소재 요가매트 찾습니다. 사용감 조금 있어도 괜찮으니까 찢어진 곳만 없으면 돼요! 색상은 가급적 파스텔톤이면 좋겠어요! (샤방샤방한 거 좋아함💖)',
+ 100000, 0, NOW(), NOW() + INTERVAL 4 DAY, NOW() + INTERVAL 6 DAY,
+ 1, NOW(), NULL, 'N', NULL),
 
--- 3. 진행중 경매 (open) - 자전거 헬멧
-(9, 3,
- '로드용 헬멧, 가벼운 모델 찾습니다',
- '자출+주말 라이딩용으로 쓸 헬멧 찾고 있습니다. M 사이즈, 통풍 잘 되는 모델로 제안 부탁드려요.',
- 200000, 18,
- NOW() - INTERVAL 3 DAY,
- NOW() + INTERVAL 2 DAY,
- NOW() + INTERVAL 4 DAY,
- 1,
- NOW() - INTERVAL 3 DAY, NULL,
- 'N', NULL),
+(3, 1, '/images/auction/ball_dm.png',
+ '층간소음 없는 실내용 ''스텔스 농구공'' 구해요! 🏀',
+ '밤에도 집에서 드리블 연습하고 싶어서 저소음 공 찾고 있어요! 7호 사이즈면 좋겠고, 상태 깨끗한 녀석으로 픽 하겠습니다! ',
+ 50000, 0, NOW(), NOW() + INTERVAL 4 DAY, NOW() + INTERVAL 7 DAY,
+ 1, NOW(), NULL, 'N', NULL),
 
--- 4. 정상 낙찰된 경매 (closed) - 헬스 홈트 세트
-(10, 5,
- '홈트용 아령 + 매트 세트 구합니다',
- '1~10kg 조절 가능한 아령과 두꺼운 요가매트 세트로 제안 부탁드려요.',
- 250000, 57,
- NOW() - INTERVAL 10 DAY,
- NOW() - INTERVAL 5 DAY,
- NOW() - INTERVAL 3 DAY,
- 3,
- NOW() - INTERVAL 10 DAY, NOW() - INTERVAL 3 DAY,
- 'N', NULL),
+(4, 2, '/images/auction/ra_dm.png',
+ '입문용 요넥스 배드민턴 라켓(경량) 구합니다 🏸',
+ '손목이 약해서 4U~5U 정도의 가벼운 라켓 찾아요. 거트(줄) 새로 안 갈아도 바로 쓸 수 있는 상태면 더 좋습니다! 파스텔톤이면 바로 낙찰! 💖',
+ 100000, 0, NOW(), NOW() + INTERVAL 6 DAY, NOW() + INTERVAL 8 DAY,
+ 1, NOW(), NULL, 'N', NULL),
 
--- 5. 정상 낙찰된 경매 (closed) - 수영 용품 세트
-(8, 7,
- '수영 입문용 세트 (수경+수모+수영복)',
- '성인 남성 수영 입문용 세트 제안 부탁드립니다. 브랜드는 크게 상관 없고 내구성 좋은 제품이면 좋겠습니다.',
- 200000, 44,
- NOW() - INTERVAL 12 DAY,
- NOW() - INTERVAL 7 DAY,
- NOW() - INTERVAL 5 DAY,
- 3,
- NOW() - INTERVAL 12 DAY, NOW() - INTERVAL 5 DAY,
- 'N', NULL),
+(5, 3, '/images/auction/pro_dm.png',
+ '러닝용 무릎 니슬리브 1세트 구함 (M사이즈) 🏃‍♀️',
+ '무릎 지지력이 짱짱한 제품 찾아요! 세탁해도 냄새 안 나고 늘어남 없는 S급 상태였으면 좋겠습니다. 택배비 포함해서 좋은 가격 제시해주세요! ✨',
+ 60000, 0, NOW(), NOW() + INTERVAL 4 DAY, NOW() + INTERVAL 5 DAY,
+ 1, NOW(), NULL, 'N', NULL),
 
--- 6. 마감 후 결정 진행중 느낌 (closed, 낙찰자 아직 확정 X) - 축구 스파이크
-(3, 4,
- '인조잔디용 축구 스파이크 요청',
- '발볼 넓은 편이라, 발 편한 인조잔디용 스파이크 찾고 있습니다. 270mm 기준 제안 부탁드려요.',
- 180000, 29,
- NOW() - INTERVAL 6 DAY,
- NOW() - INTERVAL 1 DAY,
- NOW() + INTERVAL 1 DAY,
- 2,
- NOW() - INTERVAL 6 DAY, NULL,
- 'N', NULL),
+(6, 4, '/images/auction/sh_dm.png',
+ '나이키 에어줌 페가수스 러닝화 (240mm) 👟',
+ '조깅 시작해보려고 해요! 핑크나 화이트 컬러 들어간 디자인 좋아합니다. 바닥창 거의 안 닳은 새거 같은 중고 부탁드려요!',
+ 100000, 0, NOW(), NOW() + INTERVAL 6 DAY, NOW() + INTERVAL 8 DAY,
+ 1, NOW(), NULL, 'N', NULL),
 
--- 7. 유찰된 경매 (failed) - 스키 장비
-(4, 6,
- '스키 풀세트(중고) 구합니다',
- '스키/부츠/폴/헬멧 풀세트로 중고 매물을 찾고 있습니다. 175cm, 70kg 기준 맞는 장비면 좋겠습니다.',
- 500000, 12,
- NOW() - INTERVAL 15 DAY,
- NOW() - INTERVAL 10 DAY,
- NOW() - INTERVAL 8 DAY,
- 4,
- NOW() - INTERVAL 15 DAY, NOW() - INTERVAL 8 DAY,
- 'N', NULL),
+(7, 5, '/images/auction/fit_dm3.png',
+ '멜킨 스쿼트 머신 (화이트 에디션) 구해요! 🏋️‍♀️',
+ '거실 인테리어 해치지 않는 깔끔한 화이트 컬러 스쿼트 머신 삽니다! 사용감 적고 발등 스펀지 짱짱한 걸로 보내주실 분?',
+ 100000, 0, NOW(), NOW() + INTERVAL 3 DAY, NOW() + INTERVAL 5 DAY,
+ 1, NOW(), NULL, 'N', NULL),
 
--- 8. 취소된 경매 (canceled) - 요가 매트 (구매자 취소)
-(7, 5,
- '두꺼운 요가 매트 구합니다 (취소됨)',
- '무릎이 안 좋아서 두꺼운 요가 매트 찾아요. 집에서 사용하는 용도입니다.',
- 80000, 9,
- NOW() - INTERVAL 7 DAY,
- NOW() - INTERVAL 4 DAY,
- NOW() - INTERVAL 3 DAY,
- 5,
- NOW() - INTERVAL 7 DAY, NOW() - INTERVAL 3 DAY,
- 'N', NULL),
+(8, 6, '/images/auction/out_dm.png',
+ '감성 캠핑용 루미에르 랜턴 구합니다 🕯️',
+ '캠핑 밤을 샤방샤방하게 밝혀줄 가스 랜턴 찾아요! 유리 갓에 금 안 가고 케이스까지 풀세트로 있으신 분 찾습니다. 분위기 장인 되고 싶어요! 🔥',
+ 50000, 0, NOW(), NOW() + INTERVAL 5 DAY, NOW() + INTERVAL 7 DAY,
+ 1, NOW(), NULL, 'N', NULL),
 
--- 9. 관리자 삭제된 경매 (is_deleted = Y) - 리조트 이용권 (법적 이슈 케이스)
-(5, 8,
- '리조트 숙박권 양도 요청 (관리자 삭제)',
- '리조트 숙박권 양도 받으려고 합니다. 날짜는 협의 가능해요.',
- 600000, 5,
- NOW() - INTERVAL 20 DAY,
- NOW() - INTERVAL 15 DAY,
- NOW() - INTERVAL 14 DAY,
- 6,
- NOW() - INTERVAL 20 DAY, NOW() - INTERVAL 14 DAY,
- 'Y', NOW() - INTERVAL 13 DAY),
+(9, 7, '/images/auction/sw_dm.png',
+ '미즈노 엑셀아이 수경 (노패킹/미러) 🏊‍♀️',
+ '눈 자국 덜 남는 노패킹 수경 찾아요! 렌즈에 기스 없는 거 선호하고, 컬러는 화려할수록 좋습니다. 수영장 인싸 되게 도와주세요! ✨',
+ 50000, 0, NOW(), NOW() + INTERVAL 2 DAY, NOW() + INTERVAL 4 DAY,
+ 1, NOW(), NULL, 'N', NULL),
 
--- 10. 관리자 삭제된 경매 (is_deleted = Y) - 콘서트 티켓 (정책 위반)
-(6, 8,
- '콘서트 티켓 양도 요청 (정책 위반)',
- '콘서트 티켓 구해봅니다. 연석이면 좋겠습니다.',
- 400000, 7,
- NOW() - INTERVAL 18 DAY,
- NOW() - INTERVAL 13 DAY,
- NOW() - INTERVAL 12 DAY,
- 6,
- NOW() - INTERVAL 18 DAY, NOW() - INTERVAL 12 DAY,
- 'Y', NOW() - INTERVAL 11 DAY),
+(10, 8, '/images/ac_dm.png',
+ '가민 스마트워치 충전 케이블(정품) 급구! ⚡',
+ '충전기를 잃어버려서 운동 기록을 못 하고 있어요 ㅠㅠ 정품 케이블 단선 안 된 걸로 빨리 보내주실 판매자님 찾습니다!',
+ 1500000, 0, NOW(), NOW() + INTERVAL 7 DAY, NOW() + INTERVAL 9 DAY,
+ 1, NOW(), NULL, 'N', NULL),
  
- -- 11. 공/볼 (1번) 관련 경매
-(3, 1, 
- '축구 소모임에서 쓸 공인구 여러 개 구해요', 
- '상태 좋은 프리미어리그나 챔스 공인구 찾습니다. 낱개도 좋으니 제안 주세요.', 
- 120000, 15, 
- NOW() - INTERVAL 1 DAY, NOW() + INTERVAL 4 DAY, NOW() + INTERVAL 6 DAY, 
- 1, NOW() - INTERVAL 1 DAY, NULL, 'N', NULL),
+(1, 1, '/images/auction/ball_dm1.png',
+ '시선강탈! 파스텔 ''솜사탕 테니스공'' 1캔(4구) 구해요! 🎾',
+ '테니스 코트에서도 예쁨을 포기할 수 없는 테린이입니다! 
+ 흔한 형광색 말고, 핑크나 민트색 솜사탕 같은 파스텔톤 테니스공 찾고 있어요! 💖 
+ 
+ 새 상품이면 좋고, 상태 좋은 중고도 환영합니다. 
+ 예쁜 공으로 연습하면 서브가 더 잘 들어갈 것 같아요! ✨',
+ 25000, 0, NOW(), NOW() + INTERVAL 5 DAY, NOW() + INTERVAL 7 DAY,
+ 1, NOW(), NULL, 'N', NULL),
+ 
+ -- [진행중] 골프 드라이버 (카테고리 2: 라켓/골프류 가정)
+(1, 2, '/images/auction/ra_dm2.png',
+ '⛳ 테일러메이드 스텔스2 여성용 드라이버 12도 구해요!',
+ '드라이버 비거리가 안 나와서 고민인 골린이입니다. 🏌️‍♀️\n테일러메이드 스텔스2 모델로 구하고 있고, 샤프트는 L이었으면 좋겠어요!\n헤드 윗부분에 큼직한 기스만 없으면 바로 검토하겠습니다. ',
+ 450000, 0, NOW(), NOW() + INTERVAL 5 DAY, NOW() + INTERVAL 7 DAY,
+ 1, NOW(), NULL, 'N', NULL),
 
--- 12. 공/볼 (1번) 관련 경매
-(4, 1, 
- '야외 우레탄 코트용 농구공 추천 바랍니다', 
- '내구성 좋은 농구공 찾고 있습니다. 7호 사이즈 위주로 제안 부탁드려요.', 
- 60000, 22, 
- NOW() - INTERVAL 2 DAY, NOW() + INTERVAL 3 DAY, NOW() + INTERVAL 5 DAY, 
- 1, NOW() - INTERVAL 2 DAY, NULL, 'N', NULL),
+-- [진행중] 전기 자전거 (카테고리 8: 잡화/기타 가정)
+(2, 8, '/images/auction/ac_dm2.png',
+ '🚲 출퇴근용 퀄리스포츠 Q3 미니 전기자전거 찾습니다!',
+ '왕복 10km 출퇴근용으로 타려고 해요. 🚲\n배터리 상태 양호하고 브레이크 밀림 없는 녀석으로 구합니다!\n짐받이 설치되어 있으면 더 좋아요. ✨',
+ 800000, 0, NOW(), NOW() + INTERVAL 4 DAY, NOW() + INTERVAL 6 DAY,
+ 1, NOW(), NULL, 'N', NULL),
 
--- 13. 액세서리/잡화 (8번) 관련 경매
-(5, 8, 
- '헬스장 갈 때 들기 좋은 큰 가방 구합니다', 
- '신발이랑 옷이 다 들어가는 넉넉한 사이즈의 백팩이나 더플백 찾고 있어요.', 
- 100000, 10, 
- NOW() - INTERVAL 1 DAY, NOW() + INTERVAL 5 DAY, NOW() + INTERVAL 7 DAY, 
- 1, NOW() - INTERVAL 1 DAY, NULL, 'N', NULL),
+-- [유찰/실패] 캠핑 텐트 (카테고리 6: 아웃도어) -> 상태 4
+(3, 6, '/images/auction/out_dm2.png',
+ '⛺ [유찰테스트] 노르디스크 아스가르드 12.6 면텐트 구함',
+ '감성 캠핑의 끝판왕 아스가르드 12.6 모델 구해요.\n곰팡이 없고 시즈닝 잘 된 녀석으로 픽 하겠습니다! 🐯',
+ 900000, 15, NOW() - INTERVAL 10 DAY, NOW() - INTERVAL 5 DAY, NOW() - INTERVAL 3 DAY,
+ 4, NOW() - INTERVAL 10 DAY, NULL, 'N', NULL),
 
--- 14. 액세서리/잡화 (8번) 관련 경매
-(6, 8, 
- '야간 라이딩용 반사 장갑이나 양말 세트', 
- '밤에 자전거 탈 때 안전을 위해 눈에 잘 띄는 잡화 세트 제안 부탁드립니다.', 
- 40000, 5, 
- NOW() - INTERVAL 12 HOUR, NOW() + INTERVAL 2 DAY, NOW() + INTERVAL 4 DAY, 
- 1, NOW() - INTERVAL 12 HOUR, NULL, 'N', NULL);
+-- [취소] 야구 글러브 (카테고리 1: 공/볼) -> 상태 5
+(4, 1, '/images/auction/out_dm2.png',
+ '⚾ [취소테스트] 미즈노 프로 내야수용 글러브 구해요',
+ '캐치볼용으로 쓸 미즈노 프로 등급 글러브 찾습니다.\n가급적 길들이기 완료된 제품 선호해요! ✨',
+ 300000, 8, NOW() - INTERVAL 2 DAY, NOW() - INTERVAL 1 DAY, NOW() + INTERVAL 1 DAY,
+ 5, NOW() - INTERVAL 2 DAY, NULL, 'N', NULL);
+
+SET @a = (SELECT MIN(auction_idx) FROM auction ORDER BY auction_idx DESC LIMIT 15);
  
  /* ==========================================
    BID 더미 데이터 (각 상태별)
    ========================================== */
 
 INSERT INTO bid (
-    auction_idx, bidder_idx, item_idx, bid_price,
-    bid_quantity, bid_message, bid_status_idx,
-    bid_regdate, bid_moddate
+    auction_idx, bidder_idx, item_idx,
+    bid_price, bid_quantity, bid_message,
+    bid_status_idx, bid_regdate, bid_moddate
 ) VALUES
--- Auction 1 (open) : 여러 normal 입찰, 아직 낙찰 없음
-(1, 9,  1, 130000, 1, '쿠션 좋은 러닝화 새 제품으로 제안드립니다.', 1,
- NOW() - INTERVAL 1 DAY, NULL),
-(1, 10, 2, 140000, 1, '전시 상품이었지만 거의 새 것이라 상태 좋습니다.', 1,
- NOW() - INTERVAL 20 HOUR, NULL),
-(1, 2,  3, 150000, 1, '인기 모델이고, 한 달 사용했습니다.', 1,
- NOW() - INTERVAL 10 HOUR, NULL),
 
--- Auction 2 (open) : normal + 취소된 입찰
-(2, 4,  4, 750000, 1, '중고 아이언 세트입니다. 사용감 있지만 성능 좋습니다.', 1,
- NOW() - INTERVAL 2 DAY, NULL),
-(2, 5,  5, 900000, 1, '거의 새 제품 수준입니다. 피팅 포함 가능합니다.', 1,
- NOW() - INTERVAL 1 DAY, NULL),
-(2, 3,  6, 700000, 1, '연습용으로 쓰던 세트라 흠집은 있지만 저렴하게 드립니다.', 4,
- NOW() - INTERVAL 3 DAY, NOW() - INTERVAL 2 DAY), -- 취소된 입찰
+-- auction 스쿼트랙+바벨(@a) 입찰 1건
+(@a, 2, @i,
+ 190000, 1, '홈짐 입문용으로 구매해서 약 1년 반 정도 열심히 사용한 B급 제품입니다. 이제 더 높은 단계로 넘어가려고 저렴하게 처분합니다. 사진 보시다시피 사용감이 꽤 있습니다.',
+ 1, NOW(), NULL),
 
--- Auction 3 (open) : normal 입찰 몇 개
-(3, 1,  7, 150000, 1, '경량 헬멧, 사이즈 M, 한 시즌 사용했습니다.', 1,
- NOW() - INTERVAL 2 DAY, NULL),
-(3, 8,  8, 180000, 1, '통풍 잘 되는 모델입니다. 실착 10회 미만.', 1,
- NOW() - INTERVAL 30 HOUR, NULL),
+-- auction 요가매트(@a+1) 입찰 2건
 
--- Auction 4 (closed, 정상 낙찰된 케이스)
---   1개 won, 나머지 lost
-(4, 10, 9, 220000, 1, '아령 세트(2~10kg) + 두꺼운 매트 세트입니다.', 2,
- NOW() - INTERVAL 7 DAY, NOW() - INTERVAL 5 DAY),  -- 낙찰된 입찰
-(4, 2,  10,240000, 1, '브랜드 제품이며 사용감 거의 없습니다.', 3,
- NOW() - INTERVAL 8 DAY, NOW() - INTERVAL 5 DAY),  -- 낙찰 실패
-(4, 7,  11,200000, 1, '사용감 있지만 가성비 좋은 세트입니다.', 3,
- NOW() - INTERVAL 9 DAY, NOW() - INTERVAL 5 DAY),
+(@a+1, 1, @i+1,
+ 90000, 1, '✨✨ [AURA-ZEN] 코스믹 글리터 🧘‍♀️ ''유니콘 갤럭시'' ✨✨
 
--- Auction 5 (closed, 정상 낙찰된 수영 세트)
-(5, 8,  12,150000, 1, '수경+수모+수영복 새 제품 세트입니다.', 2,
- NOW() - INTERVAL 9 DAY, NOW() - INTERVAL 7 DAY),  -- 낙찰
-(5, 1,  13,130000, 1, '수경만 사용감 있고 나머지는 새것 수준입니다.', 3,
- NOW() - INTERVAL 10 DAY, NOW() - INTERVAL 7 DAY),
-(5, 3,  14,170000, 1, '브랜드 세트이며, 사이즈 교환은 어렵습니다.', 3,
- NOW() - INTERVAL 11 DAY, NOW() - INTERVAL 7 DAY),
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+👋 안녕하세요! 나만의 홈트 공간을 빛내줄 ''AURA-ZEN''입니다.
+매일 마주하는 내 방 바닥, 이제 은하수로 바꿔보세요!
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
--- Auction 6 (closed, 마감 후 결정 진행중 느낌: normal 입찰만 있고 won 없음)
-(6, 4,  15,160000, 1, '인조잔디용 스파이크, 270mm, 사용감 적습니다.', 1,
- NOW() - INTERVAL 3 DAY, NULL),
-(6, 5,  16,150000, 1, '발볼 넓은 분께 추천드리는 모델입니다.', 1,
- NOW() - INTERVAL 4 DAY, NULL),
+🎨 1. 방 안의 작은 우주 [Design Focus]
+────────────────────────────────
+지루한 홈트 공간에 화려한 생동감을 더해드립니다.
+천연고무 Base에 💎코스메틱 등급 글리터💎를 수천 번 분사하여,
+마치 거실에 은하수가 흐르는 듯한 황홀한 비주얼을 구현했습니다.
 
--- Auction 7 (failed, 유찰: 입찰이 거의 없거나 너무 낮음)
-(7, 6,  17,200000, 1, '스키 세트지만 연식이 좀 있습니다.', 3,
- NOW() - INTERVAL 14 DAY, NULL),
+🌌 [유니콘 갤럭시 패턴]
+햇살이나 형광등 아래에서 다채로운 빛을 발산합니다.
+매트 하나만으로 홈트 인증샷 찍고 싶은 ''인스타 감성'' 룸이 완성됩니다!
 
--- Auction 8 (canceled, 취소된 경매: 입찰은 있었지만 상태 canceled)
-(8, 7,  18,60000, 1, '살짝 사용감 있는 요가 매트입니다.', 4,
- NOW() - INTERVAL 6 DAY, NOW() - INTERVAL 4 DAY),
 
--- Auction 9 (관리자 삭제된 경매: 입찰도 모두 취소 처리)
-(9, 5,  19,550000, 1, '리조트 숙박권 주중 1박 양도 제안드립니다.', 5,
- NOW() - INTERVAL 19 DAY, NOW() - INTERVAL 13 DAY),
+🛡️ 2. 소음 걱정 없는 고성능 스펙 [Home-Training]
+────────────────────────────────
+집에서 수련할 때 가장 중요한 건 역시 층간소음과 접지력이죠!
 
--- Auction 10 (관리자 삭제된 콘서트 티켓 케이스)
-(10,6,  20,350000, 2, '콘서트 티켓 2장 양도합니다.', 5,
- NOW() - INTERVAL 17 DAY, NOW() - INTERVAL 11 DAY),
+✔️ [Silent Care] 프리미엄 고밀도 TPE로 층간소음 완벽 차단
+✔️ [Zero-Slip] 땀이 나도 자석처럼 달라붙는 최강의 논슬립
+✔️ [Eco-Friendly] 고무 냄새 NO! 개봉 즉시 사용 가능한 안심 소재
 
--- Auction 11
-(11, 7, 21, 110000, 1, '미개봉 나이키 공인구입니다. 박스 풀셋이에요.', 1, NOW() - INTERVAL 5 HOUR, NULL),
+📏 상세 규격
+- 폭: 넉넉한 66cm (집에서도 넓고 쾌적하게!)
+- 길이: 183cm
+- 두께: 무릎 관절 보호와 바닥 소음을 모두 잡은 최적의 5.5mm
 
--- Auction 13
-(13, 1, 23, 85000, 1, '언더아머 백팩인데 수납공간 정말 많고 깨끗합니다.', 1, NOW() - INTERVAL 2 HOUR, NULL);
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+단순한 운동 기구가 아닌, 당신의 공간을 바꾸는 오브제가 될 것입니다.
+아우라-젠과 함께 매일 더 설레는 홈트 시간을 만들어보세요! 🐯✨',
+ 1, NOW(), NULL),
+
+-- auction 배드민턴 진행중(@a+4) 입찰 3건
+(@a+3, 10, @i+2,
+ 90000, 1, '거트 작업 새로 마친 상태이며, 헤드 부분 기스 없는 최상급 컨디션입니다. 가벼운 무게(5U)라 손목 부담 없이 사용 가능합니다.',
+ 1, NOW(), NULL),
+
+(@a+3, 1, @i+3,
+ 80000, 1, '사용감은 약간 있지만 파스텔 민트 색상이 아주 예쁜 모델입니다. 배드민턴 입문용으로 추천드리며, 셔틀콕 2알 서비스로 동봉해 드립니다.',
+ 1, NOW(), NULL),
+
+(@a+3, 9, @i+4,
+ 100000, 1, '선물 받고 보관만 한 미개봉 새상품입니다. 정가보다 저렴하게 제안하며, 보증서 포함 풀패키지로 발송해 드립니다.',
+ 1, NOW(), NULL),
+
+-- auction 러닝화(@a+6) 입찰 2건
+(@a+5, 9, @i+5,
+ 90000, 1, '실내 헬스장에서 딱 2번 착용했습니다. 아웃솔 마모 전혀 없고 신발 안쪽 로고도 선명한 새제품급 상태입니다.',
+ 1, NOW(), NULL),
+
+(@a+5, 2, @i+6,
+ 80000, 1, '실외 조깅용으로 사용하여 미세한 오염은 있으나 전문 세탁 완료하여 깨끗합니다. 기능상 하자 전혀 없으니 편하게 신으실 분 추천합니다.',
+ 1, NOW(), NULL),
+ 
+ -- 골프 드라이버 경매(@new_a)에 대한 입찰
+(@new_a, 10, @new_i,
+ 430000, 1, '⛳ 필드 딱 3번 나간 신품급 드라이버 제안드립니다!
+ 와이프 선물용으로 샀는데 골프에 흥미가 없어서 아깝지만 내놓아요. 💦
+ 헤드와 샤프트 모두 정품 스티커 붙어있고, 전용 커버도 새것 그대로입니다.
+ 비거리 고민이시면 이 드라이버가 정답일 거예요! ✨',
+ 1, NOW(), NULL),
+
+-- 전기 자전거 경매(@new_a+1)에 대한 입찰
+(@new_a+1, 5, @new_i+1,
+ 780000, 1, '🚲 출퇴근 끝판왕 퀄리 Q3 미니 제안드려요!
+ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ 작년 가을에 구매해서 배터리 효율 아주 좋습니다!
+ ✔️ 튜닝 내역: 앞뒤 머드가드 설치, 푹신한 젤 안장 교체 완료!
+ ✔️ 주행 거리: 약 150km 미만
+ 직접 타보시면 모터 힘 짱짱한 거 바로 느끼실 거예요! 🔥',
+ 1, NOW(), NULL);
 
 
  /* ==========================================
@@ -510,209 +467,7 @@ INSERT INTO review (
    옥션 더미 데이터 (추가)
    ========================================== */
  
- INSERT INTO auction (
-    buyer_idx,
-    item_category_idx,
-    auction_thumbnail_img,
-    auction_title,
-    auction_desc,
-    auction_target_price,
-    auction_view_count,
-    auction_start_at,
-    auction_end_at,
-    auction_decision_deadline,
-    auction_status_idx,
-    auction_regdate,
-    auction_moddate,
-    auction_is_deleted,
-    auction_deldate
-) VALUES
--- 15. 스쿼트 랙 + 바벨 세트
-(1, 5,
- '/images/auction/23418b2b-cff1-404b-bfbc-862abc9d9b07_fit_dm.png',
- '입문용 스쿼트 랙 + 바벨 세트 구해요! 🏋️‍♀️',
- '이제 막 홈짐 시작하려는 헬린이입니다. 아파트라 너무 크지 않은 미니 랙이나 분리형 랙이었으면 좋겠어요. 바벨은 탄력봉 아니어도 되니까 저렴하게 넘겨주실 판매자님 찾습니다!',
- 200000,
- 0,
- NOW() - INTERVAL 2 DAY,          -- start_at
- NOW() + INTERVAL 1 DAY,          -- end_at
- NOW() + INTERVAL 1 DAY + INTERVAL 30 MINUTE, -- decision_deadline
- 1,
- NOW() - INTERVAL 2 DAY,
- NULL,
- 'N',
- NULL
-),
-
--- 16. 요가매트
-(2, 5,
- '/images/auction/ea94aa3f-7d64-484c-af18-d72ec90cfffd_fit_dm2.png',
- '요가매트 8mm 이상 두꺼운 거 파실 분? 🧘‍♀️',
- '무릎이 아파서 아주 푹신하고 두꺼운 TPE 소재 요가매트 찾습니다. 사용감 조금 있어도 괜찮으니까 찢어진 곳만 없으면 돼요! 색상은 가급적 파스텔톤이면 좋겠어요! (샤방샤방한 거 좋아함💖)',
- 100000,
- 0,
- NOW() - INTERVAL 2 DAY,
- NOW() + INTERVAL 1 DAY,
- NOW() + INTERVAL 1 DAY + INTERVAL 30 MINUTE,
- 1,
- NOW() - INTERVAL 2 DAY,
- NULL,
- 'N',
- NULL
-),
-
--- 17. 스텔스 농구공
-(3, 1,
- '/images/auction/6ad8833d-12a0-4759-83f6-62927b691267_ball_dm.png',
- '층간소음 없는 실내용 ''스텔스 농구공'' 구해요! 🏀',
- '밤에도 집에서 드리블 연습하고 싶어서 저소음 공 찾고 있어요! 7호 사이즈면 좋겠고, 상태 깨끗한 녀석으로 픽 하겠습니다! 🐯',
- 50000,
- 0,
- NOW() - INTERVAL 2 DAY,
- NOW() + INTERVAL 5 DAY,
- NOW() + INTERVAL 8 DAY,
- 1,
- NOW() - INTERVAL 2 DAY,
- NULL,
- 'N',
- NULL
-),
-
--- 18. 요넥스 배드민턴 라켓 (버전 1)
-(4, 2,
- '/images/auction/auction_default.png',
- '입문용 요넥스 배드민턴 라켓(경량) 구합니다 🏸',
- '손목이 약해서 4U~5U 정도의 가벼운 라켓 찾아요. 거트(줄) 새로 안 갈아도 바로 쓸 수 있는 상태면 더 좋습니다! 파스텔톤이면 바로 낙찰! 💖',
- 100000,
- 0,
- NOW() - INTERVAL 2 DAY,
- NOW() + INTERVAL 1 DAY,
- NOW() + INTERVAL 3 DAY,
- 5,                                -- 예: 진행 상태 코드
- NOW() - INTERVAL 2 DAY,
- NOW() - INTERVAL 2 DAY + INTERVAL 10 MINUTE,
- 'N',
- NULL
-),
-
--- 19. 요넥스 배드민턴 라켓 (버전 2)
-(4, 2,
- '/images/auction/6de1d54f-89fe-486f-bd2a-775d3dec2345_ra_dm.png',
- '입문용 요넥스 배드민턴 라켓(경량) 구합니다 🏸',
- '손목이 약해서 4U~5U 정도의 가벼운 라켓 찾아요. 거트(줄) 새로 안 갈아도 바로 쓸 수 있는 상태면 더 좋습니다! 파스텔톤이면 바로 낙찰! 💖',
- 100000,
- 0,
- NOW() - INTERVAL 2 DAY,
- NOW() + INTERVAL 1 DAY,
- NOW() + INTERVAL 2 DAY,
- 1,
- NOW() - INTERVAL 2 DAY,
- NULL,
- 'N',
- NULL
-),
-
--- 20. 무릎 니슬리브
-(5, 3,
- '/images/auction/aecff9f6-5ef3-49b6-83d4-6f01539b930b_pro_dm.png',
- '러닝용 무릎 니슬리브 1세트 구함 (M사이즈) 🏃‍♀️',
- '무릎 지지력이 짱짱한 제품 찾아요! 세탁해도 냄새 안 나고 늘어남 없는 S급 상태였으면 좋겠습니다. 택배비 포함해서 좋은 가격 제시해주세요! ✨',
- 60000,
- 0,
- NOW() - INTERVAL 2 DAY,
- NOW() + INTERVAL 2 DAY,
- NOW() + INTERVAL 3 DAY,
- 1,
- NOW() - INTERVAL 2 DAY,
- NULL,
- 'N',
- NULL
-),
-
--- 21. 러닝화
-(6, 1,
- '/images/auction/c726c0cf-efce-4da5-aa4b-5f8884d62502_sh_dm.png',
- '나이키 에어줌 페가수스 러닝화 (240mm) 👟',
- '조깅 시작해보려고 해요! 핑크나 화이트 컬러 들어간 디자인 좋아합니다. 바닥창 거의 안 닳은 새거 같은 중고 부탁드려요!',
- 100000,
- 0,
- NOW() - INTERVAL 2 DAY,
- NOW() + INTERVAL 0 DAY + INTERVAL 4 HOUR,
- NOW() + INTERVAL 3 DAY + INTERVAL 4 HOUR,
- 1,
- NOW() - INTERVAL 2 DAY,
- NULL,
- 'N',
- NULL
-),
-
--- 22. 스쿼트 머신
-(7, 5,
- '/images/auction/63f683a4-d760-4be1-ba09-84ddaa275534_fit_dm3.png',
- '멜킨 스쿼트 머신 (화이트 에디션) 구해요! 🏋️‍♀️',
- '거실 인테리어 해치지 않는 깔끔한 화이트 컬러 스쿼트 머신 삽니다! 사용감 적고 발등 스펀지 짱짱한 걸로 보내주실 분?',
- 100000,
- 0,
- NOW() - INTERVAL 2 DAY,
- NOW() + INTERVAL 1 DAY,
- NOW() + INTERVAL 3 DAY,
- 1,
- NOW() - INTERVAL 2 DAY,
- NULL,
- 'N',
- NULL
-),
-
--- 23. 캠핑 랜턴
-(8, 6,
- '/images/auction/c0eb63d7-fd10-48e2-8bde-9c63020b626c_out_dm.png',
- '감성 캠핑용 루미에르 랜턴 구합니다 🕯️',
- '캠핑 밤을 샤방샤방하게 밝혀줄 가스 랜턴 찾아요! 유리 갓에 금 안 가고 케이스까지 풀세트로 있으신 분 찾습니다. 분위기 장인 되고 싶어요! 🔥',
- 50000,
- 0,
- NOW() - INTERVAL 2 DAY,
- NOW() + INTERVAL 3 DAY,
- NOW() + INTERVAL 5 DAY,
- 1,
- NOW() - INTERVAL 2 DAY,
- NULL,
- 'N',
- NULL
-),
-
--- 24. 수경
-(9, 7,
- '/images/auction/182adde3-dbca-43e6-b79f-d0f3dc30a8ed_sw_dm.png',
- '미즈노 엑셀아이 수경 (노패킹/미러) 🏊‍♀️',
- '눈 자국 덜 남는 노패킹 수경 찾아요! 렌즈에 기스 없는 거 선호하고, 컬러는 화려할수록 좋습니다. 수영장 인싸 되게 도와주세요! ✨',
- 50000,
- 0,
- NOW() - INTERVAL 2 DAY,
- NOW() - INTERVAL 1 DAY,
- NOW() + INTERVAL 2 DAY,
- 4,
- NOW() - INTERVAL 2 DAY,
- NULL,
- 'N',
- NULL
-),
-
--- 25. 가민 충전 케이블
-(10, 8,
- '/images/auction/bdc9e624-0e28-41cf-9e54-29af4a83254c_ac_dm.png',
- '가민 스마트워치 충전 케이블(정품) 급구! ⚡',
- '충전기를 잃어버려서 운동 기록을 못 하고 있어요 ㅠㅠ 정품 케이블 단선 안 된 걸로 빨리 보내주실 판매자님 찾습니다!',
- 1500000,
- 0,
- NOW() - INTERVAL 2 DAY,
- NOW() - INTERVAL 1 DAY,
- NOW() + INTERVAL 1 DAY,
- 4,
- NOW() - INTERVAL 2 DAY,
- NULL,
- 'N',
- NULL
-);
+ 
 
 /* ==========================================
    알림용 더미

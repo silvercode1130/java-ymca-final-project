@@ -11,7 +11,11 @@
 
 		<div
 			class="bg-white border border-gray-100 rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.03)] overflow-hidden">
-
+			
+			<!-- 토스트 메시지 -->
+			<span th:if="${successMessage}" id="toast-success" th:data-msg="${successMessage}"></span>
+			<span th:if="${errorMessage}" id="toast-error" th:data-msg="${errorMessage}"></span>
+			
 			<!-- 헤더 -->
 			<div class="px-6 py-5 border-b border-gray-100">
 				<h2 class="text-lg sm:text-xl font-semibold text-[#222222]"

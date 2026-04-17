@@ -76,9 +76,16 @@ function showToast(message, type, onClick) {
         info:    { bg: '#3498db', color: 'white', icon: 'ℹ️'  }
     };
     const s = styles[type] || styles.info;
+
+    // 패널티 키워드 강조 + 줄바꿈(\n) 처리
+    const formatted = message
+        .replace(/\n/g, '<br>')
+        .replace(/(패널티[^<]*)/g, '<span style="background:rgba(0,0,0,0.2);padding:1px 6px;border-radius:4px;font-weight:700;">⚠️ $1</span>');
+
     _createToast(
-        `<div style="display:flex;align-items:center;gap:8px;color:${s.color};">
-            <span>${s.icon}</span><span>${message}</span>
+        `<div style="display:flex;align-items:flex-start;gap:8px;color:${s.color};">
+            <span style="flex-shrink:0;margin-top:1px;">${s.icon}</span>
+            <span style="line-height:1.6;">${formatted}</span>
         </div>`,
         s.bg, null, onClick
     );
@@ -97,30 +104,6 @@ function showNotificationToast(title, message, targetUrl) {
         </div>`,
         '#ffffff', '#7CBD00',
         () => { window.location.href = targetUrl || '/notifications'; }
-    );
-}
-
-// ── 채팅 토스트 (카카오 스타일, 클릭 시 채팅창 이동) ──
-function showChatToast(senderName, message, chatroomIdx) {
-    _createToast(
-        `<div style="display:flex;align-items:center;gap:6px;color:#3C1E1E;">
-            <span style="font-size:15px;">💬</span>
-            <strong style="font-size:13px;">${senderName}</strong>
-            <span style="font-size:10px;margin-left:auto;opacity:0.6;">채팅</span>
-        </div>
-        <div style="font-size:12px;color:#3C1E1E;opacity:0.85;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:270px;">
-            ${message}
-        </div>`,
-        '#FEE500', '#3C1E1E',
-        () => {
-            if (chatroomIdx) {
-                window.open(
-                    '/chats/' + chatroomIdx,
-                    'chat_' + chatroomIdx,
-                    'width=420,height=600,menubar=no,toolbar=no,location=no,resizable=yes,scrollbars=yes'
-                );
-            }
-        }
     );
 }
 

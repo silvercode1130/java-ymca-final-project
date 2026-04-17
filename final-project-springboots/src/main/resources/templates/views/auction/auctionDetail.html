@@ -122,9 +122,9 @@
               <!-- 버튼 그룹 -->
               <div class="d-flex gap-2 flex-wrap mt-3">
                 <a class="btn btn-outline-secondary"
-				   th:href="${detail.auctionStatusIdx == 1 ? '/auctions' : '/auctions?statusFilter=closed'}">
-				    ← 목록으로
-				</a>
+                  th:href="${detail.auctionStatusIdx == 1 ? '/auctions' : '/auctions?statusFilter=closed'}">
+                    ← 목록으로
+                </a>
 
                 <!-- 구매자 본인 + 진행중 → 취소 / 수동 마감 -->
                 <th:block th:if="${session.loginUser != null

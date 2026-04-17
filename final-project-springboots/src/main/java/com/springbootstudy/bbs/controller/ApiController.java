@@ -43,7 +43,7 @@ public class ApiController {
 	    try {
 	        String memId = memEmail;
 	        String tempPwd = "TMP_" + UUID.randomUUID().toString().substring(0, 8);
-	        String memIp = "127.0.0.1";
+	        String memIp = "172.30.1.94";
 	        Integer memRoleIdx = 1;
 	        Integer memGradeIdx = 1;
 
