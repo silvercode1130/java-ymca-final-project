@@ -287,7 +287,7 @@ INSERT INTO auction (
  50000, 0, NOW(), NOW() + INTERVAL 2 DAY, NOW() + INTERVAL 4 DAY,
  1, NOW(), NULL, 'N', NULL),
 
-(10, 8, '/images/ac_dm.png',
+(10, 8, '/images/auction/ac_dm.png',
  '가민 스마트워치 충전 케이블(정품) 급구! ⚡',
  '충전기를 잃어버려서 운동 기록을 못 하고 있어요 ㅠㅠ 정품 케이블 단선 안 된 걸로 빨리 보내주실 판매자님 찾습니다!',
  1500000, 0, NOW(), NOW() + INTERVAL 7 DAY, NOW() + INTERVAL 9 DAY,
@@ -325,7 +325,7 @@ INSERT INTO auction (
  4, NOW() - INTERVAL 10 DAY, NULL, 'N', NULL),
 
 -- [취소] 야구 글러브 (카테고리 1: 공/볼) -> 상태 5
-(4, 1, '/images/auction/out_dm2.png',
+(4, 1, '/images/auction/ball_dm2.png',
  '⚾ [취소테스트] 미즈노 프로 내야수용 글러브 구해요',
  '캐치볼용으로 쓸 미즈노 프로 등급 글러브 찾습니다.\n가급적 길들이기 완료된 제품 선호해요! ✨',
  300000, 8, NOW() - INTERVAL 2 DAY, NOW() - INTERVAL 1 DAY, NOW() + INTERVAL 1 DAY,
@@ -336,6 +336,9 @@ SET @a = (SELECT MIN(auction_idx) FROM auction ORDER BY auction_idx DESC LIMIT 1
  /* ==========================================
    BID 더미 데이터 (각 상태별)
    ========================================== */
+
+SET @new_a = @a + 10;
+SET @new_i = @i + 7;
 
 INSERT INTO bid (
     auction_idx, bidder_idx, item_idx,
