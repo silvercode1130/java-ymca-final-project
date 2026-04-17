@@ -39,7 +39,7 @@ public class PaymentApiController {
             HttpSession session) {
         try {
         	MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
-            Long memIdx = loginUser.getMemIdx();
+            Long memIdx = (Long) loginUser.getMemIdx();
             if (memIdx == null) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
             }

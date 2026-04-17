@@ -51,12 +51,12 @@
 			<!-- 기존 form 유지 -->
 			<form action="/mypage/addresses/edit" id="memberAddr"
 				name="memberAddrForm">
-
 				<input type="hidden" name="addrIdx" id="deleteAddrIdx">
+			</form>
 
-				<!-- 배송지 카드 목록 -->
-				<div th:if="${addrList != null and !#lists.isEmpty(addrList)}"
-					class="space-y-4">
+			<!-- 배송지 리스트 있을 때 -->
+			<div th:if="${addrList != null and !#lists.isEmpty(addrList)}"
+				class="space-y-4">
 
 					<div th:each="addr : ${addrList}"
 						class="border border-gray-200 bg-white rounded-xl"
@@ -106,22 +106,20 @@
 
 				</div>
 
-				<!-- 배송지 없을 때 -->
-				<div th:if="${addrList == null or #lists.isEmpty(addrList)}"
-					class="border border-gray-200 bg-white rounded-xl">
-					<div class="px-6 py-6 text-center text-sm text-gray-500">등록된
-						배송지가 없습니다</div>
-				</div>
+			<!-- 배송지 없을 때 -->
+			<div th:if="${addrList == null or #lists.isEmpty(addrList)}"
+				class="border border-gray-200 bg-white rounded-xl">
+				<div class="px-6 py-6 text-center text-sm text-gray-500">등록된
+					배송지가 없습니다.</div>
+			</div>
 
-				<!-- 주소 추가 버튼 -->
-				<div class="pt-1">
-					<button type="button"
-						onclick="location.href='/mypage/addresses/new'"
-						class="w-full inline-flex items-center justify-center px-4 py-2.5 bg-[#7CBD00] text-white rounded-md text-sm font-semibold hover:bg-[#6BAD00]">
-						주소 추가</button>
-				</div>
-
-			</form>
+			<!-- 새 배송지 추가 버튼 -->
+			<div>
+				<button type="button"
+					class="w-full inline-flex items-center justify-center px-4 py-2.5 bg-[#7CBD00] text-white rounded-md text-sm font-semibold hover:bg-[#6BAD00]"
+					th:onclick="|location.href='@{/mypage/addresses/new}'|">새
+					배송지 추가</button>
+			</div>
 
 		</div>
 

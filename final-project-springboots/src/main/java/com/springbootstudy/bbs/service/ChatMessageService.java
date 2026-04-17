@@ -22,6 +22,10 @@ public class ChatMessageService {
     }
 
     public void saveMessage(ChatMessageVO message) {
+        if (message.getSentAt() == null) {
+            message.setSentAt(LocalDateTime.now());
+        }
+        message.setIsRead("N");
         chatMessageMapper.insertMessage(message);
     }
 
@@ -30,7 +34,17 @@ public class ChatMessageService {
             message.setSentAt(LocalDateTime.now());
         }
 
+        message.setIsRead("N");
+
         chatMessageMapper.insertMessage(message);
         return message;
+    }
+
+    public int markRoomMessagesRead(Long chatroomIdx, Long viewerIdx) {
+        return chatMessageMapper.markRoomMessagesRead(chatroomIdx, viewerIdx);
+    }
+
+    public int countUnreadForMember(Long memIdx) {
+        return chatMessageMapper.countUnreadForMember(memIdx);
     }
 }

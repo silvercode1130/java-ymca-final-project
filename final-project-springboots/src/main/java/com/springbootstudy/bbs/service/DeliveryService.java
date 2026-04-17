@@ -10,7 +10,10 @@ import com.springbootstudy.bbs.domain.PaymentVO;
 import com.springbootstudy.bbs.mapper.DeliveryMapper;
 import com.springbootstudy.bbs.mapper.PaymentMapper;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Service
+@Slf4j
 public class DeliveryService {
 
   @Autowired
@@ -44,8 +47,8 @@ public class DeliveryService {
     // 배송 정보 등록
     deliveryMapper.insertDelivery(deliveryVO);
 
-    // 경매 상태 배송중(9)으로 변경
-    paymentMapper.updateAuctionStatusByBidIdx(deliveryVO.getBidIdx(), 9);
+    // 비즈니스 룰: 마감/낙찰 이후 auctionStatus/bidStatus는 더 이상 변경하지 않는다.
+    log.debug("bidIdx={} 배송시작 후 auctionStatus 갱신은 비활성화됨", deliveryVO.getBidIdx());
 
     OrdersVO order = ordersService.findByBidIdx(deliveryVO.getBidIdx());
     if (order != null) {
@@ -72,8 +75,8 @@ public class DeliveryService {
     // 결제 confirmed_at 기록
     paymentMapper.updateConfirmedAt(bidIdx);
 
-    // 경매 상태 배송완료(10)으로 변경
-    paymentMapper.updateAuctionStatusByBidIdx(bidIdx, 10);
+    // 비즈니스 룰: 마감/낙찰 이후 auctionStatus/bidStatus는 더 이상 변경하지 않는다.
+    log.debug("bidIdx={} 수령확인 후 auctionStatus 갱신은 비활성화됨", bidIdx);
 
     OrdersVO order = ordersService.findByBidIdx(bidIdx);
     if (order != null) {

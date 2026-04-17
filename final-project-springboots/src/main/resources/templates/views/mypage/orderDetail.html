@@ -22,10 +22,18 @@
         </div>
 
         <div class="px-6 py-6 space-y-6">
+            <div th:if="${successMessage}" class="px-4 py-3 rounded-lg bg-[#ECFDF3] text-[#0F766E] text-sm" th:text="${successMessage}"></div>
+            <div th:if="${warningMessage}" class="px-4 py-3 rounded-lg bg-[#FFF7ED] text-[#9A3412] text-sm" th:text="${warningMessage}"></div>
+            <div th:if="${errorMessage}" class="px-4 py-3 rounded-lg bg-[#FEF2F2] text-[#B91C1C] text-sm" th:text="${errorMessage}"></div>
+
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                 <div>
                     <p class="text-gray-400 text-xs">경매 제목</p>
                     <p class="mt-1 font-semibold text-[#222222]" th:text="${order.auctionTitle}">경매 제목</p>
+                    <div class="mt-2" th:if="${order.itemName != null and !#strings.isEmpty(order.itemName)}">
+                        <span class="inline-flex items-center rounded-full bg-[#F3FAE8] px-2.5 py-1 text-[11px] font-semibold text-[#4C7C00]"
+                              th:text="${'낙찰 상품: ' + order.itemName}">낙찰 상품: 상품명</span>
+                    </div>
                 </div>
                 <div>
                     <p class="text-gray-400 text-xs">주문 상태</p>
@@ -74,9 +82,30 @@
                     </button>
                 </form>
 
+                    <!-- 판매자 취소는 결제완료 + 배송 시작 전에서만 허용 (배송 이후 임의취소 금지). -->
+                    <form th:if="${order.userRole == 'SELLER' and order.orderStatusCode == 'PAID' and order.shippingStatusCode != 'SHIPPING'}"
+                      th:action="@{/mypage/orders/{orderIdx}/cancel(orderIdx=${order.orderIdx})}" method="post" class="m-0"
+                      onsubmit="return confirm('거래 취소 시 패널티 1점이 부과됩니다.\n정말 취소하시겠습니까?');">
+                    <button type="submit"
+                            class="px-3 py-1.5 rounded-lg bg-[#D64545] text-white text-xs font-semibold hover:bg-[#C13A3A]">
+                        거래 취소
+                    </button>
+                </form>
+
                 <a th:if="${order.userRole == 'SELLER' and order.orderStatusCode == 'PAID'}"
                    th:href="@{/mypage/sales}"
                    class="px-3 py-1.5 rounded-lg bg-[#222222] text-white text-xs font-semibold hover:bg-[#444444]">배송시작</a>
+            </div>
+
+            <div th:if="${order.userRole == 'BUYER' and order.shippingStatusCode == 'SHIPPING' and order.orderStatusCode != 'CONFIRMED' and order.orderStatusCode != 'CANCELED'}"
+                 class="border border-gray-200 rounded-xl p-4 bg-gray-50">
+                <p class="text-sm font-semibold text-[#222222]">문제가 발생했나요?</p>
+                <!-- 배송 이후 구매자 임의취소를 막고, 분쟁은 고객센터로 유도한다. -->
+                <p class="mt-1 text-xs text-[#767676]">배송이 시작된 거래는 취소 대신 고객센터로 문의해 주세요.</p>
+                <a th:href="@{/support/inquiry}"
+                   class="mt-2 inline-flex items-center px-3 py-2 rounded-lg bg-[#222222] text-white text-xs font-semibold hover:bg-[#333333]">
+                    고객센터 문의하기
+                </a>
             </div>
         </div>
     </div>

@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -85,6 +87,23 @@ public class NotificationController {
 	    boolean hasUnread = notificationService.hasUnread(memIdx);
 
 	    return hasUnread ? "Y" : "N";
+	}
+
+	// 헤더 미리보기용 최근 알림 2개 조회
+	@GetMapping("/notifications/recent")
+	@ResponseBody
+	public ResponseEntity<List<NotificationVO>> recentNotifications(HttpSession session,
+			@RequestParam(name = "limit", defaultValue = "2") int limit) {
+
+		MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
+		if (loginUser == null) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(List.of());
+		}
+
+		int safeLimit = Math.max(1, Math.min(limit, 5));
+		Long memIdx = loginUser.getMemIdx();
+		List<NotificationVO> recent = notificationService.getRecentNotificationsForMember(memIdx, safeLimit);
+		return ResponseEntity.ok(recent);
 	}
 
 
