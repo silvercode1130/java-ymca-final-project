@@ -88,7 +88,7 @@
 
                         <div th:if="${addr == null}" class="rounded-xl border border-dashed border-gray-200 bg-gray-50 px-4 py-4 text-[#767676]">
                             등록된 배송지가 없습니다.
-                            <a href="/mypage/addresses" class="font-semibold text-[#7CBD00] hover:underline">배송지를 등록</a>한 뒤 결제할 수 있습니다.
+                            <a th:href="@{/mypage/addresses/new(redirect=${paymentReturnUrl})}" class="font-semibold text-[#7CBD00] hover:underline">배송지를 등록</a>한 뒤 결제할 수 있습니다.
                         </div>
                     </div>
                 </section>
@@ -114,13 +114,24 @@
                                   th:text="${#numbers.formatInteger(bid.bidPrice, 0, 'COMMA') + '원'}">0원</span>
                         </div>
 
-                        <div th:if="${addr == null}" class="rounded-xl bg-amber-50 px-4 py-3 text-xs leading-6 text-amber-800">
-                            배송지가 없어도 결제는 가능하지만, 결제 완료 후 주소를 등록해 주세요.
+                        <div th:if="${addr == null}" class="rounded-xl bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-800">
+                            결제를 위해 배송지를 등록해주세요.
+                        </div>
+
+                        <a th:if="${addr == null}"
+                           th:href="@{/mypage/addresses/new(redirect=${paymentReturnUrl})}"
+                           class="inline-flex w-full items-center justify-center rounded-full border border-[#7CBD00] bg-white px-5 py-3 text-sm font-semibold text-[#7CBD00] transition-colors hover:bg-[#F5FCE8]">
+                            배송지 등록하기
+                        </a>
+
+                        <div th:if="${addr != null}" class="rounded-xl bg-[#F3FAE8] px-4 py-3 text-xs leading-6 text-[#4C7C00]">
+                            배송지 확인이 완료되었습니다. 결제를 진행해 주세요.
                         </div>
 
                         <button type="button"
-                                class="pay-btn inline-flex w-full items-center justify-center rounded-full bg-[#222222] px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#111111]"
-                                th:attr="data-bid-idx=${bid.bidIdx}, data-order-name=${bid.itemName}, data-price=${bid.bidPrice}">
+                                class="pay-btn inline-flex w-full items-center justify-center rounded-full bg-[#222222] px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#111111] disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-500"
+                                th:disabled="${addr == null}"
+                                th:attr="data-bid-idx=${bid.bidIdx}, data-order-name=${bid.itemName}, data-price=${bid.bidPrice}, data-has-address=${addr != null}">
                             토스로 결제하기
                         </button>
 

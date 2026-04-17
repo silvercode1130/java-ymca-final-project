@@ -44,9 +44,11 @@ public class PaymentPageController {
       return "redirect:/auctions";
 
     MemberAddrVO addr = memberAddrService.getPrimaryAddr(loginUser.getMemIdx());
+    String paymentReturnUrl = "/payment/pay?auctionIdx=" + auctionIdx;
     model.addAttribute("bid", bid);
     model.addAttribute("addr", addr);
     model.addAttribute("memTel", loginUser.getMemTel());
+    model.addAttribute("paymentReturnUrl", paymentReturnUrl);
 
     return "views/payment/pay";
   }
