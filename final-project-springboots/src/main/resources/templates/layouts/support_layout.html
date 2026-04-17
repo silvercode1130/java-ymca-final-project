@@ -41,14 +41,27 @@
                <p class="text-sm text-[#767676]"></p>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 lg:gap-8">
+               <div class="flex flex-col gap-6 lg:flex-row lg:gap-8">
                <!-- Left Sidebar - Menu -->
-               <aside class="lg:col-span-1">
-                  <div class="lg:w-64 flex-shrink-0">
-                     <div class="bg-white border border-gray-100 sticky top-24">
+                  <aside class="w-full lg:w-60 lg:flex-shrink-0">
+                     <div class="bg-white border border-gray-100 sticky top-24 overflow-hidden rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.03)]">
+                        <button id="support-sidebar-toggle" type="button"
+                           class="lg:hidden w-full flex items-center justify-between px-4 py-3 border-b border-gray-100 text-sm font-semibold text-[#222222]"
+                           aria-expanded="false"
+                           aria-controls="support-sidebar-body"
+                           onclick="toggleSupportSidebarAccordion()">
+                           <span>고객지원 메뉴</span>
+                           <i class="bi bi-chevron-down text-[#767676] transition-transform duration-300"
+                              id="support-sidebar-icon"></i>
+                        </button>
+                        <div class="hidden lg:block px-4 py-3 border-b border-gray-100">
+                           <h3 class="font-semibold text-[#222222]">고객지원</h3>
+                        </div>
+                        <div id="support-sidebar-body"
+                           class="overflow-hidden transition-[max-height] duration-300 ease-in-out max-h-0 lg:max-h-none lg:overflow-visible">
 
                         <!-- 헤더 -->
-                        <div class="px-4 py-3 border-b border-gray-100">
+                           <div class="px-4 py-3 border-b border-gray-100 lg:hidden">
                            <h3 class="font-semibold text-[#222222]">카테고리</h3>
                         </div>
 
@@ -56,30 +69,29 @@
                         <nav class="flex flex-col px-2 py-2 text-sm">
                            <!-- 이용안내 -->
                            <a th:href="@{/support/guide}"
-                              class="px-4 py-3 rounded flex items-center gap-2 transition-colors"
+                              class="block rounded-lg px-4 py-3 text-sm font-semibold leading-5 transition-colors"
                               th:classappend="${activeSupportMenu == 'guide'} ?
                                    ' bg-gray-100 text-[#222222] font-semibold'
                                    : ' text-[#767676] font-semibold hover:bg-gray-50 hover:text-[#222222]'">
-                              <i class="bi bi-book me-1 text-[0.9rem]"></i> <span>이용안내</span>
+                              이용안내
                            </a>
 
                            <!-- 자주 묻는 질문 -->
                            <a th:href="@{/support/faq}"
-                              class="px-4 py-3 rounded flex items-center gap-2 transition-colors"
+                              class="block rounded-lg px-4 py-3 text-sm font-semibold leading-5 transition-colors"
                               th:classappend="${activeSupportMenu == 'faq'} ?
                                    ' bg-gray-100 text-[#222222] font-semibold'
                                    : ' text-[#767676] font-semibold hover:bg-gray-50 hover:text-[#222222]'">
-                              <i class="bi bi-question-circle me-1 text-[0.9rem]"></i> <span>자주
-                                 묻는 질문</span>
+                              자주 묻는 질문
                            </a>
 
                            <!-- 고객문의 -->
                            <a th:href="@{/support/inquiry}"
-                              class="px-4 py-3 rounded flex items-center gap-2 transition-colors"
+                              class="block rounded-lg px-4 py-3 text-sm font-semibold leading-5 transition-colors"
                               th:classappend="${activeSupportMenu == 'inquiry'} ?
                                    ' bg-gray-100 text-[#222222] font-semibold'
                                    : ' text-[#767676] font-semibold hover:bg-gray-50 hover:text-[#222222]'">
-                              <i class="bi bi-chat-dots me-1 text-[0.9rem]"></i> <span>고객문의</span>
+                              고객문의
                            </a>
                         </nav>
 
@@ -99,12 +111,12 @@
                            </div>
                         </div>
 
-                     </div>
+                        </div>
                   </div>
                </aside>
 
                <!-- 오른쪽 영역: 각 고객지원 페이지에서 채워 넣는 부분 -->
-               <main class="lg:col-span-3" layout:fragment="content">
+                  <main class="flex-1 min-w-0" layout:fragment="content">
                   <!-- 개별 페이지에서 오버라이드 -->
                </main>
             </div>
@@ -118,5 +130,42 @@
 	</div>
 	<!-- floating-buttons -->
 	<div th:replace="fragments/floating-buttons :: floating-buttons"></div>
+   <script>
+      function toggleSupportSidebarAccordion() {
+         var toggle = document.getElementById('support-sidebar-toggle');
+         var body = document.getElementById('support-sidebar-body');
+         var icon = document.getElementById('support-sidebar-icon');
+
+         if (!toggle || !body) return;
+
+         var isExpanded = toggle.getAttribute('aria-expanded') === 'true';
+         if (isExpanded) {
+            body.style.maxHeight = body.scrollHeight + 'px';
+            requestAnimationFrame(function () {
+               body.style.maxHeight = '0px';
+            });
+            toggle.setAttribute('aria-expanded', 'false');
+            if (icon) icon.style.transform = 'rotate(0deg)';
+         } else {
+            body.style.maxHeight = body.scrollHeight + 'px';
+            body.addEventListener('transitionend', function handler() {
+               body.style.maxHeight = 'none';
+               body.removeEventListener('transitionend', handler);
+            });
+            toggle.setAttribute('aria-expanded', 'true');
+            if (icon) icon.style.transform = 'rotate(180deg)';
+         }
+      }
+
+      document.addEventListener('DOMContentLoaded', function () {
+         var toggle = document.getElementById('support-sidebar-toggle');
+         var body = document.getElementById('support-sidebar-body');
+         if (!toggle || !body) return;
+         if (window.innerWidth < 1024) {
+            body.style.maxHeight = '0px';
+            toggle.setAttribute('aria-expanded', 'false');
+         }
+      });
+   </script>
 </body>
 </html>

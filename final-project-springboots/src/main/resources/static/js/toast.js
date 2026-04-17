@@ -107,6 +107,30 @@ function showNotificationToast(title, message, targetUrl) {
     );
 }
 
+// ── 채팅 토스트 (카카오 스타일, 클릭 시 채팅창 이동) ──
+function showChatToast(senderName, message, chatroomIdx) {
+    _createToast(
+        `<div style="display:flex;align-items:center;gap:6px;color:#3C1E1E;">
+            <span style="font-size:15px;">💬</span>
+            <strong style="font-size:13px;">${senderName}</strong>
+            <span style="font-size:10px;margin-left:auto;opacity:0.6;">채팅</span>
+        </div>
+        <div style="font-size:12px;color:#3C1E1E;opacity:0.85;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:270px;">
+            ${message}
+        </div>`,
+        '#FEE500', '#3C1E1E',
+        () => {
+            if (chatroomIdx) {
+                window.open(
+                    '/chats/' + chatroomIdx,
+                    'chat_' + chatroomIdx,
+                    'width=420,height=600,menubar=no,toolbar=no,location=no,resizable=yes,scrollbars=yes'
+                );
+            }
+        }
+    );
+}
+
 // ── 페이지 로드 시 Thymeleaf 플래시 메시지 자동 감지 ──
 (function() {
     if (window._pickqToastInitialized) return;
