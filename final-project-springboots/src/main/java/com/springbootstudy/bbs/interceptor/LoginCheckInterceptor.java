@@ -44,7 +44,7 @@ public class LoginCheckInterceptor implements HandlerInterceptor {
                uri.startsWith("/memberDelete") ||
                uri.startsWith("/mypage/") ||
                uri.startsWith("/auctions/new") ||
-               uri.startsWith("/auctions/") && uri.contains("/bids") ||
+               uri.startsWith("/auctions/") && uri.contains("/bids") && !uri.endsWith("/win") ||
                uri.startsWith("/boards/write") ||
                uri.startsWith("/boards/edit") ||
                uri.startsWith("/review/write");

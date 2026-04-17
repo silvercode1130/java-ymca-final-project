@@ -9,7 +9,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.springbootstudy.bbs.domain.MemberVO;
+import com.springbootstudy.bbs.domain.NotificationVO;
 import com.springbootstudy.bbs.domain.ReviewVO;
+import com.springbootstudy.bbs.service.NotificationService;
 import com.springbootstudy.bbs.service.ReviewService;
 
 import jakarta.servlet.http.HttpSession;
@@ -21,6 +23,9 @@ public class ReviewController {
 
 	@Autowired
 	ReviewService reviewService;
+	
+	@Autowired
+	private NotificationService notificationService;
 
 	// 리뷰 조회 창 -----------------------------------------------------------------
 
@@ -48,7 +53,7 @@ public class ReviewController {
 		return "views/review/review";
 	}
 
-	// 리뷰 작성창 -----------------------------------------------------------------
+	// 리뷰  -----------------------------------------------------------------
 
 	// 검색 전에도 기본 리스트가 table에 뜨도록 추가
 	@GetMapping("/mypage/reviews/reviewWrite")
@@ -98,17 +103,31 @@ public class ReviewController {
 			@RequestParam("bidder_idx") Long bidderIdx,
 			@RequestParam("reviewTitle") String reviewTitle,
 			@RequestParam("reviewStar") int reviewStar,
-			@RequestParam("content") String content) {
-		ReviewVO vo = new ReviewVO();
-		vo.setBuyerIdx(buyerIdx);
-		vo.setBidIdx(bidIdx);
-		vo.setAuctionIdx(auctionIdx);
-		vo.setBidderIdx(bidderIdx);
-		vo.setReviewTitle(reviewTitle);
-		vo.setReviewStar(reviewStar);
-		vo.setContent(content);
+			@RequestParam("content") String content,
+			HttpSession session) {
+		ReviewVO reviewVO = new ReviewVO();
+		reviewVO.setBuyerIdx(buyerIdx);
+		reviewVO.setBidIdx(bidIdx);
+		reviewVO.setAuctionIdx(auctionIdx);
+		reviewVO.setBidderIdx(bidderIdx);
+		reviewVO.setReviewTitle(reviewTitle);
+		reviewVO.setReviewStar(reviewStar);
+		reviewVO.setContent(content);
 
-		reviewService.insertReview(vo);
+		reviewService.insertReview(reviewVO);
+		
+		MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
+		
+		if (loginUser != null) {
+		    NotificationVO reviewNoti = new NotificationVO();
+		    reviewNoti.setReceiverIdx(reviewVO.getBidderIdx());
+		    reviewNoti.setSenderIdx(loginUser.getMemIdx());
+		    reviewNoti.setNotificationType("REVIEW_RECEIVED");
+		    reviewNoti.setNotificationTitle("새 리뷰가 등록되었습니다");
+		    reviewNoti.setNotificationMessage("별점 " + reviewVO.getReviewStar() + "점 리뷰가 작성되었습니다.");
+		    reviewNoti.setTargetUrl("/mypage/reviews");
+		    notificationService.sendAndPush(reviewNoti);
+		}
 
 		return "redirect:/mypage/reviews";
 	}

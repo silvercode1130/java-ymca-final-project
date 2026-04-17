@@ -17,8 +17,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.springbootstudy.bbs.domain.MemberVO;
+import com.springbootstudy.bbs.domain.NotificationVO;
 import com.springbootstudy.bbs.mapper.MemberMapper;
 import com.springbootstudy.bbs.service.MemberService;
+import com.springbootstudy.bbs.service.NotificationService;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -49,6 +51,9 @@ public class MemberController {
 
     @Autowired
     HttpSession session;
+    
+    @Autowired
+    private NotificationService notificationService;
 
     // 회원가입 -----------------------------------------------------------------
 
@@ -330,7 +335,7 @@ public class MemberController {
 
         model.addAttribute("memberVO", memberVO);
         model.addAttribute("gradeName", gradeName);
-
+        
         return "views/member/memberUpdate";
     }
 
@@ -367,7 +372,15 @@ public class MemberController {
         // 수정된 정보로 저장
         MemberVO updated = memberMapper.selectOneFromId(vo.getMemId());
         session.setAttribute("loginUser", updated);
-
+        
+        NotificationVO noti = new NotificationVO();
+        noti.setReceiverIdx(sessionUser.getMemIdx());
+        noti.setNotificationType("INFO_UPDATED");
+        noti.setNotificationTitle("회원정보가 수정되었습니다");
+        noti.setNotificationMessage("회원정보가 성공적으로 수정되었습니다.");
+        noti.setTargetUrl("/mypage/info");
+        notificationService.sendAndPush(noti);
+        
         return "redirect:/main";
     }
 
@@ -387,7 +400,7 @@ public class MemberController {
     }
 
     // 비밀번호 찾기 -----------------------------------------------------------------
-
+    
     // 창 띄우기
     @GetMapping("/members/pwdFind")
     public String pwdFind() {
@@ -518,5 +531,4 @@ public class MemberController {
         ra.addFlashAttribute("msg", "비밀번호가 변경 되었습니다");
         return "redirect:/members/login";
     }
-
 }

@@ -17,9 +17,11 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.springbootstudy.bbs.domain.AuctionDTO;
 import com.springbootstudy.bbs.domain.BidDTO;
 import com.springbootstudy.bbs.domain.MemberVO;
+import com.springbootstudy.bbs.domain.NotificationVO;
 import com.springbootstudy.bbs.service.AuctionService;
 import com.springbootstudy.bbs.service.BidService;
 import com.springbootstudy.bbs.service.ChatRoomService;
+import com.springbootstudy.bbs.service.NotificationService;
 import com.springbootstudy.bbs.service.OrdersService;
 
 import jakarta.servlet.http.HttpSession;
@@ -27,7 +29,6 @@ import lombok.extern.slf4j.Slf4j;
 
 @Controller
 @Slf4j
-
 public class AuctionController {
 
     // 이미지 저장 경로 & 기본 이미지 경로 상수
@@ -46,6 +47,9 @@ public class AuctionController {
     
     @Autowired
     private OrdersService ordersService;
+    
+    @Autowired
+    private NotificationService notificationService;
 
     // 경매 목록 (/auctions)
     @GetMapping("/auctions")
@@ -173,6 +177,13 @@ public class AuctionController {
         }
 
         ra.addFlashAttribute("successMessage", "구매요청이 등록되었습니다! 🎉");
+        NotificationVO noti = new NotificationVO();
+        noti.setReceiverIdx(loginUser.getMemIdx());
+        noti.setNotificationType("AUCTION_REGISTERED");
+        noti.setNotificationTitle("구매요청이 등록되었습니다");
+        noti.setNotificationMessage("\"" + dto.getAuctionTitle() + "\" 경매가 등록되었습니다.");
+        noti.setTargetUrl("/auctions");
+        notificationService.sendNotification(noti);
 
         return "redirect:/auctions";
     }
@@ -193,6 +204,15 @@ public class AuctionController {
         } catch (IllegalArgumentException e) {
             ra.addFlashAttribute("errorMessage", e.getMessage());
         }
+        
+        NotificationVO delNoti = new NotificationVO();
+        delNoti.setReceiverIdx(loginUser.getMemIdx());
+        delNoti.setNotificationType("AUCTION_DELETED");
+        delNoti.setNotificationTitle("구매요청이 삭제되었습니다");
+        delNoti.setNotificationMessage("경매가 삭제 처리되었습니다.");
+        delNoti.setTargetUrl("/auctions");
+        notificationService.sendNotification(delNoti);
+        
         return "redirect:/auctions";
     }
 
@@ -372,6 +392,20 @@ public class AuctionController {
             return "redirect:/auctions/" + auctionIdx;
         }
 
+        // 구매자에게 알림 (1번만)
+        notificationService.notifyNewBidToAuctionWriter(auction, bidDto);
+
+        // 판매자 본인 알림 DB 저장 (푸시 없이 - 이미 flash toast 있음)
+        NotificationVO myNoti = new NotificationVO();
+        myNoti.setReceiverIdx(loginUser.getMemIdx());
+        myNoti.setNotificationType("BID_SUBMITTED");
+        myNoti.setNotificationTitle("입찰 제안이 등록되었습니다");
+        myNoti.setNotificationMessage("\"" + auction.getAuctionTitle() + "\" 에 입찰 제안을 등록했습니다.");
+        myNoti.setTargetUrl("/auctions/" + auctionIdx);
+        myNoti.setCreatedAt(java.time.LocalDateTime.now());
+        myNoti.setIsRead("N");
+        notificationService.sendNotification(myNoti);  // DB 저장만, 푸시 없음
+        
         return "redirect:/auctions/" + auctionIdx;
     }
 
@@ -418,6 +452,15 @@ public class AuctionController {
         } catch (IllegalArgumentException e) {
             ra.addFlashAttribute("bidError", e.getMessage());
         }
+        
+        NotificationVO cancelNoti = new NotificationVO();
+        cancelNoti.setReceiverIdx(loginUser.getMemIdx());
+        cancelNoti.setNotificationType("BID_CANCELED");
+        cancelNoti.setNotificationTitle("입찰이 취소되었습니다");
+        cancelNoti.setNotificationMessage("입찰 제안이 취소되었습니다.");
+        cancelNoti.setTargetUrl("/auctions/" + auctionIdx);
+        notificationService.sendNotification(cancelNoti);
+        
         return "redirect:/auctions/" + auctionIdx;
     }
 
@@ -448,33 +491,53 @@ public class AuctionController {
     // 낙찰 처리 (/auctions/{auctionIdx}/bids/{bidIdx}/win)
     @PostMapping("/auctions/{auctionIdx}/bids/{bidIdx}/win")
     public String selectWinner(@PathVariable("auctionIdx") Long auctionIdx,
-            @PathVariable("bidIdx") Long bidIdx,
-            HttpSession session,
-            RedirectAttributes ra) {
+                                 @PathVariable("bidIdx") Long bidIdx,
+                                 HttpSession session,
+                                 RedirectAttributes ra) {
+
         MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
+
+        // 세션 만료 → 로그인 페이지로 (loginRedirectUrl 경매 상세로 설정)
         if (loginUser == null) {
             session.setAttribute("loginRedirectUrl", "/auctions/" + auctionIdx);
+            ra.addFlashAttribute("errorMessage", "로그인이 필요합니다. 다시 로그인 후 낙찰을 진행해주세요.");
             return "redirect:/members/login";
         }
-
+        
         AuctionDTO auction = auctionService.auctionDetail(auctionIdx);
         if (auction == null || !auction.getBuyerIdx().equals(loginUser.getMemIdx())) {
             ra.addFlashAttribute("bidError", "권한이 없습니다.");
             return "redirect:/auctions/" + auctionIdx;
         }
-
+        
+        BidDTO winnerBid = null;
         try {
             bidService.selectWinner(bidIdx, auctionIdx);
-            // orders 처리를 위한 부분
-            BidDTO bid = bidService.findBidById(bidIdx);		// 입찰 정보 받아오기
-            ordersService.createOrderOnWinner(auction, bid);	// 거래 객체 생성
-            auctionService.updateAuctionStatus(auctionIdx, 3);	// 경매상태 마감처리
-            
-//            auctionService.updateAuctionStatus(auctionIdx, 7);	// 기존 로직 - 여차할 때 복구합니다
+            winnerBid = bidService.findBidById(bidIdx);
+            ordersService.createOrderOnWinner(auction, winnerBid);
+            auctionService.updateAuctionStatus(auctionIdx, 3);
             ra.addFlashAttribute("successMessage", "낙찰 처리가 완료되었습니다");
         } catch (IllegalArgumentException e) {
             ra.addFlashAttribute("bidError", e.getMessage());
+        } catch (Exception e) {
+            log.error("낙찰 처리 중 오류", e);
+            ra.addFlashAttribute("bidError", "낙찰 처리 중 오류가 발생했습니다. 다시 시도해주세요.");
         }
-        return "redirect:/auctions/" + auctionIdx;
+
+	     // 변경 — notifyWinnerSelectedToBidder 내부가 sendAndPush라서 1번만 호출하면 됨
+	     // 판매자에게만 WebSocket 실시간 알림 (1번만)
+	     if (winnerBid != null) {
+	         notificationService.notifyWinnerSelectedToBidder(auctionIdx, winnerBid);
+	         // 구매자 본인은 flashAttribute 토스트가 이미 뜨므로 DB 저장만
+	         NotificationVO buyerNoti = new NotificationVO();
+	         buyerNoti.setReceiverIdx(loginUser.getMemIdx());
+	         buyerNoti.setNotificationType("WINNER_SELECTED");
+	         buyerNoti.setNotificationTitle("낙찰자 선정 완료");
+	         buyerNoti.setNotificationMessage("낙찰자를 선정했습니다. 거래를 진행하세요.");
+	         buyerNoti.setTargetUrl("/auctions/" + auctionIdx);
+	         notificationService.sendNotification(buyerNoti);
+	     }
+        
+        return "redirect:/mypage/orders";
     }
 }

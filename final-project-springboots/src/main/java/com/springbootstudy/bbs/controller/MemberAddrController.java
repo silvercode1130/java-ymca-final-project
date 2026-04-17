@@ -25,7 +25,8 @@ public class MemberAddrController {
 	// 주소등록창 -----------------------------------------------------------------
 	
 	@GetMapping("/mypage/addresses/new") 
-	public String memberAddrInsert(HttpSession session, Model model) {
+    public String memberAddrInsert(@RequestParam(value = "redirect", required = false) String redirect,
+            HttpSession session, Model model) {
 
         MemberVO loginMember = (MemberVO) session.getAttribute("loginUser");
 
@@ -35,9 +36,26 @@ public class MemberAddrController {
         }
         
         model.addAttribute("member", loginMember);
+        model.addAttribute("redirectAfterSave", sanitizeRedirect(redirect));
 
         return "/views/member/memberAddrInsert";  
 	}
+
+    private String sanitizeRedirect(String redirect) {
+        if (redirect == null || redirect.isBlank()) {
+            return "/mypage/addresses";
+        }
+
+        if (!redirect.startsWith("/")) {
+            return "/mypage/addresses";
+        }
+
+        if (redirect.startsWith("//")) {
+            return "/mypage/addresses";
+        }
+
+        return redirect;
+    }
 	
 	// memberAddrInsert.html 의 Ajax 저장용
 	@PostMapping("/member/insertAddrAjax.do")

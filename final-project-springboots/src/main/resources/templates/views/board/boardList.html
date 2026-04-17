@@ -13,12 +13,12 @@
 
 		<div class="min-h-screen bg-white">
 			<div class="mx-auto max-w-[1200px] px-4 sm:px-6 py-8">
-				<div class="grid grid-cols-1 lg:grid-cols-4 gap-6 lg:gap-8">
+				<div class="flex flex-col gap-6 lg:flex-row lg:gap-8">
 
 					<!-- Left Sidebar -->
-					<aside class="lg:col-span-1">
+					<aside class="w-full lg:w-60 lg:flex-shrink-0">
 						<div
-							class="bg-white border border-gray-100 rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.03)] sticky top-24">
+							class="bg-white border border-gray-100 rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.03)] sticky top-24 overflow-hidden">
 							<!-- Mobile accordion header -->
 							<button id="sidebar-accordion-toggle"
 								class="lg:hidden w-full flex items-center justify-between px-4 py-3 border-b border-gray-100 text-sm font-semibold text-[#222222]"
@@ -47,7 +47,7 @@
 								<div class="px-2 py-2">
 									<!-- 전체 게시판 -->
 									<a th:href="@{/boards}"
-										class="w-full inline-flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-colors"
+										class="w-full inline-flex items-center rounded-lg px-4 py-3 text-sm font-semibold leading-5 transition-colors"
 										th:classappend="${typeCode == null} ?
                       ' bg-gray-100 text-[#222222]' :
                       ' text-[#767676] hover:bg-gray-50 hover:text-[#222222]'">
@@ -57,7 +57,7 @@
 									<div class="mt-1 space-y-1">
 										<a th:each="bt : ${boardTypes}"
 											th:href="@{/boards/{tc}(tc=${bt.boardTypeCode})}"
-											class="w-full inline-flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-colors"
+											class="w-full inline-flex items-center rounded-lg px-4 py-3 text-sm font-semibold leading-5 transition-colors"
 											th:classappend="${typeCode != null and typeCode == bt.boardTypeCode} ?
                         ' bg-gray-100 text-[#222222]' :
                         ' text-[#767676] hover:bg-gray-50 hover:text-[#222222]'">
@@ -70,7 +70,7 @@
 					</aside>
 
 					<!-- Right: List -->
-					<div class="lg:col-span-3">
+					<div class="flex-1 min-w-0">
 						<div
 							class="bg-white border border-gray-100 rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.03)] overflow-hidden">
 
@@ -323,6 +323,20 @@
 					if (currentBoard) currentBoard.style.display = 'none';
 				}
 			}
+		</script>
+		<script>
+			document.addEventListener('DOMContentLoaded', function () {
+				var toggle = document.getElementById('sidebar-accordion-toggle');
+				var body = document.getElementById('sidebar-accordion-body');
+				if (!toggle || !body) {
+					return;
+				}
+
+				if (window.innerWidth < 1024) {
+					body.style.maxHeight = '0px';
+					toggle.setAttribute('aria-expanded', 'false');
+				}
+			});
 		</script>
 
 	</th:block>

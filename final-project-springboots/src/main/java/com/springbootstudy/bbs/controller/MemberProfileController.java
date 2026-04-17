@@ -13,7 +13,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.springbootstudy.bbs.domain.MemberProfileVO;
 import com.springbootstudy.bbs.domain.MemberVO;
+import com.springbootstudy.bbs.domain.NotificationVO;
 import com.springbootstudy.bbs.service.MemberProfileService;
+import com.springbootstudy.bbs.service.NotificationService;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -22,6 +24,9 @@ public class MemberProfileController {
 
 	@Autowired
 	private MemberProfileService memberProfileService;
+	
+	@Autowired
+	private NotificationService notificationService;
 	
 	// 회원 프로필 띄우기 ---------------------------------------------------------------
 	
@@ -53,7 +58,7 @@ public class MemberProfileController {
     // 프로필 저장 (수정)
     @PostMapping("/mypage/profile")
     public String updateProfile(MemberProfileVO vo,
-                                @RequestParam("memImgFile") MultipartFile memImgFile) throws Exception {
+                                @RequestParam("memImgFile") MultipartFile memImgFile, HttpSession session) throws Exception {
 
     	if (!memImgFile.isEmpty()) {
 
@@ -92,7 +97,19 @@ public class MemberProfileController {
         System.out.println("isEmpty: " + memImgFile.isEmpty());
 
         memberProfileService.updateProfile(vo);
-
+        
+        MemberVO loginMember = (MemberVO) session.getAttribute("loginUser");
+        
+        if (loginMember != null) {
+            NotificationVO noti = new NotificationVO();
+            noti.setReceiverIdx(loginMember.getMemIdx());
+            noti.setNotificationType("PROFILE_UPDATED");
+            noti.setNotificationTitle("프로필이 수정되었습니다");
+            noti.setNotificationMessage("프로필 정보가 성공적으로 수정되었습니다.");
+            noti.setTargetUrl("/mypage/profile");
+            notificationService.sendAndPush(noti);
+        }
+        
         return "redirect:/mypage/profile?memIdx=" + vo.getMemIdx();
     }
     
@@ -103,8 +120,5 @@ public class MemberProfileController {
     public int checkNickname(@RequestParam("memNickname") String memNickname) {
         return memberProfileService.checkNickname(memNickname);
     }
-
-	
-	
 
 }

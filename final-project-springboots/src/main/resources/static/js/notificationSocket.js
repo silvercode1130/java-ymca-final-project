@@ -1,4 +1,8 @@
 (function () {
+	
+	if (window._notificationSocketInitialized) return;
+	    window._notificationSocketInitialized = true;
+	
     var state = {
         memIdx: null,
         stompClient: null,
@@ -363,15 +367,22 @@
 
                 console.log('[notification] received:', payload);
 
-                if (payload && payload.notificationType !== 'SYSTEM_WS_CONNECTED') {
-                    if (state.unreadCountKnown) {
-                        setKnownUnreadDelta(1);
-                    } else {
-                        setUnknownHasUnread(true);
-                    }
+				if (payload && payload.notificationType !== 'SYSTEM_WS_CONNECTED') {
+				    if (state.unreadCountKnown) {
+				        setKnownUnreadDelta(1);
+				    } else {
+				        setUnknownHasUnread(true);
+				    }
+				    prependNotification(payload);
 
-                    prependNotification(payload);
-                }
+				    if (typeof showNotificationToast === 'function') {
+				        showNotificationToast(
+				            payload.notificationTitle || '새 알림',
+				            payload.notificationMessage || '',
+				            payload.targetUrl || '/notifications'
+				        );
+				    }
+				}
             });
         }, function () {
             console.warn('[notification] websocket disconnected');
@@ -393,20 +404,25 @@
         }
     }
 
-    document.addEventListener('DOMContentLoaded', function () {
-        var context = byId('notification-context');
-        if (!context) {
-            return;
-        }
+	// 변경 — pageshow persisted 시 재연결 차단
+	document.addEventListener('DOMContentLoaded', function () {
+	    var context = byId('notification-context');
+	    if (!context) return;
+	    state.memIdx = context.getAttribute('data-mem-idx');
+	    if (!state.memIdx) return;
 
-        state.memIdx = context.getAttribute('data-mem-idx');
-        if (!state.memIdx) {
-            return;
-        }
+	    initializePageState();
+	    connectNotificationSocket(state.memIdx);
+	    document.addEventListener('click', onDocumentClick);
+	    renderUnreadIndicator();
+	});
 
-        initializePageState();
-        connectNotificationSocket(state.memIdx);
-        document.addEventListener('click', onDocumentClick);
-        renderUnreadIndicator();
-    });
+	// 뒤로가기(bfcache) 시 WebSocket 토스트 재발생 방지
+	window.addEventListener('pageshow', function(event) {
+	    if (event.persisted && state.stompClient) {
+	        // 이미 연결된 소켓 해제 — 재연결 안 함
+	        try { state.stompClient.disconnect(); } catch(e) {}
+	        state.stompClient = null;
+	    }
+	});
 })();
