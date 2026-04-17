@@ -57,7 +57,7 @@ public class LoginCheckInterceptor implements HandlerInterceptor {
            session.setAttribute("loginRedirectUrl", returnUrl);
            session.setAttribute("loginMsg", "로그인이 필요한 서비스입니다.");
            response.sendRedirect("/members/login");
-           return false;
+           return false; 
        }
        return true;
 	}
@@ -94,56 +94,5 @@ public class LoginCheckInterceptor implements HandlerInterceptor {
          throws Exception {
       log.info("##########LoginCheckInterceptor - afterCompletion()##########");
    }
-   
-   
-   
-   	 // 로그인 안하고 다른 활동 하다가 로그인을 한 경우(인테셉터) 원래 보던 페이지로 돌려주는 인터셉터
-     // web config에 필요
-//   @Override
-//   public void addInterceptors(InterceptorRegistry registry) {
-//       registry.addInterceptor(new BoardInterceptor())
-//               // 1. 게시판 관련 주소들은 진입할 때(preHandle) 감시!
-//               .addPathPatterns("/board/**") 
-//               // 2. 로그인 처리 주소는 끝날 때(postHandle) 낚아채기 위해 추가!
-//               .addPathPatterns("/loginProcess"); // 쩡이의 로그인 처리 URL로 바꿔줘!
-//   }
-   
-//   // 1. [진입 전] 로그인이 필요한 페이지(Board)에 접근할 때 실행
-//   @Override
-//   public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-//       HttpSession session = request.getSession();
-//
-//       // 로그인이 안 되어 있다면?
-//       if (session.getAttribute("loginMember") == null) {
-//           // 현재 가려던 주소를 세션에 "dest"라는 이름으로 저장!
-//           String uri = request.getRequestURI(); 
-//           String query = request.getQueryString();
-//           if (query != null) uri += "?" + query;
-//           
-//           session.setAttribute("dest", uri); // 예: "/board/write" 저장
-//           
-//           response.sendRedirect("/login"); // 로그인 페이지로 튕기기
-//           return false;
-//       }
-//       return true;
-//   }
-//
-//   // 2. [진입 후] 로그인 컨트롤러가 일을 다 끝낸 직후에 실행 (핵심!)
-//   @Override
-//   public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
-//       HttpSession session = request.getSession();
-//       String dest = (String) session.getAttribute("dest");
-//
-//       // 방금 로그인이 성공했고(세션 생성됨), 가려던 목적지(dest)가 있다면?
-//       if (session.getAttribute("loginMember") != null && dest != null) {
-//           session.removeAttribute("dest"); // 한 번 썼으니까 지우기!
-//           response.sendRedirect(dest); // 원래 보려던 보드 페이지로 강제 소환!
-//       }
-//   }
-   
-   
-   
-   
-   
    
 }

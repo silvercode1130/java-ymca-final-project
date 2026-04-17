@@ -121,7 +121,7 @@ public class MemberController {
 
         // 새로고침 했을 때 로그인 안풀리는 기능
         if (session.getAttribute("loginUser") != null) {
-            return "redirect:/main";
+            return "redirect:/main"; 
         }
 
         String msg = (String) session.getAttribute("loginMsg");
@@ -144,7 +144,7 @@ public class MemberController {
             model.addAttribute("returnUrl", sessionRedirectUrl);
         }
 
-        return "views/member/login";
+        return "views/member/login"; 
     }
 
     // login.html - 로그인 처리 기능
@@ -163,7 +163,6 @@ public class MemberController {
             long now = System.currentTimeMillis();
 
             if (now < lockTime) {
-                long remainSec = (lockTime - now) / 1000;
                 ra.addFlashAttribute("error", "로그인이 제한된 계정입니다.");
                 ra.addFlashAttribute("lockedId", memId); // 프론트에서 타이머용
                 return "redirect:/members/login";
