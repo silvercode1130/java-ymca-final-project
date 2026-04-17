@@ -15,15 +15,7 @@ public interface PaymentMapper {
   // orderId를 기준으로 해당 결제 건을 찾아 상태를 변경합니다.
   int updatePaymentStatus(@Param("orderId") String orderId, @Param("status") String status);
 
-  // 3. 경매 상태 업데이트 (예: 8번 - 낙찰/결제완료)
-  int updateAuctionStatus(@Param("bidIdx") Long bidIdx, @Param("statusIdx") int statusIdx);
-
-  // 4. 입찰 상태 업데이트 (예: 2번 - 결제완료)
-  int updateBidStatus(@Param("bidIdx") Long bidIdx, @Param("statusIdx") int statusIdx);
-
   int updateShippingInfo(PaymentVO paymentVO);
-
-  int updateAuctionStatusByBidIdx(@Param("bidIdx") Long bidIdx, @Param("statusIdx") int statusIdx);
 
   int updateConfirmedAt(@Param("bidIdx") Long bidIdx);
 

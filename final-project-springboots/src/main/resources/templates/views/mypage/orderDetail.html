@@ -74,6 +74,15 @@
                     </button>
                 </form>
 
+                <form th:if="${order.orderStatusCode == 'CREATED' or order.orderStatusCode == 'PAID'}"
+                      th:action="@{/mypage/orders/{orderIdx}/cancel(orderIdx=${order.orderIdx})}" method="post" class="m-0"
+                      onsubmit="return confirm('이 거래를 취소하시겠습니까?');">
+                    <button type="submit"
+                            class="px-3 py-1.5 rounded-lg bg-[#D64545] text-white text-xs font-semibold hover:bg-[#C13A3A]">
+                        거래취소
+                    </button>
+                </form>
+
                 <a th:if="${order.userRole == 'SELLER' and order.orderStatusCode == 'PAID'}"
                    th:href="@{/mypage/sales}"
                    class="px-3 py-1.5 rounded-lg bg-[#222222] text-white text-xs font-semibold hover:bg-[#444444]">배송시작</a>

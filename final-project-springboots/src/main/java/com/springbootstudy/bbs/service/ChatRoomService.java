@@ -1,5 +1,8 @@
 package com.springbootstudy.bbs.service;
 
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -52,5 +55,9 @@ public class ChatRoomService {
         }
 
         return room.getChatroomIdx();
+    }
+
+    public List<Map<String, Object>> getRoomSummariesByMember(Long memIdx) {
+        return chatRoomMapper.findRoomSummariesByMember(memIdx);
     }
 }

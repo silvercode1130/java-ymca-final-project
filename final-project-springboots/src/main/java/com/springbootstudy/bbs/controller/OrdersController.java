@@ -135,4 +135,36 @@ public class OrdersController {
 
 		return "redirect:/mypage/orders/" + orderIdx;
 	}
+
+	@PostMapping("/orders/{orderIdx}/cancel")
+	public String cancelOrder(@PathVariable("orderIdx") Long orderIdx,
+			HttpSession session,
+			RedirectAttributes ra) {
+		MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
+		if (loginUser == null) {
+			return "redirect:/members/login";
+		}
+
+		OrdersVO order = ordersService.findByOrderIdx(orderIdx);
+		if (order == null) {
+			ra.addFlashAttribute("errorMessage", "주문 정보를 찾을 수 없습니다.");
+			return "redirect:/mypage/orders";
+		}
+
+		Long memIdx = loginUser.getMemIdx();
+		boolean participant = memIdx.equals(order.getBuyerIdx()) || memIdx.equals(order.getSellerIdx());
+		if (!participant) {
+			ra.addFlashAttribute("errorMessage", "거래 취소 권한이 없습니다.");
+			return "redirect:/mypage/orders";
+		}
+
+		try {
+			ordersService.markOrderCanceled(orderIdx);
+			ra.addFlashAttribute("successMessage", "거래가 취소되었습니다.");
+		} catch (Exception e) {
+			ra.addFlashAttribute("errorMessage", e.getMessage());
+		}
+
+		return "redirect:/mypage/orders/" + orderIdx;
+	}
 }

@@ -12,6 +12,7 @@ import com.springbootstudy.bbs.domain.AuctionDTO;
 import com.springbootstudy.bbs.domain.BidDTO;
 import com.springbootstudy.bbs.domain.BoardVO;
 import com.springbootstudy.bbs.domain.NotificationVO;
+import com.springbootstudy.bbs.domain.OrdersVO;
 import com.springbootstudy.bbs.domain.ReplyVO;
 import com.springbootstudy.bbs.mapper.NotificationMapper;
 
@@ -173,5 +174,75 @@ public class NotificationService {
 		notification.setNotificationMessage("게시글에 새로운 댓글이 등록되었습니다.");
 		notification.setTargetUrl("/boards/" + board.getBoardTypeCode() + "/" + board.getBoardIdx());
 		sendAndPush(notification);
+	}
+
+	public void notifyOrderPaid(OrdersVO order) {
+		if (order == null) {
+			return;
+		}
+		String message = "주문 [" + order.getOrderIdx() + "] 결제가 완료되었습니다.";
+		sendTradeNotificationToBoth(order, "TRADE_PAYMENT_COMPLETED", "결제 완료", message);
+	}
+
+	public void notifyOrderShipped(OrdersVO order) {
+		if (order == null) {
+			return;
+		}
+		String message = "주문 [" + order.getOrderIdx() + "] 배송이 시작되었습니다.";
+		sendTradeNotificationToBoth(order, "TRADE_SHIPPING_STARTED", "배송 시작", message);
+	}
+
+	public void notifyOrderReceiptConfirmed(OrdersVO order) {
+		if (order == null) {
+			return;
+		}
+		String message = "주문 [" + order.getOrderIdx() + "] 수령 확인이 완료되었습니다.";
+		sendTradeNotificationToBoth(order, "TRADE_RECEIPT_CONFIRMED", "수령 확인", message);
+	}
+
+	public void notifyOrderCompleted(OrdersVO order) {
+		if (order == null) {
+			return;
+		}
+		String message = "주문 [" + order.getOrderIdx() + "] 거래가 완료되었습니다.";
+		sendTradeNotificationToBoth(order, "TRADE_COMPLETED", "거래 완료", message);
+	}
+
+	public void notifyOrderCanceled(OrdersVO order) {
+		if (order == null) {
+			return;
+		}
+		String message = "주문 [" + order.getOrderIdx() + "] 거래가 취소되었습니다.";
+		sendTradeNotificationToBoth(order, "TRADE_CANCELED", "거래 취소", message);
+	}
+
+	private void sendTradeNotificationToBoth(OrdersVO order, String type, String title, String message) {
+		if (order.getOrderIdx() == null) {
+			return;
+		}
+
+		if (order.getBuyerIdx() != null) {
+			NotificationVO buyerNotification = new NotificationVO();
+			buyerNotification.setReceiverIdx(order.getBuyerIdx());
+			buyerNotification.setAuctionIdx(order.getAuctionIdx());
+			buyerNotification.setBidIdx(order.getBidIdx());
+			buyerNotification.setNotificationType(type);
+			buyerNotification.setNotificationTitle(title);
+			buyerNotification.setNotificationMessage(message);
+			buyerNotification.setTargetUrl("/mypage/orders/" + order.getOrderIdx());
+			sendAndPush(buyerNotification);
+		}
+
+		if (order.getSellerIdx() != null) {
+			NotificationVO sellerNotification = new NotificationVO();
+			sellerNotification.setReceiverIdx(order.getSellerIdx());
+			sellerNotification.setAuctionIdx(order.getAuctionIdx());
+			sellerNotification.setBidIdx(order.getBidIdx());
+			sellerNotification.setNotificationType(type);
+			sellerNotification.setNotificationTitle(title);
+			sellerNotification.setNotificationMessage(message);
+			sellerNotification.setTargetUrl("/mypage/orders/" + order.getOrderIdx());
+			sendAndPush(sellerNotification);
+		}
 	}
 }
