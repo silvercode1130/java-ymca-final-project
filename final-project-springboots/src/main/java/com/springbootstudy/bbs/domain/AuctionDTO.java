@@ -3,6 +3,8 @@ package com.springbootstudy.bbs.domain;
 import lombok.Data;
 import java.time.LocalDateTime;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 @Data
 public class AuctionDTO {
 
@@ -10,8 +12,11 @@ public class AuctionDTO {
     private Long auctionIdx;
     private String auctionTitle;
     private Long auctionTargetPrice;
-    private LocalDateTime auctionEndAt;
     private String auctionDesc;
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm")
+    private LocalDateTime auctionEndAt;
+
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime auctionDecisionDeadline;
     private LocalDateTime auctionRegdate; // 리스트 정렬 및 날짜 표시용
 

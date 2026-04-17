@@ -62,11 +62,6 @@ public class BidService {
         // 위에서 생성된 itemIdx를 가지고 입찰(bid) 정보 저장
         bidMapper.insertBid(bidDto);
 
-        AuctionDTO auction = auctionMapper.auctionDetail(bidDto.getAuctionIdx());
-        if (auction != null) {
-            notificationService.notifyNewBidToAuctionWriter(auction, bidDto);
-        }
-        
     }
     
     // 입찰 삭제 - 소프트 딜리트

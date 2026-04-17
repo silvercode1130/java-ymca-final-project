@@ -110,6 +110,19 @@
 				websocketConnected = true;
 				stompClient.subscribe('/topic/chatroom/' + chatroomIdx, function(frame) {
 					const message = JSON.parse(frame.body);
+					const data = JSON.parse(frame.body);
+					
+					// 내가 보낸 메시지가 아닐 때만 부모창에 토스트
+				    if (data.senderIdx !== myIdx && window.opener && !window.opener.closed) {
+				        try {
+				            window.opener.showChatToast(
+				                data.senderName || '상대방',
+				                data.messageContent || '',
+				                chatroomIdx
+				            );
+				        } catch(e) {}
+				    }
+					
 					appendMessage(message);
 				});
 			}, function() {

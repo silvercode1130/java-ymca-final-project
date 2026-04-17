@@ -123,20 +123,5 @@
         )
     </insert>
 
-    <!-- 경매 수정 -->
-    <update id="updateAuction">
-        UPDATE auction
-        SET auction_title = #{auctionTitle},
-            auction_desc = #{auctionDesc},
-            auction_target_price = #{auctionTargetPrice},
-            auction_end_at = #{auctionEndAt},
-            auction_decision_deadline = #{auctionDecisionDeadline},
-            auction_moddate = NOW()
-        WHERE auction_idx = #{auctionIdx}
-          AND buyer_idx = #{buyerIdx}
-          AND auction_status_idx = 1
-          AND auction_is_deleted = 'N'
-    </update>
-    
 </mapper>
 

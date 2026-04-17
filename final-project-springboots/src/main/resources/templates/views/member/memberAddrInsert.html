@@ -6,9 +6,7 @@
 <meta charset="UTF-8">
 <title>배송지 관리 - PickQ</title>
 
-
-<script
-	src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+<script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 
 <script type="text/javascript">
     // 주소창 띄우기
@@ -28,6 +26,7 @@
       const memZipcode = document.getElementById("memZipcode").value;
       const memAddr = document.getElementById("memAddr").value;
       const memAddrDetail = document.getElementById("memAddrDetail").value;
+      const redirectAfterSave = document.getElementById("redirectAfterSave").value;
       const isPrimaryCheckbox = document.getElementById("isPrimary");
       const isPrimary = isPrimaryCheckbox.checked ? "Y" : "N";
 
@@ -59,7 +58,7 @@
           .then(result => {
             if (result.trim() === "1") {
               alert("✓ 성공적으로 저장되었습니다!");
-              location.href = "/mypage/addresses";
+              location.href = redirectAfterSave || "/mypage/addresses";
             } else {
               alert("✗ 저장 실패: 다시 시도해 주세요.");
             }
@@ -101,6 +100,8 @@
 
 					<input type="hidden" id="memIdx" name="memIdx"
 						th:value="${member.memIdx}" />
+          <input type="hidden" id="redirectAfterSave" name="redirectAfterSave"
+            th:value="${redirectAfterSave}" />
 
 					<!-- 대표 주소 체크 -->
 					<div class="flex items-center gap-2">

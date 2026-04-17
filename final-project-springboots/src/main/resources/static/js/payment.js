@@ -46,16 +46,29 @@ const PaymentModule = {
   initButtons: function () {
     document.querySelectorAll(".pay-btn").forEach((btn) => {
       btn.addEventListener("click", () => {
-        const bidIdx = btn.getAttribute("data-idx");
-        const payData = {
-          amount: btn.getAttribute("data-price"),
-          orderId: "ORD_" + bidIdx + "_" + new Date().getTime(),
-          orderName: btn.getAttribute("data-title"),
-          customerName:
-            typeof loginMemName !== "undefined" ? loginMemName : "구매자",
-          payMethod: "카드",
-        };
-        this.request(payData);
+        const bidIdx = btn.getAttribute("data-bid-idx");
+        const amount = Number(btn.getAttribute("data-price") || 0);
+        const orderName = btn.getAttribute("data-order-name") || "결제 상품";
+
+        if (!bidIdx || !amount || !orderName) {
+          alert("결제 정보가 올바르지 않습니다.");
+          return;
+        }
+
+        this.getSessionInfo()
+          .then((sessionInfo) => {
+            const payData = {
+              amount: amount,
+              orderId: "ORD_" + bidIdx + "_" + new Date().getTime(),
+              orderName: orderName,
+              customerName: sessionInfo.memName || "구매자",
+              payMethod: "카드",
+            };
+            this.request(payData);
+          })
+          .catch((err) => {
+            alert("세션 정보를 불러오지 못했습니다: " + err.message);
+          });
       });
     });
   },
@@ -77,7 +90,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // 필수값 없으면 바로 fail로
     if (!paymentKey || !orderId || !amount) {
       alert("결제 정보가 없습니다.");
-      location.href = "/payment/fail";
+      location.href = "/payment/fail?message=" + encodeURIComponent("결제 정보가 없습니다.");
       return;
     }
 
@@ -103,7 +116,7 @@ document.addEventListener("DOMContentLoaded", function () {
       })
       .catch((err) => {
         alert("결제 승인 실패: " + err.message);
-        location.href = "/payment/fail";
+        location.href = "/payment/fail?message=" + encodeURIComponent(err.message || "결제 승인 실패");
       });
   }
 });
