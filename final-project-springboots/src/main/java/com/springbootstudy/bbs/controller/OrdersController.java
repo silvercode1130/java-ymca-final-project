@@ -152,15 +152,15 @@ public class OrdersController {
 		}
 
 		Long memIdx = loginUser.getMemIdx();
-		boolean participant = memIdx.equals(order.getBuyerIdx()) || memIdx.equals(order.getSellerIdx());
-		if (!participant) {
+		if (!memIdx.equals(order.getSellerIdx())) {
 			ra.addFlashAttribute("errorMessage", "거래 취소 권한이 없습니다.");
 			return "redirect:/mypage/orders";
 		}
 
 		try {
-			ordersService.markOrderCanceled(orderIdx);
-			ra.addFlashAttribute("successMessage", "거래가 취소되었습니다.");
+			ordersService.cancelOrderBySeller(orderIdx, memIdx);
+			ra.addFlashAttribute("successMessage", "거래가 취소되고 결제가 환불 처리됩니다.");
+			ra.addFlashAttribute("warningMessage", "판매자 거래 취소 정책에 따라 패널티 1점이 부과됩니다.");
 		} catch (Exception e) {
 			ra.addFlashAttribute("errorMessage", e.getMessage());
 		}

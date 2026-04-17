@@ -28,6 +28,15 @@
     <update id="updateConfirmedAt"> UPDATE payment SET confirmed_at = NOW(), pay_status =
         'CONFIRMED' WHERE bid_idx = #{bidIdx} </update>
 
+    <!-- 판매자 거래 취소 시 환불(에스크로 취소) 처리 -->
+    <update id="cancelEscrowPaymentByBidIdx">
+        UPDATE payment
+        SET pay_status = 'CANCELED',
+            canceled_at = CASE WHEN canceled_at IS NULL THEN NOW() ELSE canceled_at END
+        WHERE bid_idx = #{bidIdx}
+          AND pay_status = 'DONE'
+    </update>
+
     <!-- 결제 정보 조회 (중복결제 체크 및 pay_idx 조회용) -->
     <select id="findPaymentByBidIdx" resultType="com.springbootstudy.bbs.domain.PaymentVO"> SELECT *
         FROM payment WHERE bid_idx = #{bidIdx} AND pay_status IN ('DONE', 'CONFIRMED') LIMIT 1 </select>

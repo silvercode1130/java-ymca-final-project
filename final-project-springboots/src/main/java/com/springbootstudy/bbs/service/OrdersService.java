@@ -20,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 public class OrdersService {
 
 	private final OrdersMapper ordersMapper;
+	private final EscrowRefundService escrowRefundService;
 	private final NotificationService notificationService;
 
 	// 1. 낙찰 시 주문 생성
@@ -118,6 +119,43 @@ public class OrdersService {
 
 		ordersMapper.updateOrderCanceled(orderIdx);
 		notificationService.notifyOrderCanceled(requireOrder(orderIdx));
+	}
+
+	/**
+	 * 판매자 결제완료 취소 전용 플로우.
+	 * 비즈니스 룰:
+	 * 1) 판매자 본인만 취소 가능
+	 * 2) 결제완료(PAID) 상태에서만 가능
+	 * 3) 배송 시작 이후(SHIPPED)는 취소 불가
+	 * 4) 패널티 1점 정책은 추후 member_penalty 연동 예정(TODO)
+	 */
+	@Transactional
+	public void cancelOrderBySeller(Long orderIdx, Long sellerMemIdx) {
+		OrdersVO order = requireOrder(orderIdx);
+
+		if (sellerMemIdx == null || !sellerMemIdx.equals(order.getSellerIdx())) {
+			throw new IllegalStateException("판매자 본인만 거래 취소를 요청할 수 있습니다.");
+		}
+
+		if (!"PAID".equals(order.getOrderStatus())) {
+			throw new IllegalStateException("결제완료 상태에서만 판매자 거래 취소가 가능합니다.");
+		}
+
+		// 배송이 시작된 뒤에는 구매자 보호를 위해 임의 취소를 금지한다.
+		if ("SHIPPED".equals(order.getOrderStatus()) || "CONFIRMED".equals(order.getOrderStatus())) {
+			throw new IllegalStateException("배송 시작 이후에는 판매자가 임의로 거래를 취소할 수 없습니다.");
+		}
+
+		escrowRefundService.refundPaidEscrowByBidIdx(order.getBidIdx(),
+				"판매자 요청으로 주문 [" + order.getOrderIdx() + "] 거래가 취소되었습니다.");
+
+		ordersMapper.updateOrderCanceled(orderIdx);
+		OrdersVO updatedOrder = requireOrder(orderIdx);
+
+		// TODO: 패널티 1점 정책은 member_penalty 실구현 단계에서 DB 적재로 확장.
+		log.info("판매자 거래취소 패널티 정책 적용 대상 - orderIdx={}, sellerIdx={}", orderIdx, sellerMemIdx);
+
+		notificationService.notifyOrderCanceledBySellerWithRefund(updatedOrder);
 	}
 
 	// 2-5. bid 기준으로 주문 찾기 (배송/수령확인에서 사용)

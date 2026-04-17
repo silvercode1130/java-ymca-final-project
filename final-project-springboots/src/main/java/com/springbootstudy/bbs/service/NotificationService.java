@@ -224,6 +224,14 @@ public class NotificationService {
 		sendTradeNotificationToBoth(order, "TRADE_CANCELED", "거래 취소", message);
 	}
 
+	public void notifyOrderCanceledBySellerWithRefund(OrdersVO order) {
+		if (order == null) {
+			return;
+		}
+		String message = "판매자 사정으로 주문 [" + order.getOrderIdx() + "] 거래가 취소되었고, 결제가 환불 처리됩니다.";
+		sendTradeNotificationToBoth(order, "TRADE_CANCELED_BY_SELLER", "거래 취소 및 환불", message);
+	}
+
 	private void sendTradeNotificationToBoth(OrdersVO order, String type, String title, String message) {
 		if (order.getOrderIdx() == null) {
 			return;
