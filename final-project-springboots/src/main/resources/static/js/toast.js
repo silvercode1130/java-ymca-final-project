@@ -1,162 +1,158 @@
 /**
  * PickQ 통합 토스트 시스템
- * - 일반 토스트: 우측 하단 (초록/빨강/파랑)
- * - 채팅 토스트: 우측 상단 (카카오톡 스타일, 클릭 시 채팅창 이동)
- * 두 종류가 겹치지 않도록 위치를 분리함
+ * - 모든 토스트: 우측 하단, 위로 쌓임
+ * - 일반 알림: 초록/빨강/파랑
+ * - 알림(벨): 흰색 + 초록 테두리
+ * - 채팅: 노란 카카오 스타일
  */
 
-// ── 일반 토스트 (우측 하단) ──────────────────────────────
-function showToast(message, type, onClick) {
-    const colors = {
-        success: { bg: '#2ecc71', icon: '✅' },
-        error:   { bg: '#e74c3c', icon: '⚠️' },
-        info:    { bg: '#3498db', icon: 'ℹ️'  }
-    };
-    const style = colors[type] || colors.info;
+// ── 토스트 제거 ──
+function _removeToast(el) {
+    if (!el || !el.parentNode) return;
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(20px)';
+    setTimeout(() => {
+        if (el.parentNode) el.remove();
+        _repositionToasts();
+    }, 300);
+}
 
+// ── 모든 토스트 위치 재정렬 (우측 하단, 위로 쌓임) ──
+function _repositionToasts() {
+    const toasts = [...document.querySelectorAll('.pickq-toast')].reverse();
+    let bottom = 30;
+    toasts.forEach(t => {
+        t.style.bottom = bottom + 'px';
+        bottom += t.offsetHeight + 10;
+    });
+}
+
+// ── 토스트 생성 공통 함수 ──
+function _createToast(innerHTML, bgColor, borderLeft, onClick) {
     const toast = document.createElement('div');
     toast.className = 'pickq-toast';
     toast.style.cssText = `
         position: fixed;
         bottom: 30px;
         right: 30px;
-        background: ${style.bg};
-        color: white;
-        padding: 14px 20px;
-        border-radius: 10px;
-        font-size: 14px;
-        font-weight: 500;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-        z-index: 9998;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        max-width: 320px;
-        word-break: keep-all;
-        opacity: 0;
-        transform: translateY(20px);
-        transition: opacity 0.3s ease, transform 0.3s ease;
-        cursor: ${onClick ? 'pointer' : 'default'};
-    `;
-    toast.innerHTML = `<span>${style.icon}</span><span>${message}</span>`;
-    if (onClick) toast.addEventListener('click', onClick);
-    document.body.appendChild(toast);
-
-    requestAnimationFrame(() => {
-        toast.style.opacity = '1';
-        toast.style.transform = 'translateY(0)';
-    });
-
-    const timer = setTimeout(() => _removeToast(toast), 4000);
-    toast.addEventListener('click', () => clearTimeout(timer));
-}
-
-function _removeToast(el) {
-    el.style.opacity = '0';
-    el.style.transform = 'translateY(20px)';
-    setTimeout(() => el.remove(), 300);
-}
-
-
-// ── 채팅 토스트 (우측 상단, 카카오 스타일) ──────────────
-let _chatToastQueue = [];
-let _chatToastShowing = false;
-
-function showChatToast(senderName, message, chatroomIdx) {
-    _chatToastQueue.push({ senderName, message, chatroomIdx });
-    if (!_chatToastShowing) _showNextChatToast();
-}
-
-function _showNextChatToast() {
-    if (_chatToastQueue.length === 0) { _chatToastShowing = false; return; }
-    _chatToastShowing = true;
-
-    const { senderName, message, chatroomIdx } = _chatToastQueue.shift();
-
-    const toast = document.createElement('div');
-    toast.style.cssText = `
-        position: fixed;
-        top: 80px;
-        right: 20px;
-        background: #FEE500;
-        color: #3C1E1E;
-        padding: 12px 16px;
+        background: ${bgColor};
+        padding: 14px 18px;
         border-radius: 12px;
         font-size: 13px;
+        font-weight: 500;
         box-shadow: 0 4px 16px rgba(0,0,0,0.18);
         z-index: 9999;
         display: flex;
         flex-direction: column;
         gap: 4px;
-        max-width: 280px;
+        max-width: 320px;
         word-break: keep-all;
-        cursor: pointer;
         opacity: 0;
-        transform: translateX(40px);
-        transition: opacity 0.3s ease, transform 0.3s ease;
-        border-left: 4px solid #3C1E1E;
+        transform: translateY(20px);
+        transition: opacity 0.3s ease, transform 0.3s ease, bottom 0.2s ease;
+        cursor: ${onClick ? 'pointer' : 'default'};
+        ${borderLeft ? 'border-left: 4px solid ' + borderLeft + ';' : ''}
     `;
-    toast.innerHTML = `
-        <div style="display:flex;align-items:center;gap:6px;">
-            <span style="font-size:16px;">💬</span>
-            <strong style="font-size:13px;">${senderName}</strong>
-            <span style="font-size:10px;margin-left:auto;opacity:0.6;">채팅</span>
-        </div>
-        <div style="font-size:12px;opacity:0.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:240px;">
-            ${message}
-        </div>
-    `;
-
-    // 클릭 시 채팅창으로 이동
-    toast.addEventListener('click', () => {
-        _removeToast(toast);
-        if (chatroomIdx) {
-            window.open(
-                '/chats/' + chatroomIdx,
-                'chat_' + chatroomIdx,
-                'width=420,height=600,menubar=no,toolbar=no,location=no,resizable=yes,scrollbars=yes'
-            );
-        }
-    });
-
+    toast.innerHTML = innerHTML;
+    if (onClick) toast.addEventListener('click', () => { _removeToast(toast); onClick(); });
     document.body.appendChild(toast);
 
     requestAnimationFrame(() => {
         toast.style.opacity = '1';
-        toast.style.transform = 'translateX(0)';
+        toast.style.transform = 'translateY(0)';
+        _repositionToasts();
     });
 
-    setTimeout(() => {
-        _removeToast(toast);
-        setTimeout(_showNextChatToast, 300);
-    }, 4000);
+    const timer = setTimeout(() => _removeToast(toast), 5000);
+    toast.addEventListener('click', () => clearTimeout(timer));
+    return toast;
 }
 
+// ── 일반 토스트 (성공/에러/정보) ──
+function showToast(message, type, onClick) {
+    const styles = {
+        success: { bg: '#2ecc71', color: 'white', icon: '✅' },
+        error:   { bg: '#e74c3c', color: 'white', icon: '⚠️' },
+        info:    { bg: '#3498db', color: 'white', icon: 'ℹ️'  }
+    };
+    const s = styles[type] || styles.info;
+    _createToast(
+        `<div style="display:flex;align-items:center;gap:8px;color:${s.color};">
+            <span>${s.icon}</span><span>${message}</span>
+        </div>`,
+        s.bg, null, onClick
+    );
+}
 
-// ── 페이지 로드 시 Thymeleaf 플래시 메시지 자동 감지 ──────
-window.addEventListener('pageshow', function (event) {
-    if (event.persisted) return;
+// ── 알림 토스트 (벨 알림, 클릭 시 알림창 이동) ──
+function showNotificationToast(title, message, targetUrl) {
+    _createToast(
+        `<div style="display:flex;align-items:center;gap:6px;">
+            <span style="font-size:15px;">🔔</span>
+            <strong style="font-size:13px;color:#222;">${title}</strong>
+            <span style="font-size:10px;margin-left:auto;color:#888;">알림</span>
+        </div>
+        <div style="font-size:12px;color:#555;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:270px;">
+            ${message}
+        </div>`,
+        '#ffffff', '#7CBD00',
+        () => { window.location.href = targetUrl || '/notifications'; }
+    );
+}
 
-    const toastShownKey = 'toastShown_' + location.pathname;
-    if (sessionStorage.getItem(toastShownKey)) {
-        sessionStorage.removeItem(toastShownKey);
-        return;
-    }
+// ── 채팅 토스트 (카카오 스타일, 클릭 시 채팅창 이동) ──
+function showChatToast(senderName, message, chatroomIdx) {
+    _createToast(
+        `<div style="display:flex;align-items:center;gap:6px;color:#3C1E1E;">
+            <span style="font-size:15px;">💬</span>
+            <strong style="font-size:13px;">${senderName}</strong>
+            <span style="font-size:10px;margin-left:auto;opacity:0.6;">채팅</span>
+        </div>
+        <div style="font-size:12px;color:#3C1E1E;opacity:0.85;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:270px;">
+            ${message}
+        </div>`,
+        '#FEE500', '#3C1E1E',
+        () => {
+            if (chatroomIdx) {
+                window.open(
+                    '/chats/' + chatroomIdx,
+                    'chat_' + chatroomIdx,
+                    'width=420,height=600,menubar=no,toolbar=no,location=no,resizable=yes,scrollbars=yes'
+                );
+            }
+        }
+    );
+}
 
-    const successEl = document.getElementById('toast-success');
-    const errorEl   = document.getElementById('toast-error');
-    const bidErrEl  = document.getElementById('toast-bid-error');
+// ── 페이지 로드 시 Thymeleaf 플래시 메시지 자동 감지 ──
+(function() {
+    if (window._pickqToastInitialized) return;
+    window._pickqToastInitialized = true;
 
-    if (successEl && successEl.dataset.msg) {
-        showToast(successEl.dataset.msg, 'success');
-        sessionStorage.setItem(toastShownKey, '1');
-    }
-    if (errorEl && errorEl.dataset.msg) {
-        showToast(errorEl.dataset.msg, 'error');
-        sessionStorage.setItem(toastShownKey, '1');
-    }
-    if (bidErrEl && bidErrEl.dataset.msg) {
-        showToast(bidErrEl.dataset.msg, 'error');
-        sessionStorage.setItem(toastShownKey, '1');
-    }
-});
+    window.addEventListener('pageshow', function (event) {
+        // 뒤로가기면 무조건 아무것도 안 함
+        if (event.persisted) return;
+
+        var successEl = document.getElementById('toast-success');
+        var errorEl   = document.getElementById('toast-error');
+        var bidErrEl  = document.getElementById('toast-bid-error');
+
+        var hasMsg = (successEl && successEl.dataset.msg)
+                  || (errorEl   && errorEl.dataset.msg)
+                  || (bidErrEl  && bidErrEl.dataset.msg);
+
+        if (!hasMsg) return;
+
+        // 새로고침 중복 방지
+        var key = 'toastShown_' + location.pathname + location.search;
+        if (sessionStorage.getItem(key)) {
+            sessionStorage.removeItem(key);
+            return;
+        }
+
+        if (successEl && successEl.dataset.msg) showToast(successEl.dataset.msg, 'success');
+        if (errorEl   && errorEl.dataset.msg)   showToast(errorEl.dataset.msg,   'error');
+        if (bidErrEl  && bidErrEl.dataset.msg)  showToast(bidErrEl.dataset.msg,  'error');
+        sessionStorage.setItem(key, '1');
+    });
+})();
