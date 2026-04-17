@@ -15,8 +15,10 @@ import com.springbootstudy.bbs.domain.MemberVO;
 import com.springbootstudy.bbs.service.ChatMessageService;
 
 import jakarta.servlet.http.HttpSession;
+import lombok.extern.slf4j.Slf4j;
 
 @Controller
+@Slf4j
 public class ChatController {
 	
 	@Autowired

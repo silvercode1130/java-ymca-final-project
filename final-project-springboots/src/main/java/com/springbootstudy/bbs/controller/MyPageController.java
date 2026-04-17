@@ -1,8 +1,10 @@
 package com.springbootstudy.bbs.controller;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,15 +15,22 @@ import com.springbootstudy.bbs.domain.BidDTO;
 import com.springbootstudy.bbs.domain.BoardVO;
 import com.springbootstudy.bbs.domain.MemberVO;
 import com.springbootstudy.bbs.domain.MyPagePaymentVO;
+
+import com.springbootstudy.bbs.mapper.DeliveryMapper;
+import com.springbootstudy.bbs.mapper.PaymentMapper;
 import com.springbootstudy.bbs.service.MyPageService;
 
 import jakarta.servlet.http.HttpSession;
+import lombok.RequiredArgsConstructor;
 
 @Controller
 @RequestMapping("/mypage")
+@RequiredArgsConstructor
 public class MyPageController {
-  @Autowired
-  private MyPageService mypageService;
+
+  private final MyPageService mypageService;
+  private final PaymentMapper paymentMapper;
+  private final DeliveryMapper deliveryMapper;
 
   // 내 경매 목록
   @GetMapping("/auctions")
@@ -39,7 +48,7 @@ public class MyPageController {
     return "views/mypage/auctions";
   }
 
-  // 내 입찰 목록
+  // 🔥 핵심: 내 입찰 목록 (delivery 포함)
   @GetMapping("/bids")
   public String myBids(HttpSession session, Model model) {
 
@@ -50,7 +59,18 @@ public class MyPageController {
 
     Long memIdx = loginUser.getMemIdx();
     List<BidDTO> bids = mypageService.getMyBids(memIdx);
-    model.addAttribute("bids", bids);
+
+    List<Map<String, Object>> bidViews = new ArrayList<>();
+
+    for (BidDTO bid : bids) {
+      Map<String, Object> row = new HashMap<>();
+      row.put("bid", bid);
+      row.put("delivery", deliveryMapper.findDeliveryByBidIdx(bid.getBidIdx()));
+      row.put("payment", paymentMapper.findPaymentByBidIdx(bid.getBidIdx()));
+      bidViews.add(row);
+    }
+
+    model.addAttribute("bids", bidViews);
 
     return "views/mypage/bids";
   }
@@ -96,15 +116,5 @@ public class MyPageController {
 
     return "views/mypage/sales";
   }
-  
-  // 멤버 탈퇴
-  @GetMapping("/delete")
-  public String memberDelete(HttpSession session, Model model) {
-	    MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
-	    if (loginUser == null)
-	      return "redirect:/members/login";
-
-	    return "views/mypage/memberDelete";
-	  }
 
 }

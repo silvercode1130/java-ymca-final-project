@@ -1,5 +1,6 @@
 package com.springbootstudy.bbs.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.springbootstudy.bbs.domain.AuctionDTO;
@@ -12,7 +13,8 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class ChatRoomService {
-
+	
+	@Autowired
     private final ChatRoomMapper chatRoomMapper;
 
     public Long prepareChatroomForAuction(Long auctionIdx,

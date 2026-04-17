@@ -59,7 +59,7 @@
 	</insert>
 	
 	<!-- 입찰 등록 -->
-	<insert id="insertBid">
+	<insert id="insertBid" useGeneratedKeys="true" keyProperty="bidIdx" keyColumn="bid_idx">
 	    INSERT INTO bid (
 	        auction_idx,
 	        bidder_idx,
@@ -80,6 +80,14 @@
 	        NOW()
 	    )
 	</insert>
+
+	<!-- 특정 경매에 입찰한 회원 목록 -->
+	<select id="findDistinctBidderIdxByAuction" resultType="long">
+	    SELECT DISTINCT bidder_idx
+	    FROM bid
+	    WHERE auction_idx = #{auctionIdx}
+	      AND bid_status_idx IN (1, 2, 3)
+	</select>
 	
 	<!-- 특정 입찰 낙찰 처리 -->
 	<update id="selectWinnerBid">
