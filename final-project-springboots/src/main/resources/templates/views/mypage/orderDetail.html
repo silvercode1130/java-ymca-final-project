@@ -30,6 +30,10 @@
                 <div>
                     <p class="text-gray-400 text-xs">경매 제목</p>
                     <p class="mt-1 font-semibold text-[#222222]" th:text="${order.auctionTitle}">경매 제목</p>
+                    <div class="mt-2" th:if="${order.itemName != null and !#strings.isEmpty(order.itemName)}">
+                        <span class="inline-flex items-center rounded-full bg-[#F3FAE8] px-2.5 py-1 text-[11px] font-semibold text-[#4C7C00]"
+                              th:text="${'낙찰 상품: ' + order.itemName}">낙찰 상품: 상품명</span>
+                    </div>
                 </div>
                 <div>
                     <p class="text-gray-400 text-xs">주문 상태</p>

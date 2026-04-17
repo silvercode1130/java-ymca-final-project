@@ -25,6 +25,7 @@ public class OrdersListDTO {
     private LocalDateTime refundAt;
 
     private String auctionTitle;
+    private String itemName;
     private String buyerNickname;
     private String sellerNickname;
 

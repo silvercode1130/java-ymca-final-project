@@ -104,6 +104,7 @@
         o.confirmed_at AS confirmedAt,
         o.refund_at AS refundAt,
         a.auction_title AS auctionTitle,
+        i.item_name AS itemName,
         COALESCE(bp.mem_nickname, bm.mem_id) AS buyerNickname,
         COALESCE(sp.mem_nickname, sm.mem_id) AS sellerNickname,
         COALESCE(p.pay_status, 'READY') AS paymentStatusCode,
@@ -127,6 +128,8 @@
     <sql id="ordersListFrom">
         FROM orders o
         INNER JOIN auction a ON a.auction_idx = o.auction_idx
+        INNER JOIN bid b ON b.bid_idx = o.bid_idx
+        INNER JOIN item i ON i.item_idx = b.item_idx
         INNER JOIN member bm ON bm.mem_idx = o.buyer_idx
         LEFT JOIN member_profile bp ON bp.mem_idx = bm.mem_idx
         INNER JOIN member sm ON sm.mem_idx = o.seller_idx

@@ -5,8 +5,9 @@
         selectedRoomName: "",
         rooms: [],
         stompClient: null,
-        roomSubscription: null,
+        roomSubscriptions: new Map(),
         pollTimer: null,
+        isConnected: false,
     };
 
     function el(id) {
@@ -153,14 +154,42 @@
         });
     }
 
+    function setConversationVisible(visible) {
+        const conversationPane = el("chatConversationPane");
+        const placeholder = el("chatPlaceholder");
+        const conversationWrap = el("chatConversationWrap");
+
+        if (!conversationPane || !placeholder || !conversationWrap) {
+            return;
+        }
+
+        if (visible) {
+            conversationPane.classList.remove("hidden");
+            placeholder.classList.add("hidden");
+            conversationWrap.classList.remove("hidden");
+            conversationWrap.classList.add("flex");
+        } else {
+            conversationPane.classList.add("hidden");
+            placeholder.classList.add("hidden");
+            conversationWrap.classList.add("hidden");
+            conversationWrap.classList.remove("flex");
+        }
+    }
+
+    function setRoomListVisible(visible) {
+        const roomPane = el("chatRoomPane");
+        if (!roomPane) {
+            return;
+        }
+        roomPane.classList.toggle("hidden", !visible);
+    }
+
     function syncMobilePanels() {
         const roomPane = el("chatRoomPane");
         const conversationPane = el("chatConversationPane");
         const backBtn = el("chatMobileBackBtn");
-        const placeholder = el("chatPlaceholder");
-        const conversationWrap = el("chatConversationWrap");
 
-        if (!roomPane || !conversationPane || !backBtn || !placeholder || !conversationWrap) {
+        if (!roomPane || !conversationPane || !backBtn) {
             return;
         }
 
@@ -170,15 +199,7 @@
             backBtn.classList.add("hidden");
             backBtn.classList.remove("flex");
 
-            if (state.selectedRoomId) {
-                placeholder.classList.add("hidden");
-                conversationWrap.classList.remove("hidden");
-                conversationWrap.classList.add("flex");
-            } else {
-                placeholder.classList.remove("hidden");
-                conversationWrap.classList.add("hidden");
-                conversationWrap.classList.remove("flex");
-            }
+            setConversationVisible(Boolean(state.selectedRoomId));
             return;
         }
 
@@ -187,14 +208,13 @@
             conversationPane.classList.remove("hidden");
             backBtn.classList.remove("hidden");
             backBtn.classList.add("flex");
-            placeholder.classList.add("hidden");
-            conversationWrap.classList.remove("hidden");
-            conversationWrap.classList.add("flex");
+            setConversationVisible(true);
         } else {
             roomPane.classList.remove("hidden");
             conversationPane.classList.add("hidden");
             backBtn.classList.add("hidden");
             backBtn.classList.remove("flex");
+            setConversationVisible(false);
         }
     }
 
@@ -278,11 +298,12 @@
         if (!state.stompClient || !state.stompClient.connected) {
             return;
         }
-        if (state.roomSubscription) {
-            state.roomSubscription.unsubscribe();
+        const roomKey = String(roomId);
+        if (state.roomSubscriptions.has(roomKey)) {
+            return;
         }
 
-        state.roomSubscription = state.stompClient.subscribe("/topic/chatroom/" + roomId, (frame) => {
+        const subscription = state.stompClient.subscribe("/topic/chatroom/" + roomId, (frame) => {
             const message = JSON.parse(frame.body);
             if (Number(message.chatroomIdx) === Number(state.selectedRoomId)) {
                 appendMessage(message);
@@ -295,6 +316,27 @@
                 fetchUnreadCount();
             }
         });
+
+        state.roomSubscriptions.set(roomKey, subscription);
+    }
+
+    function subscribeAllRooms() {
+        if (!state.stompClient || !state.stompClient.connected) {
+            return;
+        }
+
+        state.rooms.forEach((room) => subscribeRoom(room.chatroomIdx));
+    }
+
+    function unsubscribeAllRooms() {
+        state.roomSubscriptions.forEach((subscription) => {
+            try {
+                subscription.unsubscribe();
+            } catch (error) {
+                console.warn("[chat] unsubscribe failed", error);
+            }
+        });
+        state.roomSubscriptions.clear();
     }
 
     function selectRoom(roomId) {
@@ -325,6 +367,11 @@
             .then((data) => {
                 state.rooms = (data.rooms || []).map(normalizeRoom);
                 renderRoomList();
+
+                if (state.isConnected) {
+                    unsubscribeAllRooms();
+                    subscribeAllRooms();
+                }
 
                 if (!state.rooms.length) {
                     state.selectedRoomId = null;
@@ -360,6 +407,7 @@
 
     function connectWebSocket() {
         if (state.stompClient && state.stompClient.connected) {
+            state.isConnected = true;
             return;
         }
         if (typeof SockJS === "undefined" || typeof Stomp === "undefined") {
@@ -371,6 +419,8 @@
         state.stompClient.debug = null;
 
         state.stompClient.connect({}, () => {
+            state.isConnected = true;
+            subscribeAllRooms();
             if (state.selectedRoomId) {
                 subscribeRoom(state.selectedRoomId);
             }
@@ -479,11 +529,6 @@
         state.selectedRoomId = null;
         syncMobilePanels();
 
-        if (state.roomSubscription) {
-            state.roomSubscription.unsubscribe();
-            state.roomSubscription = null;
-        }
-
         if (state.pollTimer) {
             clearInterval(state.pollTimer);
             state.pollTimer = null;
@@ -529,9 +574,16 @@
         bindCompose();
         bindModalButtons();
         updateScrollButtons();
-        fetchUnreadCount();
+        connectWebSocket();
+        fetchRooms().then(() => fetchUnreadCount());
 
         window.addEventListener("scroll", updateScrollButtons);
+
+        window.addEventListener("resize", () => {
+            if (state.isOpen) {
+                syncMobilePanels();
+            }
+        });
 
         if (window.feather) {
             window.feather.replace();

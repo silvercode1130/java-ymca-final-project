@@ -14,6 +14,7 @@ import com.springbootstudy.bbs.domain.BoardVO;
 import com.springbootstudy.bbs.domain.NotificationVO;
 import com.springbootstudy.bbs.domain.OrdersVO;
 import com.springbootstudy.bbs.domain.ReplyVO;
+import com.springbootstudy.bbs.mapper.BidMapper;
 import com.springbootstudy.bbs.mapper.NotificationMapper;
 
 @Service
@@ -21,6 +22,9 @@ public class NotificationService {
 
 	@Autowired
 	private NotificationMapper notificationMapper;
+
+	@Autowired
+	private BidMapper bidMapper;
 
 	@Autowired
 	private SimpMessagingTemplate simpMessagingTemplate;
@@ -188,7 +192,7 @@ public class NotificationService {
 		if (order == null) {
 			return;
 		}
-		String message = "주문 [" + order.getOrderIdx() + "] 결제가 완료되었습니다.";
+		String message = buildTradeMessage(order, "결제가 완료되었습니다");
 		sendTradeNotificationToBoth(order, "TRADE_PAYMENT_COMPLETED", "결제 완료", message);
 	}
 
@@ -196,7 +200,7 @@ public class NotificationService {
 		if (order == null) {
 			return;
 		}
-		String message = "주문 [" + order.getOrderIdx() + "] 배송이 시작되었습니다.";
+		String message = buildTradeMessage(order, "배송이 시작되었습니다");
 		sendTradeNotificationToBoth(order, "TRADE_SHIPPING_STARTED", "배송 시작", message);
 	}
 
@@ -204,7 +208,7 @@ public class NotificationService {
 		if (order == null) {
 			return;
 		}
-		String message = "주문 [" + order.getOrderIdx() + "] 수령 확인이 완료되었습니다.";
+		String message = buildTradeMessage(order, "수령 확인이 완료되었습니다");
 		sendTradeNotificationToBoth(order, "TRADE_RECEIPT_CONFIRMED", "수령 확인", message);
 	}
 
@@ -212,7 +216,7 @@ public class NotificationService {
 		if (order == null) {
 			return;
 		}
-		String message = "주문 [" + order.getOrderIdx() + "] 거래가 완료되었습니다.";
+		String message = buildTradeMessage(order, "거래가 완료되었습니다");
 		sendTradeNotificationToBoth(order, "TRADE_COMPLETED", "거래 완료", message);
 	}
 
@@ -220,7 +224,7 @@ public class NotificationService {
 		if (order == null) {
 			return;
 		}
-		String message = "주문 [" + order.getOrderIdx() + "] 거래가 취소되었습니다.";
+		String message = buildTradeMessage(order, "거래가 취소되었습니다");
 		sendTradeNotificationToBoth(order, "TRADE_CANCELED", "거래 취소", message);
 	}
 
@@ -228,8 +232,26 @@ public class NotificationService {
 		if (order == null) {
 			return;
 		}
-		String message = "판매자 사정으로 주문 [" + order.getOrderIdx() + "] 거래가 취소되었고, 결제가 환불 처리됩니다.";
+		String message = buildTradeMessage(order, "판매자 사정으로 거래가 취소되었고 결제가 환불 처리됩니다");
 		sendTradeNotificationToBoth(order, "TRADE_CANCELED_BY_SELLER", "거래 취소 및 환불", message);
+	}
+
+	private String buildTradeMessage(OrdersVO order, String eventText) {
+		String itemName = resolveItemName(order);
+		return "주문 [" + order.getOrderIdx() + "] " + eventText + ". 낙찰 상품: " + itemName;
+	}
+
+	private String resolveItemName(OrdersVO order) {
+		if (order == null || order.getBidIdx() == null) {
+			return "상품 정보 없음";
+		}
+
+		BidDTO bid = bidMapper.findBidById(order.getBidIdx());
+		if (bid == null || bid.getItemName() == null || bid.getItemName().isBlank()) {
+			return "상품 정보 없음";
+		}
+
+		return bid.getItemName();
 	}
 
 	private void sendTradeNotificationToBoth(OrdersVO order, String type, String title, String message) {

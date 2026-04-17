@@ -97,8 +97,8 @@
 											<h3 th:text="${n.notificationTitle}"
 												data-notification-title
 												th:class="${n.isRead == 'Y'} ?
-                                                  'text-base font-semibold text-gray-700' :
-                                                  'text-base font-semibold text-gray-900'">
+														  'text-sm sm:text-base font-semibold text-gray-700' :
+														  'text-sm sm:text-base font-semibold text-gray-900'">
 												알림 제목</h3>
 
 											<div
@@ -115,11 +115,12 @@
 											</div>
 										</div>
 
+										<p class="text-[11px] font-semibold tracking-wide text-gray-400 mb-1">상세</p>
 										<p th:text="${n.notificationMessage}"
 											data-notification-message
 											th:class="${n.isRead == 'Y'} ?
-                                             'text-sm mb-2 text-gray-500' :
-                                             'text-sm mb-2 text-gray-700'">
+													 'text-sm mb-2 text-gray-500 leading-6' :
+													 'text-sm mb-2 text-gray-700 leading-6'">
 											알림 내용</p>
 
 										<div
