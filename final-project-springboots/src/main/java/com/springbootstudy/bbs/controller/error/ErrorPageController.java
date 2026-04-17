@@ -56,7 +56,8 @@ public class ErrorPageController implements org.springframework.boot.web.servlet
         model.addAttribute("statusCode", statusCode);
         model.addAttribute("errorTitle", errorTitle);
         model.addAttribute("errorMessage", errorMessage);
-        model.addAttribute("redirectUrl", "/");
+        model.addAttribute("redirectUrl", status == HttpStatus.NOT_FOUND ? "/" : null);
+        model.addAttribute("autoRedirect", status == HttpStatus.NOT_FOUND);
         model.addAttribute("countdownSeconds", 3);
 
         return "views/error/error";

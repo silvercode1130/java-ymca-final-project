@@ -25,7 +25,7 @@
 				<div class="mt-8 rounded-2xl bg-[#F9FAFB] px-4 py-4 text-sm text-[#374151]">
 					서비스 점검중입니다.
 					<span class="font-semibold text-[#222222]"
-						th:text="' ' + (${countdownSeconds != null ? countdownSeconds : 3}) + '초 뒤 메인 화면으로 이동합니다.'">
+						th:text="${' ' + (countdownSeconds != null ? countdownSeconds : 3) + '초 뒤 메인 화면으로 이동합니다.'}"
 						3초 뒤 메인 화면으로 이동합니다.
 					</span>
 				</div>
@@ -48,6 +48,7 @@
 		<script th:inline="javascript">
 			(function () {
 				const redirectUrl = /*[[${redirectUrl}]]*/ '/';
+				const autoRedirect = /*[[${autoRedirect}]]*/ false;
 				const countdownSeconds = /*[[${countdownSeconds}]]*/ 3;
 				const homeButton = document.getElementById('errorHomeButton');
 				let remaining = Number(countdownSeconds || 3);
@@ -68,14 +69,16 @@
 					});
 				}
 
-				timerId = window.setInterval(function () {
-					remaining -= 1;
-					if (remaining <= 0) {
-						goHome();
-					}
-				}, 1000);
+				if (autoRedirect) {
+					timerId = window.setInterval(function () {
+						remaining -= 1;
+						if (remaining <= 0) {
+							goHome();
+						}
+					}, 1000);
 
-				window.setTimeout(goHome, Math.max(1, Number(countdownSeconds || 3)) * 1000);
+					window.setTimeout(goHome, Math.max(1, Number(countdownSeconds || 3)) * 1000);
+				}
 			})();
 		</script>
 	</main>
