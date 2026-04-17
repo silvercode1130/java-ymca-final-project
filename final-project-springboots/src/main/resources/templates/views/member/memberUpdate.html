@@ -1,19 +1,20 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layouts/mypage_layout}">
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layouts/mypage_layout}">
 <head>
-  <meta charset="UTF-8">
-  <title>개인정보확인/수정 - 마이페이지</title>
+<meta charset="UTF-8">
+<title>개인정보확인/수정 - 마이페이지</title>
 
-  <!-- BI 아이콘 -->
-  <link rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<!-- BI 아이콘 -->
+<link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
-  <!-- 다음 우편번호 -->
-  <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+<!-- 다음 우편번호 -->
+<script
+	src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 
-  <script type="text/javascript">
+<script type="text/javascript">
     // 전화번호 - 010-xxxx-xxxx 형식
     function formatTel(input) {
       let value = input.value.replace(/[^0-9]/g, "");
@@ -142,131 +143,111 @@
   </script>
 </head>
 <body>
-<div layout:fragment="content">
+	<div layout:fragment="content">
 
-  <form action="/mypage/info"
-        id="memberUpdateForm"
-        name="memberUpdateForm"
-        method="post">
+		<form action="/mypage/info" id="memberUpdateForm"
+			name="memberUpdateForm" method="post">
 
-    <div class="border border-gray-100 bg-white rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.02)]">
-      <!-- 헤더 -->
-      <div class="px-6 py-5 border-b border-gray-100">
-        <h2 class="text-lg sm:text-xl font-bold text-[#222222]">개인정보확인/수정</h2>
-        <p class="mt-1 text-xs sm:text-sm text-[#767676]">
-          회원 정보를 업데이트하세요
-        </p>
-      </div>
+			<div
+				class="border border-gray-100 bg-white rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.02)]">
+				<!-- 헤더 -->
+				<div class="px-6 py-5 border-b border-gray-100">
+					<h2 class="text-lg sm:text-xl font-bold text-[#222222]">개인정보확인/수정</h2>
+					<p class="mt-1 text-xs sm:text-sm text-[#767676]">회원 정보를
+						업데이트하세요</p>
+				</div>
 
-      <!-- 내용 -->
-      <div class="px-6 py-6 space-y-5">
+				<!-- 내용 -->
+				<div class="px-6 py-6 space-y-5">
 
-        <!-- 아이디 / 회원등급 -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div class="space-y-1.5">
-            <label for="memId" class="text-sm font-medium text-gray-900">아이디</label>
-            <input type="text"
-                   name="memId"
-                   id="memId"
-                   th:value="${memberVO.memId}"
-                   readonly
-                   class="w-full bg-gray-100 border border-gray-300 rounded-md px-3 h-10 text-sm text-gray-600">
-          </div>
+					<!-- 아이디 / 회원등급 -->
+					<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+						<div class="space-y-1.5">
+							<label for="memId" class="text-sm font-medium text-gray-900">아이디</label>
+							<input type="text" name="memId" id="memId"
+								th:value="${memberVO.memId}" readonly
+								class="w-full bg-gray-100 border border-gray-300 rounded-md px-3 h-10 text-sm text-gray-600">
+						</div>
 
-          <div class="space-y-1.5">
-            <label class="text-sm font-medium text-gray-900">회원등급</label>
-            <div class="flex items-center gap-2">
-              <span class="inline-flex items-center px-2 py-1 rounded-full bg-yellow-500 text-white text-xs font-semibold">
-                <span th:text="${gradeName}">골드</span>
-              </span>
-              <span class="text-xs sm:text-sm text-gray-500">
-                <!-- 필요하면 등급 index도 같이 출력 -->
-              </span>
-            </div>
-          </div>
-        </div>
+						<div class="space-y-1.5">
+							<label class="text-sm font-medium text-gray-900">회원등급</label>
+							<div class="flex items-center gap-2">
+								<span
+									class="inline-flex items-center px-2 py-1 rounded-full bg-yellow-500 text-white text-xs font-semibold">
+									<span th:text="${gradeName}">골드</span>
+								</span> <span class="text-xs sm:text-sm text-gray-500"> <!-- 필요하면 등급 index도 같이 출력 -->
+								</span>
+							</div>
+						</div>
+					</div>
 
-        <!-- 이름 -->
-        <div class="space-y-1.5">
-          <label for="memName" class="text-sm font-medium text-gray-900">이름</label>
-          <input type="text"
-                 name="memName"
-                 id="memName"
-                 th:value="${memberVO.memName}"
-                 class="w-full bg-white border border-gray-300 rounded-md px-3 h-10 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#7CBD00]">
-        </div>
+					<!-- 이름 -->
+					<div class="space-y-1.5">
+						<label for="memName" class="text-sm font-medium text-gray-900">이름</label>
+						<input type="text" name="memName" id="memName"
+							th:value="${memberVO.memName}"
+							class="w-full bg-white border border-gray-300 rounded-md px-3 h-10 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#7CBD00]">
+					</div>
 
-        <!-- 이메일 -->
-        <div class="space-y-1.5">
-          <label for="memEmail" class="text-sm font-medium text-gray-900">이메일</label>
-          <input type="text"
-                 name="memEmail"
-                 id="memEmail"
-                 th:value="${memberVO.memEmail}"
-                 class="w-full bg-white border border-gray-300 rounded-md px-3 h-10 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#7CBD00]">
-        </div>
+					<!-- 이메일 -->
+					<div class="space-y-1.5">
+						<label for="memEmail" class="text-sm font-medium text-gray-900">이메일</label>
+						<input type="text" name="memEmail" id="memEmail"
+							th:value="${memberVO.memEmail}"
+							class="w-full bg-white border border-gray-300 rounded-md px-3 h-10 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#7CBD00]">
+					</div>
 
-        <!-- 전화번호 -->
-        <div class="space-y-1.5">
-          <label for="memTel" class="text-sm font-medium text-gray-900">전화번호</label>
-          <input type="text"
-                 name="memTel"
-                 id="memTel"
-                 th:value="${memberVO.memTel}"
-                 maxlength="13"
-                 oninput="formatTel(this)"
-                 class="w-full bg-white border border-gray-300 rounded-md px-3 h-10 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#7CBD00]">
-        </div>
+					<!-- 전화번호 -->
+					<div class="space-y-1.5">
+						<label for="memTel" class="text-sm font-medium text-gray-900">전화번호</label>
+						<input type="text" name="memTel" id="memTel"
+							th:value="${memberVO.memTel}" maxlength="13"
+							oninput="formatTel(this)"
+							class="w-full bg-white border border-gray-300 rounded-md px-3 h-10 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#7CBD00]">
+					</div>
 
-        <!-- 생년월일 -->
-        <div class="space-y-1.5">
-          <label for="memBday" class="text-sm font-medium text-gray-900">생년월일</label>
-          <input type="date"
-                 name="memBday"
-                 id="memBday"
-                 th:value="${memberVO.memBday}"
-                 class="w-full bg-white border border-gray-300 rounded-md px-3 h-10 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#7CBD00]">
-        </div>
+					<!-- 생년월일 -->
+					<div class="space-y-1.5">
+						<label for="memBday" class="text-sm font-medium text-gray-900">생년월일</label>
+						<input type="date" name="memBday" id="memBday"
+							th:value="${memberVO.memBday}"
+							class="w-full bg-white border border-gray-300 rounded-md px-3 h-10 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#7CBD00]">
+					</div>
 
-        <!-- 비밀번호 변경 -->
-        <div class="space-y-2">
-          <label class="text-sm font-medium text-gray-900">새 비밀번호</label>
-          <div class="relative">
-            <input type="password"
-                   name="newPwd"
-                   id="newPwd"
-                   placeholder="🔒 변경할 비밀번호를 입력해주세요"
-                   class="w-full bg-white border border-gray-300 rounded-md px-3 pr-9 h-10 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#7CBD00]">
-            <span id="togglePwd"
-                  class="absolute inset-y-0 right-2 flex items-center text-gray-500 cursor-pointer">
-              <i class="bi bi-eye"></i>
-            </span>
-          </div>
+					<!-- 비밀번호 변경 -->
+					<div class="space-y-2" th:if="${memberVO.memLoginType != 'NAVER'}">
+						<label class="text-sm font-medium text-gray-900">새 비밀번호</label>
+						<div class="relative">
+							<input type="password" name="newPwd" id="newPwd"
+								placeholder="🔒 변경할 비밀번호를 입력해주세요"
+								class="w-full bg-white border border-gray-300 rounded-md px-3 pr-9 h-10 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#7CBD00]">
+							<span id="togglePwd"
+								class="absolute inset-y-0 right-2 flex items-center text-gray-500 cursor-pointer">
+								<i class="bi bi-eye"></i>
+							</span>
+						</div>
 
-          <label for="newPwdConfirm" class="text-sm font-medium text-gray-900 mt-2">비밀번호 확인</label>
-          <input type="password"
-                 id="newPwdConfirm"
-                 placeholder="🔒 변경할 비밀번호를 확인해주세요"
-                 class="w-full bg-white border border-gray-300 rounded-md px-3 h-10 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#7CBD00]">
+						<label for="newPwdConfirm"
+							class="text-sm font-medium text-gray-900 mt-2">비밀번호 확인</label> <input
+							type="password" id="newPwdConfirm"
+							placeholder="🔒 변경할 비밀번호를 확인해주세요"
+							class="w-full bg-white border border-gray-300 rounded-md px-3 h-10 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#7CBD00]">
 
-          <span id="pwdMatchMsg" class="text-[11px]"></span>
-        </div>
+						<span id="pwdMatchMsg" class="text-[11px]"></span>
+					</div>
 
-        <!-- 버튼 -->
-        <div class="pt-1">
-          <button type="submit"
-                  id="submitBtn"
-                  disabled
-                  class="inline-flex items-center px-4 py-2.5 bg-[#7CBD00] text-white rounded-md text-sm font-semibold hover:bg-[#6BAD00] disabled:bg-gray-300 disabled:cursor-not-allowed">
-            정보 업데이트
-          </button>
-        </div>
+					<!-- 버튼 -->
+					<div class="pt-1">
+						<button type="submit" id="submitBtn" disabled
+							class="inline-flex items-center px-4 py-2.5 bg-[#7CBD00] text-white rounded-md text-sm font-semibold hover:bg-[#6BAD00] disabled:bg-gray-300 disabled:cursor-not-allowed">
+							정보 업데이트</button>
+					</div>
 
-      </div>
-    </div>
+				</div>
+			</div>
 
-  </form>
+		</form>
 
-</div>
+	</div>
 </body>
 </html>

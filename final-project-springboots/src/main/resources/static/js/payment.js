@@ -112,7 +112,7 @@ document.addEventListener("DOMContentLoaded", function () {
       })
       .then((data) => {
         alert("결제가 완료되었습니다!");
-        location.href = "/mypage/payments";
+        location.href = "/mypage/orders";
       })
       .catch((err) => {
         alert("결제 승인 실패: " + err.message);
