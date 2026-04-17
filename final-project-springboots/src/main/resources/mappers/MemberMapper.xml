@@ -13,7 +13,7 @@
 -->
 <mapper namespace="com.springbootstudy.bbs.mapper.MemberMapper" >
    <!-- 나중에 추가로 늘려야 할 수 있음!!! -->
-   <select id="myPage">
+	<select id="myPage">
       SELECT * FROM member
       WHERE mem_idx = #{memIdx} 
    </select>

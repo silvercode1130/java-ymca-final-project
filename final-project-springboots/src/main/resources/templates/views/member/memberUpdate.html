@@ -229,7 +229,7 @@
         </div>
 
         <!-- 비밀번호 변경 -->
-        <div class="space-y-2" th:if="${memberVO.memLoginType == 'LOCAL'}">
+        <div class="space-y-2" th:if="${memberVO.memLoginType != 'NAVER'}">
           <label class="text-sm font-medium text-gray-900">새 비밀번호</label>
           <div class="relative">
             <input type="password"

@@ -44,7 +44,7 @@ public class ApiController {
 	        String memId = memEmail;
 	        String tempPwd = "TMP_" + UUID.randomUUID().toString().substring(0, 8);
 	        String memIp = "127.0.0.1";
-	        Integer memRoleIdx = 1;
+	        Integer memRoleIdx = 1; 
 	        Integer memGradeIdx = 1;
 
 	        MemberVO user = apiService.findByEmail(memEmail);
