@@ -54,6 +54,14 @@ public class NotificationService {
 		return notificationMapper.selectNotificationsByMember(memIdx);
 	}
 
+	// 회원별 최근 알림 조회
+	public List<NotificationVO> getRecentNotificationsForMember(Long memIdx, int limit) {
+		if (limit <= 0) {
+			return List.of();
+		}
+		return notificationMapper.selectRecentNotificationsByMember(memIdx, limit);
+	}
+
 	// 단건 읽음 처리
 	public void markAsRead(Long notificationIdx) {
 		notificationMapper.updateNotificationRead(notificationIdx);
