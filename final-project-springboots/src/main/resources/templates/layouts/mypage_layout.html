@@ -39,11 +39,25 @@
                <p class="text-xs sm:text-sm text-[#767676]">내 정보와 활동 내역을 관리하세요</p>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 lg:gap-8">
+               <div class="flex flex-col gap-6 lg:flex-row lg:gap-8">
                <!-- 공통 사이드바 -->
-               <aside class="lg:col-span-1">
+                  <aside class="w-full lg:w-60 lg:flex-shrink-0">
                   <div
-                     class="bg-white border border-gray-100 rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.03)] sticky top-24">
+                        class="bg-white border border-gray-100 rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.03)] sticky top-24 overflow-hidden">
+                        <button id="mypage-sidebar-toggle" type="button"
+                           class="lg:hidden w-full flex items-center justify-between px-4 py-3 border-b border-gray-100 text-sm font-semibold text-[#222222]"
+                           aria-expanded="false"
+                           aria-controls="mypage-sidebar-body"
+                           onclick="toggleMypageSidebarAccordion()">
+                           <span>마이페이지 메뉴</span>
+                           <i class="bi bi-chevron-down text-[#767676] transition-transform duration-300"
+                              id="mypage-sidebar-icon"></i>
+                        </button>
+                        <div class="hidden lg:block px-4 py-3 border-b border-gray-100">
+                           <h3 class="text-sm font-semibold text-[#222222]">마이페이지 메뉴</h3>
+                        </div>
+                        <div id="mypage-sidebar-body"
+                           class="overflow-hidden transition-[max-height] duration-300 ease-in-out max-h-0 lg:max-h-none lg:overflow-visible">
 
                      <!-- MY 경매 -->
                      <div class="px-4 py-3 border-b border-gray-100">
@@ -53,35 +67,23 @@
                      </div>
                      <div class="px-2 py-2 space-y-1">
                         <a th:href="@{/mypage/auctions}"
-                           class="w-full inline-flex items-center rounded-lg px-3 py-3 text-[15px] font-semibold transition-colors"
+                           class="w-full inline-flex items-center rounded-lg px-4 py-3 text-sm font-semibold transition-colors"
                            th:classappend="${activeMenu == 'myAuctions'} ?
                                   ' bg-gray-100 text-[#222222]' :
-                                  ' text-[#767676] hover:bg-gray-50 hover:text-[#222222]'">
-									<span
-									class="mr-2 inline-flex h-6 w-6 items-center justify-center rounded-md border border-[#222222]">
-										<span
-										class="block h-3 w-3 rounded-[3px] border border-[#222222]"></span>
-								</span> <span>내 경매 내역</span>
+                                  ' text-[#767676] font-semibold hover:bg-gray-50 hover:text-[#222222]'">
+                        <span>내 경매 내역</span>
 								</a> <a th:href="@{/mypage/bids}"
-									class="w-full inline-flex items-center rounded-lg px-3 py-3 text-[15px] transition-colors"
+                           class="w-full inline-flex items-center rounded-lg px-4 py-3 text-sm font-semibold transition-colors"
 									th:classappend="${activeMenu == 'myBids'} ?
                                   ' bg-gray-100 text-[#222222]' :
-                                  ' text-[#767676] hover:bg-gray-50 hover:text-[#222222]'">
-									<span
-									class="mr-2 inline-flex h-6 w-6 items-center justify-center rounded-md border border-[#C5C7CE]">
-										<span
-										class="block h-3 w-3 border-l-2 border-b-2 border-[#7C7F88] rotate-[-35deg] translate-x-[1px]"></span>
-								</span> <span>내 입찰 내역</span>
+                                                                                ' text-[#767676] font-semibold hover:bg-gray-50 hover:text-[#222222]'">
+                        <span>내 입찰 내역</span>
 								</a> <a th:href="@{/mypage/orders}"
-									class="w-full inline-flex items-center rounded-lg px-3 py-3 text-[15px] transition-colors"
+                           class="w-full inline-flex items-center rounded-lg px-4 py-3 text-sm font-semibold transition-colors"
 									th:classappend="${activeMenu == 'myOrders'} ?
                                   ' bg-gray-100 text-[#222222]' :
-                                  ' text-[#767676] hover:bg-gray-50 hover:text-[#222222]'">
-									<span
-									class="mr-2 inline-flex h-6 w-6 items-center justify-center rounded-md border border-[#C5C7CE]">
-										<span
-										class="block h-3 w-3 border-l-2 border-b-2 border-[#7C7F88] rotate-[-35deg] translate-x-[1px]"></span>
-								</span> <span>내 거래 내역</span>
+                                                                                ' text-[#767676] font-semibold hover:bg-gray-50 hover:text-[#222222]'">
+                        <span>내 거래 내역</span>
 								</a>
 							</div>
 
@@ -93,38 +95,23 @@
                      </div>
                      <div class="px-2 py-2 space-y-1">
                         <a th:href="@{/mypage/profile}"
-                           class="w-full inline-flex items-center rounded-lg px-3 py-3 text-[15px] transition-colors"
+                           class="w-full inline-flex items-center rounded-lg px-4 py-3 text-sm font-semibold transition-colors"
                            th:classappend="${activeMenu == 'profile'} ?
                                   ' bg-gray-100 text-[#222222]' :
-                                  ' text-[#4B4E57] hover:bg-gray-50 hover:text-[#222222]'">
-                           <span
-                           class="mr-2 inline-flex h-6 w-6 items-center justify-center rounded-full border border-[#C5C7CE]">
-                              <span
-                              class="relative block h-3 w-3 rounded-full border border-[#7C7F88]">
-                                 <span
-                                 class="absolute -bottom-1 left-1/2 h-[6px] w-[10px] -translate-x-1/2 rounded-full border border-[#7C7F88] border-t-0"></span>
-                           </span>
-                        </span> <span>나의 프로필</span>
+                              ' text-[#767676] font-semibold hover:bg-gray-50 hover:text-[#222222]'">
+                              <span>나의 프로필</span>
                         </a> <a th:href="@{/mypage/boards}"
-                           class="w-full inline-flex items-center rounded-lg px-3 py-3 text-[15px] transition-colors"
+                           class="w-full inline-flex items-center rounded-lg px-4 py-3 text-sm font-semibold transition-colors"
                            th:classappend="${activeMenu == 'posts'} ?
                                   ' bg-gray-100 text-[#222222]' :
-                                  ' text-[#4B4E57] hover:bg-gray-50 hover:text-[#222222]'">
-                           <span
-                           class="mr-2 inline-flex h-6 w-6 items-center justify-center rounded-md border border-[#C5C7CE]">
-                              <span
-                              class="block h-3 w-2 border border-[#7C7F88] border-t-2 rounded-[3px]"></span>
-                        </span> <span>내가 쓴 글</span>
+                              ' text-[#767676] font-semibold hover:bg-gray-50 hover:text-[#222222]'">
+                              <span>내가 쓴 글</span>
                         </a> <a th:href="@{/mypage/reviews}"
-                           class="w-full inline-flex items-center rounded-lg px-3 py-3 text-[15px] transition-colors"
+                           class="w-full inline-flex items-center rounded-lg px-4 py-3 text-sm font-semibold transition-colors"
                            th:classappend="${activeMenu == 'reviews'} ?
                                   ' bg-gray-100 text-[#222222]' :
-                                  ' text-[#4B4E57] hover:bg-gray-50 hover:text-[#222222]'">
-									<span
-									class="mr-2 inline-flex h-6 w-6 items-center justify-center rounded-full border border-[#C5C7CE]">
-										<span
-										class="block h-0 w-0 border-l-[6px] border-r-[6px] border-b-[9px] border-l-transparent border-r-transparent border-b-[#7C7F88]"></span>
-								</span> <span>내 리뷰 관리</span>
+                              ' text-[#767676] font-semibold hover:bg-gray-50 hover:text-[#222222]'">
+                        <span>내 리뷰 관리</span>
 								</a>
 							</div>
 
@@ -136,53 +123,37 @@
                      </div>
                      <div class="px-2 py-2 space-y-1 mb-2">
                         <a th:href="@{/mypage/info}"
-                           class="w-full inline-flex items-center rounded-lg px-3 py-3 text-[15px] transition-colors"
+                           class="w-full inline-flex items-center rounded-lg px-4 py-3 text-sm font-semibold transition-colors"
                            th:classappend="${activeMenu == 'member'} ?
                                   ' bg-gray-100 text-[#222222]' :
-                                  ' text-[#4B4E57] hover:bg-gray-50 hover:text-[#222222]'">
-                           <span
-                           class="mr-2 inline-flex h-6 w-6 items-center justify-center rounded-full border border-[#C5C7CE]">
-                              <span
-                              class="relative block h-3 w-3 rounded-full border border-[#7C7F88]">
-                                 <span
-                                 class="absolute -bottom-1 left-1/2 h-[6px] w-[10px] -translate-x-1/2 rounded-full border border-[#7C7F88] border-t-0"></span>
-                           </span>
-                        </span> <span>개인정보확인/수정</span>
+                              ' text-[#767676] font-semibold hover:bg-gray-50 hover:text-[#222222]'">
+                              <span>개인정보확인/수정</span>
                         </a> <a th:href="@{/mypage/addresses}"
-                           class="w-full inline-flex items-center rounded-lg px-3 py-3 text-[15px] transition-colors"
+                           class="w-full inline-flex items-center rounded-lg px-4 py-3 text-sm font-semibold transition-colors"
                            th:classappend="${activeMenu == 'address'} ?
                                   ' bg-gray-100 text-[#222222]' :
-                                  ' text-[#4B4E57] hover:bg-gray-50 hover:text-[#222222]'">
-                           <span
-                           class="mr-2 inline-flex h-6 w-6 items-center justify-center rounded-full border border-[#C5C7CE]">
-                              <span
-                              class="relative block h-3 w-3 rounded-full border border-[#7C7F88]">
-                                 <span
-                                 class="absolute -bottom-[3px] left-1/2 h-[6px] w-[6px] -translate-x-1/2 border-l-2 border-b-2 border-[#7C7F88] rotate-45"></span>
-                           </span>
-                        </span> <span>배송지 관리</span>
+                              ' text-[#767676] font-semibold hover:bg-gray-50 hover:text-[#222222]'">
+                              <span>배송지 관리</span>
                         </a> 
                         
                         <!-- 회원탈퇴 post로 바꾸기 위해
                         form 추가 및 a 태그의 href 제거 했습니다!
                         확인 결과 탈퇴처리 잘 됩니다! -->
                         <form id="delete-form" th:action="@{/mypage/delete}" method="post" style="display: none;"></form>
-                           <a class="w-full inline-flex items-center rounded-lg px-3 py-3 text-[15px] transition-colors"
-                              th:classappend="${activeMenu == 'delete'} ? ' bg-[#FFF5F5] text-[#D64545]' : ' text-[#D64545] hover:bg-[#FFF5F5]'"
+                           <a class="w-full inline-flex items-center rounded-lg px-4 py-3 text-sm font-semibold transition-colors"
+                              th:classappend="${activeMenu == 'delete'} ? ' bg-[#FFF5F5] text-[#D64545]' : ' text-[#D64545] font-semibold hover:bg-[#FFF5F5]'"
                               onclick="if(confirm('정말 탈퇴하시겠습니까?')) { document.getElementById('delete-form').submit(); }">
-                              <span class="mr-2 inline-flex h-6 w-6 items-center justify-center rounded-md border border-[#F08C8C]">
-                                 <span class="block h-3 w-2 border border-[#D64545] border-t-0 rounded-b-[3px]"></span>
-                              </span> 
-                              <span>회원탈퇴</span>
+                                 <span>회원탈퇴</span>
                            </a>
                         
                      </div>
 
-                  </div>
+                        </div>
+                     </div>
                </aside>
 
                <!-- 오른쪽 영역: 각 페이지에서 채워 넣는 부분 -->
-               <main class="lg:col-span-3" layout:fragment="content">
+                  <main class="flex-1 min-w-0" layout:fragment="content">
                   <!-- 각 마이페이지 화면에서 오버라이드 -->
                </main>
 
@@ -197,5 +168,42 @@
 	</div>
 	<!-- floating-buttons -->
 	<div th:replace="fragments/floating-buttons :: floating-buttons"></div>
+   <script>
+      function toggleMypageSidebarAccordion() {
+         var toggle = document.getElementById('mypage-sidebar-toggle');
+         var body = document.getElementById('mypage-sidebar-body');
+         var icon = document.getElementById('mypage-sidebar-icon');
+
+         if (!toggle || !body) return;
+
+         var isExpanded = toggle.getAttribute('aria-expanded') === 'true';
+         if (isExpanded) {
+            body.style.maxHeight = body.scrollHeight + 'px';
+            requestAnimationFrame(function () {
+               body.style.maxHeight = '0px';
+            });
+            toggle.setAttribute('aria-expanded', 'false');
+            if (icon) icon.style.transform = 'rotate(0deg)';
+         } else {
+            body.style.maxHeight = body.scrollHeight + 'px';
+            body.addEventListener('transitionend', function handler() {
+               body.style.maxHeight = 'none';
+               body.removeEventListener('transitionend', handler);
+            });
+            toggle.setAttribute('aria-expanded', 'true');
+            if (icon) icon.style.transform = 'rotate(180deg)';
+         }
+      }
+
+      document.addEventListener('DOMContentLoaded', function () {
+         var toggle = document.getElementById('mypage-sidebar-toggle');
+         var body = document.getElementById('mypage-sidebar-body');
+         if (!toggle || !body) return;
+         if (window.innerWidth < 1024) {
+            body.style.maxHeight = '0px';
+            toggle.setAttribute('aria-expanded', 'false');
+         }
+      });
+   </script>
 </body>
 </html>

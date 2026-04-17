@@ -31,57 +31,71 @@
 					</div>
 				</header>
 
-				<div class="flex flex-col gap-8 lg:flex-row">
+				<div class="flex flex-col gap-6 lg:flex-row lg:gap-8">
 
 					<!-- 왼쪽: 카테고리 사이드바 -->
 					<aside class="w-full lg:w-60 lg:flex-shrink-0">
-						<div class="sticky top-24 bg-white border border-gray-100 rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.03)]">
-							<div class="px-4 py-3 border-b border-gray-100">
+						<div class="sticky top-24 bg-white border border-gray-100 rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.03)] overflow-hidden">
+							<button id="auction-sidebar-toggle"
+								class="lg:hidden w-full flex items-center justify-between px-4 py-3 border-b border-gray-100 text-sm font-semibold text-[#222222]"
+								aria-expanded="false"
+								aria-controls="auction-sidebar-body"
+								onclick="toggleAuctionSidebarAccordion()">
+								<span class="flex items-center gap-2">
+									<span>카테고리</span>
+									<span id="auction-sidebar-current"
+										class="text-xs font-normal text-[#767676]"
+										th:text="${selectedCategory != null ? '· 선택됨' : '· 전체'}"></span>
+								</span>
+								<i class="bi bi-chevron-down text-[#767676] transition-transform duration-300"
+									id="auction-sidebar-icon"></i>
+							</button>
+							<div class="hidden lg:block px-4 py-3 border-b border-gray-100">
 								<h3 class="text-sm font-semibold text-[#222222]">카테고리</h3>
 							</div>
-							<nav class="px-2 py-2 text-sm">
+							<nav id="auction-sidebar-body" class="px-2 py-2 text-sm overflow-hidden transition-[max-height] duration-300 ease-in-out max-h-0 lg:max-h-none lg:overflow-visible">
 								<a th:href="@{/auctions(sortBy=${sortBy}, statusFilter=${statusFilter})}"
-									class="block rounded-lg px-3 py-2 transition-colors"
+									class="block rounded-lg px-4 py-3 text-sm font-semibold leading-5 transition-colors"
 									th:classappend="${selectedCategory == null} ? 'bg-gray-100 text-[#222222] font-semibold' : 'text-[#767676] hover:bg-gray-50 hover:text-[#222222]'">
 									전체
 								</a>
 								<a th:href="@{/auctions/category/ball(sortBy=${sortBy}, statusFilter=${statusFilter})}"
-									class="block rounded-lg px-3 py-2 transition-colors"
+									class="block rounded-lg px-4 py-3 text-sm font-semibold leading-5 transition-colors"
 									th:classappend="${selectedCategory == 'ball'} ? 'bg-gray-100 text-[#222222] font-semibold' : 'text-[#767676] hover:bg-gray-50 hover:text-[#222222]'">
 									공/볼
 								</a>
 								<a th:href="@{/auctions/category/racket(sortBy=${sortBy}, statusFilter=${statusFilter})}"
-									class="block rounded-lg px-3 py-2 transition-colors"
+									class="block rounded-lg px-4 py-3 text-sm font-semibold leading-5 transition-colors"
 									th:classappend="${selectedCategory == 'racket'} ? 'bg-gray-100 text-[#222222] font-semibold' : 'text-[#767676] hover:bg-gray-50 hover:text-[#222222]'">
 									라켓/배트/클럽
 								</a>
 								<a th:href="@{/auctions/category/protective(sortBy=${sortBy}, statusFilter=${statusFilter})}"
-									class="block rounded-lg px-3 py-2 transition-colors"
+									class="block rounded-lg px-4 py-3 text-sm font-semibold leading-5 transition-colors"
 									th:classappend="${selectedCategory == 'protective'} ? 'bg-gray-100 text-[#222222] font-semibold' : 'text-[#767676] hover:bg-gray-50 hover:text-[#222222]'">
 									보호대/보호장비
 								</a>
 								<a th:href="@{/auctions/category/apparel(sortBy=${sortBy}, statusFilter=${statusFilter})}"
-									class="block rounded-lg px-3 py-2 transition-colors"
+									class="block rounded-lg px-4 py-3 text-sm font-semibold leading-5 transition-colors"
 									th:classappend="${selectedCategory == 'apparel'} ? 'bg-gray-100 text-[#222222] font-semibold' : 'text-[#767676] hover:bg-gray-50 hover:text-[#222222]'">
 									의류/신발
 								</a>
 								<a th:href="@{/auctions/category/fitness(sortBy=${sortBy}, statusFilter=${statusFilter})}"
-									class="block rounded-lg px-3 py-2 transition-colors"
+									class="block rounded-lg px-4 py-3 text-sm font-semibold leading-5 transition-colors"
 									th:classappend="${selectedCategory == 'fitness'} ? 'bg-gray-100 text-[#222222] font-semibold' : 'text-[#767676] hover:bg-gray-50 hover:text-[#222222]'">
 									헬스/홈트 용품
 								</a>
 								<a th:href="@{/auctions/category/outdoor(sortBy=${sortBy}, statusFilter=${statusFilter})}"
-									class="block rounded-lg px-3 py-2 transition-colors"
+									class="block rounded-lg px-4 py-3 text-sm font-semibold leading-5 transition-colors"
 									th:classappend="${selectedCategory == 'outdoor'} ? 'bg-gray-100 text-[#222222] font-semibold' : 'text-[#767676] hover:bg-gray-50 hover:text-[#222222]'">
 									아웃도어/캠핑
 								</a>
 								<a th:href="@{/auctions/category/swim(sortBy=${sortBy}, statusFilter=${statusFilter})}"
-									class="block rounded-lg px-3 py-2 transition-colors"
+									class="block rounded-lg px-4 py-3 text-sm font-semibold leading-5 transition-colors"
 									th:classappend="${selectedCategory == 'swim'} ? 'bg-gray-100 text-[#222222] font-semibold' : 'text-[#767676] hover:bg-gray-50 hover:text-[#222222]'">
 									수영/수상 스포츠
 								</a>
 								<a th:href="@{/auctions/category/accessory(sortBy=${sortBy}, statusFilter=${statusFilter})}"
-									class="block rounded-lg px-3 py-2 transition-colors"
+									class="block rounded-lg px-4 py-3 text-sm font-semibold leading-5 transition-colors"
 									th:classappend="${selectedCategory == 'accessory'} ? 'bg-gray-100 text-[#222222] font-semibold' : 'text-[#767676] hover:bg-gray-50 hover:text-[#222222]'">
 									액세서리/잡화
 								</a>
@@ -283,6 +297,43 @@
 		</div>
 		
 		<script src="/js/auctionList.js"></script>
+		<script>
+			function toggleAuctionSidebarAccordion() {
+				var toggle = document.getElementById('auction-sidebar-toggle');
+				var body = document.getElementById('auction-sidebar-body');
+				var icon = document.getElementById('auction-sidebar-icon');
+
+				if (!toggle || !body) return;
+
+				var isExpanded = toggle.getAttribute('aria-expanded') === 'true';
+				if (isExpanded) {
+					body.style.maxHeight = body.scrollHeight + 'px';
+					requestAnimationFrame(function () {
+						body.style.maxHeight = '0px';
+					});
+					toggle.setAttribute('aria-expanded', 'false');
+					if (icon) icon.style.transform = 'rotate(0deg)';
+				} else {
+					body.style.maxHeight = body.scrollHeight + 'px';
+					body.addEventListener('transitionend', function handler() {
+						body.style.maxHeight = 'none';
+						body.removeEventListener('transitionend', handler);
+					});
+					toggle.setAttribute('aria-expanded', 'true');
+					if (icon) icon.style.transform = 'rotate(180deg)';
+				}
+			}
+
+			document.addEventListener('DOMContentLoaded', function () {
+				var toggle = document.getElementById('auction-sidebar-toggle');
+				var body = document.getElementById('auction-sidebar-body');
+				if (!toggle || !body) return;
+				if (window.innerWidth < 1024) {
+					body.style.maxHeight = '0px';
+					toggle.setAttribute('aria-expanded', 'false');
+				}
+			});
+		</script>
 	</th:block>
 </body>
 </html>

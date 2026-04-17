@@ -67,7 +67,13 @@ public class PaymentPageController {
 
   // 3. 결제 실패 페이지
   @GetMapping("/fail")
-  public String failPage() {
-    return "redirect:/mypage/orders";
+  public String failPage(@RequestParam(value = "message", required = false) String message,
+      HttpSession session, Model model) {
+    MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
+    if (loginUser == null)
+      return "redirect:/members/login";
+
+    model.addAttribute("failMessage", message);
+    return "views/payment/pay_fail";
   }
 }
