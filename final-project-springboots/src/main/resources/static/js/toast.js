@@ -76,9 +76,16 @@ function showToast(message, type, onClick) {
         info:    { bg: '#3498db', color: 'white', icon: 'ℹ️'  }
     };
     const s = styles[type] || styles.info;
+
+    // 패널티 키워드 강조 + 줄바꿈(\n) 처리
+    const formatted = message
+        .replace(/\n/g, '<br>')
+        .replace(/(패널티[^<]*)/g, '<span style="background:rgba(0,0,0,0.2);padding:1px 6px;border-radius:4px;font-weight:700;">⚠️ $1</span>');
+
     _createToast(
-        `<div style="display:flex;align-items:center;gap:8px;color:${s.color};">
-            <span>${s.icon}</span><span>${message}</span>
+        `<div style="display:flex;align-items:flex-start;gap:8px;color:${s.color};">
+            <span style="flex-shrink:0;margin-top:1px;">${s.icon}</span>
+            <span style="line-height:1.6;">${formatted}</span>
         </div>`,
         s.bg, null, onClick
     );

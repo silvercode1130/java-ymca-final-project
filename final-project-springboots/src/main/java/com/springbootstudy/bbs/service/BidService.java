@@ -97,7 +97,6 @@ public class BidService {
         // 경매 자체의 상태를 '마감(3)'으로 즉시 변경
         auctionMapper.updateAuctionStatus(auctionIdx, 3);
 
-		notificationService.notifyWinnerSelectedToBidder(auctionIdx, winnerBid);
     }
 
     // 입찰 단건 상세 조회
