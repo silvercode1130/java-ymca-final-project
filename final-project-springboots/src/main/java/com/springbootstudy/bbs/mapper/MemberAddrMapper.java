@@ -29,4 +29,8 @@ public interface MemberAddrMapper {
 	// 대표 배송지 단건 조회
 	MemberAddrVO selectPrimaryAddr(@Param("memIdx") Long memIdx);
 
+	// 대표배송지 버튼
+	void resetPrimary(Long memIdx);
+	void updatePrimary(Long addrIdx);
+	
 }

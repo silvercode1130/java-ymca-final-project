@@ -106,11 +106,29 @@ public class MemberAddrController {
         return "/views/member/memberAddrUpdate";
     }
 
+    // 주소 수정
     @PostMapping("/member/updateAddrAjax.do")
     @ResponseBody
     public int updateAddr(MemberAddrVO vo) {
 
         return memberAddrService.updateAddr(vo);
+    }
+    
+    
+    // 버튼 누르면 대표배송지로 수정
+    @PostMapping("/mypage/addresses/primary")
+    public String setPrimary(@RequestParam("addrIdx") Long addrIdx,
+                             HttpSession session) {
+
+        MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
+
+        if (loginUser == null) {
+            return "redirect:/members/login";
+        }
+
+        memberAddrService.setPrimary(addrIdx, loginUser.getMemIdx());
+
+        return "redirect:/mypage/addresses";
     }
 
 }

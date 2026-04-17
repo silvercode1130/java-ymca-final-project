@@ -56,5 +56,15 @@ public class MemberAddrService {
     public MemberAddrVO getPrimaryAddr(Long memIdx) {
         return memberAddrMapper.selectPrimaryAddr(memIdx);
     }
+    
 
+    // 상세주소 버튼 기능
+	public void setPrimary(Long addrIdx, Long memIdx) {
+		 // 1. 기존 대표 배송지 전부 해제
+	    memberAddrMapper.resetPrimary(memIdx);
+
+	    // 2. 선택한 주소만 대표로 설정
+	    memberAddrMapper.updatePrimary(addrIdx);
+		
+	}
 }
