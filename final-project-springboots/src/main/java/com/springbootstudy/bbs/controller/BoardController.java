@@ -16,6 +16,7 @@ import com.springbootstudy.bbs.domain.BoardVO;
 import com.springbootstudy.bbs.domain.MemberVO;
 import com.springbootstudy.bbs.domain.ReplyVO;
 import com.springbootstudy.bbs.service.BoardService;
+import com.springbootstudy.bbs.service.NotificationService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -26,6 +27,9 @@ public class BoardController {
 
     @Autowired
     private BoardService boardService;
+    
+    @Autowired
+    private NotificationService notificationService;
 
     // ── 게시판 목록 (전체 or 카테고리별) ─────────────────────
     // /boards → 전체 목록 (커뮤니티 홈)
@@ -294,7 +298,12 @@ public class BoardController {
             // 대댓글: 현재 보던 페이지 유지
             targetPage = replyPage;
         }
-
+        
+        BoardVO boardVO = boardService.getBoardDetail(boardIdx, session);
+        if (boardVO != null) {
+            notificationService.notifyNewReplyToBoardWriter(boardVO, reply);
+        }
+        
         return "redirect:/boards/" + typeCode + "/" + boardIdx
                 + "?replyPage=" + targetPage + "&sortType=" + sortType + fromParam;
     }

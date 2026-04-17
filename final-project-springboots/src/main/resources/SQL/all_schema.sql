@@ -1,5 +1,3 @@
-
-
 /* ==========================================
    DATABASE 생성 및 선택
    ========================================== */
@@ -42,6 +40,13 @@ DROP TABLE IF EXISTS payment;
 
 DROP TABLE IF EXISTS chatroom;
 DROP TABLE IF EXISTS chatmessage;
+
+DROP TABLE IF EXISTS member_penalty;
+DROP TABLE IF EXISTS review;
+
+DROP TABLE IF EXISTS delivery;
+DROP TABLE IF EXISTS notification;
+DROP TABLE IF EXISTS orders;
 
 SET FOREIGN_KEY_CHECKS = 1;
 
