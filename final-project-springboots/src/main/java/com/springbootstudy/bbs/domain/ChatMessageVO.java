@@ -11,4 +11,6 @@ public class ChatMessageVO {
     private Long senderIdx;			// 작성자 fk
     private String messageContent;	// 메시지 내용
     private LocalDateTime sentAt;	// 메시지 작성시간
+    private String isRead;			// 읽음 여부 (Y/N)
+    private LocalDateTime readAt;	// 읽음 시각
 }

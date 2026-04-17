@@ -2,7 +2,6 @@ package com.springbootstudy.bbs.service;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,13 +12,16 @@ import com.springbootstudy.bbs.dto.OrdersListDTO;
 import com.springbootstudy.bbs.mapper.OrdersMapper;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class OrdersService {
-	
-	@Autowired
-	private OrdersMapper ordersMapper;
+
+	private final OrdersMapper ordersMapper;
+	private final EscrowRefundService escrowRefundService;
+	private final NotificationService notificationService;
 
 	// 1. 낙찰 시 주문 생성
 	public OrdersVO createOrderOnWinner(AuctionDTO auction, BidDTO bid) {
@@ -46,33 +48,117 @@ public class OrdersService {
 	@Transactional
 	public void markOrderPaid(Long orderIdx) {
 		OrdersVO order = requireOrder(orderIdx);
-		if (!"CREATED".equals(order.getOrderStatus()) && !"PAID".equals(order.getOrderStatus())) {
+
+		if ("PAID".equals(order.getOrderStatus())) {
+			log.info("주문 {} 는 이미 결제완료 상태입니다. 중복 결제완료 처리를 건너뜁니다.", orderIdx);
+			return;
+		}
+
+		if (!"CREATED".equals(order.getOrderStatus())) {
 			throw new IllegalStateException("CREATED 상태에서만 결제완료 처리할 수 있습니다.");
 		}
+
+		// 비즈니스 룰: 마감/낙찰 이후 auctionStatus, bidStatus 는 더 이상 변경하지 않는다.
 		ordersMapper.updateOrderPaid(orderIdx);
+		notificationService.notifyOrderPaid(requireOrder(orderIdx));
 	}
 
 	// 2-2. 배송 시작 시 상태 변화
 	@Transactional
 	public void markOrderShipped(Long orderIdx) {
 		OrdersVO order = requireOrder(orderIdx);
-		if (!"PAID".equals(order.getOrderStatus()) && !"SHIPPED".equals(order.getOrderStatus())) {
+
+		if ("SHIPPED".equals(order.getOrderStatus())) {
+			log.info("주문 {} 는 이미 배송시작 상태입니다. 중복 배송시작 처리를 건너뜁니다.", orderIdx);
+			return;
+		}
+
+		if (!"PAID".equals(order.getOrderStatus())) {
 			throw new IllegalStateException("PAID 상태에서만 배송시작 처리할 수 있습니다.");
 		}
+
+		// 비즈니스 룰: 마감/낙찰 이후 auctionStatus, bidStatus 는 더 이상 변경하지 않는다.
 		ordersMapper.updateOrderShipped(orderIdx);
+		notificationService.notifyOrderShipped(requireOrder(orderIdx));
 	}
 
 	// 2-3. 구매 확정 시 상태 변화
 	@Transactional
 	public void markOrderConfirmed(Long orderIdx) {
 		OrdersVO order = requireOrder(orderIdx);
-		if (!"SHIPPED".equals(order.getOrderStatus()) && !"CONFIRMED".equals(order.getOrderStatus())) {
+
+		if ("CONFIRMED".equals(order.getOrderStatus())) {
+			log.info("주문 {} 는 이미 구매확정 상태입니다. 중복 구매확정 처리를 건너뜁니다.", orderIdx);
+			return;
+		}
+
+		if (!"SHIPPED".equals(order.getOrderStatus())) {
 			throw new IllegalStateException("SHIPPED 상태에서만 구매확정 처리할 수 있습니다.");
 		}
+
+		// 비즈니스 룰: 마감/낙찰 이후 auctionStatus, bidStatus 는 더 이상 변경하지 않는다.
 		ordersMapper.updateOrderConfirmed(orderIdx);
+		OrdersVO updatedOrder = requireOrder(orderIdx);
+		notificationService.notifyOrderReceiptConfirmed(updatedOrder);
+		notificationService.notifyOrderCompleted(updatedOrder);
 	}
 
-	// 2-4. bid 기준으로 주문 찾기 (배송/수령확인에서 사용)
+	// 2-4. 거래 취소 시 상태 변화
+	@Transactional
+	public void markOrderCanceled(Long orderIdx) {
+		OrdersVO order = requireOrder(orderIdx);
+
+		if ("CANCELED".equals(order.getOrderStatus())) {
+			log.info("주문 {} 는 이미 거래취소 상태입니다. 중복 취소 처리를 건너뜁니다.", orderIdx);
+			return;
+		}
+
+		if ("CONFIRMED".equals(order.getOrderStatus())) {
+			throw new IllegalStateException("이미 거래완료된 주문은 취소할 수 없습니다.");
+		}
+
+		ordersMapper.updateOrderCanceled(orderIdx);
+		notificationService.notifyOrderCanceled(requireOrder(orderIdx));
+	}
+
+	/**
+	 * 판매자 결제완료 취소 전용 플로우.
+	 * 비즈니스 룰:
+	 * 1) 판매자 본인만 취소 가능
+	 * 2) 결제완료(PAID) 상태에서만 가능
+	 * 3) 배송 시작 이후(SHIPPED)는 취소 불가
+	 * 4) 패널티 1점 정책은 추후 member_penalty 연동 예정(TODO)
+	 */
+	@Transactional
+	public void cancelOrderBySeller(Long orderIdx, Long sellerMemIdx) {
+		OrdersVO order = requireOrder(orderIdx);
+
+		if (sellerMemIdx == null || !sellerMemIdx.equals(order.getSellerIdx())) {
+			throw new IllegalStateException("판매자 본인만 거래 취소를 요청할 수 있습니다.");
+		}
+
+		if (!"PAID".equals(order.getOrderStatus())) {
+			throw new IllegalStateException("결제완료 상태에서만 판매자 거래 취소가 가능합니다.");
+		}
+
+		// 배송이 시작된 뒤에는 구매자 보호를 위해 임의 취소를 금지한다.
+		if ("SHIPPED".equals(order.getOrderStatus()) || "CONFIRMED".equals(order.getOrderStatus())) {
+			throw new IllegalStateException("배송 시작 이후에는 판매자가 임의로 거래를 취소할 수 없습니다.");
+		}
+
+		escrowRefundService.refundPaidEscrowByBidIdx(order.getBidIdx(),
+				"판매자 요청으로 주문 [" + order.getOrderIdx() + "] 거래가 취소되었습니다.");
+
+		ordersMapper.updateOrderCanceled(orderIdx);
+		OrdersVO updatedOrder = requireOrder(orderIdx);
+
+		// TODO: 패널티 1점 정책은 member_penalty 실구현 단계에서 DB 적재로 확장.
+		log.info("판매자 거래취소 패널티 정책 적용 대상 - orderIdx={}, sellerIdx={}", orderIdx, sellerMemIdx);
+
+		notificationService.notifyOrderCanceledBySellerWithRefund(updatedOrder);
+	}
+
+	// 2-5. bid 기준으로 주문 찾기 (배송/수령확인에서 사용)
 	public OrdersVO findByBidIdx(Long bidIdx) {
 		return ordersMapper.findByBidIdx(bidIdx);
 	}

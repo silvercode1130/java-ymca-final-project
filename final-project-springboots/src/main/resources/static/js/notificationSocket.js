@@ -133,14 +133,14 @@
 
     function getTitleClasses(isRead) {
         return isRead
-            ? 'text-base font-semibold text-gray-700'
-            : 'text-base font-semibold text-gray-900';
+            ? 'text-sm sm:text-base font-semibold text-gray-700'
+            : 'text-sm sm:text-base font-semibold text-gray-900';
     }
 
     function getMessageClasses(isRead) {
         return isRead
-            ? 'text-sm mb-2 text-gray-500'
-            : 'text-sm mb-2 text-gray-700';
+            ? 'text-sm mb-2 text-gray-500 leading-6'
+            : 'text-sm mb-2 text-gray-700 leading-6';
     }
 
     function applyCardState(card, isRead) {
@@ -200,6 +200,7 @@
             + '          <button type="button" data-action="mark-read" data-notification-idx="' + escapeHtml(card.dataset.notificationIdx) + '" class="' + (isRead ? 'hidden' : 'hidden text-xs sm:inline-flex items-center hover:text-[#7CBD00]') + '">✔</button>'
             + '        </div>'
             + '      </div>'
+            + '      <p class="text-[11px] font-semibold tracking-wide text-gray-400 mb-1">상세</p>'
             + '      <p data-notification-message class="' + getMessageClasses(isRead) + '">' + escapeHtml(notification.notificationMessage || '') + '</p>'
             + '      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">'
             + '        <div data-notification-target>'

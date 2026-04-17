@@ -68,6 +68,6 @@ public class PaymentPageController {
   // 3. 결제 실패 페이지
   @GetMapping("/fail")
   public String failPage() {
-    return "views/payment/pay_fail";
+    return "redirect:/mypage/orders";
   }
 }

@@ -53,6 +53,29 @@
 		BY created_at DESC
 	</select>
 
+	<!-- 회원별 최근 알림 목록 -->
+	<select id="selectRecentNotificationsByMember" resultType="com.springbootstudy.bbs.domain.NotificationVO">
+		SELECT
+		notification_idx AS notificationIdx,
+		receiver_idx AS receiverIdx,
+		sender_idx AS senderIdx,
+		auction_idx AS auctionIdx,
+		bid_idx AS bidIdx,
+		board_idx AS boardIdx,
+		reply_idx AS replyIdx,
+		notification_type AS notificationType,
+		notification_title AS notificationTitle,
+		notification_message AS notificationMessage,
+		target_url AS targetUrl,
+		is_read AS isRead,
+		created_at AS createdAt,
+		read_at AS readAt
+		FROM notification
+		WHERE receiver_idx = #{memIdx}
+		ORDER BY created_at DESC
+		LIMIT #{limit}
+	</select>
+
 	<!-- 알림 읽음 -->
 	<update id="updateNotificationRead" parameterType="long">
 		UPDATE
