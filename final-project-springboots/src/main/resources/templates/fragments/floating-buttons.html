@@ -9,9 +9,8 @@
 		<!-- 우하단 플로팅 버튼 영역 -->
 		<div class="fixed bottom-6 right-6 z-50 flex flex-col items-center gap-3">
 			<!-- 채팅 버튼 -->
-			<button id="globalChatBtn" type="button"
-				class="relative w-12 h-12 rounded-full bg-white shadow-md shadow-gray-300 flex items-center justify-center hover:shadow-lg transition"
-				onclick="openChatModal()">
+			<button id="chatFloatingButton" type="button"
+				class="relative w-12 h-12 rounded-full bg-white shadow-md shadow-gray-300 flex items-center justify-center hover:shadow-lg transition">
 				<i data-feather="message-circle" class="w-5 h-5 text-gray-700"></i>
 				<span id="chatUnreadBadge"
 					class="hidden absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-[10px] text-white rounded-full flex items-center justify-center">0</span>
@@ -33,51 +32,11 @@
 			</div>
 		</div>
 
-		<!-- 전역 채팅 모달 -->
-		<div id="chatModalRoot"
-			class="hidden fixed inset-0 z-[70] bg-white md:bg-transparent md:inset-auto md:bottom-6 md:right-6 md:w-[860px] md:h-[520px] md:rounded-2xl md:shadow-xl md:border md:border-gray-200 md:overflow-hidden">
-			<div class="h-full flex flex-col bg-white">
-				<div class="h-14 border-b border-gray-100 px-4 flex items-center justify-between">
-					<div class="flex items-center gap-2">
-						<button id="chatMobileBackBtn" type="button"
-							class="hidden md:hidden w-8 h-8 rounded-full hover:bg-gray-100 items-center justify-center">
-							<i data-feather="chevron-left" class="w-4 h-4 text-gray-700"></i>
-						</button>
-						<p class="text-sm font-semibold text-gray-800">채팅</p>
-					</div>
-					<button id="chatModalCloseBtn" type="button"
-						class="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center">
-						<i data-feather="x" class="w-4 h-4 text-gray-700"></i>
-					</button>
-				</div>
+		<!-- 데스크탑용 채팅 뷰 (md 이상) -->
+		<div class="hidden md:block" th:replace="~{fragments/chat/chat-desktop :: chat-desktop-view}"></div>
 
-				<div class="flex-1 min-h-0 md:flex">
-					<div id="chatRoomPane" class="w-full md:w-[36%] border-r border-gray-100">
-						<div id="chatRoomList" class="h-full overflow-y-auto"></div>
-					</div>
-
-					<div id="chatConversationPane" class="hidden w-full md:flex md:w-[64%] md:flex-col min-h-0">
-						<div id="chatPlaceholder" class="flex-1 items-center justify-center text-sm text-gray-400 flex md:flex">
-							채팅방을 선택하세요.
-						</div>
-
-						<div id="chatConversationWrap" class="hidden flex-1 min-h-0 flex-col">
-							<div id="chatRoomTitle" class="h-12 px-4 border-b border-gray-100 text-sm font-semibold text-gray-700 flex items-center"></div>
-							<div id="chatMessageList" class="flex-1 overflow-y-auto px-3 py-3 space-y-2 bg-gray-50"></div>
-							<div class="border-t border-gray-100 p-3">
-								<form id="chatComposeForm" class="flex items-end gap-2">
-									<textarea id="chatMessageInput" rows="1"
-										class="w-full resize-none rounded-xl border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#7CBD00]"
-										placeholder="메시지를 입력하세요"></textarea>
-									<button type="submit"
-										class="shrink-0 h-10 px-3 rounded-xl bg-[#222222] text-white text-sm font-semibold hover:bg-[#333333]">전송</button>
-								</form>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
+		<!-- 모바일용 채팅 뷰 (md 미만) -->
+		<div class="block md:hidden" th:replace="~{fragments/chat/chat-mobile :: chat-mobile-view}"></div>
 	</div>
 
 </body>

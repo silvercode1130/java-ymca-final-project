@@ -1,13 +1,15 @@
 (function () {
     const state = {
         isOpen: false,
+        activeView: null,
         selectedRoomId: null,
         selectedRoomName: "",
         rooms: [],
         stompClient: null,
         roomSubscriptions: new Map(),
-        pollTimer: null,
         isConnected: false,
+        unreadPollTimer: null,
+        roomPollTimer: null,
     };
 
     function el(id) {
@@ -16,6 +18,10 @@
 
     function isMobile() {
         return window.innerWidth < 768;
+    }
+
+    function currentView() {
+        return isMobile() ? "mobile" : "desktop";
     }
 
     function getLoginContext() {
@@ -58,10 +64,10 @@
             return;
         }
 
-        const value = Number(count || 0);
-        if (value > 0) {
+        const unread = Math.max(0, Number(count || 0));
+        if (unread > 0) {
             badge.classList.remove("hidden");
-            badge.textContent = value > 99 ? "99+" : String(value);
+            badge.textContent = unread > 99 ? "99+" : String(unread);
         } else {
             badge.classList.add("hidden");
             badge.textContent = "0";
@@ -91,19 +97,14 @@
 
         return requestJson("/api/chats/unread-count")
             .then((data) => {
-                updateUnreadBadge(data.unreadCount || 0);
-                return data.unreadCount || 0;
+                const unread = Number(data.unreadCount || 0);
+                updateUnreadBadge(unread);
+                return unread;
             })
             .catch(() => {
                 updateUnreadBadge(0);
                 return 0;
             });
-    }
-
-    function escapeHtml(text) {
-        const div = document.createElement("div");
-        div.textContent = text == null ? "" : String(text);
-        return div.innerHTML;
     }
 
     function normalizeRoom(room) {
@@ -115,21 +116,91 @@
         };
     }
 
-    function renderRoomList() {
-        const roomList = el("chatRoomList");
-        if (!roomList) {
+    function escapeHtml(text) {
+        const div = document.createElement("div");
+        div.textContent = text == null ? "" : String(text);
+        return div.innerHTML;
+    }
+
+    function desktopRoot() {
+        return el("chatDesktopModalRoot");
+    }
+
+    function mobileRoot() {
+        return el("chatMobileModalRoot");
+    }
+
+    function activeMessageListEl() {
+        return state.activeView === "mobile" ? el("chatMobileMessageList") : el("chatDesktopMessageList");
+    }
+
+    function activeRoomTitleEl() {
+        return state.activeView === "mobile" ? el("chatMobileRoomTitle") : el("chatDesktopRoomTitle");
+    }
+
+    function setModalVisibility(visible, view) {
+        const desktop = desktopRoot();
+        const mobile = mobileRoot();
+
+        if (desktop) {
+            desktop.classList.toggle("hidden", !(visible && view === "desktop"));
+        }
+        if (mobile) {
+            mobile.classList.toggle("hidden", !(visible && view === "mobile"));
+        }
+    }
+
+    function updateDesktopPanels() {
+        const placeholder = el("chatDesktopPlaceholder");
+        const conversation = el("chatDesktopConversationWrap");
+        const hasSelection = Boolean(state.selectedRoomId);
+
+        if (placeholder) {
+            placeholder.classList.toggle("hidden", hasSelection);
+        }
+        if (conversation) {
+            conversation.classList.toggle("hidden", !hasSelection);
+            conversation.classList.toggle("flex", hasSelection);
+        }
+    }
+
+    function updateMobilePanels() {
+        const listPane = el("chatMobileListPane");
+        const roomPane = el("chatMobileRoomPane");
+        const hasSelection = Boolean(state.selectedRoomId);
+
+        if (listPane) {
+            listPane.classList.toggle("hidden", hasSelection);
+        }
+        if (roomPane) {
+            roomPane.classList.toggle("hidden", !hasSelection);
+            roomPane.classList.toggle("flex", hasSelection);
+        }
+    }
+
+    function updateViewPanels() {
+        updateDesktopPanels();
+        updateMobilePanels();
+
+        const title = activeRoomTitleEl();
+        if (title) {
+            title.textContent = state.selectedRoomName || "";
+        }
+    }
+
+    function renderRoomListInto(listEl) {
+        if (!listEl) {
             return;
         }
 
         if (!state.rooms.length) {
-            roomList.innerHTML = '<div class="h-full flex items-center justify-center text-sm text-gray-400">채팅방이 없습니다.</div>';
+            listEl.innerHTML = '<div class="h-full flex items-center justify-center text-sm text-gray-400">채팅방이 없습니다.</div>';
             return;
         }
 
-        roomList.innerHTML = state.rooms.map((room) => {
-            const activeClass = room.chatroomIdx === state.selectedRoomId
-                ? "bg-gray-100 border-l-4 border-l-[#7CBD00]"
-                : "hover:bg-gray-50";
+        listEl.innerHTML = state.rooms.map((room) => {
+            const active = room.chatroomIdx === state.selectedRoomId;
+            const activeClass = active ? "bg-gray-100 border-l-4 border-l-[#7CBD00]" : "hover:bg-gray-50";
             const dot = room.unreadCount > 0
                 ? '<span class="w-2 h-2 bg-red-500 rounded-full"></span>'
                 : "";
@@ -137,16 +208,16 @@
             return (
                 '<button type="button" data-room-id="' + room.chatroomIdx + '" '
                 + 'class="chat-room-item w-full text-left px-3 py-3 border-b border-gray-100 flex items-center justify-between gap-2 ' + activeClass + '">'
-                + '<div class="min-w-0">'
-                + '<p class="text-sm font-semibold text-gray-800 truncate">' + escapeHtml(room.opponentName) + '</p>'
-                + '<p class="text-xs text-gray-500 truncate">' + escapeHtml(room.lastMessage || "대화를 시작해보세요") + '</p>'
-                + '</div>'
-                + '<div class="shrink-0">' + dot + '</div>'
+                + '  <div class="min-w-0">'
+                + '    <p class="text-sm font-semibold text-gray-800 truncate">' + escapeHtml(room.opponentName) + '</p>'
+                + '    <p class="text-xs text-gray-500 truncate">' + escapeHtml(room.lastMessage || "대화를 시작해보세요") + '</p>'
+                + '  </div>'
+                + '  <div class="shrink-0">' + dot + '</div>'
                 + '</button>'
             );
         }).join("");
 
-        roomList.querySelectorAll(".chat-room-item").forEach((button) => {
+        listEl.querySelectorAll(".chat-room-item").forEach((button) => {
             button.addEventListener("click", () => {
                 const roomId = Number(button.dataset.roomId);
                 selectRoom(roomId);
@@ -154,111 +225,85 @@
         });
     }
 
-    function setConversationVisible(visible) {
-        const conversationPane = el("chatConversationPane");
-        const placeholder = el("chatPlaceholder");
-        const conversationWrap = el("chatConversationWrap");
-
-        if (!conversationPane || !placeholder || !conversationWrap) {
-            return;
-        }
-
-        if (visible) {
-            conversationPane.classList.remove("hidden");
-            placeholder.classList.add("hidden");
-            conversationWrap.classList.remove("hidden");
-            conversationWrap.classList.add("flex");
-        } else {
-            conversationPane.classList.add("hidden");
-            placeholder.classList.add("hidden");
-            conversationWrap.classList.add("hidden");
-            conversationWrap.classList.remove("flex");
-        }
-    }
-
-    function setRoomListVisible(visible) {
-        const roomPane = el("chatRoomPane");
-        if (!roomPane) {
-            return;
-        }
-        roomPane.classList.toggle("hidden", !visible);
-    }
-
-    function syncMobilePanels() {
-        const roomPane = el("chatRoomPane");
-        const conversationPane = el("chatConversationPane");
-        const backBtn = el("chatMobileBackBtn");
-
-        if (!roomPane || !conversationPane || !backBtn) {
-            return;
-        }
-
-        if (!isMobile()) {
-            roomPane.classList.remove("hidden");
-            conversationPane.classList.remove("hidden");
-            backBtn.classList.add("hidden");
-            backBtn.classList.remove("flex");
-
-            setConversationVisible(Boolean(state.selectedRoomId));
-            return;
-        }
-
-        if (state.selectedRoomId) {
-            roomPane.classList.add("hidden");
-            conversationPane.classList.remove("hidden");
-            backBtn.classList.remove("hidden");
-            backBtn.classList.add("flex");
-            setConversationVisible(true);
-        } else {
-            roomPane.classList.remove("hidden");
-            conversationPane.classList.add("hidden");
-            backBtn.classList.add("hidden");
-            backBtn.classList.remove("flex");
-            setConversationVisible(false);
-        }
+    function renderRoomLists() {
+        renderRoomListInto(el("chatDesktopRoomList"));
+        renderRoomListInto(el("chatMobileRoomList"));
     }
 
     function scrollMessagesToBottom() {
-        const messageList = el("chatMessageList");
-        if (!messageList) {
+        const list = activeMessageListEl();
+        if (!list) {
             return;
         }
-        messageList.scrollTop = messageList.scrollHeight;
+
+        requestAnimationFrame(() => {
+            list.scrollTop = list.scrollHeight;
+        });
+    }
+
+    function ensureMessageStack(listEl) {
+        if (!listEl) {
+            return null;
+        }
+
+        let stack = listEl.querySelector("[data-chat-message-stack='true']");
+        if (!stack) {
+            stack = document.createElement("div");
+            stack.setAttribute("data-chat-message-stack", "true");
+            stack.className = "min-h-full flex flex-col justify-end gap-2";
+            listEl.innerHTML = "";
+            listEl.appendChild(stack);
+        }
+        return stack;
+    }
+
+    function messageBubbleHtml(msg, mine) {
+        const rowClass = mine ? "justify-end" : "justify-start";
+        const bubbleClass = mine
+            ? "bg-[#222222] text-white"
+            : "bg-white text-gray-800 border border-gray-200";
+
+        return (
+            '<div class="w-full flex ' + rowClass + '">'
+            + '  <div class="max-w-[82%] rounded-2xl px-3 py-2 text-sm leading-relaxed ' + bubbleClass + '">'
+            + escapeHtml(msg.messageContent)
+            + '  </div>'
+            + '</div>'
+        );
     }
 
     function renderMessages(messages) {
-        const messageList = el("chatMessageList");
-        if (!messageList) {
+        const list = activeMessageListEl();
+        if (!list) {
             return;
         }
 
         const context = getLoginContext();
-        messageList.innerHTML = (messages || []).map((msg) => {
-            const mine = Number(msg.senderIdx) === Number(context.memIdx);
-            const rowClass = mine ? "justify-end" : "justify-start";
-            const bubbleClass = mine
-                ? "bg-[#222222] text-white"
-                : "bg-white text-gray-800 border border-gray-200";
+        const stack = ensureMessageStack(list);
+        if (!stack) {
+            return;
+        }
 
-            return (
-                '<div class="w-full flex ' + rowClass + '">'
-                + '<div class="max-w-[82%] rounded-2xl px-3 py-2 text-sm leading-relaxed ' + bubbleClass + '">'
-                + escapeHtml(msg.messageContent)
-                + '</div>'
-                + '</div>'
-            );
+        stack.innerHTML = (messages || []).map((msg) => {
+            const mine = Number(msg.senderIdx) === Number(context.memIdx);
+            return messageBubbleHtml(msg, mine);
         }).join("");
 
         scrollMessagesToBottom();
     }
 
     function appendMessage(message) {
-        const messageList = el("chatMessageList");
-        if (!messageList) {
+        const list = activeMessageListEl();
+        if (!list) {
             return;
         }
 
         const context = getLoginContext();
+        const stack = ensureMessageStack(list);
+        if (!stack) {
+            return;
+        }
+
         const mine = Number(message.senderIdx) === Number(context.memIdx);
         const wrapper = document.createElement("div");
         wrapper.className = "w-full flex " + (mine ? "justify-end" : "justify-start");
@@ -269,7 +314,7 @@
         bubble.textContent = message.messageContent || "";
 
         wrapper.appendChild(bubble);
-        messageList.appendChild(wrapper);
+        stack.appendChild(wrapper);
         scrollMessagesToBottom();
     }
 
@@ -277,6 +322,7 @@
         if (!state.selectedRoomId) {
             return Promise.resolve();
         }
+
         return requestJson("/api/chats/rooms/" + state.selectedRoomId + "/read", {
             method: "POST",
         }).catch(() => {});
@@ -298,14 +344,24 @@
         if (!state.stompClient || !state.stompClient.connected) {
             return;
         }
-        const roomKey = String(roomId);
-        if (state.roomSubscriptions.has(roomKey)) {
+
+        const key = String(roomId);
+        if (state.roomSubscriptions.has(key)) {
             return;
         }
 
         const subscription = state.stompClient.subscribe("/topic/chatroom/" + roomId, (frame) => {
-            const message = JSON.parse(frame.body);
-            if (Number(message.chatroomIdx) === Number(state.selectedRoomId)) {
+            let message;
+            try {
+                message = JSON.parse(frame.body || "{}");
+            } catch (error) {
+                message = {};
+            }
+
+            const inSelectedRoom = Number(message.chatroomIdx) === Number(state.selectedRoomId);
+            const modalVisible = state.isOpen;
+
+            if (modalVisible && inSelectedRoom) {
                 appendMessage(message);
                 markSelectedRoomRead().then(() => {
                     fetchRooms();
@@ -317,15 +373,7 @@
             }
         });
 
-        state.roomSubscriptions.set(roomKey, subscription);
-    }
-
-    function subscribeAllRooms() {
-        if (!state.stompClient || !state.stompClient.connected) {
-            return;
-        }
-
-        state.rooms.forEach((room) => subscribeRoom(room.chatroomIdx));
+        state.roomSubscriptions.set(key, subscription);
     }
 
     function unsubscribeAllRooms() {
@@ -339,34 +387,19 @@
         state.roomSubscriptions.clear();
     }
 
-    function selectRoom(roomId) {
-        const room = state.rooms.find((item) => Number(item.chatroomIdx) === Number(roomId));
-        if (!room) {
+    function subscribeAllRooms() {
+        if (!state.stompClient || !state.stompClient.connected) {
             return;
         }
 
-        state.selectedRoomId = room.chatroomIdx;
-        state.selectedRoomName = room.opponentName;
-
-        const roomTitle = el("chatRoomTitle");
-        if (roomTitle) {
-            roomTitle.textContent = room.opponentName;
-        }
-
-        renderRoomList();
-        syncMobilePanels();
-        loadMessages(room.chatroomIdx).then(() => {
-            subscribeRoom(room.chatroomIdx);
-            fetchRooms();
-            fetchUnreadCount();
-        });
+        state.rooms.forEach((room) => subscribeRoom(room.chatroomIdx));
     }
 
     function fetchRooms(preferredRoomId) {
         return requestJson("/api/chats/rooms")
             .then((data) => {
                 state.rooms = (data.rooms || []).map(normalizeRoom);
-                renderRoomList();
+                renderRoomLists();
 
                 if (state.isConnected) {
                     unsubscribeAllRooms();
@@ -375,7 +408,8 @@
 
                 if (!state.rooms.length) {
                     state.selectedRoomId = null;
-                    syncMobilePanels();
+                    state.selectedRoomName = "";
+                    updateViewPanels();
                     return;
                 }
 
@@ -385,46 +419,40 @@
                 }
 
                 const stillExists = state.rooms.some((room) => room.chatroomIdx === state.selectedRoomId);
-                if (stillExists) {
-                    syncMobilePanels();
-                    return;
+                if (!stillExists && state.activeView === "desktop") {
+                    state.selectedRoomId = null;
+                    state.selectedRoomName = "";
                 }
 
-                if (!isMobile()) {
-                    selectRoom(state.rooms[0].chatroomIdx);
-                } else {
-                    state.selectedRoomId = null;
-                    syncMobilePanels();
-                }
+                updateViewPanels();
             })
             .catch(() => {
                 state.rooms = [];
-                renderRoomList();
+                renderRoomLists();
                 state.selectedRoomId = null;
-                syncMobilePanels();
+                state.selectedRoomName = "";
+                updateViewPanels();
             });
     }
 
-    function connectWebSocket() {
-        if (state.stompClient && state.stompClient.connected) {
-            state.isConnected = true;
-            return;
-        }
-        if (typeof SockJS === "undefined" || typeof Stomp === "undefined") {
+    function selectRoom(roomId) {
+        const room = state.rooms.find((item) => Number(item.chatroomIdx) === Number(roomId));
+        if (!room) {
             return;
         }
 
-        const socket = new SockJS("/ws-chat");
-        state.stompClient = Stomp.over(socket);
-        state.stompClient.debug = null;
+        state.selectedRoomId = room.chatroomIdx;
+        state.selectedRoomName = room.opponentName;
+        updateViewPanels();
+        renderRoomLists();
 
-        state.stompClient.connect({}, () => {
-            state.isConnected = true;
-            subscribeAllRooms();
-            if (state.selectedRoomId) {
-                subscribeRoom(state.selectedRoomId);
-            }
-        }, () => {});
+        loadMessages(room.chatroomIdx).then(() => {
+            subscribeRoom(room.chatroomIdx);
+            markSelectedRoomRead().then(() => {
+                fetchRooms();
+                fetchUnreadCount();
+            });
+        });
     }
 
     function sendMessage(content) {
@@ -457,9 +485,44 @@
         }).catch(() => {});
     }
 
-    function bindCompose() {
-        const form = el("chatComposeForm");
-        const input = el("chatMessageInput");
+    function connectWebSocket() {
+        const context = getLoginContext();
+        if (!context.isLogin) {
+            return;
+        }
+
+        if (state.stompClient && state.stompClient.connected) {
+            state.isConnected = true;
+            return;
+        }
+
+        if (typeof SockJS === "undefined" || typeof Stomp === "undefined") {
+            return;
+        }
+
+        const socket = new SockJS("/ws-chat");
+        state.stompClient = Stomp.over(socket);
+        state.stompClient.debug = null;
+
+        state.stompClient.connect({}, () => {
+            state.isConnected = true;
+            subscribeAllRooms();
+        }, () => {
+            state.isConnected = false;
+        });
+    }
+
+    function adjustTextareaHeight(textarea) {
+        if (!textarea) {
+            return;
+        }
+        textarea.style.height = "auto";
+        textarea.style.height = Math.min(textarea.scrollHeight, 112) + "px";
+    }
+
+    function bindComposeForm(formId, inputId) {
+        const form = el(formId);
+        const input = el(inputId);
         if (!form || !input) {
             return;
         }
@@ -470,8 +533,10 @@
             if (!content || !content.trim()) {
                 return;
             }
+
             sendMessage(content);
             input.value = "";
+            input.style.height = "auto";
             input.focus();
         });
 
@@ -481,6 +546,8 @@
                 form.requestSubmit();
             }
         });
+
+        input.addEventListener("input", () => adjustTextareaHeight(input));
     }
 
     function openChatModal(preferredRoomId) {
@@ -491,14 +558,10 @@
         }
 
         state.isOpen = true;
-        const root = el("chatModalRoot");
-        if (!root) {
-            return;
-        }
+        state.activeView = currentView();
 
-        root.classList.remove("hidden");
-        syncMobilePanels();
-        connectWebSocket();
+        setModalVisibility(true, state.activeView);
+        updateViewPanels();
 
         fetchRooms(preferredRoomId).then(() => {
             fetchUnreadCount();
@@ -507,10 +570,11 @@
             }
         });
 
-        if (state.pollTimer) {
-            clearInterval(state.pollTimer);
+        if (state.roomPollTimer) {
+            clearInterval(state.roomPollTimer);
         }
-        state.pollTimer = window.setInterval(() => {
+
+        state.roomPollTimer = window.setInterval(() => {
             if (!state.isOpen) {
                 return;
             }
@@ -521,38 +585,79 @@
 
     function closeChatModal() {
         state.isOpen = false;
-        const root = el("chatModalRoot");
-        if (root) {
-            root.classList.add("hidden");
-        }
-
+        state.activeView = null;
         state.selectedRoomId = null;
-        syncMobilePanels();
+        state.selectedRoomName = "";
 
-        if (state.pollTimer) {
-            clearInterval(state.pollTimer);
-            state.pollTimer = null;
+        setModalVisibility(false, currentView());
+        updateViewPanels();
+
+        if (state.roomPollTimer) {
+            clearInterval(state.roomPollTimer);
+            state.roomPollTimer = null;
         }
 
         fetchUnreadCount();
     }
 
-    function bindModalButtons() {
-        const closeBtn = el("chatModalCloseBtn");
-        const backBtn = el("chatMobileBackBtn");
+    function handleResize() {
+        updateScrollButtons();
 
-        if (closeBtn) {
-            closeBtn.addEventListener("click", closeChatModal);
+        if (!state.isOpen) {
+            return;
         }
 
-        if (backBtn) {
-            backBtn.addEventListener("click", () => {
+        const nextView = currentView();
+        if (state.activeView === nextView) {
+            return;
+        }
+
+        state.activeView = nextView;
+        setModalVisibility(true, state.activeView);
+        updateViewPanels();
+        if (state.selectedRoomId) {
+            loadMessages(state.selectedRoomId);
+        }
+    }
+
+    function bindButtons() {
+        const floatingBtn = el("chatFloatingButton");
+        const desktopClose = el("chatDesktopCloseBtn");
+        const mobileClose = el("chatMobileCloseBtn");
+        const mobileRoomClose = el("chatMobileRoomCloseBtn");
+        const mobileBack = el("chatMobileBackBtn");
+
+        if (floatingBtn) {
+            floatingBtn.addEventListener("click", () => openChatModal());
+        }
+        if (desktopClose) {
+            desktopClose.addEventListener("click", closeChatModal);
+        }
+        if (mobileClose) {
+            mobileClose.addEventListener("click", closeChatModal);
+        }
+        if (mobileRoomClose) {
+            mobileRoomClose.addEventListener("click", closeChatModal);
+        }
+        if (mobileBack) {
+            mobileBack.addEventListener("click", () => {
                 state.selectedRoomId = null;
-                syncMobilePanels();
+                state.selectedRoomName = "";
+                updateViewPanels();
+                renderRoomLists();
             });
         }
 
-        window.addEventListener("resize", syncMobilePanels);
+        window.addEventListener("resize", handleResize);
+    }
+
+    function startUnreadPolling() {
+        if (state.unreadPollTimer) {
+            clearInterval(state.unreadPollTimer);
+        }
+
+        fetchUnreadCount();
+        state.unreadPollTimer = window.setInterval(fetchUnreadCount, 10000);
     }
 
     window.openChatModal = function () {
@@ -571,19 +676,16 @@
     window.scrollToBottom = scrollToBottom;
 
     document.addEventListener("DOMContentLoaded", () => {
-        bindCompose();
-        bindModalButtons();
-        updateScrollButtons();
-        connectWebSocket();
-        fetchRooms().then(() => fetchUnreadCount());
+        bindButtons();
+        bindComposeForm("chatDesktopComposeForm", "chatDesktopMessageInput");
+        bindComposeForm("chatMobileComposeForm", "chatMobileMessageInput");
 
+        updateScrollButtons();
         window.addEventListener("scroll", updateScrollButtons);
 
-        window.addEventListener("resize", () => {
-            if (state.isOpen) {
-                syncMobilePanels();
-            }
-        });
+        connectWebSocket();
+        fetchRooms();
+        startUnreadPolling();
 
         if (window.feather) {
             window.feather.replace();
