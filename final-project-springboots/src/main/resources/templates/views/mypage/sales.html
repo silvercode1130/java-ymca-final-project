@@ -91,7 +91,7 @@
 										class="text-blue-600 font-medium"> 배송중 </span>
 									<!-- 수령완료 -->
 									<span th:if="${sale.deliveryStatus == 'DELIVERED'}"
-										class="text-gray-600 font-medium"> 수령완료 </span>
+										class="text-gray-600 font-medium"> 구매확정 완료 </span>
 								</div>
 							</div>
 						</div>
@@ -149,7 +149,7 @@
 								<span th:if="${sale.deliveryStatus == 'SHIPPING'}"
 									class="text-[11px] text-blue-600 font-medium"> 배송중 </span> <span
 									th:if="${sale.deliveryStatus == 'DELIVERED'}"
-									class="text-[11px] text-gray-600 font-medium"> 수령완료 </span>
+									class="text-[11px] text-gray-600 font-medium"> 구매확정 완료 </span>
 							</div>
 						</div>
 

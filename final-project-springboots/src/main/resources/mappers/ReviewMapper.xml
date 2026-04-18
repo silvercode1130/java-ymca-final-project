@@ -43,6 +43,28 @@
 		WHERE r.bidder_idx = #{memIdx}
 		ORDER BY r.review_idx DESC
 	</select>
+
+	<!-- 프로필 화면용 내가 받은 리뷰 목록 -->
+	<select id="getReceivedReviewsForProfile" resultType="com.springbootstudy.bbs.dto.ProfileReviewDTO">
+	    SELECT
+	        r.review_idx AS reviewIdx,
+	        r.review_title AS reviewTitle,
+	        r.review_star AS reviewStar,
+	        r.review_regdate AS reviewRegdate,
+	        a.auction_title AS auctionTitle,
+	        i.item_name AS itemName,
+	        r.buyer_idx AS reviewerMemIdx,
+	        COALESCE(mp.mem_nickname, m.mem_id) AS reviewerNickname
+	    FROM review r
+	    JOIN auction a ON r.auction_idx = a.auction_idx
+	    JOIN bid b ON r.bid_idx = b.bid_idx
+	    LEFT JOIN item i ON b.item_idx = i.item_idx
+	    JOIN member m ON r.buyer_idx = m.mem_idx
+	    LEFT JOIN member_profile mp ON m.mem_idx = mp.mem_idx
+	    WHERE r.bidder_idx = #{memIdx}
+	      AND r.review_is_deleted = 'N'
+	    ORDER BY r.review_regdate DESC
+	</select>
 	
 	<!-- 내가 받은 리뷰 별점 평균 -->
 	<select id="getAvgRating" resultType="double">
@@ -142,6 +164,39 @@
 		JOIN member bidder ON b.bidder_idx = bidder.mem_idx
 		WHERE r.review_idx = #{reviewIdx}
     </select>
+
+	<!-- 프로필 화면에서 진입하는 리뷰 상세보기 -->
+	<select id="getProfileReviewDetail" resultType="com.springbootstudy.bbs.dto.ProfileReviewDetailDTO">
+	    SELECT
+	        r.review_idx AS reviewIdx,
+	        r.bidder_idx AS profileMemIdx,
+	        r.buyer_idx AS reviewerMemIdx,
+	        r.review_title AS reviewTitle,
+	        r.review_content AS reviewContent,
+	        r.review_star AS reviewStar,
+	        r.review_regdate AS reviewRegdate,
+	        r.auction_idx AS auctionIdx,
+	        r.bid_idx AS bidIdx,
+	        a.auction_title AS auctionTitle,
+	        i.item_name AS itemName,
+	        b.bid_regdate AS tradeDate,
+	        COALESCE(reviewerProfile.mem_nickname, reviewer.mem_id) AS reviewerNickname,
+	        reviewerGrade.grade_name AS reviewerGradeName,
+	        COALESCE(profileOwnerProfile.mem_nickname, profileOwner.mem_id) AS profileNickname,
+	        profileOwnerGrade.grade_name AS profileGradeName
+	    FROM review r
+	    JOIN auction a ON r.auction_idx = a.auction_idx
+	    JOIN bid b ON r.bid_idx = b.bid_idx
+	    LEFT JOIN item i ON b.item_idx = i.item_idx
+	    JOIN member reviewer ON r.buyer_idx = reviewer.mem_idx
+	    LEFT JOIN member_profile reviewerProfile ON reviewer.mem_idx = reviewerProfile.mem_idx
+	    LEFT JOIN grade reviewerGrade ON reviewer.mem_grade_idx = reviewerGrade.grade_idx
+	    JOIN member profileOwner ON r.bidder_idx = profileOwner.mem_idx
+	    LEFT JOIN member_profile profileOwnerProfile ON profileOwner.mem_idx = profileOwnerProfile.mem_idx
+	    LEFT JOIN grade profileOwnerGrade ON profileOwner.mem_grade_idx = profileOwnerGrade.grade_idx
+	    WHERE r.review_idx = #{reviewIdx}
+	      AND r.review_is_deleted = 'N'
+	</select>
 	
 	<!-- 임시삭제 -->
 	<update id="deleteReview">

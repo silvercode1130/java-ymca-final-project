@@ -67,7 +67,12 @@ public class ReviewController {
 
 	// 검색 전에도 기본 리스트가 table에 뜨도록 추가
 	@GetMapping("/mypage/reviews/reviewWrite")
-	public String reviewWrite(HttpSession session, Model model) {
+	public String reviewWrite(
+			@RequestParam(value = "auctionIdx", required = false) Long auctionIdx,
+			@RequestParam(value = "bidIdx", required = false) Long bidIdx,
+			@RequestParam(value = "bidderIdx", required = false) Long bidderIdx,
+			HttpSession session,
+			Model model) {
 
 		MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
 		if (loginUser == null) {
@@ -77,6 +82,9 @@ public class ReviewController {
 		// 로그인한 구매자 기준으로 리뷰 가능한 거래 목록 조회
 		List<ReviewVO> list = reviewService.getWritableReviewList(loginUser.getMemIdx());
 		model.addAttribute("reviewList", list);
+		model.addAttribute("selectedAuctionIdx", auctionIdx);
+		model.addAttribute("selectedBidIdx", bidIdx);
+		model.addAttribute("selectedBidderIdx", bidderIdx);
 
 		return "views/review/reviewWrite";
 	}

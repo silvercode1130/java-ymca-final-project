@@ -6,6 +6,8 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param; 
 
 import com.springbootstudy.bbs.domain.ReviewVO;
+import com.springbootstudy.bbs.dto.ProfileReviewDTO;
+import com.springbootstudy.bbs.dto.ProfileReviewDetailDTO;
 
 @Mapper
 public interface ReviewMapper {
@@ -15,6 +17,9 @@ public interface ReviewMapper {
 	
 	// 내가 받은 리뷰 조회
 	List<ReviewVO> getReceivedReviews(@Param("memIdx") Long memIdx);  
+
+	// 프로필 화면용 받은 리뷰 목록
+	List<ProfileReviewDTO> getReceivedReviewsForProfile(@Param("memIdx") Long memIdx);
 	
 	// 내가 받은 리뷰 별점 평균
 	Double getAvgRating(@Param("memIdx") Long memIdx);
@@ -31,6 +36,9 @@ public interface ReviewMapper {
 	
 	// 리뷰 상세보기
 	ReviewVO getReviewDetail(Long reviewIdx);
+
+	// 프로필 화면에서 진입하는 리뷰 상세 조회
+	ProfileReviewDetailDTO getProfileReviewDetail(@Param("reviewIdx") Long reviewIdx);
 	
 	// 리뷰 삭제하기(관리자만)
 	//List<ReviewVO> getAllReviewList();    

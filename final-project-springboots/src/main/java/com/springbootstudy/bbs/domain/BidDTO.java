@@ -10,6 +10,7 @@ public class BidDTO {
     private Long bidIdx;          // 입찰 번호 (PK)
     private Long auctionIdx;      // 경매 번호 (FK)
     private Long bidderIdx;       // 입찰자 회원 번호 (FK)
+    private String auctionTitle;  // 경매 제목
 
     // 입찰 내용
     private Long bidPrice;        // 제안 가격

@@ -35,6 +35,13 @@ public class AuctionDTO {
     private Long minBidPrice;
     private Integer bidCount;
 
+    // 마이페이지 경매 목록용 낙찰 정보
+    private Long winnerBidIdx;
+    private String winnerItemName;
+    private Long winnerBidPrice;
+    private String winnerBidderMemId;
+    private String winnerBidderMemIdMasked;
+
     // 작성자
     private Long buyerIdx;
     private String buyerMemId;     // 구매자 회원 아이디 (마스킹 전)

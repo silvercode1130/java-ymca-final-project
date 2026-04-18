@@ -122,13 +122,13 @@ public class OrdersController {
 
 		OrdersVO order = ordersService.findByOrderIdx(orderIdx);
 		if (order == null || !loginUser.getMemIdx().equals(order.getBuyerIdx())) {
-			ra.addFlashAttribute("errorMessage", "배송확정 권한이 없습니다.");
+			ra.addFlashAttribute("errorMessage", "구매확정 권한이 없습니다.");
 			return "redirect:/mypage/orders";
 		}
 
 		try {
 			deliveryService.confirmReceipt(order.getBidIdx());
-			ra.addFlashAttribute("successMessage", "배송확정이 완료되었습니다.");
+			ra.addFlashAttribute("successMessage", "구매확정이 완료되었습니다.");
 		} catch (Exception e) {
 			ra.addFlashAttribute("errorMessage", e.getMessage());
 		}

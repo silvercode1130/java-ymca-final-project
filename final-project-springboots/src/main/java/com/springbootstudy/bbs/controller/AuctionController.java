@@ -527,6 +527,15 @@ public class AuctionController {
 
          // 판매자 본인은 flashAttribute 토스트가 이미 뜨므로 DB 저장만
          if (winnerBid != null) {
+             notificationService.notifyWinnerSelectedToBidder(auctionIdx, winnerBid);
+             notificationService.notifyAuctionStatusChangedToBidders(
+                 auction,
+                 "AUCTION_WINNER_SELECTED",
+                 "낙찰자 선정",
+                 "다른 입찰자가 낙찰자로 선정되어 경매가 종료되었습니다.",
+                 winnerBid.getBidderIdx()
+             );
+
              NotificationVO buyerNoti = new NotificationVO();
              buyerNoti.setReceiverIdx(loginUser.getMemIdx());
              buyerNoti.setNotificationType("WINNER_SELECTED");

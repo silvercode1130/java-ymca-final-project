@@ -67,31 +67,46 @@
     }
 
     function renderUnreadIndicator() {
-        var dot = byId('notification-bell-dot');
-        var badge = byId('notification-bell-badge');
+        var dots = Array.from(document.querySelectorAll('[data-notification-bell-dot]'));
+        var badges = Array.from(document.querySelectorAll('[data-notification-bell-badge]'));
 
-        if (!dot || !badge) {
+        if (dots.length === 0 || badges.length === 0) {
             return;
         }
 
         if (state.unreadCountKnown) {
             if (state.unreadCount > 0) {
-                badge.textContent = state.unreadCount > 99 ? '99+' : String(state.unreadCount);
-                badge.classList.remove('hidden');
-                dot.classList.add('hidden');
+                var badgeText = state.unreadCount > 99 ? '99+' : String(state.unreadCount);
+                badges.forEach(function (badge) {
+                    badge.textContent = badgeText;
+                    badge.classList.remove('hidden');
+                });
+                dots.forEach(function (dot) {
+                    dot.classList.add('hidden');
+                });
             } else {
-                badge.textContent = '0';
-                badge.classList.add('hidden');
-                dot.classList.add('hidden');
+                badges.forEach(function (badge) {
+                    badge.textContent = '0';
+                    badge.classList.add('hidden');
+                });
+                dots.forEach(function (dot) {
+                    dot.classList.add('hidden');
+                });
             }
             return;
         }
 
-        badge.classList.add('hidden');
+        badges.forEach(function (badge) {
+            badge.classList.add('hidden');
+        });
         if (state.hasUnread) {
-            dot.classList.remove('hidden');
+            dots.forEach(function (dot) {
+                dot.classList.remove('hidden');
+            });
         } else {
-            dot.classList.add('hidden');
+            dots.forEach(function (dot) {
+                dot.classList.add('hidden');
+            });
         }
     }
 
