@@ -45,6 +45,11 @@ public class ReviewService {
 	    reviewMapper.insertReview(vo);
 	}
 	
+	// 🔥 알림 수신자 검증용 DB 조회 메서드
+	public Long findBidderIdxByBidIdx(Long bidIdx) {
+	    return reviewMapper.findBidderIdxByBidIdx(bidIdx);
+	}
+	
 	// 리뷰 상세보기
 	public ReviewVO getReviewDetail(Long reviewIdx) {
 	    return reviewMapper.getReviewDetail(reviewIdx);

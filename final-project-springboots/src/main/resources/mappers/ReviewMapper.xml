@@ -95,6 +95,7 @@
 	    </if>
 	</select>
 	
+	<!-- 리뷰 피드백 들어온 부분 -->
 	<!-- 리뷰 작성하기 -->
 	<insert id="insertReview">
 	    INSERT INTO review (
@@ -120,6 +121,13 @@
 	    JOIN bid b ON a.auction_idx = b.auction_idx
 	    WHERE b.bid_idx = #{bidIdx}  
 	</insert>
+	
+	<!-- 🔥 알림 수신자 검증용 bidder 조회 -->
+	<select id="findBidderIdxByBidIdx" resultType="Long">
+	    SELECT b.bidder_idx
+	    FROM bid b
+	    WHERE b.bid_idx = #{bidIdx}
+	</select>
 	
 	<!-- 리뷰 상세보기 -->
 	<select id="getReviewDetail" parameterType="long" resultType="com.springbootstudy.bbs.domain.ReviewVO">

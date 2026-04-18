@@ -28,6 +28,7 @@ public interface ReviewMapper {
 	
 	// 리뷰 작성하기
 	void insertReview(ReviewVO vo);
+	Long findBidderIdxByBidIdx(Long bidIdx); 
 	
 	// 리뷰 상세보기
 	ReviewVO getReviewDetail(Long reviewIdx);
@@ -44,6 +45,6 @@ public interface ReviewMapper {
     List<ReviewVO> getDeletedReviewList();
 
     // 리뷰 삭제 취소
-	void cancelDelete(Long reviewIdx); 
+	void cancelDelete(Long reviewIdx);
 	
 }
