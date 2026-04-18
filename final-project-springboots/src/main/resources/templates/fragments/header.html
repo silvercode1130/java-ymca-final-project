@@ -5,16 +5,17 @@
 
 		<!-- 전체 폭(풀 브리드), 안쪽 컨테이너만 max-w-7xl -->
 		<header class="sticky top-0 z-50 bg-white border-b border-gray-200">
-			<div id="notification-context"
-				th:if="${session.loginUser != null}"
+			<div id="notification-context" th:if="${session.loginUser != null}"
 				th:attr="data-mem-idx=${session.loginUser.memIdx}"></div>
 			<div class="max-w-7xl mx-auto px-4">
 				<div class="grid grid-cols-12 h-16 items-center gap-4">
 
 					<!-- Logo : 좌측 -->
 					<div class="col-span-6 md:col-span-3">
-						<a th:href="@{/}" class="flex items-center gap-3"> <!-- 나중에 실제 로고 이미지로 교체 -->
-							<span class="text-xl font-bold text-[#222222] tracking-tight">PickQ</span>
+						<a th:href="@{/}" class="flex items-center gap-3">
+							<!-- <span class="text-xl font-bold text-[#222222] tracking-tight">PickQ</span> -->
+							<img th:src="@{/images/common/pickQ_logo.png}" alt="PickQ 로고"
+							class="h-8 w-auto" />
 						</a>
 					</div>
 
@@ -45,8 +46,8 @@
 								<button type="button" id="notification-menu-trigger"
 									class="relative w-9 h-9 rounded-full hover:bg-gray-100 transition-colors flex items-center justify-center"
 									aria-label="알림">
-									<i data-feather="bell" class="w-4 h-4 text-[#222222]"></i>
-									<span id="notification-bell-dot"
+									<i data-feather="bell" class="w-4 h-4 text-[#222222]"></i> <span
+										id="notification-bell-dot"
 										class="hidden absolute top-1 right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white"></span>
 									<span id="notification-bell-badge"
 										class="hidden absolute -top-1 -right-1 min-w-5 h-5 px-1 rounded-full bg-red-500 text-white text-[10px] font-semibold leading-5 text-center border-2 border-white">0</span>
@@ -57,12 +58,12 @@
 									<div class="px-4 py-3 border-b border-gray-100">
 										<p class="text-sm font-semibold text-[#222222]">최근 알림</p>
 									</div>
-									<div id="notification-recent-list" class="max-h-[280px] overflow-y-auto divide-y divide-gray-100"></div>
+									<div id="notification-recent-list"
+										class="max-h-[280px] overflow-y-auto divide-y divide-gray-100"></div>
 									<div class="px-4 py-3 bg-gray-50 border-t border-gray-100">
 										<a th:href="@{/notifications}"
 											class="w-full inline-flex items-center justify-center px-3 py-2 rounded-lg bg-[#222222] text-white text-xs font-semibold hover:bg-[#333333] transition-colors">
-											알람 전체보기
-										</a>
+											알람 전체보기 </a>
 									</div>
 								</div>
 							</div>
@@ -100,15 +101,14 @@
 								th:href="@{/mypage/boards}"
 								class="px-2 py-1 rounded text-xs bg-gray-100 text-[#222222]">
 								<span th:text="${session.loginUser.memName}">내정보</span>
-							</a>
-							<a th:if="${session.loginUser == null}" href="#"
+							</a> <a th:if="${session.loginUser == null}" href="#"
 								onclick="location.href='/members/login?redirect=' + encodeURIComponent(location.href)"
 								class="px-2 py-1 rounded text-xs bg-[#7CBD00] text-white">
 								로그인 </a>
 							<!-- 햄버거 버튼 -->
 							<button onclick="openMobileNav()"
-									class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors"
-									aria-label="메뉴 열기">
+								class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors"
+								aria-label="메뉴 열기">
 								<i class="bi bi-list text-[#222222] text-2xl"></i>
 							</button>
 						</div>
