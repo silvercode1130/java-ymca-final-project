@@ -46,7 +46,7 @@
 												th:alt="${detail.auctionTitle}"
 												class="w-full h-full object-cover cursor-pointer hover:opacity-90 transition-opacity">
 										</div>
-										
+
 									</div>
 
 									<!-- 헤더 정보 -->
@@ -79,13 +79,13 @@
 											<h1 class="text-xl sm:text-2xl font-bold text-[#222222] mb-2"
 												th:text="${detail.auctionTitle}">경매 제목</h1>
 
-											<div class="text-[11px] sm:text-xs text-gray-500 space-x-2">
-												<span>카테고리: [[${detail.itemCategoryName}]]</span> <span>|</span>
-												<span>입찰 마감:
+											<div
+												class="text-right text-[11px] sm:text-xs text-gray-500 space-y-1">
+												<span class="block">입찰 마감:
 													[[${#temporals.format(detail.auctionEndAt, 'yyyy-MM-dd
-													HH:mm')}]] </span> <span>|</span> <span>결정 마감:
+													HH:mm')}]]</span> <span class="block">결정 마감:
 													[[${#temporals.format(detail.auctionDecisionDeadline,
-													'yyyy-MM-dd HH:mm')}]] </span>
+													'yyyy-MM-dd HH:mm')}]]</span>
 											</div>
 										</div>
 
@@ -111,7 +111,7 @@
 
 								<!-- 상세 설명 -->
 								<div
-									class="border border-gray-200 rounded-lg p-5 sm:p-6 bg-gray-50">
+									class="border border-gray-200 rounded-lg p-4 sm:p-6 bg-gray-50">
 									<h3
 										class="text-base sm:text-lg font-bold text-[#222222] mb-3 sm:mb-4">
 										구매 요청 상세</h3>
@@ -273,13 +273,13 @@
 										<!-- 버튼 -->
 										<div class="flex flex-col sm:flex-row gap-3 pt-4">
 											<button type="button"
-												class="flex-1 h-14 sm:h-12 border border-gray-300 rounded-md text-sm sm:text-sm text-gray-700 hover:bg-gray-50"
+												class="flex-1 min-h-[52px] sm:min-h-[48px] px-4 rounded-lg border border-gray-400 bg-white text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors"
 												th:onclick="|location.href='/auctions/${detail.auctionIdx}'|">
 												취소</button>
+
 											<button type="submit"
-												class="flex-1 h-14 sm:h-12 bg-[#7CBD00] text-white hover:bg-[#6BAD00]
-                                   rounded-md font-bold text-sm sm:text-lg inline-flex items-center justify-center">
-												<span class="mr-2 text-base sm:text-lg">📦</span> 판매 제안 등록
+												class="flex-1 min-h-[52px] sm:min-h-[48px] px-4 rounded-lg bg-[#7CBD00] text-white hover:bg-[#6BAD00] transition-colors font-bold text-sm sm:text-base inline-flex items-center justify-center">
+												<span class="mr-2 text-base">📦</span> 판매 제안 등록
 											</button>
 										</div>
 
