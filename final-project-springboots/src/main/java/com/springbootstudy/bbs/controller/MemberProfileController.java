@@ -58,13 +58,14 @@ public class MemberProfileController {
     // 프로필 저장 (수정)
     @PostMapping("/mypage/profile")
     public String updateProfile(MemberProfileVO vo,
-                                @RequestParam("memImgFile") MultipartFile memImgFile, HttpSession session) throws Exception {
+                                @RequestParam("memImgFile") MultipartFile memImgFile, HttpSession session) 
+                    			throws Exception {
 
     	if (!memImgFile.isEmpty()) {
 
     	    String uploadDir = System.getProperty("user.dir")
     	            + "/src/main/resources/static/images/profile/";
-
+ 
     	    File dir = new File(uploadDir);
     	    if (!dir.exists()) {
     	        dir.mkdirs();
