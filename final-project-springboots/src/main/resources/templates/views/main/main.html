@@ -217,9 +217,9 @@
 					</div>
 
 					<div
-						th:if="${auctionList != null and #lists.size(auctionList) > 0}"
+						th:if="${hotAuctions != null and #lists.size(hotAuctions) > 0}"
 						class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-						<div th:each="auction, stat : ${auctionList}"
+						<div th:each="auction, stat : ${hotAuctions}"
 							th:if="${stat.index < 4}" class="bg-white">
 							<a th:href="@{'/auctions/' + ${auction.auctionIdx}}"
 								class="block group">
@@ -251,7 +251,7 @@
 					</div>
 
 					<div
-						th:if="${auctionList == null or #lists.size(auctionList) == 0}"
+						th:if="${hotAuctions == null or #lists.size(hotAuctions) == 0}"
 						class="text-sm text-[#767676]">아직 등록된 경매가 없습니다.</div>
 				</div>
 			</section>
@@ -271,9 +271,9 @@
 					</div>
 
 					<div
-						th:if="${auctionList != null and #lists.size(auctionList) > 0}"
+						th:if="${deadlineAuctions != null and #lists.size(deadlineAuctions) > 0}"
 						class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-						<div th:each="auction, stat : ${auctionList}"
+						<div th:each="auction, stat : ${deadlineAuctions}"
 							th:if="${stat.index < 5}" class="bg-white">
 							<a th:href="@{'/auctions/' + ${auction.auctionIdx}}"
 								class="block group">
@@ -305,7 +305,7 @@
 					</div>
 
 					<div
-						th:if="${auctionList == null or #lists.size(auctionList) == 0}"
+						th:if="${deadlineAuctions == null or #lists.size(deadlineAuctions) == 0}"
 						class="text-sm text-[#767676]">마감 임박 경매가 없습니다.</div>
 				</div>
 			</section>
@@ -325,9 +325,9 @@
 					</div>
 
 					<div
-						th:if="${auctionList != null and #lists.size(auctionList) > 0}"
+						th:if="${latestAuctions != null and #lists.size(latestAuctions) > 0}"
 						class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-						<div th:each="auction, stat : ${auctionList}"
+						<div th:each="auction, stat : ${latestAuctions}"
 							th:if="${stat.index < 10}" class="bg-white">
 							<a th:href="@{'/auctions/' + ${auction.auctionIdx}}"
 								class="block group">
@@ -359,7 +359,7 @@
 					</div>
 
 					<div
-						th:if="${auctionList == null or #lists.size(auctionList) == 0}"
+						th:if="${latestAuctions == null or #lists.size(latestAuctions) == 0}"
 						class="text-sm text-[#767676]">최근 등록된 경매가 없습니다.</div>
 				</div>
 			</section>

@@ -27,8 +27,15 @@
 		<div class="container mx-auto px-4 py-6">
 
 			<!-- 브레드크럼 -->
-			<div class="text-sm text-gray-500 mb-3">홈 / 경매 /
-				[[${detail.itemCategoryName}]] / 상세</div>
+			<div class="mb-4 flex items-center gap-2 text-xs sm:text-sm text-gray-600">
+				<a th:href="@{/}" class="hover:text-[#7CBD00]">홈</a>
+				<span>/</span>
+				<a th:href="@{/auctions}" class="hover:text-[#7CBD00]">경매</a>
+				<span>/</span>
+				<a th:href="@{/auctions/category/{categoryCode}(categoryCode=${detail.itemCategoryCode})}" class="hover:text-[#7CBD00]" th:text="${detail.itemCategoryName}">카테고리</a>
+				<span>/</span>
+				<span class="text-gray-900">경매 상세</span>
+			</div>
 
 			<div class="row g-4">
 
@@ -43,84 +50,64 @@
 							<!-- ── mode == list : 경매 기본 정보 ── -->
 							<th:block th:if="${mode == 'list'}">
 
-								<div class="d-flex gap-4">
+								<div class="d-flex flex-column flex-md-row gap-4">
 
-									<!-- 썸네일 + 채팅 버튼 -->
-									<div style="width: 180px;" class="d-flex flex-column gap-2">
-										<img
-											th:src="${detail.auctionThumbnailImg != null and detail.auctionThumbnailImg != ''}
+									<div class="w-100" style="max-width:220px;">
+										<div class="ratio ratio-1x1 rounded overflow-hidden bg-light border">
+											<img
+												th:src="${detail.auctionThumbnailImg != null and detail.auctionThumbnailImg != ''}
                                ? @{${detail.auctionThumbnailImg}}
                                : @{/images/auction/auction_default.png}"
-											class="img-fluid rounded" alt="경매 이미지"
-											style="cursor: pointer;">
-
-										<button type="button" class="btn btn-dark w-100"
-											th:if="${chatroomIdx != null}"
-											th:onclick="|openChatPopup(${chatroomIdx})|">
-											<i class="bi bi-chat-dots me-1"></i> 대화하기
-										</button>
+												class="w-100 h-100 object-fit-cover" alt="경매 이미지">
+										</div>
+										<div class="text-muted small mt-3">카테고리: [[${detail.itemCategoryName}]]</div>
+										<div class="text-muted small">입찰 마감: [[${#temporals.format(detail.auctionEndAt, 'yyyy-MM-dd HH:mm')}]]</div>
+										<div class="text-muted small">결정 마감: [[${#temporals.format(detail.auctionDecisionDeadline, 'yyyy-MM-dd HH:mm')}]]</div>
 									</div>
 
-									<!-- 정보 -->
 									<div class="flex-grow-1 d-flex flex-column">
-
-										<!-- 상태 배지 + 타이머 -->
-										<div
-											class="d-flex justify-content-between align-items-center mb-2">
-											<div>
-												<span class="badge bg-success"
-													th:if="${detail.auctionStatusIdx == 1}">진행중</span> <span
-													class="badge bg-primary"
-													th:if="${detail.auctionStatusIdx == 2}">결정대기중</span> <span
-													class="badge bg-secondary"
-													th:if="${detail.auctionStatusIdx == 3}">마감</span> <span
-													class="badge bg-danger"
-													th:if="${detail.auctionStatusIdx == 4}">유찰</span> <span
-													class="badge bg-dark"
-													th:if="${detail.auctionStatusIdx == 5}">취소</span> <span
-													class="badge bg-dark"
-													th:if="${detail.auctionStatusIdx == 6}">삭제됨</span>
+										<div class="d-flex justify-content-between align-items-center mb-2 gap-2">
+											<div class="d-flex align-items-center gap-1 flex-wrap">
+												<span class="badge bg-success" th:if="${detail.auctionStatusIdx == 1}">진행중</span>
+												<span class="badge bg-primary" th:if="${detail.auctionStatusIdx == 2}">결정대기중</span>
+												<span class="badge bg-secondary" th:if="${detail.auctionStatusIdx == 3}">마감</span>
+												<span class="badge bg-danger" th:if="${detail.auctionStatusIdx == 4}">유찰</span>
+												<span class="badge bg-dark" th:if="${detail.auctionStatusIdx == 5}">취소</span>
+												<span class="badge bg-dark" th:if="${detail.auctionStatusIdx == 6}">삭제됨</span>
 											</div>
-											<!-- JS 타이머 (1번 기준: id="realtime-timer", data-* 속성) -->
 											<span id="realtime-timer"
 												class="fw-bold text-secondary small"
 												th:data-status="${detail.auctionStatusIdx}"
 												th:data-end="${detail.auctionEndAt}"
 												th:data-deadline="${detail.auctionDecisionDeadline}">
-												[[${detail.timeDisplay}]] </span>
+												[[${detail.timeDisplay}]]
+											</span>
 										</div>
 
 										<h4 class="fw-bold mb-3" th:text="${detail.auctionTitle}"></h4>
 
-										<!-- 구매자 정보 -->
-										<div class="text-muted small mb-2">
-											구매자: <span class="fw-semibold"
-												th:text="${detail.buyerMemIdMasked}"
-												th:if="${detail.buyerMemIdMasked}"></span>
+										<div class="d-flex align-items-center justify-content-between mb-3 gap-2 flex-wrap">
+											<div class="text-muted small">
+												구매자:
+												<span class="fw-semibold" th:text="${detail.buyerMemIdMasked}" th:if="${detail.buyerMemIdMasked}"></span>
+											</div>
+											<button type="button" class="btn btn-dark btn-sm"
+												th:if="${chatroomIdx != null}"
+												th:onclick="|openChatPopup(${chatroomIdx})|">
+												<i class="bi bi-chat-dots me-1"></i> 대화하기
+											</button>
 										</div>
 
-										<!-- 카테고리 / 마감일 -->
-										<div class="text-muted small mb-1">카테고리:
-											[[${detail.itemCategoryName}]]</div>
-										<div class="text-muted small mb-3">입찰 마감:
-											[[${#temporals.format(detail.auctionEndAt, 'yyyy-MM-dd
-											HH:mm')}]] &nbsp;|&nbsp; 결정 마감:
-											[[${#temporals.format(detail.auctionDecisionDeadline,
-											'yyyy-MM-dd HH:mm')}]]</div>
-
-										<!-- 가격 -->
 										<div class="mt-auto text-end">
 											<div class="text-muted small">희망 예산</div>
-											<div class="fw-bold fs-5">
-												[[${#numbers.formatInteger(detail.auctionTargetPrice, 0,
-												'COMMA')}]]원</div>
-											<div class="text-muted small">현재 최저가</div>
-											<div class="fw-bold text-danger fs-5">
-												<span
-													th:text="${detail.minBidPrice == 0 ? '제안없음' : #numbers.formatInteger(detail.minBidPrice, 0, 'COMMA') + '원'}"></span>
+											<div class="fw-bold" style="font-size: 1.75rem; line-height: 1.1;">
+												[[${#numbers.formatInteger(detail.auctionTargetPrice, 0, 'COMMA')}]]원
+											</div>
+											<div class="text-muted small mt-2">현재 최저가</div>
+											<div class="fw-bold text-danger" style="font-size: 1.65rem; line-height: 1.1;">
+												<span th:text="${detail.minBidPrice == null or detail.minBidPrice == 0 ? '-' : #numbers.formatInteger(detail.minBidPrice, 0, 'COMMA') + '원'}"></span>
 											</div>
 										</div>
-
 									</div>
 								</div>
 

@@ -120,15 +120,19 @@ public class AuctionService {
 	
 	// 시간 포맷 편의 메서드(경매 데이터 가공 메서드)
 	private String formatDuration(Duration d) {
-		long days = d.toDays();
-	    long h = d.toHoursPart();
-	    long m = d.toMinutesPart();
-	    long s = d.toSecondsPart();
+		long totalSeconds = Math.max(0, d.getSeconds());
+	    long days = totalSeconds / 86400;
+	    long hours = (totalSeconds % 86400) / 3600;
+	    long minutes = (totalSeconds % 3600) / 60;
+	    long seconds = totalSeconds % 60;
 
-	    if (days > 0) {
-	        return String.format("%d일 %d시간 %d분", days, h, m);
+	    if (days >= 1) {
+	        return String.format("%d일 %d시간", days, hours);
 	    }
-	    return String.format("%02d:%02d:%02d", h, m, s);
+	    if (hours >= 1) {
+	        return String.format("%d시간 %d분", hours, minutes);
+	    }
+	    return String.format("%02d:%02d", minutes, seconds);
 	}
 	
 	// 경매 등록 (구매 요청)

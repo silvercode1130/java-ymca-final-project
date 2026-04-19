@@ -79,8 +79,8 @@
 
 							<!-- 최저 입찰가 -->
 							<div class="text-right font-semibold"
-								th:classappend="${auction.minBidPrice == 0} ? ' text-gray-500' : ' text-[#7CBD00]'"
-								th:text="${auction.minBidPrice == 0 ? '입찰 없음' : #numbers.formatInteger(auction.minBidPrice, 0, 'COMMA') + '원'}">
+								th:classappend="${auction.minBidPrice == null or auction.minBidPrice == 0} ? ' text-gray-500' : ' text-[#7CBD00]'"
+								th:text="${auction.minBidPrice == null or auction.minBidPrice == 0 ? '-' : #numbers.formatInteger(auction.minBidPrice, 0, 'COMMA') + '원'}">
 							</div>
 
 							<!-- 상태 -->
@@ -154,8 +154,8 @@
 								<div>
 									<div class="text-gray-400">최저 입찰가</div>
 									<div class="font-semibold"
-										th:classappend="${auction.minBidPrice == 0} ? ' text-gray-500' : ' text-[#7CBD00]'"
-										th:text="${auction.minBidPrice == 0 ? '입찰 없음' : #numbers.formatInteger(auction.minBidPrice, 0, 'COMMA') + '원'}"></div>
+										th:classappend="${auction.minBidPrice == null or auction.minBidPrice == 0} ? ' text-gray-500' : ' text-[#7CBD00]'"
+										th:text="${auction.minBidPrice == null or auction.minBidPrice == 0 ? '-' : #numbers.formatInteger(auction.minBidPrice, 0, 'COMMA') + '원'}"></div>
 								</div>
 								<div>
 									<div class="text-gray-400">입찰 수</div>

@@ -8,7 +8,7 @@
 </head>
 <body>
 <th:block layout:fragment="content">
-  <section class="max-w-5xl mx-auto px-4 py-6 md:py-8">
+  <section class="max-w-7xl mx-auto px-4 py-6 md:py-8">
     <div class="mb-4 md:mb-6">
       <a th:if="${profileBackUrl != null}" th:href="${profileBackUrl}"
          class="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900">
@@ -44,10 +44,12 @@
 
         <div class="flex-1 w-full">
           <div class="flex flex-wrap items-center gap-2 mb-2">
+            <img th:if="${profile.gradeName != null and profile.gradeName != '' and #strings.toLowerCase(profile.gradeName) != 'basic'}"
+                 th:src="@{'/images/common/icon_' + ${#strings.toLowerCase(profile.gradeName)} + '.png'}"
+                 alt="grade"
+                 class="w-5 h-5 object-contain">
             <h2 class="text-lg md:text-xl font-semibold text-gray-900"
-                th:text="${profile.memNickname != null and profile.memNickname != '' ? profile.memNickname : profile.memId}">닉네임</h2>
-            <span class="inline-flex items-center rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700 border border-emerald-200"
-                  th:text="${profile.gradeName != null ? profile.gradeName : '기본'}">기본</span>
+                th:text="${profile.memNickname != null and profile.memNickname != '' ? profile.memNickname : profile.maskedMemId}">닉네임</h2>
           </div>
 
           <p class="text-sm md:text-base text-gray-600 leading-relaxed min-h-[2.25rem]"

@@ -77,6 +77,41 @@ function _escapeHtml(value) {
         .replace(/'/g, '&#39;');
 }
 
+function _pushPendingToast(payload) {
+    try {
+        const key = 'pickq_pending_toasts';
+        const existing = sessionStorage.getItem(key);
+        const list = existing ? JSON.parse(existing) : [];
+        list.push(payload);
+        sessionStorage.setItem(key, JSON.stringify(list));
+    } catch (e) {
+        // storage 사용 불가 시 무시
+    }
+}
+
+function _flushPendingToasts() {
+    try {
+        const key = 'pickq_pending_toasts';
+        const existing = sessionStorage.getItem(key);
+        if (!existing) return;
+
+        sessionStorage.removeItem(key);
+        const list = JSON.parse(existing);
+        if (!Array.isArray(list) || list.length === 0) return;
+
+        list.forEach((item) => {
+            if (!item || !item.type) return;
+            if (item.type === 'notification') {
+                showNotificationToast(item.title || '새 알림', item.message || '', item.targetUrl || '/notifications', true);
+            } else if (item.type === 'chat') {
+                showChatToast(item.senderName || '새 메시지', item.message || '', item.chatroomIdx, true);
+            }
+        });
+    } catch (e) {
+        // 파싱 실패 시 무시
+    }
+}
+
 // ── 일반 토스트 (성공/에러/정보) ──
 function showToast(message, type, onClick) {
     const styles = {
@@ -100,7 +135,7 @@ function showToast(message, type, onClick) {
 }
 
 // ── 알림 토스트 (벨 알림, 클릭 시 알림창 이동) ──
-function showNotificationToast(title, message, targetUrl) {
+function showNotificationToast(title, message, targetUrl, disableClick) {
     _createToast(
         `<div style="display:flex;align-items:center;gap:6px;">
             <span style="font-size:15px;">🔔</span>
@@ -111,12 +146,20 @@ function showNotificationToast(title, message, targetUrl) {
             ${_escapeHtml(message)}
         </div>`,
         '#ffffff', '#7CBD00',
-        () => { window.location.href = targetUrl || '/notifications'; }
+        disableClick ? null : () => {
+            _pushPendingToast({
+                type: 'notification',
+                title: title,
+                message: message,
+                targetUrl: targetUrl || '/notifications'
+            });
+            window.location.href = targetUrl || '/notifications';
+        }
     );
 }
 
 // ── 채팅 토스트 (카카오 스타일, 클릭 시 채팅창 이동) ──
-function showChatToast(senderName, message, chatroomIdx) {
+function showChatToast(senderName, message, chatroomIdx, disableClick) {
     _createToast(
         `<div style="display:flex;align-items:center;gap:6px;color:#3C1E1E;">
             <span style="font-size:15px;">💬</span>
@@ -127,7 +170,13 @@ function showChatToast(senderName, message, chatroomIdx) {
             ${_escapeHtml(message)}
         </div>`,
         '#FEE500', '#3C1E1E',
-        () => {
+        disableClick ? null : () => {
+            _pushPendingToast({
+                type: 'chat',
+                senderName: senderName,
+                message: message,
+                chatroomIdx: chatroomIdx
+            });
             if (chatroomIdx) {
                 window.open(
                     '/chats/' + chatroomIdx,
@@ -147,6 +196,8 @@ function showChatToast(senderName, message, chatroomIdx) {
     window.addEventListener('pageshow', function (event) {
         // 뒤로가기면 무조건 아무것도 안 함
         if (event.persisted) return;
+
+        _flushPendingToasts();
 
         var successEl = document.getElementById('toast-success');
         var errorEl   = document.getElementById('toast-error');

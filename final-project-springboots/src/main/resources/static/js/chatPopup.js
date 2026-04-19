@@ -201,8 +201,10 @@
         listEl.innerHTML = state.rooms.map((room) => {
             const active = room.chatroomIdx === state.selectedRoomId;
             const activeClass = active ? "bg-gray-100 border-l-4 border-l-[#7CBD00]" : "hover:bg-gray-50";
-            const dot = room.unreadCount > 0
-                ? '<span class="w-2 h-2 bg-red-500 rounded-full"></span>'
+            const unreadBadge = room.unreadCount > 0
+                ? '<span class="inline-flex min-w-5 h-5 px-1 items-center justify-center rounded-full bg-red-500 text-white text-[10px] font-semibold">'
+                    + (room.unreadCount > 99 ? "99+" : String(room.unreadCount))
+                    + '</span>'
                 : "";
 
             return (
@@ -212,7 +214,7 @@
                 + '    <p class="text-sm font-semibold text-gray-800 truncate">' + escapeHtml(room.opponentName) + '</p>'
                 + '    <p class="text-xs text-gray-500 truncate">' + escapeHtml(room.lastMessage || "대화를 시작해보세요") + '</p>'
                 + '  </div>'
-                + '  <div class="shrink-0">' + dot + '</div>'
+                + '  <div class="shrink-0">' + unreadBadge + '</div>'
                 + '</button>'
             );
         }).join("");

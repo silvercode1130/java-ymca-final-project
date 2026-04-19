@@ -115,8 +115,8 @@ function initDetailTimer() {
 
         let target = null;
         let prefix = '';
-        if (status === 1)      { target = endTime;  prefix = '입찰 마감까지 '; }
-        else if (status === 2) { target = deadline; prefix = '결정 마감까지 '; }
+        if (status === 1)      { target = endTime;  prefix = '입찰 '; }
+        else if (status === 2) { target = deadline; prefix = '결정 '; }
         else { timerEl.innerText = ''; return; }
 
         if (!target || isNaN(target.getTime())) { timerEl.innerText = ''; return; }
@@ -131,14 +131,20 @@ function initDetailTimer() {
             return;
         }
 
-        const d = Math.floor(diff / 86400000);
-        const h = Math.floor((diff / 3600000) % 24);
-        const m = Math.floor((diff / 60000)   % 60);
-        const s = Math.floor((diff / 1000)    % 60);
+        const totalSeconds = Math.floor(diff / 1000);
+        const d = Math.floor(totalSeconds / 86400);
+        const h = Math.floor((totalSeconds % 86400) / 3600);
+        const m = Math.floor((totalSeconds % 3600) / 60);
+        const s = totalSeconds % 60;
 
         let str = prefix;
-        if (d > 0) str += d + '일 ';
-        str += pad(h) + ':' + pad(m) + ':' + pad(s);
+        if (d >= 1) {
+            str += d + '일 ' + h + '시간';
+        } else if (h >= 1) {
+            str += h + '시간 ' + m + '분';
+        } else {
+            str += pad(m) + ':' + pad(s);
+        }
         if (timerEl.innerText !== str) timerEl.innerText = str;
     }
 

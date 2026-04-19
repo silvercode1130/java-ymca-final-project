@@ -10,6 +10,8 @@
 <main layout:fragment="content">
 
     <div class="bg-white border border-gray-100 rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.03)] overflow-hidden">
+        <span th:if="${successMessage}" id="toast-success" th:data-msg="${successMessage}"></span>
+        <span th:if="${errorMessage}" id="toast-error" th:data-msg="${errorMessage}"></span>
         <div class="px-6 py-5 border-b border-gray-100">
             <div class="flex items-center justify-between gap-3">
                 <h2 class="text-lg sm:text-xl font-semibold text-[#222222]">거래 상세</h2>
@@ -22,9 +24,7 @@
         </div>
 
         <div class="px-6 py-6 space-y-6">
-            <div th:if="${successMessage}" class="px-4 py-3 rounded-lg bg-[#ECFDF3] text-[#0F766E] text-sm" th:text="${successMessage}"></div>
             <div th:if="${warningMessage}" class="px-4 py-3 rounded-lg bg-[#FFF7ED] text-[#9A3412] text-sm" th:text="${warningMessage}"></div>
-            <div th:if="${errorMessage}" class="px-4 py-3 rounded-lg bg-[#FEF2F2] text-[#B91C1C] text-sm" th:text="${errorMessage}"></div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                 <div>
