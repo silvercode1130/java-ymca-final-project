@@ -44,7 +44,7 @@
 
         <div class="flex-1 w-full">
           <div class="flex flex-wrap items-center gap-2 mb-2">
-            <img th:if="${profile.gradeName != null and profile.gradeName != '' and #strings.toLowerCase(profile.gradeName) != 'basic'}"
+              <img th:if="${profile.gradeName != null and profile.gradeName != '' and #strings.toLowerCase(profile.gradeName) != 'basic' and #strings.toLowerCase(profile.gradeName) != 'normal'}"
                  th:src="@{'/images/common/icon_' + ${#strings.toLowerCase(profile.gradeName)} + '.png'}"
                  alt="grade"
                  class="w-5 h-5 object-contain">

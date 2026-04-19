@@ -19,12 +19,60 @@
 	background: #e8f5e9;
 	border-left: 4px solid #7CBD00;
 }
+
+.auction-state-shell {
+	position: relative;
+}
+
+.auction-state-shell.is-inactive .card {
+	filter: grayscale(0.18);
+	opacity: 0.92;
+}
+
+.auction-terminal-locked {
+	pointer-events: none;
+	user-select: none;
+}
+
+.auction-terminal-locked .card {
+	filter: grayscale(0.45);
+	opacity: 0.75;
+}
+
+.auction-state-overlay {
+	position: absolute;
+	inset: 0;
+	border-radius: 14px;
+	background: linear-gradient(180deg, rgba(248, 249, 250, 0.22), rgba(173, 181, 189, 0.22));
+	backdrop-filter: grayscale(18%);
+	pointer-events: none;
+	display: flex;
+	align-items: flex-start;
+	justify-content: center;
+	padding-top: 12px;
+	z-index: 8;
+}
+
+.auction-state-pill {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	padding: 6px 12px;
+	border-radius: 999px;
+	background: rgba(52, 58, 64, 0.82);
+	color: #fff;
+	font-size: 12px;
+	font-weight: 600;
+	letter-spacing: 0.01em;
+	box-shadow: 0 6px 14px rgba(0, 0, 0, 0.18);
+}
 </style>
 </head>
 <body>
 	<th:block layout:fragment="content">
 
-		<div class="container mx-auto px-4 py-6">
+		<div class="container mx-auto px-4 py-6" id="auction-page-root"
+			th:attr="data-auction-idx=${detail.auctionIdx},data-page-type='auction-detail',data-auction-status=${detail.auctionStatusIdx}">
 
 			<!-- 브레드크럼 -->
 			<div class="mb-4 flex items-center gap-2 text-xs sm:text-sm text-gray-600">
@@ -37,7 +85,10 @@
 				<span class="text-gray-900">경매 상세</span>
 			</div>
 
-			<div class="row g-4">
+			<div class="auction-state-shell"
+				th:classappend="${detail.auctionStatusIdx != 1} ? ' is-inactive' : ''">
+				<div class="row g-4"
+					th:classappend="${detail.auctionStatusIdx >= 3} ? ' auction-terminal-locked' : ''">
 
 				<!-- ═══════════════════════════════
            LEFT: mode에 따라 경매상세 or 입찰상세
@@ -556,6 +607,18 @@
 				</div>
 				<!-- /RIGHT -->
 
+				</div>
+
+				<div class="auction-state-overlay" th:if="${detail.auctionStatusIdx != 1}">
+					<div class="auction-state-pill" th:switch="${detail.auctionStatusIdx}">
+						<span th:case="2">결정 대기중 경매</span>
+						<span th:case="3">마감된 경매</span>
+						<span th:case="4">유찰된 경매</span>
+						<span th:case="5">취소된 경매</span>
+						<span th:case="6">삭제된 경매</span>
+						<span th:case="*">진행이 종료된 경매</span>
+					</div>
+				</div>
 			</div>
 		</div>
 

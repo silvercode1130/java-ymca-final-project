@@ -289,6 +289,8 @@ public class AuctionController {
             HttpSession session, Model model,
             RedirectAttributes ra) {
 
+        auctionService.updateExpiredAuctions();
+
         MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
         if (loginUser == null) {
 
@@ -328,6 +330,8 @@ public class AuctionController {
             @RequestParam(value = "bidImageFile", required = false) MultipartFile bidImageFile,
             HttpSession session,
             RedirectAttributes ra) {
+        auctionService.updateExpiredAuctions();
+
         MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
         if (loginUser == null) {
             session.setAttribute("loginRedirectUrl", "/auctions/" + auctionIdx);
