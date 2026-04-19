@@ -9,7 +9,7 @@
 	    SELECT *
 		    FROM bid_list_view
 		    WHERE auction_idx = #{auctionIdx}
-		      AND bid_status_idx != 5
+		      AND bid_status_idx IN (1, 2, 3)  <!-- 진행중, 낙찰, 실패만 조회 -->
 		    ORDER BY bid_price ASC
 	</select>
 	
@@ -23,10 +23,11 @@
 	<!-- 입찰 삭제 - 소프트 딜리트 -->
 	<update id="softDeleteBid">
 	    UPDATE bid
-		    SET bid_status_idx = 5,
+		    SET bid_status_idx = 4,
 		        bid_moddate = NOW()
 		    WHERE bid_idx = #{bidIdx}
 		      AND bidder_idx = #{bidderIdx}
+		      AND bid_status_idx = 1
 	</update>
 	
 	<!-- 입찰 삭제 - 관리자 (bidder_idx 조건 없음) -->

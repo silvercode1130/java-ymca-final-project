@@ -449,17 +449,18 @@ public class AuctionController {
         try {
             bidService.deleteBid(bidIdx, loginUser.getMemIdx());
             ra.addFlashAttribute("successMessage", "입찰이 취소되었습니다.");
+
+            NotificationVO cancelNoti = new NotificationVO();
+            cancelNoti.setReceiverIdx(loginUser.getMemIdx());
+            cancelNoti.setNotificationType("BID_CANCELED");
+            cancelNoti.setNotificationTitle("입찰이 취소되었습니다");
+            cancelNoti.setNotificationMessage("입찰 제안이 취소되었습니다.");
+            cancelNoti.setTargetUrl("/auctions/" + auctionIdx);
+            notificationService.sendNotification(cancelNoti);
         } catch (IllegalArgumentException e) {
             ra.addFlashAttribute("bidError", e.getMessage());
+            return "redirect:/auctions/" + auctionIdx;
         }
-        
-        NotificationVO cancelNoti = new NotificationVO();
-        cancelNoti.setReceiverIdx(loginUser.getMemIdx());
-        cancelNoti.setNotificationType("BID_CANCELED");
-        cancelNoti.setNotificationTitle("입찰이 취소되었습니다");
-        cancelNoti.setNotificationMessage("입찰 제안이 취소되었습니다.");
-        cancelNoti.setTargetUrl("/auctions/" + auctionIdx);
-        notificationService.sendNotification(cancelNoti);
         
         return "redirect:/auctions/" + auctionIdx;
     }
@@ -516,7 +517,7 @@ public class AuctionController {
             winnerBid = bidService.findBidById(bidIdx);
             ordersService.createOrderOnWinner(auction, winnerBid);
             auctionService.updateAuctionStatus(auctionIdx, 3);
-            ra.addFlashAttribute("successMessage", "낙찰 처리가 완료되었습니다");
+            ra.addFlashAttribute("successMessage", "낙찰자가 선정되었습니다.\n24시간 내에 결제를 완료해주세요.\n미결제 시 패널티가 부여됩니다.");
         } catch (IllegalArgumentException e) {
             ra.addFlashAttribute("bidError", e.getMessage());
         } catch (Exception e) {
@@ -524,19 +525,25 @@ public class AuctionController {
             ra.addFlashAttribute("bidError", "낙찰 처리 중 오류가 발생했습니다. 다시 시도해주세요.");
         }
 
-	     // 변경 — notifyWinnerSelectedToBidder 내부가 sendAndPush라서 1번만 호출하면 됨
-	     // 판매자에게만 WebSocket 실시간 알림 (1번만)
-	     if (winnerBid != null) {
-	         notificationService.notifyWinnerSelectedToBidder(auctionIdx, winnerBid);
-	         // 구매자 본인은 flashAttribute 토스트가 이미 뜨므로 DB 저장만
-	         NotificationVO buyerNoti = new NotificationVO();
-	         buyerNoti.setReceiverIdx(loginUser.getMemIdx());
-	         buyerNoti.setNotificationType("WINNER_SELECTED");
-	         buyerNoti.setNotificationTitle("낙찰자 선정 완료");
-	         buyerNoti.setNotificationMessage("낙찰자를 선정했습니다. 거래를 진행하세요.");
-	         buyerNoti.setTargetUrl("/auctions/" + auctionIdx);
-	         notificationService.sendNotification(buyerNoti);
-	     }
+         // 판매자 본인은 flashAttribute 토스트가 이미 뜨므로 DB 저장만
+         if (winnerBid != null) {
+             notificationService.notifyWinnerSelectedToBidder(auctionIdx, winnerBid);
+             notificationService.notifyAuctionStatusChangedToBidders(
+                 auction,
+                 "AUCTION_WINNER_SELECTED",
+                 "낙찰자 선정",
+                 "다른 입찰자가 낙찰자로 선정되어 경매가 종료되었습니다.",
+                 winnerBid.getBidderIdx()
+             );
+
+             NotificationVO buyerNoti = new NotificationVO();
+             buyerNoti.setReceiverIdx(loginUser.getMemIdx());
+             buyerNoti.setNotificationType("WINNER_SELECTED");
+             buyerNoti.setNotificationTitle("낙찰자 선정 완료");
+             buyerNoti.setNotificationMessage("낙찰자를 선정했습니다. 거래를 진행하세요.");
+             buyerNoti.setTargetUrl("/auctions/" + auctionIdx);
+             notificationService.sendNotification(buyerNoti);
+         }
         
         return "redirect:/mypage/orders";
     }

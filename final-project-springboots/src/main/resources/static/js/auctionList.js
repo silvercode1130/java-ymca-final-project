@@ -16,13 +16,19 @@ function updateTimer() {
                 needsReload  = true;
                 return;
             }
-            const d = Math.floor(diff / 86400000);
-            const h = Math.floor((diff / 3600000) % 24);
-            const m = Math.floor((diff / 60000)   % 60);
-            const s = Math.floor((diff / 1000)    % 60);
-            let str = '입찰 ';
-            if (d > 0) str += d + '일 ';
-            str += pad(h) + ':' + pad(m) + ':' + pad(s);
+            const totalSeconds = Math.floor(diff / 1000);
+            const d = Math.floor(totalSeconds / 86400);
+            const h = Math.floor((totalSeconds % 86400) / 3600);
+            const m = Math.floor((totalSeconds % 3600) / 60);
+            const s = totalSeconds % 60;
+            let str = '';
+            if (d >= 1) {
+                str += d + '일 ' + h + '시간';
+            } else if (h >= 1) {
+                str += h + '시간 ' + m + '분';
+            } else {
+                str += pad(m) + ':' + pad(s);
+            }
             if (el.innerText !== str) el.innerText = str;
         }
         // 결정대기(2): 결정마감 카운트
@@ -33,13 +39,19 @@ function updateTimer() {
                 needsReload  = true;
                 return;
             }
-            const d = Math.floor(diff / 86400000);
-            const h = Math.floor((diff / 3600000) % 24);
-            const m = Math.floor((diff / 60000)   % 60);
-            const s = Math.floor((diff / 1000)    % 60);
+            const totalSeconds = Math.floor(diff / 1000);
+            const d = Math.floor(totalSeconds / 86400);
+            const h = Math.floor((totalSeconds % 86400) / 3600);
+            const m = Math.floor((totalSeconds % 3600) / 60);
+            const s = totalSeconds % 60;
             let str = '결정 ';
-            if (d > 0) str += d + '일 ';
-            str += pad(h) + ':' + pad(m) + ':' + pad(s);
+            if (d >= 1) {
+                str += d + '일 ' + h + '시간';
+            } else if (h >= 1) {
+                str += h + '시간 ' + m + '분';
+            } else {
+                str += pad(m) + ':' + pad(s);
+            }
             if (el.innerText !== str) el.innerText = str;
         }
         // 그 외는 표시 없음

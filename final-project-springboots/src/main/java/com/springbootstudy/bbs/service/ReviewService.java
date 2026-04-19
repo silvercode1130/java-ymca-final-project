@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.springbootstudy.bbs.domain.ReviewVO;
+import com.springbootstudy.bbs.dto.ProfileReviewDTO;
+import com.springbootstudy.bbs.dto.ProfileReviewDetailDTO;
 import com.springbootstudy.bbs.mapper.ReviewMapper;
 
 @Service
@@ -23,6 +25,11 @@ public class ReviewService {
 	// 내가 받은 리뷰 조회
 	public List<ReviewVO> getReceivedReviews(Long memIdx) {
 		return reviewMapper.getReceivedReviews(memIdx);   
+	}
+
+	// 프로필 화면용 받은 리뷰 목록
+	public List<ProfileReviewDTO> getReceivedReviewsForProfile(Long memIdx) {
+		return reviewMapper.getReceivedReviewsForProfile(memIdx);
 	}
 	
 	// 내가 받은 리뷰 별점 평균
@@ -53,6 +60,11 @@ public class ReviewService {
 	// 리뷰 상세보기
 	public ReviewVO getReviewDetail(Long reviewIdx) {
 	    return reviewMapper.getReviewDetail(reviewIdx);
+	}
+
+	// 프로필 화면에서 진입하는 리뷰 상세보기
+	public ProfileReviewDetailDTO getProfileReviewDetail(Long reviewIdx) {
+		return reviewMapper.getProfileReviewDetail(reviewIdx);
 	}
 	
 	// 리뷰 임시삭제하기

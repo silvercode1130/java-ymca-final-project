@@ -10,6 +10,8 @@
 <main layout:fragment="content">
 
     <div class="bg-white border border-gray-100 rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.03)] overflow-hidden">
+        <span th:if="${successMessage}" id="toast-success" th:data-msg="${successMessage}"></span>
+        <span th:if="${errorMessage}" id="toast-error" th:data-msg="${errorMessage}"></span>
         <div class="px-6 py-5 border-b border-gray-100">
             <div class="flex items-center justify-between gap-3">
                 <h2 class="text-lg sm:text-xl font-semibold text-[#222222]">거래 상세</h2>
@@ -22,9 +24,7 @@
         </div>
 
         <div class="px-6 py-6 space-y-6">
-            <div th:if="${successMessage}" class="px-4 py-3 rounded-lg bg-[#ECFDF3] text-[#0F766E] text-sm" th:text="${successMessage}"></div>
             <div th:if="${warningMessage}" class="px-4 py-3 rounded-lg bg-[#FFF7ED] text-[#9A3412] text-sm" th:text="${warningMessage}"></div>
-            <div th:if="${errorMessage}" class="px-4 py-3 rounded-lg bg-[#FEF2F2] text-[#B91C1C] text-sm" th:text="${errorMessage}"></div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                 <div>
@@ -57,6 +57,28 @@
                     <p class="text-gray-400 text-xs">배송 상태</p>
                     <p class="mt-1 text-[#222222]" th:text="${order.shippingStatusName}">배송전</p>
                 </div>
+                <div>
+                    <p class="text-gray-400 text-xs">택배사</p>
+                    <p class="mt-1 text-[#222222]" th:text="${order.courierCompany != null ? order.courierCompany : '-'}">-</p>
+                </div>
+                <div>
+                    <p class="text-gray-400 text-xs">운송장번호</p>
+                    <p class="mt-1 text-[#222222]" th:text="${order.trackingNumber != null ? order.trackingNumber : '-'}">-</p>
+                </div>
+            </div>
+
+            <div class="border-t border-gray-100 pt-4">
+                <h3 class="text-sm font-semibold text-[#222222] mb-2">거래 상대 정보</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                    <div>
+                        <p class="text-gray-400 text-xs">구매자</p>
+                        <p class="mt-1 font-semibold text-[#222222]" th:text="${order.buyerMemIdMasked}">buyer**</p>
+                    </div>
+                    <div>
+                        <p class="text-gray-400 text-xs">판매자</p>
+                        <p class="mt-1 font-semibold text-[#222222]" th:text="${order.sellerMemIdMasked}">seller**</p>
+                    </div>
+                </div>
             </div>
 
             <div class="border-t border-gray-100 pt-4">
@@ -65,7 +87,7 @@
                     <div>주문 생성: <span th:text="${order.orderRegdate != null ? #temporals.format(order.orderRegdate, 'yyyy-MM-dd HH:mm') : '-'}">-</span></div>
                     <div>결제 완료: <span th:text="${order.paidAt != null ? #temporals.format(order.paidAt, 'yyyy-MM-dd HH:mm') : '-'}">-</span></div>
                     <div>배송 시작: <span th:text="${order.shippedAt != null ? #temporals.format(order.shippedAt, 'yyyy-MM-dd HH:mm') : '-'}">-</span></div>
-                    <div>구매 확정: <span th:text="${order.confirmedAt != null ? #temporals.format(order.confirmedAt, 'yyyy-MM-dd HH:mm') : '-'}">-</span></div>
+                    <div>구매확정: <span th:text="${order.confirmedAt != null ? #temporals.format(order.confirmedAt, 'yyyy-MM-dd HH:mm') : '-'}">-</span></div>
                 </div>
             </div>
 
@@ -78,9 +100,16 @@
                       th:action="@{/mypage/orders/{orderIdx}/confirm(orderIdx=${order.orderIdx})}" method="post" class="m-0">
                     <button type="submit"
                             class="px-3 py-1.5 rounded-lg bg-[#7CBD00] text-white text-xs font-semibold hover:bg-[#6AA500]">
-                        배송확정
+                        구매확정
                     </button>
                 </form>
+
+                <a th:if="${order.userRole == 'BUYER' and order.orderStatusCode == 'CONFIRMED' and order.reviewIdx == null}"
+                   th:href="@{/mypage/reviews/reviewWrite(auctionIdx=${order.auctionIdx}, bidIdx=${order.bidIdx}, bidderIdx=${order.sellerIdx})}"
+                   class="px-3 py-1.5 rounded-lg bg-[#222222] text-white text-xs font-semibold hover:bg-[#444444]">리뷰 작성하기</a>
+
+                <span th:if="${order.userRole == 'BUYER' and order.orderStatusCode == 'CONFIRMED' and order.reviewIdx != null}"
+                      class="px-3 py-1.5 rounded-lg bg-gray-100 text-gray-600 text-xs font-semibold">리뷰 작성 완료</span>
 
                     <!-- 판매자 취소는 결제완료 + 배송 시작 전에서만 허용 (배송 이후 임의취소 금지). -->
                     <form th:if="${order.userRole == 'SELLER' and order.orderStatusCode == 'PAID' and order.shippingStatusCode != 'SHIPPING'}"

@@ -11,7 +11,11 @@
 
 		<div
 			class="bg-white border border-gray-100 rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.03)] overflow-hidden">
-
+			
+			<!-- 토스트 메시지 -->
+			<span th:if="${successMessage}" id="toast-success" th:data-msg="${successMessage}"></span>
+			<span th:if="${errorMessage}" id="toast-error" th:data-msg="${errorMessage}"></span>
+			
 			<!-- 헤더 -->
 			<div class="px-6 py-5 border-b border-gray-100">
 				<h2 class="text-lg sm:text-xl font-semibold text-[#222222]"
@@ -58,13 +62,13 @@
 										th:text="${'낙찰 상품: ' + order.itemName}">낙찰 상품: 상품명</span>
 								</div>
 								<div class="mt-1 text-[11px] text-[#999999]" th:if="${order.userRole == 'BUYER'}">
-									판매자 <span th:text="${order.sellerNickname}">seller123</span>
+									판매자 <span th:text="${order.sellerMemIdMasked}">seller123</span>
 								</div>
 								<div class="mt-1 text-[11px] text-[#999999]" th:if="${order.userRole == 'SELLER'}">
-									구매자 <span th:text="${order.buyerNickname}">buyer123</span>
+									구매자 <span th:text="${order.buyerMemIdMasked}">buyer123</span>
 								</div>
 								<div class="mt-1 text-[11px] text-[#999999]" th:if="${order.userRole == 'BOTH'}">
-									상대방 <span th:text="${order.sellerNickname}">user123</span>
+									상대방 <span th:text="${order.sellerMemIdMasked}">user123</span>
 								</div>
 							</div>
 
@@ -103,6 +107,16 @@
 									th:text="${order.shippingStatusName}">배송전</div>
 							</div>
 							<div>
+								<div class="text-[#9ca3af]">택배사</div>
+								<div class="mt-0.5 text-[#222222]"
+									th:text="${order.courierCompany != null ? order.courierCompany : '-'}">-</div>
+							</div>
+							<div>
+								<div class="text-[#9ca3af]">운송장번호</div>
+								<div class="mt-0.5 text-[#222222]"
+									th:text="${order.trackingNumber != null ? order.trackingNumber : '-'}">-</div>
+							</div>
+							<div>
 								<div class="text-[#9ca3af]">주문일</div>
 								<div class="mt-0.5 text-[#222222]"
 									th:text="${#temporals.format(order.orderRegdate, 'yyyy-MM-dd')}">
@@ -126,7 +140,7 @@
 								th:onclick="|event.stopPropagation(); location.href='/mypage/sales'|">
 								배송시작</button>
 
-							<!-- 배송중일 때만 배송확정 버튼 -->
+							<!-- 배송중일 때만 구매확정 버튼 -->
 							<form class="m-0"
 								th:if="${order.userRole == 'BUYER' and order.shippingStatusCode == 'SHIPPING'}"
 								th:action="@{/mypage/orders/{orderIdx}/confirm(orderIdx=${order.orderIdx})}"
@@ -134,8 +148,18 @@
 								onclick="event.stopPropagation();">
 								<button type="submit"
 									class="px-3 py-1.5 rounded-lg bg-[#7CBD00] text-white text-[11px] sm:text-xs font-semibold hover:bg-[#6AA500]">
-									배송확정</button>
+									구매확정</button>
 							</form>
+
+							<a th:if="${order.userRole == 'BUYER' and order.orderStatusCode == 'CONFIRMED' and order.reviewIdx == null}"
+								th:href="@{/mypage/reviews/reviewWrite(auctionIdx=${order.auctionIdx}, bidIdx=${order.bidIdx}, bidderIdx=${order.sellerIdx})}"
+								class="px-3 py-1.5 rounded-lg bg-[#222222] text-white text-[11px] sm:text-xs font-semibold hover:bg-[#444444]"
+								onclick="event.stopPropagation();">
+								리뷰 작성하기</a>
+
+							<span th:if="${order.userRole == 'BUYER' and order.orderStatusCode == 'CONFIRMED' and order.reviewIdx != null}"
+								class="px-3 py-1.5 rounded-lg bg-gray-100 text-gray-600 text-[11px] sm:text-xs font-semibold">
+								리뷰 작성 완료</span>
 
 							<!-- 항상 노출되는 상세보기 (원하면 생략 가능) -->
 							<button type="button"

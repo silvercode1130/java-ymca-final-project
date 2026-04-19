@@ -26,8 +26,15 @@ public class OrdersListDTO {
 
     private String auctionTitle;
     private String itemName;
+    private String buyerMemId;
+    private String buyerMemIdMasked;
+    private String sellerMemId;
+    private String sellerMemIdMasked;
     private String buyerNickname;
     private String sellerNickname;
+    private String courierCompany;
+    private String trackingNumber;
+    private Long reviewIdx;
 
     private String paymentStatusCode;
     private String paymentStatusName;

@@ -6,6 +6,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>PickQ - 마이페이지</title>
 
+<!-- Pretendard -->
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+
+<!-- 공통 CSS -->
+<link rel="stylesheet" th:href="@{/css/common.css}">
+
+<!-- favicon -->
+<link rel="shortcut icon" href="/images/common/pickQ_favicon.ico" type="image/x-icon">
+
 <!-- Bootstrap -->
 <link th:href="@{/bootstrap/bootstrap.min.css}" rel="stylesheet">
 
@@ -22,8 +31,9 @@
 <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
 <script th:src="@{/js/notificationSocket.js}" defer></script>
 <script th:src="@{/js/chatPopup.js}" defer></script>
+<script th:src="@{/js/toast.js}"></script>
 </head>
-<body>
+<body class="font-['Pretendard']">
    <div class="container">
 
       <!-- header -->
@@ -34,10 +44,16 @@
       <!-- 공통 마이페이지 레이아웃 -->
       <div class="min-h-screen bg-white">
          <div class="mx-auto max-w-[1200px] px-4 sm:px-6 py-8">
-            <div class="mb-8">
-               <h1 class="text-2xl sm:text-3xl font-bold text-[#222222] mb-2">마이페이지</h1>
-               <p class="text-xs sm:text-sm text-[#767676]">내 정보와 활동 내역을 관리하세요</p>
-            </div>
+            <!-- 상단 헤더 -->
+				<header class="mb-4 py-3 px-3 sm:py-10">
+					<div
+						class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+						<div>
+                     <h1 class="text-3xl sm:text-4xl font-bold text-[#222222] mb-1">마이 페이지</h1>
+                     <p class="text-base text-[#767676]">내 정보와 활동 내역을 관리하세요.</p>
+						</div>
+					</div>
+				</header>
 
                <div class="flex flex-col gap-6 lg:flex-row lg:gap-8">
                <!-- 공통 사이드바 -->
@@ -45,7 +61,7 @@
                   <div
                         class="bg-white border border-gray-100 rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.03)] sticky top-24 overflow-hidden">
                         <button id="mypage-sidebar-toggle" type="button"
-                           class="lg:hidden w-full flex items-center justify-between px-4 py-3 border-b border-gray-100 text-sm font-semibold text-[#222222]"
+                           class="lg:hidden w-full flex items-center justify-between px-4 py-3 border-b border-gray-100 text-base font-semibold text-[#222222]"
                            aria-expanded="false"
                            aria-controls="mypage-sidebar-body"
                            onclick="toggleMypageSidebarAccordion()">
@@ -54,7 +70,7 @@
                               id="mypage-sidebar-icon"></i>
                         </button>
                         <div class="hidden lg:block px-4 py-3 border-b border-gray-100">
-                           <h3 class="text-sm font-semibold text-[#222222]">마이페이지 메뉴</h3>
+                           <h3 class="text-base font-semibold text-[#222222]">마이페이지 메뉴</h3>
                         </div>
                         <div id="mypage-sidebar-body"
                            class="overflow-hidden transition-[max-height] duration-300 ease-in-out max-h-0 lg:max-h-none lg:overflow-visible">
@@ -62,24 +78,24 @@
                      <!-- MY 경매 -->
                      <div class="px-4 py-3 border-b border-gray-100">
                         <h3
-                           class="text-[11px] font-semibold tracking-[0.06em] text-[#8C8F95]">MY
+                           class="text-xs font-semibold tracking-[0.06em] text-[#8C8F95]">MY
                            경매</h3>
                      </div>
                      <div class="px-2 py-2 space-y-1">
                         <a th:href="@{/mypage/auctions}"
-                           class="w-full inline-flex items-center rounded-lg px-4 py-3 text-sm font-semibold transition-colors"
+                           class="w-full inline-flex items-center rounded-lg px-4 py-3 text-base font-semibold transition-colors"
                            th:classappend="${activeMenu == 'myAuctions'} ?
                                   ' bg-gray-100 text-[#222222]' :
                                   ' text-[#767676] font-semibold hover:bg-gray-50 hover:text-[#222222]'">
                         <span>내 경매 내역</span>
 								</a> <a th:href="@{/mypage/bids}"
-                           class="w-full inline-flex items-center rounded-lg px-4 py-3 text-sm font-semibold transition-colors"
+                           class="w-full inline-flex items-center rounded-lg px-4 py-3 text-base font-semibold transition-colors"
 									th:classappend="${activeMenu == 'myBids'} ?
                                   ' bg-gray-100 text-[#222222]' :
                                                                                 ' text-[#767676] font-semibold hover:bg-gray-50 hover:text-[#222222]'">
                         <span>내 입찰 내역</span>
 								</a> <a th:href="@{/mypage/orders}"
-                           class="w-full inline-flex items-center rounded-lg px-4 py-3 text-sm font-semibold transition-colors"
+                           class="w-full inline-flex items-center rounded-lg px-4 py-3 text-base font-semibold transition-colors"
 									th:classappend="${activeMenu == 'myOrders'} ?
                                   ' bg-gray-100 text-[#222222]' :
                                                                                 ' text-[#767676] font-semibold hover:bg-gray-50 hover:text-[#222222]'">
@@ -90,24 +106,24 @@
                      <!-- MY 활동 -->
                      <div class="px-4 py-3 border-y border-gray-100 bg-gray-50 mt-1">
                         <h3
-                           class="text-[11px] font-semibold tracking-[0.06em] text-[#8C8F95]">MY
+                           class="text-xs font-semibold tracking-[0.06em] text-[#8C8F95]">MY
                            활동</h3>
                      </div>
                      <div class="px-2 py-2 space-y-1">
                         <a th:href="@{/mypage/profile}"
-                           class="w-full inline-flex items-center rounded-lg px-4 py-3 text-sm font-semibold transition-colors"
+                           class="w-full inline-flex items-center rounded-lg px-4 py-3 text-base font-semibold transition-colors"
                            th:classappend="${activeMenu == 'profile'} ?
                                   ' bg-gray-100 text-[#222222]' :
                               ' text-[#767676] font-semibold hover:bg-gray-50 hover:text-[#222222]'">
                               <span>나의 프로필</span>
                         </a> <a th:href="@{/mypage/boards}"
-                           class="w-full inline-flex items-center rounded-lg px-4 py-3 text-sm font-semibold transition-colors"
+                           class="w-full inline-flex items-center rounded-lg px-4 py-3 text-base font-semibold transition-colors"
                            th:classappend="${activeMenu == 'posts'} ?
                                   ' bg-gray-100 text-[#222222]' :
                               ' text-[#767676] font-semibold hover:bg-gray-50 hover:text-[#222222]'">
                               <span>내가 쓴 글</span>
                         </a> <a th:href="@{/mypage/reviews}"
-                           class="w-full inline-flex items-center rounded-lg px-4 py-3 text-sm font-semibold transition-colors"
+                           class="w-full inline-flex items-center rounded-lg px-4 py-3 text-base font-semibold transition-colors"
                            th:classappend="${activeMenu == 'reviews'} ?
                                   ' bg-gray-100 text-[#222222]' :
                               ' text-[#767676] font-semibold hover:bg-gray-50 hover:text-[#222222]'">
@@ -118,18 +134,18 @@
                      <!-- MY 정보 -->
                      <div class="px-4 py-3 border-y border-gray-100 bg-gray-50 mt-1">
                         <h3
-                           class="text-[11px] font-semibold tracking-[0.06em] text-[#8C8F95]">MY
+                           class="text-xs font-semibold tracking-[0.06em] text-[#8C8F95]">MY
                            정보</h3>
                      </div>
                      <div class="px-2 py-2 space-y-1 mb-2">
                         <a th:href="@{/mypage/info}"
-                           class="w-full inline-flex items-center rounded-lg px-4 py-3 text-sm font-semibold transition-colors"
+                           class="w-full inline-flex items-center rounded-lg px-4 py-3 text-base font-semibold transition-colors"
                            th:classappend="${activeMenu == 'member'} ?
                                   ' bg-gray-100 text-[#222222]' :
                               ' text-[#767676] font-semibold hover:bg-gray-50 hover:text-[#222222]'">
                               <span>개인정보확인/수정</span>
                         </a> <a th:href="@{/mypage/addresses}"
-                           class="w-full inline-flex items-center rounded-lg px-4 py-3 text-sm font-semibold transition-colors"
+                           class="w-full inline-flex items-center rounded-lg px-4 py-3 text-base font-semibold transition-colors"
                            th:classappend="${activeMenu == 'address'} ?
                                   ' bg-gray-100 text-[#222222]' :
                               ' text-[#767676] font-semibold hover:bg-gray-50 hover:text-[#222222]'">
@@ -140,7 +156,7 @@
                         form 추가 및 a 태그의 href 제거 했습니다!
                         확인 결과 탈퇴처리 잘 됩니다! -->
                         <form id="delete-form" th:action="@{/mypage/delete}" method="post" style="display: none;"></form>
-                           <a class="w-full inline-flex items-center rounded-lg px-4 py-3 text-sm font-semibold transition-colors"
+                           <a class="w-full inline-flex items-center rounded-lg px-4 py-3 text-base font-semibold transition-colors"
                               th:classappend="${activeMenu == 'delete'} ? ' bg-[#FFF5F5] text-[#D64545]' : ' text-[#D64545] font-semibold hover:bg-[#FFF5F5]'"
                               onclick="if(confirm('정말 탈퇴하시겠습니까?')) { document.getElementById('delete-form').submit(); }">
                                  <span>회원탈퇴</span>

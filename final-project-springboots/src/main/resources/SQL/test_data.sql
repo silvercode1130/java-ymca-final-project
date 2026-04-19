@@ -9,7 +9,7 @@ INSERT INTO member (
     mem_ip, mem_role_idx, mem_grade_idx, mem_bday
 ) VALUES
 ('admin', 'admin', '관리자', '010-0000-0000', 'admin01@test.com',
- '127.0.0.1', 2, 4, '1990-01-01'),
+ '127.0.0.1', 2, 5, '1990-01-01'),
 
 ('user01', '1234', '유저01', '010-1111-1111', 'user01@test.com',
  '127.0.0.1', 1, 1, '1993-01-01'),

@@ -13,10 +13,11 @@
 	<div layout:fragment="content">
 
 		<!-- 숨겨진 기본 정보 -->
-		<input type="hidden" name="buyer_idx" th:value="${session.loginUser.memIdx}"> 
-		<input type="hidden" name="bidder_idx" th:value="${bidderIdx}"> 
-		<input type="hidden" name="auction_idx" th:value="${auctionIdx}">
-		<input type="hidden" name="bid_idx" th:value="${bidIdx}">
+		<input type="hidden" name="buyer_idx"
+			th:value="${session.loginUser.memIdx}"> <input type="hidden"
+			name="bidder_idx" th:value="${selectedBidderIdx}"> <input
+			type="hidden" name="auction_idx" th:value="${selectedAuctionIdx}"> <input
+			type="hidden" name="bid_idx" th:value="${selectedBidIdx}">
 
 		<!-- 전체 래퍼 -->
 		<div class="space-y-6">
@@ -102,14 +103,14 @@
 
 			<!-- 아래: 실제 리뷰 작성 폼 카드 (초기에는 숨김) -->
 			<form id="reviewForm" action="/mypage/reviews/reviewWrite" method="post"
-				style="display: none;"
+				th:style="${selectedBidIdx != null ? 'display: block;' : 'display: none;'}"
 				class="border border-gray-200 bg-white rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.02)]">
 
 				<input type="hidden" name="buyer_idx"
 					th:value="${session.loginUser.memIdx}"> <input
-					type="hidden" name="bid_idx" id="bid_idx"> <input
-					type="hidden" name="auction_idx" id="auction_idx"> <input
-					type="hidden" name="bidder_idx" id="bidder_idx">
+					type="hidden" name="bid_idx" id="bid_idx" th:value="${selectedBidIdx}"> <input
+					type="hidden" name="auction_idx" id="auction_idx" th:value="${selectedAuctionIdx}"> <input
+					type="hidden" name="bidder_idx" id="bidder_idx" th:value="${selectedBidderIdx}">
 
 				<div class="px-6 py-5 border-b border-gray-100">
 					<h3 class="text-base sm:text-lg font-bold text-gray-900">리뷰 작성</h3>
@@ -191,6 +192,10 @@
           document.getElementById("reviewForm").style.display = "block";
           document.getElementById("reviewForm").scrollIntoView({ behavior: "smooth" });
         }
+
+				if (document.getElementById("bid_idx").value) {
+				  document.getElementById("reviewForm").style.display = "block";
+				}
 
         // 별점 부여 기능
         const stars = document.querySelectorAll("#stars span");

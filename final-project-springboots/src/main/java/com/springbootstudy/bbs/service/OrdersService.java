@@ -101,6 +101,7 @@ public class OrdersService {
 		OrdersVO updatedOrder = requireOrder(orderIdx);
 		notificationService.notifyOrderReceiptConfirmed(updatedOrder);
 		notificationService.notifyOrderCompleted(updatedOrder);
+		notificationService.notifyReviewWriteReminder(updatedOrder);
 	}
 
 	// 2-4. 거래 취소 시 상태 변화
@@ -168,22 +169,58 @@ public class OrdersService {
 	}
 
 	public OrdersListDTO getOrderDetailForMember(Long orderIdx, Long memIdx) {
-		return ordersMapper.findDetailByOrderIdxAndMember(orderIdx, memIdx);
+		OrdersListDTO order = ordersMapper.findDetailByOrderIdxAndMember(orderIdx, memIdx);
+		maskOrderParticipantIds(order);
+		return order;
 	}
 
 	// 3-1. 내가 구매한 거래내역 조회
 	public List<OrdersListDTO> getOrdersAsBuyer(Long buyerIdx) {
-		return ordersMapper.findAllByBuyerIdx(buyerIdx);
+		List<OrdersListDTO> orders = ordersMapper.findAllByBuyerIdx(buyerIdx);
+		maskOrderParticipantIds(orders);
+		return orders;
 	}
 
 	// 3-2. 내가 판매한 거래내역 조회
 	public List<OrdersListDTO> getOrdersAsSeller(Long sellerIdx) {
-		return ordersMapper.findAllBySellerIdx(sellerIdx);
+		List<OrdersListDTO> orders = ordersMapper.findAllBySellerIdx(sellerIdx);
+		maskOrderParticipantIds(orders);
+		return orders;
 	}
 
 	// 3-3. 내가 참여한 전체 거래내역 (구매 + 판매) 조회
 	public List<OrdersListDTO> getMyOrders(Long memIdx) {
-		return ordersMapper.findAllByMemberIdx(memIdx);
+		List<OrdersListDTO> orders = ordersMapper.findAllByMemberIdx(memIdx);
+		maskOrderParticipantIds(orders);
+		return orders;
+	}
+
+	private void maskOrderParticipantIds(List<OrdersListDTO> orders) {
+		if (orders == null) {
+			return;
+		}
+		for (OrdersListDTO order : orders) {
+			maskOrderParticipantIds(order);
+		}
+	}
+
+	private void maskOrderParticipantIds(OrdersListDTO order) {
+		if (order == null) {
+			return;
+		}
+		order.setBuyerMemIdMasked(maskMemId(order.getBuyerMemId()));
+		order.setSellerMemIdMasked(maskMemId(order.getSellerMemId()));
+	}
+
+	private String maskMemId(String memId) {
+		if (memId == null || memId.isBlank()) {
+			return "-";
+		}
+		if (memId.length() > 2) {
+			int len = memId.length();
+			return memId.substring(0, 2) + "*".repeat(Math.max(1, len - 3)) + memId.substring(len - 1);
+		}
+		return memId.substring(0, 1) + "*".repeat(Math.max(1, memId.length() - 1));
 	}
 
 	private OrdersVO requireOrder(Long orderIdx) {

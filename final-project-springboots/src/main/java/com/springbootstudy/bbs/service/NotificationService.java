@@ -121,6 +121,22 @@ public class NotificationService {
 		sendAndPush(notification);
 	}
 
+	// 경매 상태 변경 알림 - 구매자
+	public void notifyAuctionStatusChangedToOwner(AuctionDTO auction, String notificationType, String title, String message) {
+		if (auction == null || auction.getBuyerIdx() == null) {
+			return;
+		}
+
+		NotificationVO notification = new NotificationVO();
+		notification.setReceiverIdx(auction.getBuyerIdx());
+		notification.setAuctionIdx(auction.getAuctionIdx());
+		notification.setNotificationType(notificationType);
+		notification.setNotificationTitle(title);
+		notification.setNotificationMessage(message);
+		notification.setTargetUrl("/auctions/" + auction.getAuctionIdx());
+		sendAndPush(notification);
+	}
+
 	public void notifyAuctionDecisionClosedToOwner(AuctionDTO auction) {
 		if (auction == null || auction.getBuyerIdx() == null) {
 			return;
@@ -168,6 +184,41 @@ public class NotificationService {
 		sendAndPush(notification);
 	}
 
+	// 경매 상태 변경 알림 - 참여 입찰자들
+	public void notifyAuctionStatusChangedToBidders(AuctionDTO auction, String notificationType, String title, String message) {
+		notifyAuctionStatusChangedToBidders(auction, notificationType, title, message, null);
+	}
+
+	// 특정 입찰자 제외용 (낙찰자 제외 등)
+	public void notifyAuctionStatusChangedToBidders(AuctionDTO auction, String notificationType, String title, String message, Long excludeBidderIdx) {
+		if (auction == null || auction.getAuctionIdx() == null) {
+			return;
+		}
+
+		List<Long> bidderIdxList = bidMapper.findDistinctBidderIdxByAuction(auction.getAuctionIdx());
+		if (bidderIdxList == null || bidderIdxList.isEmpty()) {
+			return;
+		}
+
+		for (Long bidderIdx : bidderIdxList) {
+			if (bidderIdx == null) {
+				continue;
+			}
+			if (excludeBidderIdx != null && excludeBidderIdx.equals(bidderIdx)) {
+				continue;
+			}
+
+			NotificationVO notification = new NotificationVO();
+			notification.setReceiverIdx(bidderIdx);
+			notification.setAuctionIdx(auction.getAuctionIdx());
+			notification.setNotificationType(notificationType);
+			notification.setNotificationTitle(title);
+			notification.setNotificationMessage(message);
+			notification.setTargetUrl("/auctions/" + auction.getAuctionIdx());
+			sendAndPush(notification);
+		}
+	}
+
 	public void notifyNewReplyToBoardWriter(BoardVO board, ReplyVO reply) {
 		if (board == null || reply == null || board.getMemIdx() == null) {
 			return;
@@ -192,53 +243,74 @@ public class NotificationService {
 		if (order == null) {
 			return;
 		}
-		String message = buildTradeMessage(order, "결제가 완료되었습니다");
-		sendTradeNotificationToBoth(order, "TRADE_PAYMENT_COMPLETED", "결제 완료", message);
+		String message = buildTradeMessage(order, "결제가 완료되었습니다.");
+		sendTradeNotificationToBoth(order, "TRADE_PAYMENT_COMPLETED", "거래 결제 완료", message);
 	}
 
 	public void notifyOrderShipped(OrdersVO order) {
 		if (order == null) {
 			return;
 		}
-		String message = buildTradeMessage(order, "배송이 시작되었습니다");
-		sendTradeNotificationToBoth(order, "TRADE_SHIPPING_STARTED", "배송 시작", message);
+		String message = buildTradeMessage(order, "배송이 시작되었습니다.");
+		sendTradeNotificationToBoth(order, "TRADE_SHIPPING_STARTED", "거래 배송 시작", message);
 	}
 
 	public void notifyOrderReceiptConfirmed(OrdersVO order) {
 		if (order == null) {
 			return;
 		}
-		String message = buildTradeMessage(order, "수령 확인이 완료되었습니다");
-		sendTradeNotificationToBoth(order, "TRADE_RECEIPT_CONFIRMED", "수령 확인", message);
+		String message = buildTradeMessage(order, "구매확정이 완료되었습니다.");
+		sendTradeNotificationToBoth(order, "TRADE_RECEIPT_CONFIRMED", "거래 구매확정", message);
 	}
 
 	public void notifyOrderCompleted(OrdersVO order) {
 		if (order == null) {
 			return;
 		}
-		String message = buildTradeMessage(order, "거래가 완료되었습니다");
-		sendTradeNotificationToBoth(order, "TRADE_COMPLETED", "거래 완료", message);
+		String message = buildTradeMessage(order, "거래가 완료되었습니다.");
+		sendTradeNotificationToBoth(order, "TRADE_COMPLETED", "거래 완료 안내", message);
+	}
+
+	public void notifyReviewWriteReminder(OrdersVO order) {
+		if (order == null || order.getBuyerIdx() == null || order.getAuctionIdx() == null || order.getBidIdx() == null) {
+			return;
+		}
+
+		String itemName = resolveItemName(order);
+
+		NotificationVO notification = new NotificationVO();
+		notification.setReceiverIdx(order.getBuyerIdx());
+		notification.setSenderIdx(order.getSellerIdx());
+		notification.setAuctionIdx(order.getAuctionIdx());
+		notification.setBidIdx(order.getBidIdx());
+		notification.setNotificationType("REVIEW_WRITE_REMINDER");
+		notification.setNotificationTitle("리뷰 작성 안내");
+		notification.setNotificationMessage("'" + itemName + "' 거래의 구매가 확정되었습니다. 상품에 대해 리뷰를 남겨주세요.");
+		notification.setTargetUrl("/mypage/reviews/reviewWrite?auctionIdx=" + order.getAuctionIdx()
+				+ "&bidIdx=" + order.getBidIdx()
+				+ "&bidderIdx=" + order.getSellerIdx());
+		sendAndPush(notification);
 	}
 
 	public void notifyOrderCanceled(OrdersVO order) {
 		if (order == null) {
 			return;
 		}
-		String message = buildTradeMessage(order, "거래가 취소되었습니다");
-		sendTradeNotificationToBoth(order, "TRADE_CANCELED", "거래 취소", message);
+		String message = buildTradeMessage(order, "거래가 취소되었습니다.");
+		sendTradeNotificationToBoth(order, "TRADE_CANCELED", "거래 취소 안내", message);
 	}
 
 	public void notifyOrderCanceledBySellerWithRefund(OrdersVO order) {
 		if (order == null) {
 			return;
 		}
-		String message = buildTradeMessage(order, "판매자 사정으로 거래가 취소되었고 결제가 환불 처리됩니다");
+		String message = buildTradeMessage(order, "판매자 사정으로 거래가 취소되었고 결제가 환불 처리됩니다.");
 		sendTradeNotificationToBoth(order, "TRADE_CANCELED_BY_SELLER", "거래 취소 및 환불", message);
 	}
 
 	private String buildTradeMessage(OrdersVO order, String eventText) {
 		String itemName = resolveItemName(order);
-		return "주문 [" + order.getOrderIdx() + "] " + eventText + ". 낙찰 상품: " + itemName;
+		return "'" + itemName + "' 거래에서 " + eventText;
 	}
 
 	private String resolveItemName(OrdersVO order) {

@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.springbootstudy.bbs.domain.MemberProfileVO;
+import com.springbootstudy.bbs.dto.ProfilePageDTO;
 import com.springbootstudy.bbs.mapper.MemberProfileMapper;
 
 @Service
@@ -21,6 +22,11 @@ public class MemberProfileService {
     	System.out.println("memberProfileService.java 진입 완료(insert)"); 
     	
         return memberProfileMapper.selectProfileByMemIdx(memIdx); 
+    }
+
+    // 공개 프로필 조회
+    public ProfilePageDTO getProfilePage(Long memIdx) {
+        return memberProfileMapper.selectProfilePageByMemIdx(memIdx);
     }
  
     // 수정
