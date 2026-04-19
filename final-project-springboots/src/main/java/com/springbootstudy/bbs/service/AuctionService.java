@@ -86,7 +86,7 @@ public class AuctionService {
 	    if (dto.getAuctionStatusIdx() == 1 && dto.getAuctionEndAt() != null) {
 	        Duration d = Duration.between(now, dto.getAuctionEndAt());
 	        if (!d.isNegative()) {
-	            dto.setTimeDisplay("입찰 " + formatDuration(d));
+	            dto.setTimeDisplay(formatDuration(d));
 	        }
 	        // 음수면 timeDisplay 비워둠 (updateExpiredAuctions가 곧 처리)
 

@@ -21,7 +21,7 @@ function updateTimer() {
             const h = Math.floor((totalSeconds % 86400) / 3600);
             const m = Math.floor((totalSeconds % 3600) / 60);
             const s = totalSeconds % 60;
-            let str = '입찰 ';
+            let str = '';
             if (d >= 1) {
                 str += d + '일 ' + h + '시간';
             } else if (h >= 1) {
