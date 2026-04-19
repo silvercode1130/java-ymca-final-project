@@ -35,18 +35,21 @@
           let nickname = $(this).val().trim();
 
           if (nickname.length < 2 || nickname.length > 10) {
-            $('#nicknameMsg').text("닉네임 2~10자 이내로 작성해주세요");
+            setValidationMessage('#nicknameMsg', "닉네임은 2~10자 이내로 작성해주세요");
             isNicknameOk = false;
             validateAndCheck();
             return;
           }
 
           if (nickname === originalData.nickname) {
-            $('#nicknameMsg').text("사용 가능한 닉네임 입니다");
+            clearValidationMessage('#nicknameMsg');
             isNicknameOk = true;
             validateAndCheck();
             return;
           }
+
+          isNicknameOk = false;
+          validateAndCheck();
 
           $.ajax({
             url: '/members/checkNickname',
@@ -54,16 +57,16 @@
             data: { memNickname: nickname },
             success: function(res) {
               if (res > 0) {
-                $('#nicknameMsg').text("이미 사용중인 닉네임 입니다");
+                setValidationMessage('#nicknameMsg', "이미 사용중인 닉네임입니다");
                 isNicknameOk = false;
               } else {
-                $('#nicknameMsg').text("사용 가능한 닉네임 입니다");
+                clearValidationMessage('#nicknameMsg');
                 isNicknameOk = true;
               }
               validateAndCheck();
             },
             error: function() {
-              $('#nicknameMsg').text("확인 실패하였습니다 다시 시도해주세요");
+              setValidationMessage('#nicknameMsg', "닉네임 확인에 실패했습니다. 다시 시도해주세요");
               isNicknameOk = false;
               validateAndCheck();
             }
@@ -85,8 +88,10 @@
 
           // 닉네임 검증
           if (nickname.length < 2 || nickname.length > 10) {
-            $('#nicknameMsg').text("닉네임 2~10자 이내로 작성해주세요");
+            setValidationMessage('#nicknameMsg', "닉네임은 2~10자 이내로 작성해주세요");
             isValid = false;
+          } else if (nickname === originalData.nickname) {
+            clearValidationMessage('#nicknameMsg');
           }
 
           if (!isNicknameOk) {
@@ -95,10 +100,10 @@
 
           // 자기소개 검증
           if (intro.length === 0 || intro.length > 200) {
-            $('#introMsg').text("자기소개 1~200자 이내로 작성해주세요");
+            setValidationMessage('#introMsg', "자기소개는 1~200자 이내로 작성해주세요");
             isValid = false;
           } else {
-            $('#introMsg').text("");
+            clearValidationMessage('#introMsg');
           }
 
           // 이미지 변경 여부
@@ -135,6 +140,14 @@
           }
         }
 
+        function setValidationMessage(selector, message) {
+          $(selector).text(message).removeClass('hidden');
+        }
+
+        function clearValidationMessage(selector) {
+          $(selector).text('').addClass('hidden');
+        }
+
         validateAndCheck();
       });
     </script>
@@ -146,8 +159,8 @@
 				class="border border-gray-100 bg-white rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.02)]">
 				<!-- 헤더 -->
 				<div class="px-6 py-5 border-b border-gray-100">
-					<h2 class="text-lg sm:text-xl font-bold text-[#222222]">나의 프로필</h2>
-					<p class="mt-1 text-xs sm:text-sm text-[#767676]">프로필 이미지, 닉네임,
+          <h2 class="text-xl sm:text-2xl font-bold text-[#222222]">나의 프로필</h2>
+          <p class="mt-2 text-sm sm:text-base text-[#767676]">프로필 이미지, 닉네임,
 						자기소개를 수정하세요</p>
 				</div>
 
@@ -155,10 +168,10 @@
 				<div class="px-6 py-6 sm:py-7 space-y-6">
 
 					<!-- 프로필 이미지 -->
-					<div class="flex flex-col sm:flex-row items-start gap-6">
-						<div class="flex-shrink-0">
+          <div class="flex flex-col sm:flex-row items-center sm:items-start gap-6">
+            <div class="flex-shrink-0 w-full sm:w-auto flex justify-center sm:justify-start">
 							<div
-								class="w-24 h-24 sm:w-32 sm:h-32 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
+                class="w-[44vw] h-[44vw] min-w-[140px] min-h-[140px] max-w-[200px] max-h-[200px] sm:w-36 sm:h-36 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
 								<img id="preview"
 									th:src="${profile.memImg != null} ? @{'/images/profile/' + ${profile.memImg}} :
                            @{'/images/profile/profile_default.png'}"
@@ -168,13 +181,13 @@
 						</div>
 
 						<div class="flex-1">
-							<label class="text-sm font-medium text-gray-900">프로필 이미지</label>
-							<p class="text-xs text-gray-500 mb-3">JPG, PNG 파일 (최대 100MB)</p>
+              <label class="text-base sm:text-lg font-medium text-gray-900">프로필 이미지</label>
+              <p class="text-sm text-gray-500 mb-3">JPG, PNG 파일 (최대 100MB)</p>
 							<div class="flex flex-wrap gap-2">
 								<button type="button"
-									class="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md text-xs sm:text-sm text-gray-700 hover:bg-gray-50"
+                  class="inline-flex items-center px-4 py-2.5 border border-gray-300 rounded-md text-sm sm:text-base text-gray-700 hover:bg-gray-50"
 									onclick="document.getElementById('fileInput').click();">
-									<i class="bi bi-upload mr-1 text-[13px]"></i> 이미지 변경
+                  <i class="bi bi-upload mr-1 text-base"></i> 이미지 변경
 								</button>
 							</div>
 							<input type="file" name="memImgFile" id="fileInput"
@@ -184,29 +197,27 @@
 
 					<!-- 닉네임 -->
 					<div class="space-y-1.5">
-						<label for="memNickname" class="text-sm font-medium text-gray-900">닉네임</label>
+            <label for="memNickname" class="text-base sm:text-lg font-medium text-gray-900">닉네임</label>
 						<input name="memNickname" id="memNickname" type="text"
 							th:value="${profile.memNickname}" placeholder="ex) 픽큐"
-							class="w-full bg-white border border-gray-300 rounded-md px-3 h-10 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#7CBD00]">
-						<p class="text-[11px] text-gray-500">2~10자 이내로 입력해주세요</p>
-						<div id="nicknameMsg" class="text-[11px] text-red-500"></div>
+              class="w-full bg-white border border-gray-300 rounded-md px-4 h-12 text-base text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#7CBD00]">
+            <div id="nicknameMsg" class="hidden text-sm text-red-500"></div>
 					</div>
 
 					<!-- 자기소개 -->
 					<div class="space-y-1.5">
-						<label for="memIntro" class="text-sm font-medium text-gray-900">자기소개</label>
+            <label for="memIntro" class="text-base sm:text-lg font-medium text-gray-900">자기소개</label>
 						<textarea name="memIntro" id="memIntro" rows="4"
 							placeholder="픽큐 회원님들에게 나를 알려보세요! 👋"
 							th:utext="${profile.memIntro}"
-							class="w-full bg-white border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-900 resize-none focus:outline-none focus:ring-2 focus:ring-[#7CBD00]"></textarea>
-						<p class="text-[11px] text-gray-500">최대 200자까지 입력 가능합니다</p>
-						<div id="introMsg" class="text-[11px] text-red-500"></div>
+              class="w-full bg-white border border-gray-300 rounded-md px-4 py-3 text-base text-gray-900 resize-none focus:outline-none focus:ring-2 focus:ring-[#7CBD00]"></textarea>
+            <div id="introMsg" class="hidden text-sm text-red-500"></div>
 					</div>
 
 					<!-- 버튼 -->
 					<div>
 						<input type="submit" value="프로필 업데이트" disabled
-							class="inline-flex items-center px-4 py-2.5 bg-[#7CBD00] text-white rounded-lg text-sm font-semibold hover:bg-[#6BAD00] disabled:bg-gray-300 disabled:cursor-not-allowed">
+              class="inline-flex items-center px-5 py-3 bg-[#7CBD00] text-white rounded-lg text-base font-semibold hover:bg-[#6BAD00] disabled:bg-gray-300 disabled:cursor-not-allowed">
 					</div>
 
 				</div>
