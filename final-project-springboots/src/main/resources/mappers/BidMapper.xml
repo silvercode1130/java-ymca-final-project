@@ -28,6 +28,14 @@
 		    WHERE bid_idx = #{bidIdx}
 		      AND bidder_idx = #{bidderIdx}
 		      AND bid_status_idx = 1
+									AND auction_idx IN (
+												SELECT a.auction_idx
+												FROM auction a
+												WHERE a.auction_idx = bid.auction_idx
+													AND a.auction_status_idx = 1
+													AND a.auction_end_at > NOW()
+													AND a.auction_is_deleted = 'N'
+									)
 	</update>
 	
 	<!-- 입찰 삭제 - 관리자 (bidder_idx 조건 없음) -->
@@ -61,25 +69,30 @@
 	
 	<!-- 입찰 등록 -->
 	<insert id="insertBid" useGeneratedKeys="true" keyProperty="bidIdx" keyColumn="bid_idx">
-	    INSERT INTO bid (
-	        auction_idx,
-	        bidder_idx,
-	        item_idx,
-	        bid_price,
-	        bid_quantity,
-	        bid_message,
-	        bid_status_idx,
-	        bid_regdate
-	    ) VALUES (
-	        #{auctionIdx},
-	        #{bidderIdx},
-	        #{itemIdx},
-	        #{bidPrice},
-	        #{bidQuantity},
-	        #{bidMessage},
-	        1,
-	        NOW()
-	    )
+		INSERT INTO bid (
+			auction_idx,
+			bidder_idx,
+			item_idx,
+			bid_price,
+			bid_quantity,
+			bid_message,
+			bid_status_idx,
+			bid_regdate
+		)
+		SELECT
+			#{auctionIdx},
+			#{bidderIdx},
+			#{itemIdx},
+			#{bidPrice},
+			#{bidQuantity},
+			#{bidMessage},
+			1,
+			NOW()
+		FROM auction a
+		WHERE a.auction_idx = #{auctionIdx}
+		  AND a.auction_status_idx = 1
+		  AND a.auction_end_at > NOW()
+		  AND a.auction_is_deleted = 'N'
 	</insert>
 
 	<!-- 특정 경매에 입찰한 회원 목록 -->

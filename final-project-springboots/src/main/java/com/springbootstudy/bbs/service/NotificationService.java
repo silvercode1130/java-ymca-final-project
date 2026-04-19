@@ -51,6 +51,15 @@ public class NotificationService {
 				"/topic/notifications/" + notification.getReceiverIdx(),
 				notification
 		);
+
+		if (notification.getAuctionIdx() != null
+				&& notification.getNotificationType() != null
+				&& notification.getNotificationType().startsWith("AUCTION_")) {
+			simpMessagingTemplate.convertAndSend(
+					"/topic/auctions/" + notification.getAuctionIdx() + "/status",
+					notification
+			);
+		}
 	}
 
 	// 회원별 알림 전체 조회
