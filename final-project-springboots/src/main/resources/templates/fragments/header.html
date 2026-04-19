@@ -43,9 +43,9 @@
 							<!-- 알림 -->
 							<div id="notification-menu-wrap" class="relative">
 								<button type="button" id="notification-menu-trigger"
-									class="relative w-9 h-9 rounded-full hover:bg-gray-100 transition-colors flex items-center justify-center"
+									class="relative w-11 h-11 rounded-full hover:bg-gray-100 transition-colors flex items-center justify-center"
 									aria-label="알림">
-									<i data-feather="bell" class="w-4 h-4 text-[#222222]"></i> <span
+									<i data-feather="bell" class="w-5 h-5 text-[#222222]"></i> <span
 										id="notification-bell-dot" data-notification-bell-dot
 										class="hidden absolute top-1 right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white"></span>
 									<span id="notification-bell-badge" data-notification-bell-badge
@@ -69,16 +69,16 @@
 
 							<!-- 내 정보 -->
 							<a th:href="@{/mypage/boards}"
-								class="w-9 h-9 rounded-full hover:bg-gray-100 transition-colors flex items-center justify-center"
+								class="w-11 h-11 rounded-full hover:bg-gray-100 transition-colors flex items-center justify-center"
 								aria-label="내 계정"> <i data-feather="user"
-								class="w-4 h-4 text-[#222222]"></i>
+								class="w-5 h-5 text-[#222222]"></i>
 							</a>
 
 							<!-- 로그아웃 -->
 							<form th:action="@{/members/logout}" method="post" class="m-0">
 								<button type="submit"
-									class="inline-flex items-center px-3 py-1.5 rounded text-sm bg-[#222222] text-white font-semibold hover:bg-[#6BAD00] border-0 transition-colors">
-									<i data-feather="log-out" class="w-4 h-4 mr-1.5"></i> 로그아웃
+									class="inline-flex items-center px-4 py-2 rounded text-[18px] bg-[#222222] text-white font-semibold hover:bg-[#6BAD00] border-0 transition-colors">
+									<i data-feather="log-out" class="w-5 h-5 mr-2"></i> 로그아웃
 								</button>
 							</form>
 						</div>
@@ -88,9 +88,9 @@
 							th:if="${session.loginUser == null}">
 							<a href="javascript:void(0);"
 								onclick="location.href='/members/login?redirect=' + encodeURIComponent(location.pathname + location.search)"
-								class="px-3 py-1.5 rounded text-sm text-[#222222] hover:text-[#7CBD00] transition-colors">
+								class="px-4 py-2 rounded text-[18px] text-[#222222] hover:text-[#7CBD00] transition-colors">
 								로그인 </a> <a th:href="@{/members/register}"
-								class="px-3 py-1.5 rounded text-sm bg-[#7CBD00] text-white font-semibold hover:bg-[#6BAD00] transition-colors">
+								class="px-4 py-2 rounded text-[18px] bg-[#7CBD00] text-white font-semibold hover:bg-[#6BAD00] transition-colors">
 								회원가입 </a>
 						</div>
 
