@@ -24,6 +24,34 @@
 	    WHERE mem_idx = #{memIdx}
 	</select>
 
+    <!-- 공개 프로필 조회 (회원 + 프로필 + 등급 + 리뷰 집계) -->
+    <select id="selectProfilePageByMemIdx" resultType="com.springbootstudy.bbs.dto.ProfilePageDTO">
+        SELECT
+            m.mem_idx AS memIdx,
+            m.mem_id AS memId,
+            m.mem_name AS memName,
+            mp.mem_nickname AS memNickname,
+            mp.mem_intro AS memIntro,
+            mp.mem_img AS memImg,
+            g.grade_name AS gradeName,
+            IFNULL(rv.avg_rating, 0) AS avgRating,
+            IFNULL(rv.review_count, 0) AS reviewCount
+        FROM member m
+        LEFT JOIN member_profile mp ON m.mem_idx = mp.mem_idx
+        LEFT JOIN grade g ON m.mem_grade_idx = g.grade_idx
+        LEFT JOIN (
+            SELECT
+                bidder_idx,
+                AVG(review_star) AS avg_rating,
+                COUNT(*) AS review_count
+            FROM review
+            WHERE review_is_deleted = 'N'
+            GROUP BY bidder_idx
+        ) rv ON m.mem_idx = rv.bidder_idx
+        WHERE m.mem_idx = #{memIdx}
+          AND m.mem_is_deleted = 'N'
+    </select>
+
     <!-- 등록 -->
     <insert id="insertProfile">
         INSERT INTO member_profile (

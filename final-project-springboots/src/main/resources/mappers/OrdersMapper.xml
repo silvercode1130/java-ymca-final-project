@@ -93,7 +93,7 @@
             WHEN o.order_status = 'CREATED' THEN '결제대기'
             WHEN o.order_status = 'PAID' THEN '결제완료'
             WHEN o.order_status = 'SHIPPED' THEN '배송중'
-            WHEN o.order_status = 'CONFIRMED' THEN '거래완료'
+            WHEN o.order_status = 'CONFIRMED' THEN '구매확정'
             WHEN o.order_status = 'CANCELED' THEN '취소'
             ELSE o.order_status
         END AS orderStatusName,
@@ -105,8 +105,13 @@
         o.refund_at AS refundAt,
         a.auction_title AS auctionTitle,
         i.item_name AS itemName,
+        bm.mem_id AS buyerMemId,
+        sm.mem_id AS sellerMemId,
         COALESCE(bp.mem_nickname, bm.mem_id) AS buyerNickname,
         COALESCE(sp.mem_nickname, sm.mem_id) AS sellerNickname,
+        d.courier_company AS courierCompany,
+        d.tracking_number AS trackingNumber,
+        r.review_idx AS reviewIdx,
         COALESCE(p.pay_status, 'READY') AS paymentStatusCode,
         CASE
             WHEN COALESCE(p.pay_status, 'READY') = 'READY' THEN '결제대기'
@@ -144,6 +149,8 @@
             FROM delivery d2
             WHERE d2.bid_idx = o.bid_idx
         )
+        LEFT JOIN review r ON r.bid_idx = o.bid_idx
+            AND r.review_is_deleted = 'N'
     </sql>
 
     <select id="findAllByBuyerIdx" resultType="com.springbootstudy.bbs.dto.OrdersListDTO">

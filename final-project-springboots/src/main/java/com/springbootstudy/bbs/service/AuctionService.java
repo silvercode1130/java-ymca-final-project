@@ -55,6 +55,23 @@ public class AuctionService {
 	    // 입찰 있으면 결정대기(2), 없으면 유찰(4)
 	    int statusIdx = (detail.getBidCount() != null && detail.getBidCount() > 0) ? 2 : 4;
 	    auctionMapper.updateAuctionStatus(auctionIdx, statusIdx);
+
+	    if (statusIdx == 2) {
+	        notificationService.notifyAuctionBidClosedToOwner(detail);
+	        notificationService.notifyAuctionStatusChangedToBidders(
+	            detail,
+	            "AUCTION_BID_CLOSED",
+	            "입찰 마감 알림",
+	            "입찰이 마감되어 낙찰자 결정을 기다리게 되었습니다."
+	        );
+	    } else {
+	        notificationService.notifyAuctionStatusChangedToOwner(
+	            detail,
+	            "AUCTION_FAILED",
+	            "유찰 알림",
+	            "입찰이 마감되었지만 제안이 없어 유찰되었습니다."
+	        );
+	    }
 	}
 
 	// 상태 직접 변경 (유찰 처리 등)
@@ -62,14 +79,14 @@ public class AuctionService {
 	    auctionMapper.updateAuctionStatus(auctionIdx, statusIdx);
 	}
 	
-	// 경매 데이터 가공 (남은 시간 계산)
+	// 경매 데이터 가공 (남은 시간 계산 및 ID 마스킹)
 	private void refine(AuctionDTO dto) {
 	    LocalDateTime now = LocalDateTime.now();
 
 	    if (dto.getAuctionStatusIdx() == 1 && dto.getAuctionEndAt() != null) {
 	        Duration d = Duration.between(now, dto.getAuctionEndAt());
 	        if (!d.isNegative()) {
-	            dto.setTimeDisplay("입찰 " + formatDuration(d));
+	            dto.setTimeDisplay(formatDuration(d));
 	        }
 	        // 음수면 timeDisplay 비워둠 (updateExpiredAuctions가 곧 처리)
 
@@ -83,19 +100,39 @@ public class AuctionService {
 	    } else {
 	        dto.setTimeDisplay(""); // 마감/유찰/취소 등은 timeDisplay 없음
 	    }
+	    
+	    // 구매자 ID 마스킹
+	    maskBuyerMemId(dto);
+	}
+	
+	// 구매자 ID 마스킹 처리
+	private void maskBuyerMemId(AuctionDTO dto) {
+	    String buyerMemId = dto.getBuyerMemId();
+	    if (buyerMemId != null && buyerMemId.length() > 2) {
+	        // 첫 2글자 + * + 마지막 1글자 형태로 마스킹 (예: user123 → us***3)
+	        int len = buyerMemId.length();
+	        dto.setBuyerMemIdMasked(buyerMemId.substring(0, 2) + "*".repeat(Math.max(1, len - 3)) + buyerMemId.substring(len - 1));
+	    } else if (buyerMemId != null) {
+	        // 3글자 미만은 간단하게 처리
+	        dto.setBuyerMemIdMasked(buyerMemId.substring(0, 1) + "*".repeat(Math.max(1, buyerMemId.length() - 1)));
+	    }
 	}
 	
 	// 시간 포맷 편의 메서드(경매 데이터 가공 메서드)
 	private String formatDuration(Duration d) {
-		long days = d.toDays();
-	    long h = d.toHoursPart();
-	    long m = d.toMinutesPart();
-	    long s = d.toSecondsPart();
+		long totalSeconds = Math.max(0, d.getSeconds());
+	    long days = totalSeconds / 86400;
+	    long hours = (totalSeconds % 86400) / 3600;
+	    long minutes = (totalSeconds % 3600) / 60;
+	    long seconds = totalSeconds % 60;
 
-	    if (days > 0) {
-	        return String.format("%d일 %d시간 %d분", days, h, m);
+	    if (days >= 1) {
+	        return String.format("%d일 %d시간", days, hours);
 	    }
-	    return String.format("%02d:%02d:%02d", h, m, s);
+	    if (hours >= 1) {
+	        return String.format("%d시간 %d분", hours, minutes);
+	    }
+	    return String.format("%02d:%02d", minutes, seconds);
 	}
 	
 	// 경매 등록 (구매 요청)
@@ -147,6 +184,12 @@ public class AuctionService {
 	            AuctionDTO detail = auctionMapper.auctionDetail(dto.getAuctionIdx());
 	            if (detail != null) {
 	                notificationService.notifyAuctionBidClosedToOwner(detail);
+	                notificationService.notifyAuctionStatusChangedToBidders(
+	                    detail,
+	                    "AUCTION_BID_CLOSED",
+	                    "입찰 마감 알림",
+	                    "입찰이 마감되어 낙찰자 결정을 기다리게 되었습니다."
+	                );
 	            }
 	        }
 	    }
@@ -163,6 +206,12 @@ public class AuctionService {
 	        }
 
 	        notificationService.notifyAuctionDecisionClosedToOwner(detail);
+	        notificationService.notifyAuctionStatusChangedToBidders(
+	            detail,
+	            "AUCTION_DECISION_CLOSED",
+	            "결정 마감 알림",
+	            "낙찰자 선정 기한이 종료되어 유찰 처리되었습니다."
+	        );
 
 	        List<Long> bidderIdxList = bidMapper.findDistinctBidderIdxByAuction(dto.getAuctionIdx());
 	        for (Long bidderIdx : bidderIdxList) {
@@ -177,6 +226,7 @@ public class AuctionService {
 	// 경매 취소 - 소프트 딜리트
 	@Transactional
 	public void deleteAuction(Long auctionIdx, Long buyerIdx) {
+	    AuctionDTO detail = auctionMapper.auctionDetail(auctionIdx);
 	    int result = auctionMapper.softDeleteAuction(auctionIdx, buyerIdx);
 	    if (result == 0) {
 	        throw new IllegalArgumentException("삭제 권한이 없거나 존재하지 않는 경매입니다.");
@@ -184,14 +234,31 @@ public class AuctionService {
 	    
 	    // 해당 경매의 진행중 입찰 일괄 취소
 	    bidMapper.cancelBidsByAuction(auctionIdx);
+	    if (detail != null) {
+	        notificationService.notifyAuctionStatusChangedToBidders(
+	            detail,
+	            "AUCTION_CANCELED",
+	            "경매 취소 알림",
+	            "참여하신 경매가 구매자에 의해 취소되었습니다."
+	        );
+	    }
 	}
 	
 	// 관리자 경매 삭제
 	@Transactional
 	public void adminDeleteAuction(Long auctionIdx) {
+	    AuctionDTO detail = auctionMapper.auctionDetail(auctionIdx);
 	    int result = auctionMapper.adminDeleteAuction(auctionIdx);
 	    if (result == 0) {
 	        throw new IllegalArgumentException("존재하지 않는 경매입니다.");
+	    }
+	    if (detail != null) {
+	        notificationService.notifyAuctionStatusChangedToBidders(
+	            detail,
+	            "AUCTION_DELETED",
+	            "경매 삭제 알림",
+	            "참여하신 경매가 관리자에 의해 삭제되었습니다."
+	        );
 	    }
 	}
 	

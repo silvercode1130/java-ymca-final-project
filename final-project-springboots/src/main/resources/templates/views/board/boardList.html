@@ -13,6 +13,17 @@
 
 		<div class="min-h-screen bg-white">
 			<div class="mx-auto max-w-[1200px] px-4 sm:px-6 py-8">
+
+				<!-- 상단 헤더 -->
+				<header class="mb-4 py-3 px-3 sm:py-10">
+					<div
+						class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+						<div>
+							<h1 class="text-2xl sm:text-3xl font-bold text-[#222222] mb-1">커뮤니티</h1>
+							<p class="text-sm text-[#767676]">커뮤니티에서 다양한 주제로 소통해 보세요.</p>
+						</div>
+					</div>
+				</header>
 				<div class="flex flex-col gap-6 lg:flex-row lg:gap-8">
 
 					<!-- Left Sidebar -->
@@ -22,17 +33,15 @@
 							<!-- Mobile accordion header -->
 							<button id="sidebar-accordion-toggle"
 								class="lg:hidden w-full flex items-center justify-between px-4 py-3 border-b border-gray-100 text-sm font-semibold text-[#222222]"
-								aria-expanded="false"
-								aria-controls="sidebar-accordion-body"
+								aria-expanded="false" aria-controls="sidebar-accordion-body"
 								onclick="toggleSidebarAccordion()">
-								<span class="flex items-center gap-2">
-									<span>종목별 게시판</span>
-									<span id="sidebar-current-board"
-										class="text-xs font-normal text-[#767676]"
-										th:text="${currentType != null} ? '· ' + ${currentType.boardTypeName} : '· 전체 게시판'">
-									</span>
+								<span class="flex items-center gap-2"> <span>종목별
+										게시판</span> <span id="sidebar-current-board"
+									class="text-xs font-normal text-[#767676]"
+									th:text="${currentType != null} ? '· ' + ${currentType.boardTypeName} : '· 전체 게시판'">
 								</span>
-								<i class="bi bi-chevron-down text-[#767676] transition-transform duration-300"
+								</span> <i
+									class="bi bi-chevron-down text-[#767676] transition-transform duration-300"
 									id="sidebar-accordion-icon"></i>
 							</button>
 							<!-- Desktop header (hidden on mobile) -->
@@ -40,8 +49,7 @@
 								<h3 class="text-sm font-semibold text-[#222222]">종목별 게시판</h3>
 							</div>
 
-							<div id="sidebar-accordion-body"
-								role="region"
+							<div id="sidebar-accordion-body" role="region"
 								aria-labelledby="sidebar-accordion-toggle"
 								class="overflow-hidden transition-[max-height] duration-300 ease-in-out max-h-0 lg:max-h-none lg:overflow-visible">
 								<div class="px-2 py-2">
@@ -54,7 +62,7 @@
 										전체 게시판 </a>
 
 									<!-- 개별 게시판 -->
-									<div class="mt-1 space-y-1">
+									<div>
 										<a th:each="bt : ${boardTypes}"
 											th:href="@{/boards/{tc}(tc=${bt.boardTypeCode})}"
 											class="w-full inline-flex items-center rounded-lg px-4 py-3 text-sm font-semibold leading-5 transition-colors"
@@ -177,8 +185,7 @@
 							<!-- List Header -->
 							<div
 								class="grid grid-cols-12 gap-1 px-6 py-3 bg-gray-50 text-[11px] sm:text-xs font-semibold text-[#222222]">
-								<div class="col-span-2 text-center">종목</div>
-								<div class="col-span-5 text-center">제목</div>
+								<div class="col-span-7 text-center">제목</div>
 								<div class="col-span-2 text-center">작성자</div>
 								<div class="col-span-1 text-center">조회</div>
 								<div class="col-span-1 text-center">추천</div>
@@ -196,16 +203,8 @@
 								<div th:each="b, stat : ${boards}"
 									class="grid grid-cols-12 gap-1 px-6 py-3 text-[11px] sm:text-sm hover:bg-gray-50 transition-colors">
 
-									<!-- 종목 -->
-									<div class="col-span-2 flex items-center justify-center">
-										<a th:href="@{/boards/{tc}(tc=${b.boardTypeCode})}"
-											class="inline-flex items-center rounded-full bg-gray-100 px-2 py-1 text-[10px] sm:text-xs text-[#767676]">
-											<span th:text="${b.boardTypeName}">축구</span>
-										</a>
-									</div>
-
 									<!-- 제목 -->
-									<div class="col-span-5">
+									<div class="col-span-7">
 										<div class="flex items-center gap-2 overflow-hidden">
 											<a
 												th:href="${typeCode == null} 
@@ -249,7 +248,7 @@
 									<!-- 작성일 -->
 									<div
 										class="col-span-1 text-center text-[10px] sm:text-xs text-[#767676]"
-										th:text="${#temporals.format(b.boardRegdate, 'yyyy-MM-dd')}">
+										th:text="${#temporals.format(b.boardRegdate, 'MM-dd')}">
 										2026-03-24</div>
 								</div>
 							</div>
@@ -289,16 +288,20 @@
 		<script th:src="@{/js/board.js}"></script>
 		<script>
 			// 게시글 등록 성공 후 draft 삭제
-			if (typeof clearDraftOnSuccess === 'function') clearDraftOnSuccess();
+			if (typeof clearDraftOnSuccess === 'function')
+				clearDraftOnSuccess();
 		</script>
 		<script>
 			function toggleSidebarAccordion() {
-				var toggle = document.getElementById('sidebar-accordion-toggle');
+				var toggle = document
+						.getElementById('sidebar-accordion-toggle');
 				var body = document.getElementById('sidebar-accordion-body');
 				var icon = document.getElementById('sidebar-accordion-icon');
-				var currentBoard = document.getElementById('sidebar-current-board');
+				var currentBoard = document
+						.getElementById('sidebar-current-board');
 
-				if (!toggle || !body) return;
+				if (!toggle || !body)
+					return;
 
 				var isExpanded = toggle.getAttribute('aria-expanded') === 'true';
 
@@ -309,8 +312,10 @@
 						body.style.maxHeight = '0px';
 					});
 					toggle.setAttribute('aria-expanded', 'false');
-					if (icon) icon.style.transform = 'rotate(0deg)';
-					if (currentBoard) currentBoard.style.display = '';
+					if (icon)
+						icon.style.transform = 'rotate(0deg)';
+					if (currentBoard)
+						currentBoard.style.display = '';
 				} else {
 					// Expand: animate from 0 to scrollHeight, then set to none
 					body.style.maxHeight = body.scrollHeight + 'px';
@@ -319,14 +324,17 @@
 						body.removeEventListener('transitionend', handler);
 					});
 					toggle.setAttribute('aria-expanded', 'true');
-					if (icon) icon.style.transform = 'rotate(180deg)';
-					if (currentBoard) currentBoard.style.display = 'none';
+					if (icon)
+						icon.style.transform = 'rotate(180deg)';
+					if (currentBoard)
+						currentBoard.style.display = 'none';
 				}
 			}
 		</script>
 		<script>
-			document.addEventListener('DOMContentLoaded', function () {
-				var toggle = document.getElementById('sidebar-accordion-toggle');
+			document.addEventListener('DOMContentLoaded', function() {
+				var toggle = document
+						.getElementById('sidebar-accordion-toggle');
 				var body = document.getElementById('sidebar-accordion-body');
 				if (!toggle || !body) {
 					return;

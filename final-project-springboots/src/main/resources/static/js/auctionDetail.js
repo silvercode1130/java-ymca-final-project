@@ -115,8 +115,8 @@ function initDetailTimer() {
 
         let target = null;
         let prefix = '';
-        if (status === 1)      { target = endTime;  prefix = '입찰 마감까지 '; }
-        else if (status === 2) { target = deadline; prefix = '결정 마감까지 '; }
+        if (status === 1)      { target = endTime;  prefix = '입찰 '; }
+        else if (status === 2) { target = deadline; prefix = '결정 '; }
         else { timerEl.innerText = ''; return; }
 
         if (!target || isNaN(target.getTime())) { timerEl.innerText = ''; return; }
@@ -131,14 +131,20 @@ function initDetailTimer() {
             return;
         }
 
-        const d = Math.floor(diff / 86400000);
-        const h = Math.floor((diff / 3600000) % 24);
-        const m = Math.floor((diff / 60000)   % 60);
-        const s = Math.floor((diff / 1000)    % 60);
+        const totalSeconds = Math.floor(diff / 1000);
+        const d = Math.floor(totalSeconds / 86400);
+        const h = Math.floor((totalSeconds % 86400) / 3600);
+        const m = Math.floor((totalSeconds % 3600) / 60);
+        const s = totalSeconds % 60;
 
         let str = prefix;
-        if (d > 0) str += d + '일 ';
-        str += pad(h) + ':' + pad(m) + ':' + pad(s);
+        if (d >= 1) {
+            str += d + '일 ' + h + '시간';
+        } else if (h >= 1) {
+            str += h + '시간 ' + m + '분';
+        } else {
+            str += pad(m) + ':' + pad(s);
+        }
         if (timerEl.innerText !== str) timerEl.innerText = str;
     }
 
@@ -147,6 +153,86 @@ function initDetailTimer() {
 }
 
 window.addEventListener('load', initDetailTimer);
+
+/* ── 경매 상태 실시간 반영 (입찰폼 강제 이동 / 상세 즉시 반영) ── */
+function initAuctionStatusSocket() {
+    const root = document.getElementById('auction-page-root');
+    if (!root) return;
+
+    const auctionIdx = root.getAttribute('data-auction-idx');
+    const pageType = root.getAttribute('data-page-type') || '';
+    if (!auctionIdx || !window.SockJS || !window.Stomp) return;
+
+    const terminalTypes = new Set([
+        'AUCTION_BID_CLOSED',
+        'AUCTION_DECISION_CLOSED',
+        'AUCTION_CANCELED',
+        'AUCTION_DELETED',
+        'AUCTION_FAILED',
+        'AUCTION_WINNER_SELECTED'
+    ]);
+
+    const socket = new SockJS('/ws-notification');
+    const stompClient = Stomp.over(socket);
+    stompClient.debug = null;
+
+    stompClient.connect({}, function () {
+        stompClient.subscribe('/topic/auctions/' + auctionIdx + '/status', function (frame) {
+            let payload = {};
+            try {
+                payload = JSON.parse(frame.body || '{}');
+            } catch (e) {
+                payload = {};
+            }
+
+            const type = payload.notificationType || '';
+            if (!terminalTypes.has(type)) {
+                return;
+            }
+
+            if (pageType === 'bid-form') {
+                if (window._auctionBidFormLocked) return;
+                window._auctionBidFormLocked = true;
+
+                const modal = document.createElement('div');
+                modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.35);display:flex;align-items:center;justify-content:center;z-index:10000;';
+                modal.innerHTML = ''
+                    + '<div style="width:min(92vw,420px);background:#fff;border-radius:12px;padding:20px 18px;box-shadow:0 12px 28px rgba(0,0,0,.2);text-align:center;">'
+                    + '  <p style="margin:0;font-size:16px;font-weight:600;color:#222;line-height:1.5;">입찰할 수 없는 경매입니다. 경매 목록으로 이동합니다.</p>'
+                    + '</div>';
+                document.body.appendChild(modal);
+
+                setTimeout(function () {
+                    window.location.href = '/auctions';
+                }, 1200);
+                return;
+            }
+
+            root.setAttribute('data-auction-status', '3');
+            const shell = root.querySelector('.auction-state-shell');
+            const row = shell ? shell.querySelector('.row.g-4') : null;
+            if (shell) shell.classList.add('is-inactive');
+            if (row) row.classList.add('auction-terminal-locked');
+
+            document.querySelectorAll('form[action*="/bids"], form[action*="/close"], form[action*="/fail"], form[action*="/delete"], form[action*="/win"]').forEach(function (form) {
+                form.querySelectorAll('button[type="submit"]').forEach(function (btn) {
+                    btn.disabled = true;
+                    btn.classList.add('opacity-50');
+                    btn.classList.add('cursor-not-allowed');
+                });
+            });
+
+            if (!window._auctionDetailReloadScheduled) {
+                window._auctionDetailReloadScheduled = true;
+                setTimeout(function () {
+                    window.location.reload();
+                }, 800);
+            }
+        });
+    });
+}
+
+window.addEventListener('load', initAuctionStatusSocket);
 
 /* ── 낙찰 전 최종 확인 및 제출 (초간결 버전) ── */
 function confirmWin(e, form) {

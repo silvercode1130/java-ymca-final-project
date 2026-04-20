@@ -29,11 +29,15 @@ public class HomeController {
             model.addAttribute("loginUser", loginUser);
         }
 
-        // 메인에서 보여줄 경매 목록 (예: 전체 or 최신 N개)
-        auctionService.updateExpiredAuctions();   // 상태 자동 업데이트
-        List<AuctionDTO> auctionList = auctionService.AuctionList(null, null, null, null);
+        // 메인 섹션별 정렬 목록
+        auctionService.updateExpiredAuctions();
+        List<AuctionDTO> hotAuctions = auctionService.AuctionList(null, null, "views", "open");
+        List<AuctionDTO> deadlineAuctions = auctionService.AuctionList(null, null, "deadline", "open");
+        List<AuctionDTO> latestAuctions = auctionService.AuctionList(null, null, "latest", "open");
 
-        model.addAttribute("auctionList", auctionList);
+        model.addAttribute("hotAuctions", hotAuctions);
+        model.addAttribute("deadlineAuctions", deadlineAuctions);
+        model.addAttribute("latestAuctions", latestAuctions);
         model.addAttribute("keyword", null);
         model.addAttribute("selectedCategory", null);
 

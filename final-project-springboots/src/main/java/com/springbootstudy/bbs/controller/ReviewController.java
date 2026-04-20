@@ -10,7 +10,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.springbootstudy.bbs.domain.MemberVO;
 import com.springbootstudy.bbs.domain.NotificationVO;
+import com.springbootstudy.bbs.domain.AuctionDTO;
+import com.springbootstudy.bbs.domain.BidDTO;
 import com.springbootstudy.bbs.domain.ReviewVO;
+import com.springbootstudy.bbs.service.AuctionService;
+import com.springbootstudy.bbs.service.BidService;
 import com.springbootstudy.bbs.service.NotificationService;
 import com.springbootstudy.bbs.service.ReviewService;
 
@@ -23,6 +27,12 @@ public class ReviewController {
 
 	@Autowired
 	ReviewService reviewService;
+
+	@Autowired
+	private AuctionService auctionService;
+
+	@Autowired
+	private BidService bidService;
 	
 	@Autowired
 	private NotificationService notificationService;
@@ -57,7 +67,12 @@ public class ReviewController {
 
 	// 검색 전에도 기본 리스트가 table에 뜨도록 추가
 	@GetMapping("/mypage/reviews/reviewWrite")
-	public String reviewWrite(HttpSession session, Model model) {
+	public String reviewWrite(
+			@RequestParam(value = "auctionIdx", required = false) Long auctionIdx,
+			@RequestParam(value = "bidIdx", required = false) Long bidIdx,
+			@RequestParam(value = "bidderIdx", required = false) Long bidderIdx,
+			HttpSession session,
+			Model model) {
 
 		MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
 		if (loginUser == null) {
@@ -67,6 +82,9 @@ public class ReviewController {
 		// 로그인한 구매자 기준으로 리뷰 가능한 거래 목록 조회
 		List<ReviewVO> list = reviewService.getWritableReviewList(loginUser.getMemIdx());
 		model.addAttribute("reviewList", list);
+		model.addAttribute("selectedAuctionIdx", auctionIdx);
+		model.addAttribute("selectedBidIdx", bidIdx);
+		model.addAttribute("selectedBidderIdx", bidderIdx);
 
 		return "views/review/reviewWrite";
 	}
@@ -81,6 +99,9 @@ public class ReviewController {
 			Model model) {
 
 		MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
+		if (loginUser == null) {
+			return "redirect:/members/login";
+		}
 
 		if (keyword != null && !keyword.trim().isEmpty()) {
 			List<ReviewVO> list = reviewService.search(searchType, keyword, loginUser.getMemIdx());
@@ -105,18 +126,36 @@ public class ReviewController {
 			@RequestParam("reviewStar") int reviewStar,
 			@RequestParam("content") String content,
 			HttpSession session) {
+			MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
+			if (loginUser == null) {
+				return "redirect:/members/login";
+			}
+
+			AuctionDTO auction = auctionService.auctionDetail(auctionIdx);
+			BidDTO bid = bidService.findBidById(bidIdx);
+			if (auction == null || bid == null) {
+				return "redirect:/mypage/reviews/reviewWrite";
+			}
+			if (!auctionIdx.equals(bid.getAuctionIdx()) || !auction.getBuyerIdx().equals(loginUser.getMemIdx())) {
+				return "redirect:/mypage/reviews/reviewWrite";
+			}
+			if (bid.getBidStatusIdx() == null || bid.getBidStatusIdx() != 2) {
+				return "redirect:/mypage/reviews/reviewWrite";
+			}
+			if (bid.getBidderIdx() == null || !bid.getBidderIdx().equals(bidderIdx)) {
+				return "redirect:/mypage/reviews/reviewWrite";
+			}
+
 		ReviewVO reviewVO = new ReviewVO();
-		reviewVO.setBuyerIdx(buyerIdx);
+		reviewVO.setBuyerIdx(auction.getBuyerIdx());
 		reviewVO.setBidIdx(bidIdx);
 		reviewVO.setAuctionIdx(auctionIdx);
-		reviewVO.setBidderIdx(bidderIdx);
+		reviewVO.setBidderIdx(bid.getBidderIdx());
 		reviewVO.setReviewTitle(reviewTitle);
 		reviewVO.setReviewStar(reviewStar);
 		reviewVO.setContent(content);
 
 		reviewService.insertReview(reviewVO);
-		
-		MemberVO loginUser = (MemberVO) session.getAttribute("loginUser");
 		
 		if (loginUser != null) {
 		    NotificationVO reviewNoti = new NotificationVO();

@@ -67,31 +67,46 @@
     }
 
     function renderUnreadIndicator() {
-        var dot = byId('notification-bell-dot');
-        var badge = byId('notification-bell-badge');
+        var dots = Array.from(document.querySelectorAll('[data-notification-bell-dot]'));
+        var badges = Array.from(document.querySelectorAll('[data-notification-bell-badge]'));
 
-        if (!dot || !badge) {
+        if (dots.length === 0 || badges.length === 0) {
             return;
         }
 
         if (state.unreadCountKnown) {
             if (state.unreadCount > 0) {
-                badge.textContent = state.unreadCount > 99 ? '99+' : String(state.unreadCount);
-                badge.classList.remove('hidden');
-                dot.classList.add('hidden');
+                var badgeText = state.unreadCount > 99 ? '99+' : String(state.unreadCount);
+                badges.forEach(function (badge) {
+                    badge.textContent = badgeText;
+                    badge.classList.remove('hidden');
+                });
+                dots.forEach(function (dot) {
+                    dot.classList.add('hidden');
+                });
             } else {
-                badge.textContent = '0';
-                badge.classList.add('hidden');
-                dot.classList.add('hidden');
+                badges.forEach(function (badge) {
+                    badge.textContent = '0';
+                    badge.classList.add('hidden');
+                });
+                dots.forEach(function (dot) {
+                    dot.classList.add('hidden');
+                });
             }
             return;
         }
 
-        badge.classList.add('hidden');
+        badges.forEach(function (badge) {
+            badge.classList.add('hidden');
+        });
         if (state.hasUnread) {
-            dot.classList.remove('hidden');
+            dots.forEach(function (dot) {
+                dot.classList.remove('hidden');
+            });
         } else {
-            dot.classList.add('hidden');
+            dots.forEach(function (dot) {
+                dot.classList.add('hidden');
+            });
         }
     }
 
@@ -197,7 +212,7 @@
             + '      <div class="flex items-start justify-between gap-2 mb-2">'
             + '        <h3 data-notification-title class="' + getTitleClasses(isRead) + '">' + escapeHtml(notification.notificationTitle || '새 알림') + '</h3>'
             + '        <div class="flex items-center gap-2 flex-shrink-0 text-gray-400">'
-            + '          <button type="button" data-action="mark-read" data-notification-idx="' + escapeHtml(card.dataset.notificationIdx) + '" class="' + (isRead ? 'hidden' : 'hidden text-xs sm:inline-flex items-center hover:text-[#7CBD00]') + '">✔</button>'
+            + '          <button type="button" data-action="mark-read" data-notification-idx="' + escapeHtml(card.dataset.notificationIdx) + '" class="' + (isRead ? 'hidden' : 'inline-flex text-xs items-center hover:text-[#7CBD00]') + '">✔</button>'
             + '        </div>'
             + '      </div>'
             + '      <p class="text-[11px] font-semibold tracking-wide text-gray-400 mb-1">상세</p>'
@@ -287,6 +302,36 @@
             })
             .catch(function (error) {
                 console.error('[notification] read failed:', error);
+            });
+    }
+
+    function markReadByIdx(notificationIdx) {
+        if (!notificationIdx) {
+            return Promise.resolve();
+        }
+        return postForm('/notifications/read', { notificationIdx: notificationIdx })
+            .then(function (response) {
+                if (!response.ok) {
+                    throw new Error('HTTP ' + response.status);
+                }
+                return response.text();
+            })
+            .then(function (text) {
+                if (text !== 'OK') {
+                    return;
+                }
+
+                var card = getCardByIdx(notificationIdx);
+                applyCardState(card, true);
+                if (state.unreadCountKnown) {
+                    setKnownUnreadCount(state.unreadCount - 1);
+                } else {
+                    state.hasUnread = state.hasUnread && state.unreadCount !== 0;
+                    renderUnreadIndicator();
+                }
+            })
+            .catch(function () {
+                // 네비게이션 전 읽음 처리는 실패해도 이동은 허용
             });
     }
 
@@ -401,6 +446,44 @@
         if (readAllButton) {
             event.preventDefault();
             handleMarkAllRead();
+            return;
+        }
+
+        var targetLink = event.target.closest('[data-notification-card="true"] [data-notification-target] a');
+        if (targetLink) {
+            var card = targetLink.closest('[data-notification-card="true"]');
+            var idx = card ? card.dataset.notificationIdx : null;
+            var isRead = card ? card.dataset.isRead === 'Y' : true;
+            if (!idx || isRead) {
+                return;
+            }
+
+            event.preventDefault();
+            var href = targetLink.getAttribute('href');
+            markReadByIdx(idx).finally(function () {
+                if (href) {
+                    window.location.href = href;
+                }
+            });
+            return;
+        }
+
+        var cardWrap = event.target.closest('[data-notification-card="true"]');
+        if (cardWrap && !event.target.closest('button, a')) {
+            var targetUrl = cardWrap.dataset.targetUrl;
+            if (!targetUrl) {
+                return;
+            }
+            var cardIdx = cardWrap.dataset.notificationIdx;
+            var cardRead = cardWrap.dataset.isRead === 'Y';
+            event.preventDefault();
+            if (!cardIdx || cardRead) {
+                window.location.href = targetUrl;
+                return;
+            }
+            markReadByIdx(cardIdx).finally(function () {
+                window.location.href = targetUrl;
+            });
         }
     }
 

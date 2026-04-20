@@ -20,6 +20,36 @@ public class ChatRoomService {
 	@Autowired
     private final ChatRoomMapper chatRoomMapper;
 
+    public Long prepareChatroomForMembers(Long auctionIdx,
+                                          Long buyerIdx,
+                                          Long bidderIdx) {
+
+        if (auctionIdx == null || buyerIdx == null || bidderIdx == null) {
+            return null;
+        }
+
+        if (buyerIdx.equals(bidderIdx)) {
+            return null;
+        }
+
+        ChatRoomVO room = chatRoomMapper.findByAuctionAndMembers(
+                auctionIdx,
+                buyerIdx,
+                bidderIdx
+        );
+
+        if (room == null) {
+            ChatRoomVO newRoom = new ChatRoomVO();
+            newRoom.setAuctionIdx(auctionIdx);
+            newRoom.setBuyerIdx(buyerIdx);
+            newRoom.setBidderIdx(bidderIdx);
+            chatRoomMapper.insertChatRoom(newRoom);
+            return newRoom.getChatroomIdx();
+        }
+
+        return room.getChatroomIdx();
+    }
+
     public Long prepareChatroomForAuction(Long auctionIdx,
                                           MemberVO loginUser,
                                           AuctionDTO detail) {
@@ -38,23 +68,7 @@ public class ChatRoomService {
             return null;
         }
 
-        // 누구나 채팅 가능 (입찰 여부 체크 X)
-        ChatRoomVO room = chatRoomMapper.findByAuctionAndMembers(
-                auctionIdx,
-                buyerIdx,
-                loginMemIdx
-        );
-
-        if (room == null) {
-            ChatRoomVO newRoom = new ChatRoomVO();
-            newRoom.setAuctionIdx(auctionIdx);
-            newRoom.setBuyerIdx(buyerIdx);
-            newRoom.setBidderIdx(loginMemIdx);
-            chatRoomMapper.insertChatRoom(newRoom);
-            return newRoom.getChatroomIdx();
-        }
-
-        return room.getChatroomIdx();
+        return prepareChatroomForMembers(auctionIdx, buyerIdx, loginMemIdx);
     }
 
     public List<Map<String, Object>> getRoomSummariesByMember(Long memIdx) {
